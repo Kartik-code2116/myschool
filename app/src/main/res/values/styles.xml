@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Typography - Display -->
+    <style name="TextAppearance.Myschool.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <!-- Typography - Headline -->
+    <style name="TextAppearance.Myschool.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <!-- Typography - Title -->
+    <style name="TextAppearance.Myschool.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <!-- Typography - Body -->
+    <style name="TextAppearance.Myschool.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/on_surface_variant</item>
+    </style>
+
+    <!-- Typography - Label -->
+    <style name="TextAppearance.Myschool.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">@color/on_surface_variant</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textColor">@color/on_surface_variant</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="Widget.Myschool.Button" parent="Widget.Material3.Button">
+        <item name="android:textAppearance">@style/TextAppearance.Myschool.LabelLarge</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="elevation">2dp</item>
+    </style>
+
+    <style name="Widget.Myschool.Button.Secondary">
+        <item name="backgroundTint">@color/secondary</item>
+    </style>
+
+    <style name="Widget.Myschool.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAppearance">@style/TextAppearance.Myschool.LabelLarge</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="strokeWidth">2dp</item>
+    </style>
+
+    <style name="Widget.Myschool.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:textAppearance">@style/TextAppearance.Myschool.LabelLarge</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <!-- Card Styles -->
+    <style name="Widget.Myschool.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="contentPadding">16dp</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+    </style>
+
+    <style name="Widget.Myschool.CardView.Filled" parent="Widget.Material3.CardView.Filled">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="contentPadding">16dp</item>
+        <item name="cardBackgroundColor">@color/surface_variant</item>
+    </style>
+
+    <!-- Extended FAB Style -->
+    <style name="Widget.Myschool.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Primary">
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="iconSize">24dp</item>
+    </style>
+
+    <!-- Image View Style for Scanner -->
+    <style name="Widget.Myschool.ScannerImage" parent="">
+        <item name="cornerRadius">24dp</item>
+        <item name="strokeColor">@color/scanner_frame</item>
+        <item name="strokeWidth">4dp</item>
+    </style>
+
+    <!-- Progress Bar Style -->
+    <style name="Widget.Myschool.CircularProgress" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="indicatorColor">@color/primary</item>
+        <item name="trackColor">@color/primary_container</item>
+        <item name="indicatorSize">48dp</item>
+        <item name="trackThickness">4dp</item>
+    </style>
+
+    <!-- Chip Styles -->
+    <style name="Widget.Myschool.Chip" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">@color/primary_container</item>
+        <item name="android:textColor">@color/on_primary_container</item>
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+
+    <!-- Text Input Style -->
+    <style name="Widget.Myschool.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/primary</item>
+    </style>
+</resources>

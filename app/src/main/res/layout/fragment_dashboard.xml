@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp">
+
+        <!-- Stats Row -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginBottom="16dp">
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardSchools"
+                android:layout_width="0dp" android:layout_height="100dp"
+                android:layout_weight="1" android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/primary_container">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical" android:gravity="center" android:padding="12dp">
+                    <ImageView android:layout_width="28dp" android:layout_height="28dp"
+                        android:src="@drawable/ic_school" app:tint="@color/primary"/>
+                    <TextView android:id="@+id/tvSchoolCount"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="26sp" android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/primary"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/label_schools" android:textSize="11sp"
+                        android:textColor="@color/on_surface_variant"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardStudents"
+                android:layout_width="0dp" android:layout_height="100dp"
+                android:layout_weight="1" android:layout_marginStart="8dp"
+                app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/secondary_container">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical" android:gravity="center" android:padding="12dp">
+                    <ImageView android:layout_width="28dp" android:layout_height="28dp"
+                        android:src="@drawable/ic_students" app:tint="@color/secondary"/>
+                    <TextView android:id="@+id/tvStudentCount"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="26sp" android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/secondary"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/label_students" android:textSize="11sp"
+                        android:textColor="@color/on_surface_variant"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Quick Actions -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/label_quick_actions" android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginBottom="12dp">
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardAddSchool"
+                android:layout_width="0dp" android:layout_height="90dp"
+                android:layout_weight="1" android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/surface">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical" android:gravity="center" android:padding="8dp">
+                    <ImageView android:layout_width="32dp" android:layout_height="32dp"
+                        android:src="@drawable/ic_add_circle" app:tint="@color/primary"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" android:text="@string/action_add_school"
+                        android:textSize="12sp" android:textColor="@color/on_surface" android:gravity="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardAddStudent"
+                android:layout_width="0dp" android:layout_height="90dp"
+                android:layout_weight="1" android:layout_marginStart="4dp" android:layout_marginEnd="4dp"
+                app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/surface">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical" android:gravity="center" android:padding="8dp">
+                    <ImageView android:layout_width="32dp" android:layout_height="32dp"
+                        android:src="@drawable/ic_students" app:tint="@color/secondary"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" android:text="@string/action_add_student"
+                        android:textSize="12sp" android:textColor="@color/on_surface" android:gravity="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardEnterMarks"
+                android:layout_width="0dp" android:layout_height="90dp"
+                android:layout_weight="1" android:layout_marginStart="8dp"
+                app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/surface">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:orientation="vertical" android:gravity="center" android:padding="8dp">
+                    <ImageView android:layout_width="32dp" android:layout_height="32dp"
+                        android:src="@drawable/ic_edit" app:tint="@color/tertiary"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" android:text="@string/action_enter_marks"
+                        android:textSize="12sp" android:textColor="@color/on_surface" android:gravity="center"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Recent Schools -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/label_recent_schools" android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"
+            android:layout_marginBottom="10dp"/>
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvRecentSchools"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

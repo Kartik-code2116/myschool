@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_gradient_primary"
+        app:navigationIcon="@drawable/ic_close" app:navigationIconTint="@color/white"
+        app:title="@string/title_marksheet" app:titleTextColor="@color/white"
+        app:menu="@menu/menu_marksheet"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <!-- Printable card -->
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardMarksheet"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp" app:cardElevation="4dp" app:cardBackgroundColor="@color/white">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
+
+                    <!-- School Header -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+                        <ImageView android:id="@+id/ivPrintSchoolLogo"
+                            android:layout_width="56dp" android:layout_height="56dp"
+                            android:src="@drawable/ic_school" app:tint="@color/primary"
+                            android:layout_marginEnd="12dp"/>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:id="@+id/tvPrintSchoolName"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="School Name" android:textSize="16sp"
+                                android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"/>
+                            <TextView android:id="@+id/tvPrintSchoolAddress"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="School Address" android:textSize="11sp"
+                                android:textColor="@color/on_surface_variant"/>
+                            <TextView android:id="@+id/tvPrintBoard"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Board: CBSE" android:textSize="11sp"
+                                android:textColor="@color/on_surface_variant"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="2dp"
+                        android:background="@color/primary" android:layout_marginBottom="12dp"/>
+
+                    <!-- Exam Title -->
+                    <TextView android:id="@+id/tvPrintExamTitle"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="ANNUAL EXAMINATION REPORT CARD" android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"
+                        android:gravity="center" android:layout_marginBottom="12dp"/>
+
+                    <!-- Student Info Grid -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:layout_marginBottom="8dp">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginBottom="4dp">
+                                <TextView android:layout_width="80dp" android:layout_height="wrap_content"
+                                    android:text="@string/label_name" android:textSize="12sp"
+                                    android:textColor="@color/on_surface_variant"/>
+                                <TextView android:id="@+id/tvPrintStudentName"
+                                    android:layout_width="0dp" android:layout_height="wrap_content"
+                                    android:layout_weight="1" android:text="Student Name"
+                                    android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/on_surface"/>
+                            </LinearLayout>
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginBottom="4dp">
+                                <TextView android:layout_width="80dp" android:layout_height="wrap_content"
+                                    android:text="@string/label_roll_no" android:textSize="12sp"
+                                    android:textColor="@color/on_surface_variant"/>
+                                <TextView android:id="@+id/tvPrintRollNo"
+                                    android:layout_width="0dp" android:layout_height="wrap_content"
+                                    android:layout_weight="1" android:text="01"
+                                    android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/on_surface"/>
+                            </LinearLayout>
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginBottom="4dp">
+                                <TextView android:layout_width="80dp" android:layout_height="wrap_content"
+                                    android:text="@string/label_class" android:textSize="12sp"
+                                    android:textColor="@color/on_surface_variant"/>
+                                <TextView android:id="@+id/tvPrintClass"
+                                    android:layout_width="0dp" android:layout_height="wrap_content"
+                                    android:layout_weight="1" android:text="7 - A"
+                                    android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/on_surface"/>
+                            </LinearLayout>
+                        </LinearLayout>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="68dp" android:layout_height="80dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="0dp"
+                            app:strokeColor="@color/outline_variant" app:strokeWidth="1dp"
+                            app:cardBackgroundColor="@color/surface_variant">
+                            <ImageView android:id="@+id/ivPrintStudentPhoto"
+                                android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:src="@drawable/ic_person" android:padding="14dp"
+                                app:tint="@color/on_surface_variant" android:scaleType="centerCrop"/>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Marks Table -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="36dp"
+                        android:orientation="horizontal"
+                        android:background="@color/primary" android:gravity="center_vertical"
+                        android:paddingStart="10dp" android:paddingEnd="10dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="3" android:text="@string/col_subject"
+                            android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/white"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:text="@string/col_max"
+                            android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/white" android:gravity="center"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:text="@string/col_obtained"
+                            android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/white" android:gravity="center"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:text="@string/col_grade"
+                            android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/white" android:gravity="center"/>
+                    </LinearLayout>
+
+                    <!-- Marks rows (dynamic) -->
+                    <LinearLayout android:id="@+id/llPrintMarksRows"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
+
+                    <!-- Total / Result -->
+                    <View android:layout_width="match_parent" android:layout_height="1.5dp"
+                        android:background="@color/primary" android:layout_marginTop="4dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="44dp"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingStart="10dp" android:paddingEnd="10dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="3" android:text="@string/col_total"
+                            android:textSize="13sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/on_surface"/>
+                        <TextView android:id="@+id/tvPrintTotalMax"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:text="--"
+                            android:textSize="13sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/on_surface" android:gravity="center"/>
+                        <TextView android:id="@+id/tvPrintTotalObtained"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:text="--"
+                            android:textSize="13sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary" android:gravity="center"/>
+                        <TextView android:id="@+id/tvPrintGradeTotal"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:text="A"
+                            android:textSize="13sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary" android:gravity="center"/>
+                    </LinearLayout>
+
+                    <!-- Percentage + Result stamp -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical"
+                        android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingBottom="8dp">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="@string/label_percentage" android:textSize="11sp"
+                                android:textColor="@color/on_surface_variant"/>
+                            <TextView android:id="@+id/tvPrintPercentage"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="0.00%" android:textSize="20sp"
+                                android:fontFamily="sans-serif-medium" android:textColor="@color/primary"/>
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="@string/label_result" android:textSize="11sp"
+                                android:textColor="@color/on_surface_variant"/>
+                            <TextView android:id="@+id/tvPrintResult"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="PASS" android:textSize="18sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:paddingStart="16dp" android:paddingEnd="16dp"
+                                android:paddingTop="4dp" android:paddingBottom="4dp"
+                                android:background="@drawable/bg_result_pass" android:textColor="@color/success"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Signatures row -->
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:background="@color/outline_variant" android:layout_marginTop="12dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:paddingTop="12dp">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                            <View android:layout_width="80dp" android:layout_height="1dp"
+                                android:background="@color/on_surface"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp" android:text="@string/label_class_teacher"
+                                android:textSize="11sp" android:textColor="@color/on_surface_variant"/>
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                            <View android:layout_width="80dp" android:layout_height="1dp"
+                                android:background="@color/on_surface"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp" android:text="@string/label_principal"
+                                android:textSize="11sp" android:textColor="@color/on_surface_variant"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action buttons -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginTop="16dp">
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnPrintMarksheet"
+                    style="@style/Widget.Myschool.Button"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginEnd="8dp"
+                    android:text="@string/btn_print" app:backgroundTint="@color/primary"
+                    app:icon="@drawable/ic_reports" app:iconTint="@color/white"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnShareMarksheet"
+                    style="@style/Widget.Myschool.Button.Outlined"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="8dp"
+                    android:text="@string/btn_share" android:textColor="@color/primary"
+                    app:strokeColor="@color/primary" app:strokeWidth="1dp"
+                    app:icon="@drawable/ic_scan" app:iconTint="@color/primary"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

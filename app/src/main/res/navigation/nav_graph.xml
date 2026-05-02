@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_dashboard">
+    <fragment android:id="@+id/nav_dashboard" android:name="com.example.myschool.ui.DashboardFragment"
+        android:label="@string/nav_home"/>
+    <fragment android:id="@+id/nav_schools" android:name="com.example.myschool.ui.SchoolListFragment"
+        android:label="@string/nav_schools"/>
+    <fragment android:id="@+id/nav_students" android:name="com.example.myschool.ui.StudentListFragment"
+        android:label="@string/nav_students"/>
+    <fragment android:id="@+id/nav_reports" android:name="com.example.myschool.ui.ReportsFragment"
+        android:label="@string/nav_reports"/>
+</navigation>

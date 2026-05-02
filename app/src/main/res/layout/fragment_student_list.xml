@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Search + filter bar -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+            android:layout_marginTop="12dp" android:layout_marginBottom="4dp"
+            app:cardCornerRadius="28dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/surface">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="16dp" android:paddingEnd="8dp">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                    android:src="@drawable/ic_reports" app:tint="@color/on_surface_variant"
+                    android:layout_marginEnd="10dp"/>
+                <EditText android:id="@+id/etSearch"
+                    android:layout_width="0dp" android:layout_height="match_parent"
+                    android:layout_weight="1" android:background="@null"
+                    android:hint="@string/hint_search_student" android:textSize="14sp"
+                    android:inputType="textPersonName" android:singleLine="true"
+                    android:textColor="@color/on_surface" android:textColorHint="@color/on_surface_variant"/>
+                <ImageView android:id="@+id/btnClearSearch"
+                    android:layout_width="32dp" android:layout_height="32dp"
+                    android:src="@drawable/ic_close" android:padding="6dp"
+                    android:visibility="gone" app:tint="@color/on_surface_variant"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- School / Class filter chips -->
+        <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:scrollbars="none" android:layout_marginTop="8dp" android:layout_marginBottom="4dp">
+            <com.google.android.material.chip.ChipGroup android:id="@+id/chipGroupFilter"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:paddingStart="16dp" android:paddingEnd="16dp"
+                app:singleSelection="true" app:selectionRequired="true">
+                <com.google.android.material.chip.Chip android:id="@+id/chipAll"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/chip_all" android:checked="true"/>
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <!-- Empty state -->
+        <LinearLayout android:id="@+id/emptyState"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:orientation="vertical"
+            android:gravity="center" android:visibility="gone">
+            <ImageView android:layout_width="80dp" android:layout_height="80dp"
+                android:src="@drawable/ic_students" android:alpha="0.3"
+                app:tint="@color/on_surface_variant"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:text="@string/empty_no_students"
+                android:textSize="15sp" android:textColor="@color/on_surface_variant"/>
+        </LinearLayout>
+
+        <!-- Students RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvStudents"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:clipToPadding="false"
+            android:paddingStart="12dp" android:paddingEnd="12dp"
+            android:paddingTop="4dp" android:paddingBottom="80dp"/>
+    </LinearLayout>
+
+    <!-- FAB: Add Student -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabAddStudent"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp" android:layout_marginBottom="16dp"
+        android:text="@string/action_add_student"
+        app:icon="@drawable/ic_add_circle"
+        app:backgroundTint="@color/primary"
+        android:textColor="@color/white"
+        app:iconTint="@color/white"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

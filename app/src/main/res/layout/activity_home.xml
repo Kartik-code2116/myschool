@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background">
+    <com.google.android.material.appbar.AppBarLayout android:id="@+id/appBarLayout"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@drawable/bg_gradient_primary" app:elevation="0dp">
+        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:paddingStart="8dp" android:paddingEnd="8dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center_vertical" android:orientation="horizontal">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:id="@+id/tvGreeting"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/home_greeting" android:textColor="@color/white"
+                        android:textSize="13sp" android:alpha="0.85"/>
+                    <TextView android:id="@+id/tvTeacherName"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Teacher" android:textColor="@color/white"
+                        android:textSize="18sp" android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+                <ImageView android:id="@+id/ivProfilePic"
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:src="@drawable/ic_person" android:padding="8dp"
+                    android:background="@drawable/bg_circle_primary" app:tint="@color/white"/>
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+    <androidx.fragment.app.FragmentContainerView android:id="@+id/navHostFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_marginBottom="64dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:defaultNavHost="true" app:navGraph="@navigation/nav_graph"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView android:id="@+id/bottomNav"
+        android:layout_width="match_parent" android:layout_height="64dp"
+        android:layout_gravity="bottom" android:background="@color/surface"
+        app:elevation="8dp" app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

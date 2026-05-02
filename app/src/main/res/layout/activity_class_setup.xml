@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/bg_gradient_primary"
+            app:navigationIcon="@drawable/ic_close" app:navigationIconTint="@color/white"
+            app:title="@string/title_class_setup" app:titleTextColor="@color/white"/>
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_margin="16dp" app:cardCornerRadius="20dp"
+            app:cardElevation="4dp" app:cardBackgroundColor="@color/surface">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="20dp">
+
+                <!-- Class dropdown -->
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilClass"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="@string/label_class">
+                    <AutoCompleteTextView android:id="@+id/actvClass"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="none" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Division dropdown -->
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilDivision"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_division">
+                    <AutoCompleteTextView android:id="@+id/actvDivision"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="none" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Exam name -->
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilExamName"
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_exam_name"
+                    app:startIconDrawable="@drawable/ic_calendar" app:startIconTint="@color/primary">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etExamName"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Academic year -->
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilYear"
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_academic_year"
+                    app:startIconDrawable="@drawable/ic_calendar" app:startIconTint="@color/primary">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etYear"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="number" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Subject section header -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical"
+                    android:layout_marginTop="20dp" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="@string/label_subjects"
+                        android:textSize="15sp" android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/on_surface"/>
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnAddSubject"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/btn_add_subject" android:textColor="@color/primary"
+                        app:icon="@drawable/ic_add_circle" app:iconTint="@color/primary"/>
+                </LinearLayout>
+
+                <!-- Subject list (dynamic rows added here) -->
+                <LinearLayout android:id="@+id/llSubjectsContainer"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveClass"
+                    style="@style/Widget.Myschool.Button"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp" android:text="@string/btn_save_class"
+                    app:backgroundTint="@color/primary"/>
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/classProgress" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:indeterminate="true" android:visibility="gone"
+                    app:indicatorColor="@color/primary" app:trackColor="@color/primary_container"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

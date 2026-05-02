@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/bg_gradient_primary"
+            app:navigationIcon="@drawable/ic_close" app:navigationIconTint="@color/white"
+            app:title="@string/title_add_student" app:titleTextColor="@color/white"/>
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_margin="16dp" app:cardCornerRadius="20dp"
+            app:cardElevation="4dp" app:cardBackgroundColor="@color/surface">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="20dp">
+
+                <!-- Student Photo -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center" android:orientation="vertical" android:layout_marginBottom="16dp">
+                    <com.google.android.material.card.MaterialCardView android:id="@+id/cardStudentPhoto"
+                        android:layout_width="88dp" android:layout_height="88dp"
+                        app:cardCornerRadius="44dp" app:cardElevation="2dp"
+                        app:cardBackgroundColor="@color/surface_variant">
+                        <ImageView android:id="@+id/ivStudentPhoto"
+                            android:layout_width="match_parent" android:layout_height="match_parent"
+                            android:src="@drawable/ic_person" android:padding="20dp"
+                            app:tint="@color/on_surface_variant"/>
+                    </com.google.android.material.card.MaterialCardView>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" android:text="@string/label_tap_to_add_photo"
+                        android:textSize="12sp" android:textColor="@color/primary"/>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilStudentName"
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="@string/label_student_name"
+                    app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etStudentName"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilRollNo"
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_roll_no"
+                    app:startIconDrawable="@drawable/ic_reports" app:startIconTint="@color/primary">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRollNo"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="textCapCharacters" android:imeOptions="actionNext" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilDob"
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_dob"
+                    app:startIconDrawable="@drawable/ic_calendar" app:startIconTint="@color/primary"
+                    app:endIconDrawable="@drawable/ic_calendar" app:endIconMode="custom">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDob"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:focusable="false" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Gender radio group -->
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:text="@string/label_gender"
+                    android:textSize="13sp" android:textColor="@color/on_surface_variant"/>
+                <RadioGroup android:id="@+id/rgGender"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginTop="6dp">
+                    <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rbMale"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/gender_male" android:layout_marginEnd="24dp"/>
+                    <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rbFemale"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/gender_female"/>
+                </RadioGroup>
+
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilParentName"
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_parent_name"
+                    app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etParentName"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- School dropdown -->
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilSelectSchool"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_select_school">
+                    <AutoCompleteTextView android:id="@+id/actvSelectSchool"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="none" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Class dropdown -->
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilSelectClass"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_select_class">
+                    <AutoCompleteTextView android:id="@+id/actvSelectClass"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="none" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveStudent"
+                    style="@style/Widget.Myschool.Button"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp" android:text="@string/btn_save_student"
+                    app:backgroundTint="@color/primary"/>
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/studentProgress" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:indeterminate="true" android:visibility="gone"
+                    app:indicatorColor="@color/primary" app:trackColor="@color/primary_container"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

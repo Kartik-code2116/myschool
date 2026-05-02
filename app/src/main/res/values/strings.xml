@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MySchool</string>
+    <string name="app_tagline">Smart Result Management</string>
+    <!-- Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_schools">Schools</string>
+    <string name="nav_students">Students</string>
+    <string name="nav_reports">Reports</string>
+    <!-- Login -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to your teacher account</string>
+    <string name="btn_login">Sign In</string>
+    <string name="btn_forgot_password">Forgot Password?</string>
+    <string name="btn_google">Continue with Google</string>
+    <string name="link_no_account">Don\'t have an account? Register</string>
+    <!-- Register -->
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Register as a teacher</string>
+    <string name="btn_register">Create Account</string>
+    <string name="link_have_account">Already have an account? Sign In</string>
+    <!-- Labels -->
+    <string name="label_email">Email Address</string>
+    <string name="label_password">Password</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="label_full_name">Full Name</string>
+    <string name="label_phone">Phone Number</string>
+    <string name="label_school_name">School Name</string>
+    <string name="label_udise_code">UDISE Code</string>
+    <string name="label_board">Board (CBSE / State / ICSE)</string>
+    <string name="label_address">School Address</string>
+    <string name="label_principal_name">Principal Name</string>
+    <string name="label_tap_to_add_logo">Tap to add logo</string>
+    <string name="label_tap_to_add_photo">Tap to add photo</string>
+
+    <string name="label_division">Division</string>
+    <string name="label_exam_name">Exam Name (e.g. Annual Exam 2025)</string>
+    <string name="label_academic_year">Academic Year (e.g. 2025)</string>
+    <string name="label_subjects">Subjects</string>
+    <string name="label_subject_name">Subject Name</string>
+    <string name="label_max_marks">Max</string>
+    <string name="label_student_name">Student Full Name</string>
+    <string name="label_roll_no">Roll Number</string>
+    <string name="label_dob">Date of Birth</string>
+    <string name="label_gender">Gender</string>
+    <string name="label_parent_name">Parent / Guardian Name</string>
+    <string name="label_select_school">Select School</string>
+    <string name="label_select_class">Select Class</string>
+    <string name="label_name">Name :</string>
+    <string name="label_class">Class :</string>
+    <string name="label_percentage">Percentage</string>
+    <string name="label_result">Result</string>
+    <string name="label_class_teacher">Class Teacher</string>
+    <string name="label_principal">Principal</string>
+    <string name="label_ocr_detected">OCR Detected Image</string>
+    <string name="label_schools">Schools</string>
+    <string name="label_students">Students</string>
+    <string name="label_quick_actions">Quick Actions</string>
+    <string name="label_recent_schools">Your Schools</string>
+    <!-- Titles -->
+    <string name="title_register_school">Register School</string>
+    <string name="title_class_setup">Class &amp; Subjects Setup</string>
+    <string name="title_add_student">Add Student</string>
+    <string name="title_enter_marks">Enter Marks</string>
+    <string name="title_marksheet">Report Card</string>
+    <!-- Buttons -->
+    <string name="btn_save_school">Save School</string>
+    <string name="btn_save_class">Save Class &amp; Subjects</string>
+    <string name="btn_add_subject">Add Subject</string>
+    <string name="btn_save_student">Save Student</string>
+    <string name="btn_save_marks">Save Marks</string>
+    <string name="btn_scan">Scan</string>
+    <string name="btn_print">Print</string>
+    <string name="btn_share">Share PDF</string>
+    <!-- Table columns -->
+    <string name="col_subject">Subject</string>
+    <string name="col_max">Max</string>
+    <string name="col_obtained">Marks</string>
+    <string name="col_grade">Grade</string>
+    <string name="col_total">Total</string>
+    <!-- Chips / status -->
+    <string name="chip_all">All</string>
+    <string name="chip_pending">Pending</string>
+    <string name="chip_done">Done</string>
+    <!-- Gender -->
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <!-- Home -->
+    <string name="home_greeting">Good day,</string>
+    <string name="action_add_school">Add\nSchool</string>
+    <string name="action_add_student">Add\nStudent</string>
+    <string name="action_enter_marks">Enter\nMarks</string>
+    <!-- Search -->
+    <string name="hint_search_student">Search by name or roll no…</string>
+    <!-- Empty state -->
+    <string name="empty_no_students">No students added yet</string>
+    <!-- OCR / MainActivity -->
+    <string name="error_no_numbers">No numbers detected in image</string>
+    <string name="success_saved">Record saved successfully</string>
+    <string name="pdf_generated">PDF generated successfully</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="personal_info">Personal Information</string>
+    <string name="change_password">Change Password</string>
+    <string name="logout">Logout</string>
+    <string name="save_changes">Save Changes</string>
+</resources>
