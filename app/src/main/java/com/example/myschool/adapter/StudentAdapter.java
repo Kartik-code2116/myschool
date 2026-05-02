@@ -54,15 +54,11 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         Student s = items.get(pos);
         h.tvName.setText(s.name);
 
-        // Roll and Class combined
-        String classDisplay = "N/A";
-        if (s.classId != null && s.classId.length() > 0) {
-            classDisplay = s.classId.substring(0, Math.min(8, s.classId.length()));
-        }
-        h.tvRollClass.setText("Roll: " + s.rollNo + " | " + classDisplay);
-
-        // School name placeholder (Student model doesn't have school name, could be passed via callback if needed)
-        h.tvSchool.setText(s.schoolId != null ? s.schoolId : "");
+        // Bug #5 fix: display denormalized class name and school name instead of raw IDs
+        String classDisplay = (s.className != null && !s.className.isEmpty())
+                ? s.className : "Class N/A";
+        h.tvRollClass.setText("Roll: " + (s.rollNo != null ? s.rollNo : "—") + " | " + classDisplay);
+        h.tvSchool.setText(s.schoolName != null && !s.schoolName.isEmpty() ? s.schoolName : "");
 
         // Status chip
         if (s.marksEntered) {
@@ -82,13 +78,20 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             h.ivPhoto.setImageResource(R.drawable.ic_person);
         }
 
-        // Click listeners - use item click for entering marks, long click for marksheet
+        // Bug #4 fix: route tap based on marksEntered status so onEnterMarksClick is actually reachable.
+        // Tap: if marks not entered → enter marks; if done → view marksheet.
+        // Long press: edit student details.
         h.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onClick(s, pos);
+            if (listener == null) return;
+            if (s.marksEntered) {
+                listener.onViewMarksheetClick(s, pos);
+            } else {
+                listener.onEnterMarksClick(s, pos);
+            }
         });
 
         h.itemView.setOnLongClickListener(v -> {
-            if (listener != null) listener.onViewMarksheetClick(s, pos);
+            if (listener != null) listener.onClick(s, pos);
             return true;
         });
     }

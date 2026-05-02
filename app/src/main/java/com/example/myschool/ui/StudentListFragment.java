@@ -64,7 +64,7 @@ public class StudentListFragment extends Fragment {
         studentAdapter.setListener(new StudentAdapter.OnStudentClick() {
             @Override
             public void onClick(Student student, int position) {
-                // Open student detail/edit
+                // Long-press → edit student
                 AppCache.selectedStudent = student;
                 Intent intent = new Intent(requireContext(), StudentRegisterActivity.class);
                 intent.putExtra("edit", true);
@@ -73,9 +73,10 @@ public class StudentListFragment extends Fragment {
 
             @Override
             public void onEnterMarksClick(Student student, int position) {
+                // Bug #4 fix: this is now reachable (called on tap when marks are pending)
                 AppCache.selectedStudent = student;
-                // Find the class model for this student
                 loadClassForStudent(student, () -> {
+                    if (AppCache.selectedClass == null) return;
                     Intent intent = new Intent(requireContext(), EnterMarksActivity.class);
                     startActivity(intent);
                 });
@@ -83,6 +84,7 @@ public class StudentListFragment extends Fragment {
 
             @Override
             public void onViewMarksheetClick(Student student, int position) {
+                // Called on tap when marks are done
                 AppCache.selectedStudent = student;
                 loadMarksForStudent(student);
             }
@@ -113,7 +115,6 @@ public class StudentListFragment extends Fragment {
     }
 
     private void setupFilterChips() {
-        // Default "All" chip is already in layout
         b.chipAll.setOnClickListener(v -> {
             selectedSchool = null;
             selectedClass = null;
@@ -220,7 +221,10 @@ public class StudentListFragment extends Fragment {
         b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
+    // Bug #7 fix: always clear AppCache.selectedClass before searching to prevent
+    // stale data from a previous student leaking into the next navigation action.
     private void loadClassForStudent(Student student, Runnable onComplete) {
+        AppCache.selectedClass = null;  // clear before search
         FirebaseRepository.get().getClassesForSchool(student.schoolId, new FirebaseRepository.OnResult<List<ClassModel>>() {
             @Override
             public void onSuccess(List<ClassModel> list) {
@@ -252,12 +256,10 @@ public class StudentListFragment extends Fragment {
                         public void onSuccess(MarksRecord m) {
                             if (m != null) {
                                 AppCache.selectedMarks = m;
-                                Intent intent = new Intent(requireContext(), MarksheetActivity.class);
-                                startActivity(intent);
+                                startActivity(new Intent(requireContext(), MarksheetActivity.class));
                             } else {
                                 // No marks yet, go to enter marks
-                                Intent intent = new Intent(requireContext(), EnterMarksActivity.class);
-                                startActivity(intent);
+                                startActivity(new Intent(requireContext(), EnterMarksActivity.class));
                             }
                         }
                         @Override

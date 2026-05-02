@@ -76,7 +76,6 @@ public class StudentRegisterActivity extends AppCompatActivity {
                 schools.addAll(list);
 
                 if (schools.isEmpty()) {
-                    // No schools - show message and disable class dropdown
                     b.tilSelectSchool.setHint("No schools available");
                     b.actvSelectSchool.setEnabled(false);
                     b.tilSelectClass.setEnabled(false);
@@ -85,7 +84,6 @@ public class StudentRegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Enable dropdowns
                 b.actvSelectSchool.setEnabled(true);
                 b.tilSelectSchool.setHint(getString(R.string.label_select_school));
 
@@ -199,6 +197,12 @@ public class StudentRegisterActivity extends AppCompatActivity {
         s.gender     = gender;
         s.schoolId   = selectedSchool.id;
         s.classId    = selectedClass.id;
+
+        // Bug #2 fix: set denormalized fields so adapter can display them
+        // and teacherId so getAllStudentsForTeacher query works
+        s.teacherId  = FirebaseRepository.get().currentUid();
+        s.schoolName = selectedSchool.name != null ? selectedSchool.name : "";
+        s.className  = selectedClass.getDisplayName();
 
         showLoading(true);
         FirebaseRepository.get().saveStudent(s, new FirebaseRepository.OnResult<String>() {

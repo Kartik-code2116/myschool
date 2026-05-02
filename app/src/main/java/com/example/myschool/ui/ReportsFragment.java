@@ -10,8 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.myschool.AppCache;
-import com.example.myschool.R;
 import com.example.myschool.databinding.FragmentStudentListBinding;
 import com.example.myschool.model.ClassModel;
 import com.example.myschool.model.MarksRecord;
@@ -23,6 +21,7 @@ import com.example.myschool.utils.PdfGenerator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Reports Fragment - Class-wide reports and analytics
@@ -54,13 +53,11 @@ public class ReportsFragment extends Fragment {
     }
 
     private void setupUI() {
-        // Hide search and FAB
         b.etSearch.setVisibility(View.GONE);
         b.btnClearSearch.setVisibility(View.GONE);
         b.chipGroupFilter.setVisibility(View.VISIBLE);
         b.fabAddStudent.setVisibility(View.GONE);
 
-        // Show class selection in chip group
         b.chipAll.setText("Select Class to View Report");
         b.chipAll.setOnClickListener(v -> showClassSelector());
     }
@@ -105,17 +102,14 @@ public class ReportsFragment extends Fragment {
     }
 
     private void addClassChips(List<ClassModel> classList) {
-        // Remove old class chips but keep the "Select Class" chip
         int count = b.chipGroupFilter.getChildCount();
         for (int i = count - 1; i > 0; i--) {
             View child = b.chipGroupFilter.getChildAt(i);
-            if (child != null) {
-                b.chipGroupFilter.removeView(child);
-            }
+            if (child != null) b.chipGroupFilter.removeView(child);
         }
-
         for (ClassModel c : classList) {
-            com.google.android.material.chip.Chip chip = new com.google.android.material.chip.Chip(requireContext());
+            com.google.android.material.chip.Chip chip =
+                    new com.google.android.material.chip.Chip(requireContext());
             chip.setText(c.getDisplayName());
             chip.setCheckable(true);
             chip.setClickable(true);
@@ -132,12 +126,8 @@ public class ReportsFragment extends Fragment {
             Toast.makeText(requireContext(), "No classes available. Create a class first.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         String[] classNames = new String[classes.size()];
-        for (int i = 0; i < classes.size(); i++) {
-            classNames[i] = classes.get(i).getDisplayName();
-        }
-
+        for (int i = 0; i < classes.size(); i++) classNames[i] = classes.get(i).getDisplayName();
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Select Class")
                 .setItems(classNames, (dialog, which) -> {
@@ -149,58 +139,39 @@ public class ReportsFragment extends Fragment {
 
     private void loadReportForClass(String classId) {
         b.emptyState.setVisibility(View.GONE);
-
-        // Load students for this class
         FirebaseRepository.get().getStudentsForClass(classId, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> list) {
                 students.clear();
                 students.addAll(list);
-
-                // Load marks for these students
                 FirebaseRepository.get().getMarksForClass(classId, new FirebaseRepository.OnResult<List<MarksRecord>>() {
                     @Override
                     public void onSuccess(List<MarksRecord> marksList) {
                         marksRecords.clear();
                         marksRecords.addAll(marksList);
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> displayReport());
-                        }
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> displayReport());
                     }
                     @Override
                     public void onError(Exception e) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> displayReport());
-                        }
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> displayReport());
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        b.emptyState.setVisibility(View.VISIBLE);
-                    });
+                    getActivity().runOnUiThread(() -> b.emptyState.setVisibility(View.VISIBLE));
                 }
             }
         });
     }
 
     private void displayReport() {
-        // Create a simple report view
-        // For now, show a summary in the empty state
         int totalStudents = students.size();
-        int marksEntered = 0;
-        int passCount = 0;
-        int failCount = 0;
-
+        int marksEntered = marksRecords.size();
+        int passCount = 0, failCount = 0;
         for (MarksRecord m : marksRecords) {
-            marksEntered++;
-            if ("PASS".equals(m.result)) {
-                passCount++;
-            } else {
-                failCount++;
-            }
+            if ("PASS".equals(m.result)) passCount++; else failCount++;
         }
 
         if (totalStudents == 0) {
@@ -208,25 +179,20 @@ public class ReportsFragment extends Fragment {
             return;
         }
 
-        // Build report summary
         StringBuilder report = new StringBuilder();
         report.append("Class: ").append(selectedClass != null ? selectedClass.getDisplayName() : "N/A").append("\n");
         report.append("Exam: ").append(selectedClass != null ? selectedClass.examName : "N/A").append("\n\n");
         report.append("Total Students: ").append(totalStudents).append("\n");
         report.append("Marks Entered: ").append(marksEntered).append("\n");
         report.append("Pending: ").append(totalStudents - marksEntered).append("\n\n");
-        report.append("Results:\n");
-        report.append("Pass: ").append(passCount).append("\n");
-        report.append("Fail: ").append(failCount).append("\n");
-        report.append("Not Entered: ").append(totalStudents - marksEntered).append("\n");
+        report.append("Results:\nPass: ").append(passCount)
+              .append("\nFail: ").append(failCount)
+              .append("\nNot Entered: ").append(totalStudents - marksEntered);
 
-        // Show report in a dialog for now
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Class Report")
                 .setMessage(report.toString())
-                .setPositiveButton("Generate All PDFs", (dialog, which) -> {
-                    generateAllPdfs();
-                })
+                .setPositiveButton("Generate All PDFs", (dialog, which) -> generateAllPdfs())
                 .setNegativeButton("Close", null)
                 .show();
     }
@@ -236,48 +202,58 @@ public class ReportsFragment extends Fragment {
             Toast.makeText(requireContext(), "Select school and class first", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (marksRecords.isEmpty()) {
+            Toast.makeText(requireContext(), "No marks records to generate PDFs for", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Toast.makeText(requireContext(), "Generating PDFs...", Toast.LENGTH_SHORT).show();
 
-        int[] generated = {0};
-        int[] failed = {0};
+        // Bug #10 fix: use AtomicInteger to avoid race condition when multiple PDF
+        // generation threads call back concurrently and increment the counters.
+        final int total = marksRecords.size();
+        final AtomicInteger generated = new AtomicInteger(0);
+        final AtomicInteger failed    = new AtomicInteger(0);
 
         for (MarksRecord marks : marksRecords) {
-            // Find the student for this marks record
-            Student student = null;
+            Student matchedStudent = null;
             for (Student s : students) {
-                if (s.id.equals(marks.studentId)) {
-                    student = s;
-                    break;
+                if (s.id.equals(marks.studentId)) { matchedStudent = s; break; }
+            }
+            if (matchedStudent == null) {
+                // No student record found — count as failed and check completion
+                if (failed.incrementAndGet() + generated.get() == total) {
+                    showGenerationResult(generated.get(), failed.get());
                 }
+                continue;
             }
 
-            if (student != null) {
-                Student finalStudent = student;
-                PdfGenerator.generate(requireContext(), selectedSchool, selectedClass, student, marks,
-                        new PdfGenerator.PdfCallback() {
-                            @Override
-                            public void onSuccess(File pdfFile) {
-                                generated[0]++;
-                                checkGenerationComplete(generated[0], failed[0], marksRecords.size());
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                failed[0]++;
-                                checkGenerationComplete(generated[0], failed[0], marksRecords.size());
-                            }
-                        });
-            }
+            final Student finalStudent = matchedStudent;
+            PdfGenerator.generate(requireContext(), selectedSchool, selectedClass, finalStudent, marks,
+                    new PdfGenerator.PdfCallback() {
+                        @Override
+                        public void onSuccess(File pdfFile) {
+                            int g = generated.incrementAndGet();
+                            int f = failed.get();
+                            if (g + f == total) showGenerationResult(g, f);
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            int f = failed.incrementAndGet();
+                            int g = generated.get();
+                            if (g + f == total) showGenerationResult(g, f);
+                        }
+                    });
         }
     }
 
-    private void checkGenerationComplete(int generated, int failed, int total) {
-        if (getActivity() != null && generated + failed == total) {
-            getActivity().runOnUiThread(() -> {
-                Toast.makeText(requireContext(),
-                        "Generated: " + generated + " PDFs, Failed: " + failed,
-                        Toast.LENGTH_LONG).show();
-            });
+    private void showGenerationResult(int generated, int failed) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() ->
+                    Toast.makeText(requireContext(),
+                            "Generated: " + generated + " PDFs" +
+                            (failed > 0 ? ", Failed: " + failed : ""),
+                            Toast.LENGTH_LONG).show());
         }
     }
 
@@ -290,8 +266,6 @@ public class ReportsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (selectedClass != null) {
-            loadReportForClass(selectedClass.id);
-        }
+        if (selectedClass != null) loadReportForClass(selectedClass.id);
     }
 }

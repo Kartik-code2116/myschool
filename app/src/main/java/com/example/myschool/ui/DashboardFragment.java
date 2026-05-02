@@ -50,14 +50,38 @@ public class DashboardFragment extends Fragment {
 
     private void setupSchoolRecycler() {
         schoolAdapter = new SchoolAdapter();
+        // Bug #8 fix: show options dialog instead of jumping straight to ClassSetupActivity,
+        // consistent with SchoolListFragment behaviour.
         schoolAdapter.setListener(school -> {
             AppCache.selectedSchool = school;
-            // Navigate to school detail or class setup
-            Intent intent = new Intent(requireContext(), ClassSetupActivity.class);
-            startActivity(intent);
+            showSchoolOptions(school);
         });
         b.rvRecentSchools.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.rvRecentSchools.setAdapter(schoolAdapter);
+    }
+
+    private void showSchoolOptions(School school) {
+        String[] options = {"Add Class", "Add Student", "Edit School"};
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(school.name)
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Add Class
+                            AppCache.selectedClass = null;
+                            startActivity(new Intent(requireContext(), ClassSetupActivity.class));
+                            break;
+                        case 1: // Add Student
+                            AppCache.selectedStudent = null;
+                            startActivity(new Intent(requireContext(), StudentRegisterActivity.class));
+                            break;
+                        case 2: // Edit School
+                            Intent intent = new Intent(requireContext(), SchoolRegisterActivity.class);
+                            intent.putExtra("school_id", school.id);
+                            startActivity(intent);
+                            break;
+                    }
+                })
+                .show();
     }
 
     private void setupClickListeners() {
@@ -72,42 +96,32 @@ public class DashboardFragment extends Fragment {
         });
 
         b.cardEnterMarks.setOnClickListener(v -> {
-            // Navigate to student list to select a student for marks entry
-            if (getActivity() instanceof com.example.myschool.HomeActivity) {
-                ((com.example.myschool.HomeActivity) getActivity()).setToolbarTitle(getString(R.string.nav_students));
-            }
-            // Navigate to students tab using bottom nav
-            if (b.getRoot().getParent() instanceof View) {
-                View bottomNav = requireActivity().findViewById(R.id.bottomNav);
-                if (bottomNav instanceof com.google.android.material.bottomnavigation.BottomNavigationView) {
-                    ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav).setSelectedItemId(R.id.nav_students);
-                }
+            // Navigate to students tab via bottom nav
+            View bottomNav = requireActivity().findViewById(R.id.bottomNav);
+            if (bottomNav instanceof com.google.android.material.bottomnavigation.BottomNavigationView) {
+                ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav)
+                        .setSelectedItemId(R.id.nav_students);
             }
         });
 
         b.cardSchools.setOnClickListener(v -> {
-            if (getActivity() instanceof com.example.myschool.HomeActivity) {
-                ((com.example.myschool.HomeActivity) getActivity()).setToolbarTitle(getString(R.string.nav_schools));
-            }
             View bottomNav = requireActivity().findViewById(R.id.bottomNav);
             if (bottomNav instanceof com.google.android.material.bottomnavigation.BottomNavigationView) {
-                ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav).setSelectedItemId(R.id.nav_schools);
+                ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav)
+                        .setSelectedItemId(R.id.nav_schools);
             }
         });
 
         b.cardStudents.setOnClickListener(v -> {
-            if (getActivity() instanceof com.example.myschool.HomeActivity) {
-                ((com.example.myschool.HomeActivity) getActivity()).setToolbarTitle(getString(R.string.nav_students));
-            }
             View bottomNav = requireActivity().findViewById(R.id.bottomNav);
             if (bottomNav instanceof com.google.android.material.bottomnavigation.BottomNavigationView) {
-                ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav).setSelectedItemId(R.id.nav_students);
+                ((com.google.android.material.bottomnavigation.BottomNavigationView) bottomNav)
+                        .setSelectedItemId(R.id.nav_students);
             }
         });
     }
 
     private void loadStats() {
-        // Load school count
         FirebaseRepository.get().getSchools(new FirebaseRepository.OnResult<List<School>>() {
             @Override
             public void onSuccess(List<School> list) {
@@ -118,7 +132,6 @@ public class DashboardFragment extends Fragment {
             public void onError(Exception e) {}
         });
 
-        // Load student count
         FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> list) {
@@ -135,9 +148,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onSuccess(List<School> list) {
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        schoolAdapter.setData(list);
-                    });
+                    getActivity().runOnUiThread(() -> schoolAdapter.setData(list));
                 }
             }
             @Override
@@ -166,7 +177,6 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh data when coming back
         loadStats();
         loadSchools();
     }

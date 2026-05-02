@@ -3,7 +3,6 @@ package com.example.myschool;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.print.PrintManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -72,8 +71,9 @@ public class MarksheetActivity extends AppCompatActivity {
             b.tvPrintSchoolAddress.setText(school.address != null ? school.address : "");
             b.tvPrintBoard.setText("Board: " + (school.board != null ? school.board : ""));
         }
-        b.tvPrintExamTitle.setText(classModel.examName.toUpperCase(Locale.getDefault())
-                + " — REPORT CARD");
+        // Guard against null examName
+        String examName = classModel.examName != null ? classModel.examName : "";
+        b.tvPrintExamTitle.setText(examName.toUpperCase(Locale.getDefault()) + " — REPORT CARD");
 
         // Student info
         b.tvPrintStudentName.setText(student.name);
@@ -125,8 +125,7 @@ public class MarksheetActivity extends AppCompatActivity {
         PdfGenerator.generate(this, school, classModel, student, marks, new PdfGenerator.PdfCallback() {
             @Override public void onSuccess(File f) {
                 runOnUiThread(() -> {
-                    PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
-                    // Open PDF via FileProvider for printing
+                    // Bug #9 fix: removed unused PrintManager variable
                     Uri uri = FileProvider.getUriForFile(MarksheetActivity.this,
                             getPackageName() + ".fileprovider", f);
                     Intent view = new Intent(Intent.ACTION_VIEW);

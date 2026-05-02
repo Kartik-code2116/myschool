@@ -8,7 +8,6 @@ import com.example.myschool.model.Teacher;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +15,7 @@ import java.util.List;
 
 public class FirebaseRepository {
 
-    private static FirebaseRepository instance;
+    private static volatile FirebaseRepository instance;
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
 
@@ -31,8 +30,13 @@ public class FirebaseRepository {
         auth = FirebaseAuth.getInstance();
     }
 
+    // Bug #6 fix: thread-safe singleton with double-checked locking
     public static FirebaseRepository get() {
-        if (instance == null) instance = new FirebaseRepository();
+        if (instance == null) {
+            synchronized (FirebaseRepository.class) {
+                if (instance == null) instance = new FirebaseRepository();
+            }
+        }
         return instance;
     }
 
@@ -92,7 +96,6 @@ public class FirebaseRepository {
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<School> schools = snap != null ? snap.toObjects(School.class) : new ArrayList<>();
-                    // Sort by name in memory to avoid composite index
                     Collections.sort(schools, (a, b) -> {
                         if (a.name == null) return -1;
                         if (b.name == null) return 1;
@@ -124,7 +127,6 @@ public class FirebaseRepository {
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<ClassModel> classes = snap != null ? snap.toObjects(ClassModel.class) : new ArrayList<>();
-                    // Sort by className in memory to avoid composite index
                     Collections.sort(classes, (a, b) -> {
                         String nameA = a.className != null ? a.className : "";
                         String nameB = b.className != null ? b.className : "";
@@ -146,6 +148,8 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    // Bug #3 fix: removed .orderBy("rollNo") to avoid requiring a composite Firestore index.
+    // Sorting is now done in memory, consistent with other methods.
     public void getStudentsForClass(String classId, OnResult<List<Student>> cb) {
         if (classId == null) {
             cb.onError(new IllegalArgumentException("Class ID cannot be null"));
@@ -153,9 +157,18 @@ public class FirebaseRepository {
         }
         db.collection(COL_STUDENTS)
                 .whereEqualTo("classId", classId)
-                .orderBy("rollNo", Query.Direction.ASCENDING)
                 .get()
-                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : null))
+                .addOnSuccessListener(snap -> {
+                    // Bug #6 fix: return empty list instead of null
+                    List<Student> students = snap != null ? snap.toObjects(Student.class) : new ArrayList<>();
+                    // In-memory sort by rollNo (avoids composite index requirement)
+                    Collections.sort(students, (a, b) -> {
+                        String ra = a.rollNo != null ? a.rollNo : "";
+                        String rb = b.rollNo != null ? b.rollNo : "";
+                        return ra.compareTo(rb);
+                    });
+                    cb.onSuccess(students);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
@@ -167,7 +180,8 @@ public class FirebaseRepository {
         db.collection(COL_STUDENTS)
                 .whereEqualTo("schoolId", schoolId)
                 .get()
-                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : null))
+                // Bug #6 fix: return empty list instead of null
+                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : new ArrayList<>()))
                 .addOnFailureListener(cb::onError);
     }
 
@@ -180,7 +194,8 @@ public class FirebaseRepository {
         db.collection(COL_STUDENTS)
                 .whereEqualTo("teacherId", uid)
                 .get()
-                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : null))
+                // Bug #6 fix: return empty list instead of null
+                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : new ArrayList<>()))
                 .addOnFailureListener(cb::onError);
     }
 
@@ -213,7 +228,7 @@ public class FirebaseRepository {
                 .limit(1)
                 .get()
                 .addOnSuccessListener(snap -> {
-                    if (snap != null && !snap.isEmpty() && snap.getDocuments().size() > 0) {
+                    if (snap != null && !snap.isEmpty()) {
                         cb.onSuccess(snap.getDocuments().get(0).toObject(MarksRecord.class));
                     } else {
                         cb.onSuccess(null);
@@ -230,7 +245,8 @@ public class FirebaseRepository {
         db.collection(COL_MARKS)
                 .whereEqualTo("classId", classId)
                 .get()
-                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(MarksRecord.class) : null))
+                // Bug #6 fix: return empty list instead of null
+                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(MarksRecord.class) : new ArrayList<>()))
                 .addOnFailureListener(cb::onError);
     }
 
