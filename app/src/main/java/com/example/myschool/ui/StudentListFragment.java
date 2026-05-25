@@ -28,6 +28,7 @@ import com.example.myschool.model.MarksRecord;
 import com.example.myschool.model.School;
 import com.example.myschool.model.Student;
 import com.example.myschool.repository.FirebaseRepository;
+import com.example.myschool.utils.UiAnimations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,7 @@ public class StudentListFragment extends Fragment {
         setupSearch();
         b.chipGroupFilter.setVisibility(View.GONE);
         setupFab();
+        UiAnimations.staggerFadeIn(b.etSearch, b.rvStudents, b.fabAddStudent);
 
         applySessionFilterIfAny();
     }
@@ -113,6 +115,7 @@ public class StudentListFragment extends Fragment {
         });
         b.rvStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.rvStudents.setAdapter(studentAdapter);
+        UiAnimations.setupRecyclerAnimations(b.rvStudents);
     }
 
     private void setupSearch() {

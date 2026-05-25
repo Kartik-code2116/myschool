@@ -2,11 +2,10 @@ package com.example.myschool;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.myschool.databinding.ActivityStudentProfileBinding;
 import com.example.myschool.model.ClassModel;
@@ -14,6 +13,8 @@ import com.example.myschool.model.MarksRecord;
 import com.example.myschool.model.Student;
 import com.example.myschool.repository.FirebaseRepository;
 import com.example.myschool.utils.DetailRowHelper;
+import com.example.myschool.utils.UiAnimations;
+import com.google.android.material.chip.Chip;
 
 public class StudentProfileActivity extends AppCompatActivity {
 
@@ -26,19 +27,34 @@ public class StudentProfileActivity extends AppCompatActivity {
         b = ActivityStudentProfileBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
+        setSupportActionBar(b.toolbar);
+        b.toolbar.setNavigationOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.slide_out_right);
+        });
+
         student = AppCache.selectedStudent;
         if (student == null || student.id == null) {
-            Toast.makeText(this, "Student not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.student_not_found, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        b.btnBack.setOnClickListener(v -> finish());
-        b.btnEditStudent.setOnClickListener(v ->
-                startActivity(new Intent(this, StudentEditActivity.class)));
-        b.btnEnterMarks.setOnClickListener(v -> openMarks());
-        b.btnViewReport.setOnClickListener(v -> openReport());
+        b.btnEditStudent.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnEditStudent);
+            startActivity(new Intent(this, StudentEditActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+        });
+        b.btnEnterMarks.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnEnterMarks);
+            openMarks();
+        });
+        b.btnViewReport.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnViewReport);
+            openReport();
+        });
 
+        UiAnimations.staggerFadeIn(b.cardHeader, b.cardBasic, b.cardFamily, b.cardBank, b.cardAcademic);
         loadStudent();
     }
 
@@ -57,52 +73,78 @@ public class StudentProfileActivity extends AppCompatActivity {
     }
 
     private void bindUi(Student s) {
-        String std = s.standard != null ? s.standard : extractStandard(s);
-        String div = s.division != null ? s.division : "-";
-        String subtitle = getString(R.string.standard_division_format, std, div);
+        String name = val(s.name);
+        b.toolbar.setTitle(name);
+        b.tvStudentName.setText(name);
 
-        b.tvToolbarName.setText(s.name != null ? s.name : "");
-        b.tvToolbarStandard.setText(subtitle);
-        b.tvStudentNameLarge.setText(s.name != null ? s.name : "");
-        b.tvRegBadge.setText(getString(R.string.reg_format,
-                s.registrationNo != null ? s.registrationNo : (s.rollNo != null ? s.rollNo : "—")));
-        b.tvDobBadge.setText(s.dob != null ? s.dob : "—");
+        String std = val(s.standard);
+        if ("—".equals(std) && s.className != null) {
+            std = extractStandardFromClassName(s.className);
+        }
+        String div = val(s.division);
+        b.tvClassLine.setText(getString(R.string.standard_division_format, std, div));
 
-        b.tvRoll1.setText(val(s.rollNo));
-        b.tvRoll2.setText(val(s.rollNo2));
-        b.tvGenderVal.setText(val(s.gender));
-        b.tvCastVal.setText(val(s.cast));
+        bindMarksChip(s);
 
-        b.llFamilyDetails.removeAllViews();
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_mother_name), s.motherName);
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_mother_occupation), s.motherOccupation);
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_mother_phone), s.motherPhone);
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_father_name), s.fatherName);
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_father_occupation), s.fatherOccupation);
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_father_phone), s.fatherPhone);
-        DetailRowHelper.addRow(this, b.llFamilyDetails, getString(R.string.label_home_address), s.address);
+        DetailRowHelper.fillRows(this, b.llBasicDetails, new String[][]{
+                {getString(R.string.label_roll_no_1), s.rollNo},
+                {getString(R.string.label_roll_no_2), s.rollNo2},
+                {getString(R.string.label_reg_no), s.registrationNo},
+                {getString(R.string.label_dob), s.dob},
+                {getString(R.string.label_gender), s.gender},
+                {getString(R.string.label_cast), s.cast},
+                {getString(R.string.label_standard), s.standard},
+                {getString(R.string.label_division), s.division},
+                {getString(R.string.label_school_name), s.schoolName},
+                {getString(R.string.label_class_short), s.className},
+        });
 
-        b.llBankDetails.removeAllViews();
-        DetailRowHelper.addRow(this, b.llBankDetails, getString(R.string.label_account_no), s.bankAccount);
-        DetailRowHelper.addRow(this, b.llBankDetails, getString(R.string.label_branch), s.bankBranch);
-        DetailRowHelper.addRow(this, b.llBankDetails, getString(R.string.label_ifsc), s.bankIfsc);
-        DetailRowHelper.addRow(this, b.llBankDetails, getString(R.string.label_uid), s.bankUid);
+        DetailRowHelper.fillRows(this, b.llFamilyDetails, new String[][]{
+                {getString(R.string.label_parent_name), s.parentName},
+                {getString(R.string.label_mother_name), s.motherName},
+                {getString(R.string.label_mother_occupation), s.motherOccupation},
+                {getString(R.string.label_mother_phone), s.motherPhone},
+                {getString(R.string.label_father_name), s.fatherName},
+                {getString(R.string.label_father_occupation), s.fatherOccupation},
+                {getString(R.string.label_father_phone), s.fatherPhone},
+                {getString(R.string.label_home_address), s.address},
+        });
 
-        b.tvMedium.setText(val(s.medium));
-        b.tvMotherTongue.setText(val(s.motherTongue));
-        b.tvDateAdmission.setText(val(s.dateOfAdmission));
+        DetailRowHelper.fillRows(this, b.llBankDetails, new String[][]{
+                {getString(R.string.label_account_no), s.bankAccount},
+                {getString(R.string.label_branch), s.bankBranch},
+                {getString(R.string.label_ifsc), s.bankIfsc},
+                {getString(R.string.label_bank_uid), s.bankUid},
+        });
 
-        b.llIdDetails.removeAllViews();
-        DetailRowHelper.addRow(this, b.llIdDetails, getString(R.string.label_student_id), s.studentIdNumber);
-        DetailRowHelper.addRow(this, b.llIdDetails, getString(R.string.label_uid), s.uid);
+        DetailRowHelper.fillRows(this, b.llAcademicDetails, new String[][]{
+                {getString(R.string.label_medium), s.medium},
+                {getString(R.string.label_mother_tongue), s.motherTongue},
+                {getString(R.string.label_date_admission), s.dateOfAdmission},
+                {getString(R.string.label_student_id), s.studentIdNumber},
+                {getString(R.string.label_uid), s.uid},
+        });
     }
 
-    private String extractStandard(Student s) {
-        if (s.className != null && s.className.contains(" ")) {
-            String[] p = s.className.split(" ");
+    private void bindMarksChip(Student s) {
+        Chip chip = b.chipMarksStatus;
+        if (s.marksEntered) {
+            chip.setText(R.string.marks_entered_yes);
+            chip.setChipBackgroundColorResource(R.color.success_container);
+            chip.setTextColor(ContextCompat.getColor(this, R.color.success));
+        } else {
+            chip.setText(R.string.marks_entered_no);
+            chip.setChipBackgroundColorResource(R.color.warning_container);
+            chip.setTextColor(ContextCompat.getColor(this, R.color.warning));
+        }
+    }
+
+    private String extractStandardFromClassName(String className) {
+        if (className.contains(" ")) {
+            String[] p = className.split(" ");
             if (p.length > 1) return p[1];
         }
-        return "1";
+        return className;
     }
 
     private String val(String v) {
@@ -116,24 +158,32 @@ public class StudentProfileActivity extends AppCompatActivity {
                 return;
             }
             startActivity(new Intent(this, EnterMarksActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
     }
 
     private void openReport() {
         loadClassThen(() -> {
-            if (AppCache.selectedClass == null) return;
+            if (AppCache.selectedClass == null) {
+                Toast.makeText(this, R.string.select_class_first, Toast.LENGTH_SHORT).show();
+                return;
+            }
             FirebaseRepository.get().getMarksForStudent(student.id, student.classId,
                     new FirebaseRepository.OnResult<MarksRecord>() {
                         @Override public void onSuccess(MarksRecord m) {
                             if (m != null) {
                                 AppCache.selectedMarks = m;
                                 startActivity(new Intent(StudentProfileActivity.this, MarksheetActivity.class));
+                                overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
                             } else {
                                 Toast.makeText(StudentProfileActivity.this,
-                                        "No marks entered yet", Toast.LENGTH_SHORT).show();
+                                        R.string.no_marks_yet, Toast.LENGTH_SHORT).show();
                             }
                         }
-                        @Override public void onError(Exception e) {}
+                        @Override public void onError(Exception e) {
+                            Toast.makeText(StudentProfileActivity.this,
+                                    e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     });
         });
     }
@@ -142,6 +192,10 @@ public class StudentProfileActivity extends AppCompatActivity {
         if (SessionContext.selectedClass != null && student.classId != null
                 && student.classId.equals(SessionContext.selectedClass.id)) {
             AppCache.selectedClass = SessionContext.selectedClass;
+            next.run();
+            return;
+        }
+        if (student.schoolId == null) {
             next.run();
             return;
         }
@@ -166,7 +220,7 @@ public class StudentProfileActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (AppCache.selectedStudent != null) {
+        if (AppCache.selectedStudent != null && AppCache.selectedStudent.id != null) {
             student = AppCache.selectedStudent;
             loadStudent();
         }

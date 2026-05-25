@@ -24,6 +24,7 @@ import com.example.myschool.model.AcademicYear;
 import com.example.myschool.model.ClassModel;
 import com.example.myschool.model.School;
 import com.example.myschool.repository.FirebaseRepository;
+import com.example.myschool.utils.UiAnimations;
 
 import java.util.List;
 
@@ -68,9 +69,14 @@ public class ClassDivListFragment extends Fragment {
         });
         b.rvClassDiv.setLayoutManager(new LinearLayoutManager(requireContext()));
         b.rvClassDiv.setAdapter(adapter);
+        UiAnimations.setupRecyclerAnimations(b.rvClassDiv);
 
-        b.fabAddClass.setOnClickListener(v -> openAddClass());
+        b.fabAddClass.setOnClickListener(v -> {
+            UiAnimations.pulse(b.fabAddClass);
+            openAddClass();
+        });
 
+        UiAnimations.staggerFadeIn(b.tvClassDivYear, b.rvClassDiv, b.fabAddClass);
         ensureSchoolAndLoad();
     }
 
@@ -138,6 +144,7 @@ public class ClassDivListFragment extends Fragment {
             }
         }
         adapter.setData(list, selectedIndex);
+        UiAnimations.fadeIn(b.rvClassDiv);
     }
 
     private void openAddClass() {
@@ -148,6 +155,7 @@ public class ClassDivListFragment extends Fragment {
         AppCache.selectedSchool = SessionContext.selectedSchool;
         AppCache.selectedClass = null;
         startActivity(new Intent(requireContext(), ClassSetupActivity.class));
+        requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
     }
 
     private void showClassOptions(ClassModel c) {

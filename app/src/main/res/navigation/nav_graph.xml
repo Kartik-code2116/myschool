@@ -25,6 +25,11 @@
         android:label="@string/nav_reports"/>
 
     <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.example.myschool.ui.ProfileFragment"
+        android:label="@string/nav_profile"/>
+
+    <fragment
         android:id="@+id/nav_formative"
         android:name="com.example.myschool.ui.PlaceholderFragment"
         android:label="@string/menu_formative_summative">

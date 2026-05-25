@@ -14,6 +14,8 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.myschool.databinding.ActivityHomeBinding;
 import com.example.myschool.model.Teacher;
 import com.example.myschool.repository.FirebaseRepository;
+import com.example.myschool.utils.UiAnimations;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Set<Integer> topLevel = new HashSet<>();
         topLevel.add(R.id.nav_info_print);
+        topLevel.add(R.id.nav_profile);
         topLevel.add(R.id.nav_class_div);
         topLevel.add(R.id.nav_students);
         topLevel.add(R.id.nav_reports);
@@ -45,20 +48,15 @@ public class HomeActivity extends AppCompatActivity {
                 .build();
 
         b.btnMenu.setOnClickListener(v -> b.drawerLayout.openDrawer(GravityCompat.START));
-        b.ivProfilePic.setOnClickListener(v -> openProfile());
+        b.ivProfilePic.setOnClickListener(v -> navigateToAnimated(R.id.nav_profile));
 
         b.navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_profile) {
-                b.drawerLayout.closeDrawer(GravityCompat.START);
-                openProfile();
-                return true;
-            }
             if (item.getItemId() == R.id.nav_print_report) {
                 b.drawerLayout.closeDrawer(GravityCompat.START);
                 navController.navigate(R.id.nav_reports);
                 return true;
             }
-            boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
+            boolean handled = navigateToAnimated(item.getItemId());
             if (handled) b.drawerLayout.closeDrawer(GravityCompat.START);
             return handled;
         });
@@ -66,17 +64,26 @@ public class HomeActivity extends AppCompatActivity {
         setupDrawerHeader();
         setupDrawerActions();
 
-        b.bottomNav.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_profile) {
-                openProfile();
-                return false;
-            }
-            return NavigationUI.onNavDestinationSelected(item, navController);
-        });
+        b.bottomNav.setOnItemSelectedListener(this::navigateBottomItem);
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            updateToolbar(destination.getLabel() != null ? destination.getLabel().toString() : "",
-                    getString(R.string.subtitle_info_print));
+            if (destination == null) return;
+            int id = destination.getId();
+            String title = destination.getLabel() != null ? destination.getLabel().toString() : "";
+            String subtitle = getString(R.string.subtitle_info_print);
+            if (id == R.id.nav_students) {
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_class_div) {
+                subtitle = getString(R.string.subtitle_class_div);
+            } else if (id == R.id.nav_reports) {
+                subtitle = getString(R.string.nav_reports);
+            } else if (id == R.id.nav_info_print) {
+                title = getString(R.string.nav_home);
+            } else if (id == R.id.nav_profile) {
+                subtitle = getString(R.string.profile_subtitle);
+            }
+            updateToolbar(title, subtitle);
+            syncBottomNavSelection(id);
         });
 
         loadTeacherInfo();
@@ -95,13 +102,34 @@ public class HomeActivity extends AppCompatActivity {
         if (intent == null || navController == null) return;
         int dest = intent.getIntExtra("navigate_to", 0);
         if (dest != 0) {
-            navController.navigate(dest);
+            navigateTo(dest);
             intent.removeExtra("navigate_to");
         }
     }
 
-    private void openProfile() {
-        startActivity(new Intent(this, ProfileActivity.class));
+    private boolean navigateToAnimated(int destId) {
+        if (navController == null) return false;
+        if (navController.getCurrentDestination() != null
+                && navController.getCurrentDestination().getId() == destId) {
+            return true;
+        }
+        navigateTo(destId);
+        return true;
+    }
+
+    private boolean navigateBottomItem(android.view.MenuItem item) {
+        int id = item.getItemId();
+        boolean handled = navigateToAnimated(id);
+        return handled;
+    }
+
+    private void syncBottomNavSelection(int destinationId) {
+        if (destinationId == R.id.nav_info_print
+                || destinationId == R.id.nav_profile
+                || destinationId == R.id.nav_students
+                || destinationId == R.id.nav_reports) {
+            b.bottomNav.setSelectedItemId(destinationId);
+        }
     }
 
     private void setupDrawerHeader() {
@@ -119,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
         if (header == null) return;
         header.findViewById(R.id.btnDrawerProfile).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            openProfile();
+            navigateToAnimated(R.id.nav_profile);
         });
         header.findViewById(R.id.btnDrawerSettings).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
@@ -152,7 +180,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void navigateTo(int destId) {
-        navController.navigate(destId);
+        if (navController == null) return;
+        if (destId == R.id.nav_info_print || destId == R.id.nav_profile) {
+            navController.navigate(destId);
+        } else {
+            navController.navigate(destId, null, UiAnimations.navSlideForward());
+        }
     }
 
     @Override

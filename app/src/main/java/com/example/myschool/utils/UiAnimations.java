@@ -37,6 +37,10 @@ public final class UiAnimations {
         int step = 60;
         for (View v : views) {
             if (v == null) continue;
+            View parent = v.getParent() instanceof View ? (View) v.getParent() : null;
+            if (parent != null && parent.getAlpha() < 1f) {
+                parent.setAlpha(1f);
+            }
             v.setAlpha(0f);
             v.setTranslationY(v.getResources().getDisplayMetrics().density * 12f);
             v.animate()
@@ -45,6 +49,10 @@ public final class UiAnimations {
                     .setStartDelay(delay)
                     .setDuration(v.getResources().getInteger(R.integer.anim_duration_medium))
                     .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .withEndAction(() -> {
+                        v.setAlpha(1f);
+                        v.setTranslationY(0f);
+                    })
                     .start();
             delay += step;
         }
