@@ -4,16 +4,45 @@ public class Student {
     public String id;
     public String classId;
     public String schoolId;
-    public String teacherId;    // Bug #1 fix: required for getAllStudentsForTeacher query
-    public String className;    // Bug #5 fix: denormalized for display in adapter
-    public String schoolName;   // Bug #5 fix: denormalized for display in adapter
+    public String teacherId;
+    public String className;
+    public String schoolName;
+    public String standard;
+    public String division;
+
+    // Basic
     public String name;
     public String rollNo;
+    public String rollNo2;
+    public String registrationNo;
     public String dob;
     public String gender;
+    public String cast;
     public String parentName;
     public String photoUrl;
     public boolean marksEntered;
+
+    // Family
+    public String motherName;
+    public String motherOccupation;
+    public String motherPhone;
+    public String fatherName;
+    public String fatherOccupation;
+    public String fatherPhone;
+    public String address;
+
+    // Bank
+    public String bankAccount;
+    public String bankBranch;
+    public String bankIfsc;
+    public String bankUid;
+
+    // Academic
+    public String medium;
+    public String motherTongue;
+    public String dateOfAdmission;
+    public String studentIdNumber;
+    public String uid;
 
     public Student() {}
 }

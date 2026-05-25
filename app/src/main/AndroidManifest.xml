@@ -30,9 +30,10 @@
         <activity android:name=".LoginActivity" android:exported="false"/>
         <activity android:name=".RegisterActivity" android:exported="false"/>
         <activity android:name=".HomeActivity" android:exported="false"/>
-        <activity android:name=".SchoolRegisterActivity" android:exported="false"/>
         <activity android:name=".ClassSetupActivity" android:exported="false"/>
         <activity android:name=".StudentRegisterActivity" android:exported="false"/>
+        <activity android:name=".StudentProfileActivity" android:exported="false"/>
+        <activity android:name=".StudentEditActivity" android:exported="false"/>
         <activity android:name=".EnterMarksActivity" android:exported="false"/>
         <activity android:name=".MarksheetActivity" android:exported="false"/>
         <activity android:name=".MainActivity" android:exported="false"/>

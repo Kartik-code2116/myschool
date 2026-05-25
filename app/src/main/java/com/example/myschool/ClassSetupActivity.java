@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myschool.SessionContext;
 import com.example.myschool.databinding.ActivityClassSetupBinding;
 import com.example.myschool.databinding.ItemSubjectInputRowBinding;
 import com.example.myschool.model.ClassModel;
@@ -107,7 +108,39 @@ public class ClassSetupActivity extends AppCompatActivity {
         c.subjects  = subjects;
         try { c.year = Integer.parseInt(yearStr); } catch (NumberFormatException ignored) { c.year = 2025; }
 
+        SessionContext.syncFromAppCache();
+        if (SessionContext.selectedYear != null) {
+            c.yearId = SessionContext.selectedYear.id;
+            c.academicYearLabel = SessionContext.selectedYear.label;
+        }
+        if (SessionContext.selectedSemester != null) {
+            c.semesterId = SessionContext.selectedSemester.id;
+        }
+
         showLoading(true);
+        FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.example.myschool.model.Teacher>() {
+            @Override public void onSuccess(com.example.myschool.model.Teacher t) {
+                FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<com.example.myschool.model.School>() {
+                    @Override public void onSuccess(com.example.myschool.model.School school) {
+                        c.schoolId = school.id;
+                        SessionContext.selectedSchool = school;
+                        AppCache.selectedSchool = school;
+                        persistClass(c);
+                    }
+                    @Override public void onError(Exception e) {
+                        showLoading(false);
+                        Toast.makeText(ClassSetupActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            @Override public void onError(Exception e) {
+                showLoading(false);
+                Toast.makeText(ClassSetupActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void persistClass(ClassModel c) {
         FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
                 showLoading(false);

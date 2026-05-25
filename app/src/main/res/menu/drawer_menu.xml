@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/section_about_student">
+        <menu>
+            <item
+                android:id="@+id/nav_info_print"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/menu_info_print"/>
+            <item
+                android:id="@+id/nav_formative"
+                android:icon="@drawable/ic_table_grid"
+                android:title="@string/menu_formative_summative"/>
+            <item
+                android:id="@+id/nav_descriptive"
+                android:icon="@drawable/ic_document"
+                android:title="@string/menu_descriptive_entries"/>
+            <item
+                android:id="@+id/nav_attendance"
+                android:icon="@drawable/ic_calendar"
+                android:title="@string/menu_attendance"/>
+        </menu>
+    </item>
+
+    <item android:title="@string/section_class_level">
+        <menu>
+            <item
+                android:id="@+id/nav_class_div"
+                android:icon="@drawable/ic_id_card"
+                android:title="@string/menu_list_students"/>
+            <item
+                android:id="@+id/nav_students"
+                android:icon="@drawable/ic_students"
+                android:title="@string/menu_student_list"/>
+            <item
+                android:id="@+id/nav_subjects"
+                android:icon="@drawable/ic_book"
+                android:title="@string/menu_subjects"/>
+            <item
+                android:id="@+id/nav_weightage"
+                android:icon="@drawable/ic_pie_chart"
+                android:title="@string/menu_declare_weightage"/>
+            <item
+                android:id="@+id/nav_dropdown"
+                android:icon="@drawable/ic_list_bullet"
+                android:title="@string/menu_dropdown_list"/>
+        </menu>
+    </item>
+
+    <item android:title="@string/section_school_level">
+        <menu>
+            <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_person"
+                android:title="@string/nav_profile"/>
+            <item
+                android:id="@+id/nav_extra"
+                android:icon="@drawable/ic_expand_down"
+                android:title="@string/menu_extra_menus"/>
+        </menu>
+    </item>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_print_report"
+            android:icon="@drawable/ic_print"
+            android:title="@string/menu_print_report"/>
+        <item
+            android:id="@+id/nav_reports"
+            android:icon="@drawable/ic_reports"
+            android:title="@string/nav_reports"/>
+    </group>
+</menu>

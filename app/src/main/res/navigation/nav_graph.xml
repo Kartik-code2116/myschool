@@ -2,13 +2,75 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_dashboard">
-    <fragment android:id="@+id/nav_dashboard" android:name="com.example.myschool.ui.DashboardFragment"
-        android:label="@string/nav_home"/>
-    <fragment android:id="@+id/nav_schools" android:name="com.example.myschool.ui.SchoolListFragment"
-        android:label="@string/nav_schools"/>
-    <fragment android:id="@+id/nav_students" android:name="com.example.myschool.ui.StudentListFragment"
-        android:label="@string/nav_students"/>
-    <fragment android:id="@+id/nav_reports" android:name="com.example.myschool.ui.ReportsFragment"
+    app:startDestination="@id/nav_info_print">
+
+    <fragment
+        android:id="@+id/nav_info_print"
+        android:name="com.example.myschool.ui.InfoPrintSettingFragment"
+        android:label="@string/title_info_print"/>
+
+    <fragment
+        android:id="@+id/nav_class_div"
+        android:name="com.example.myschool.ui.ClassDivListFragment"
+        android:label="@string/title_class_div"/>
+
+    <fragment
+        android:id="@+id/nav_students"
+        android:name="com.example.myschool.ui.StudentListFragment"
+        android:label="@string/menu_student_list"/>
+
+    <fragment
+        android:id="@+id/nav_reports"
+        android:name="com.example.myschool.ui.ReportsFragment"
         android:label="@string/nav_reports"/>
+
+    <fragment
+        android:id="@+id/nav_formative"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_formative_summative">
+        <argument android:name="title" app:argType="string" android:defaultValue="Formative Summative"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_descriptive"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_descriptive_entries">
+        <argument android:name="title" app:argType="string" android:defaultValue="Descriptive Entries"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_attendance"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_attendance">
+        <argument android:name="title" app:argType="string" android:defaultValue="Attendance"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_subjects"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_subjects">
+        <argument android:name="title" app:argType="string" android:defaultValue="Subjects"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_weightage"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_declare_weightage">
+        <argument android:name="title" app:argType="string" android:defaultValue="Declare Weightage"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_dropdown"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_dropdown_list">
+        <argument android:name="title" app:argType="string" android:defaultValue="Dropdown List"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_extra"
+        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:label="@string/menu_extra_menus">
+        <argument android:name="title" app:argType="string" android:defaultValue="Extra Menus"/>
+    </fragment>
+
 </navigation>

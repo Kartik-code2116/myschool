@@ -78,21 +78,8 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             h.ivPhoto.setImageResource(R.drawable.ic_person);
         }
 
-        // Bug #4 fix: route tap based on marksEntered status so onEnterMarksClick is actually reachable.
-        // Tap: if marks not entered → enter marks; if done → view marksheet.
-        // Long press: edit student details.
         h.itemView.setOnClickListener(v -> {
-            if (listener == null) return;
-            if (s.marksEntered) {
-                listener.onViewMarksheetClick(s, pos);
-            } else {
-                listener.onEnterMarksClick(s, pos);
-            }
-        });
-
-        h.itemView.setOnLongClickListener(v -> {
             if (listener != null) listener.onClick(s, pos);
-            return true;
         });
     }
 

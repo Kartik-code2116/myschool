@@ -1,180 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/background" android:fillViewport="true">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        app:elevation="2dp">
 
-        <!-- Header with gradient -->
-        <FrameLayout android:layout_width="match_parent" android:layout_height="200dp"
-            android:background="@drawable/bg_gradient_primary">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp">
 
-            <ImageView android:id="@+id/btnBack"
-                android:layout_width="48dp" android:layout_height="48dp"
-                android:layout_gravity="start|top" android:layout_margin="8dp"
-                android:src="@drawable/ic_close" android:padding="12dp"
-                app:tint="@color/white"/>
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/back"
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/on_surface"/>
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_gravity="center" android:gravity="center" android:orientation="vertical">
-
-                <!-- Profile Photo -->
-                <FrameLayout android:layout_width="100dp" android:layout_height="100dp">
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent" android:layout_height="match_parent"
-                        app:cardCornerRadius="50dp" app:cardElevation="0dp"
-                        app:cardBackgroundColor="@color/white">
-                        <ImageView android:id="@+id/ivProfilePhoto"
-                            android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:src="@drawable/ic_person" android:padding="20dp"
-                            app:tint="@color/primary"/>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Edit photo button -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnEditPhoto"
-                        android:layout_width="32dp" android:layout_height="32dp"
-                        android:layout_gravity="bottom|end"
-                        app:cardCornerRadius="16dp" app:cardElevation="2dp"
-                        app:cardBackgroundColor="@color/secondary">
-                        <ImageView android:layout_width="match_parent" android:layout_height="match_parent"
-                            android:src="@drawable/ic_camera" android:padding="6dp"
-                            app:tint="@color/white"/>
-                    </com.google.android.material.card.MaterialCardView>
-                </FrameLayout>
-
-                <TextView android:id="@+id/tvProfileEmail"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" android:text="teacher@school.com"
-                    android:textColor="@color/white" android:textSize="14sp" android:alpha="0.9"/>
-            </LinearLayout>
-        </FrameLayout>
-
-        <!-- Profile Form -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-            android:layout_marginTop="-24dp" android:layout_marginBottom="24dp"
-            app:cardCornerRadius="20dp" app:cardElevation="4dp"
-            app:cardBackgroundColor="@color/surface">
-
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:padding="20dp">
-
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Personal Information" android:textSize="18sp"
-                    android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"/>
-
-                <!-- Full Name -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilFullName"
-                    style="@style/Widget.Myschool.TextInputLayout"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" android:hint="Full Name"
-                    app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etFullName" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:inputType="textPersonName"
-                        android:singleLine="true"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Phone -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilPhone"
-                    style="@style/Widget.Myschool.TextInputLayout"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" android:hint="Phone Number"
-                    app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPhone" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:inputType="phone"
-                        android:singleLine="true"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Email (Read-only) -->
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" android:hint="Email"
-                    app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etEmail" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:inputType="textEmailAddress"
-                        android:enabled="false" android:singleLine="true"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Save Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSaveProfile"
-                    style="@style/Widget.Myschool.Button"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp" android:text="Save Changes"/>
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Account Actions -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="16dp" app:cardElevation="2dp"
-            app:cardBackgroundColor="@color/surface">
-
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Change Password -->
-                <LinearLayout android:id="@+id/btnChangePassword"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:padding="16dp" android:background="?attr/selectableItemBackground"
-                    android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="40dp" android:layout_height="40dp"
-                        android:src="@drawable/ic_edit" android:padding="10dp"
-                        android:background="@drawable/bg_circle_surface" app:tint="@color/primary"/>
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical"
-                        android:layout_marginStart="16dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Change Password" android:textSize="15sp"
-                            android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Update your account password" android:textSize="12sp"
-                            android:textColor="@color/on_surface_variant"/>
-                    </LinearLayout>
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp"
-                        android:src="@drawable/ic_arrow_right" app:tint="@color/outline"/>
-                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/title_user"
+                    android:textColor="@color/on_surface"
+                    android:textSize="18sp"/>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:background="@color/outline_variant" android:layout_marginStart="72dp"/>
-
-                <!-- Logout -->
-                <LinearLayout android:id="@+id/btnLogout"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:padding="16dp" android:background="?attr/selectableItemBackground"
-                    android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="40dp" android:layout_height="40dp"
-                        android:src="@drawable/ic_close" android:padding="10dp"
-                        android:background="@drawable/bg_circle_surface" app:tint="@color/error"/>
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical"
-                        android:layout_marginStart="16dp">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Logout" android:textSize="15sp"
-                            android:fontFamily="sans-serif-medium" android:textColor="@color/error"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="Sign out from your account" android:textSize="12sp"
-                            android:textColor="@color/on_surface_variant"/>
-                    </LinearLayout>
-                </LinearLayout>
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subtitle_user_detail"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="12sp"/>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
-</ScrollView>
+            <ImageButton
+                android:id="@+id/btnEditProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/edit_profile"
+                android:src="@drawable/ic_edit_pencil"
+                app:tint="@color/accent_purple"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="@string/user_information"
+                android:textColor="@color/on_surface"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/surface_variant"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilName"
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/label_name_field">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etFullName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName"
+                            android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilPhone"
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/label_phone">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPhone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="phone"
+                            android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilUdise"
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/label_udise_short">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etUdise"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/label_year_field">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etYear"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/hint_paste_link">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPasteLink"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textUri"
+                            android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveProfile"
+                        style="@style/Widget.Myschool.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/save_changes"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLogout"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/logout"
+                        android:textColor="@color/error"
+                        app:strokeColor="@color/error"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/your_classes"
+                android:textColor="@color/on_surface"
+                android:textSize="15sp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvProfileClasses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -9,6 +9,10 @@ public class Teacher {
     public String email;
     public String phone;
     public String photoUrl;
+    public String udiseCode;
+    public String schoolName;
+    public String academicYearLabel;
+    public String pasteLinkResult;
     public List<String> schoolIds = new ArrayList<>();
 
     public Teacher() {}

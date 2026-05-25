@@ -14,10 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.myschool.AppCache;
+import com.example.myschool.HomeActivity;
+import com.example.myschool.SessionContext;
 import com.example.myschool.EnterMarksActivity;
 import com.example.myschool.MarksheetActivity;
 import com.example.myschool.R;
-import com.example.myschool.StudentRegisterActivity;
+import com.example.myschool.StudentEditActivity;
+import com.example.myschool.StudentProfileActivity;
 import com.example.myschool.adapter.StudentAdapter;
 import com.example.myschool.databinding.FragmentStudentListBinding;
 import com.example.myschool.model.ClassModel;
@@ -53,10 +56,32 @@ public class StudentListFragment extends Fragment {
 
         setupRecycler();
         setupSearch();
-        setupFilterChips();
+        b.chipGroupFilter.setVisibility(View.GONE);
         setupFab();
 
-        loadSchoolsForFilter();
+        applySessionFilterIfAny();
+    }
+
+    private void applySessionFilterIfAny() {
+        SessionContext.syncFromAppCache();
+        if (SessionContext.selectedClass != null && SessionContext.selectedClass.id != null) {
+            FirebaseRepository.get().getStudentsForClass(SessionContext.selectedClass.id,
+                    new FirebaseRepository.OnResult<List<Student>>() {
+                        @Override public void onSuccess(List<Student> list) {
+                            allStudents.clear();
+                            allStudents.addAll(list);
+                            filteredStudents.clear();
+                            filteredStudents.addAll(list);
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    studentAdapter.setData(filteredStudents);
+                                    b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                                });
+                            }
+                        }
+                        @Override public void onError(Exception e) { loadAllStudents(); }
+                    });
+        }
     }
 
     private void setupRecycler() {
@@ -64,11 +89,8 @@ public class StudentListFragment extends Fragment {
         studentAdapter.setListener(new StudentAdapter.OnStudentClick() {
             @Override
             public void onClick(Student student, int position) {
-                // Long-press → edit student
                 AppCache.selectedStudent = student;
-                Intent intent = new Intent(requireContext(), StudentRegisterActivity.class);
-                intent.putExtra("edit", true);
-                startActivity(intent);
+                startActivity(new Intent(requireContext(), StudentProfileActivity.class));
             }
 
             @Override
@@ -124,8 +146,9 @@ public class StudentListFragment extends Fragment {
 
     private void setupFab() {
         b.fabAddStudent.setOnClickListener(v -> {
-            AppCache.selectedStudent = null;
-            startActivity(new Intent(requireContext(), StudentRegisterActivity.class));
+            AppCache.selectedStudent = new Student();
+            startActivity(new Intent(requireContext(), StudentEditActivity.class)
+                    .putExtra("new_student", true));
         });
     }
 
@@ -277,6 +300,14 @@ public class StudentListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadAllStudents();
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).updateToolbar(
+                    getString(R.string.menu_student_list), SessionContext.getClassDivLabel());
+        }
+        if (SessionContext.selectedClass != null) {
+            applySessionFilterIfAny();
+        } else {
+            loadAllStudents();
+        }
     }
 }

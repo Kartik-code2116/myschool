@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_gradient_primary"
+        app:navigationIcon="@drawable/ic_close"
+        app:navigationIconTint="@color/white"
+        app:title="@string/edit_student"
+        app:titleTextColor="@color/white"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_student_name">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etName" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_roll_no">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRoll1" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_roll_no_2">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRoll2" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_reg_no">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRegNo" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_dob">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDob" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_gender">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etGender" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_cast">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etCast" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_standard">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etStandard" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_division">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDivision" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp"
+                android:text="@string/family_details" android:textColor="@color/success" android:fontFamily="sans-serif-medium"/>
+
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_mother_name">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherName" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_mother_occupation">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherOccupation" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_mother_phone">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_father_name">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etFatherName" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_father_occupation">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etFatherOccupation" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_father_phone">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etFatherPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_home_address">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:minLines="2"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp"
+                android:text="@string/bank_details" android:textColor="@color/success" android:fontFamily="sans-serif-medium"/>
+
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_account_no">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankAccount" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_branch">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankBranch" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_ifsc">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankIfsc" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_uid">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankUid" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_medium">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMedium" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_mother_tongue">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherTongue" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_date_admission">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDateAdmission" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_student_id">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etStudentId" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_uid">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etUid" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveStudent"
+                style="@style/Widget.Myschool.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/btn_save_student"/>
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:indeterminate="true"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

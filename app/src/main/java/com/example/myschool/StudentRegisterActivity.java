@@ -41,6 +41,8 @@ public class StudentRegisterActivity extends AppCompatActivity {
         b.tilDob.setEndIconOnClickListener(v -> showDatePicker());
         b.etDob.setOnClickListener(v -> showDatePicker());
 
+        SessionContext.syncFromAppCache();
+
         // Load schools
         loadSchools();
 
@@ -92,10 +94,12 @@ public class StudentRegisterActivity extends AppCompatActivity {
                 b.actvSelectSchool.setAdapter(new ArrayAdapter<>(StudentRegisterActivity.this,
                         android.R.layout.simple_dropdown_item_1line, names));
 
-                // Pre-select if coming from a school context
-                if (AppCache.selectedSchool != null) {
+                // Pre-select from session or cache
+                School preSchool = SessionContext.selectedSchool != null
+                        ? SessionContext.selectedSchool : AppCache.selectedSchool;
+                if (preSchool != null) {
                     for (int i = 0; i < schools.size(); i++) {
-                        if (schools.get(i).id.equals(AppCache.selectedSchool.id)) {
+                        if (schools.get(i).id.equals(preSchool.id)) {
                             b.actvSelectSchool.setText(schools.get(i).name, false);
                             selectedSchool = schools.get(i);
                             loadClassesForSchool(selectedSchool.id);
@@ -139,10 +143,11 @@ public class StudentRegisterActivity extends AppCompatActivity {
                 b.actvSelectClass.setAdapter(new ArrayAdapter<>(StudentRegisterActivity.this,
                         android.R.layout.simple_dropdown_item_1line, names));
 
-                // Pre-select if coming from class context
-                if (AppCache.selectedClass != null) {
+                ClassModel preClass = SessionContext.selectedClass != null
+                        ? SessionContext.selectedClass : AppCache.selectedClass;
+                if (preClass != null) {
                     for (int i = 0; i < classes.size(); i++) {
-                        if (classes.get(i).id.equals(AppCache.selectedClass.id)) {
+                        if (classes.get(i).id != null && classes.get(i).id.equals(preClass.id)) {
                             b.actvSelectClass.setText(names.get(i), false);
                             selectedClass = classes.get(i);
                             break;
