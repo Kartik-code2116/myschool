@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <external-files-path name="images" path="images/"/>
-    <external-files-path name="pdfs" path="pdfs/"/>
-    <external-files-path name="marksheets" path="marksheets/"/>
+    <external-files-path name="images"         path="images/"/>
+    <external-files-path name="pdfs"           path="pdfs/"/>
+    <external-files-path name="marksheets"     path="marksheets/"/>
+    <!-- PdfGenerator saves to this directory — REQUIRED for FileProvider to open/share PDFs -->
+    <external-files-path name="reports"        path="myschool_reports/"/>
 </paths>

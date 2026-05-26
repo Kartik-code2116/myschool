@@ -1,23 +1,534 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="50dp"
-    android:orientation="horizontal" android:gravity="center_vertical"
-    android:paddingStart="12dp" android:paddingEnd="12dp">
-    <TextView android:id="@+id/tvSubjectName"
-        android:layout_width="0dp" android:layout_height="wrap_content"
-        android:layout_weight="3" android:text="Mathematics"
-        android:textSize="13sp" android:textColor="@color/on_surface"/>
-    <TextView android:id="@+id/tvMaxMarks"
-        android:layout_width="0dp" android:layout_height="wrap_content"
-        android:layout_weight="1" android:text="100"
-        android:textSize="13sp" android:textColor="@color/on_surface_variant" android:gravity="center"/>
-    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etObtainedMarks"
-        android:layout_width="0dp" android:layout_height="38dp"
-        android:layout_weight="1" android:inputType="numberDecimal"
-        android:singleLine="true" android:gravity="center"
-        android:textSize="14sp" android:fontFamily="sans-serif-medium"
-        android:textColor="@color/primary" android:hint="--"
-        android:background="@drawable/bg_surface_rounded"
-        android:textColorHint="@color/on_surface_variant" android:padding="4dp"/>
-</LinearLayout>
+    android:id="@+id/cardSubject"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/outline_variant">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  HEADER — always visible, tap to expand        -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/layoutHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="14dp"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvSubjectName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/on_surface"
+                android:textSize="14sp"
+                android:text="Subject Name"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end"
+                android:layout_marginEnd="10dp">
+
+                <TextView
+                    android:id="@+id/tvSubjectTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-bold"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:text="एकूण: —/100"/>
+
+                <TextView
+                    android:id="@+id/tvSubjectGrade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="11sp"
+                    android:text="श्रेणी: —"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivExpandArrow"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_expand_down"
+                app:tint="@color/on_surface_variant"/>
+        </LinearLayout>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  EXPANDABLE DETAIL                             -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/layoutDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline_variant"
+                android:layout_marginBottom="10dp"/>
+
+            <!-- ─────────────────────────────────────── -->
+            <!--  SECTION A: आकारिक मूल्यमापन           -->
+            <!-- ─────────────────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="(A) आकारिक मूल्यमापन"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tvAkarikMaxBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/primary_container"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="पैकी 50"
+                    android:textColor="@color/primary"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
+
+            <!-- Row 1: निरीक्षण | प्रकल्प -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+
+                <!-- निरीक्षण -->
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="निरीक्षण" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etNirikhshan"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvNirikhshanMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/10" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- प्रकल्प -->
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginStart="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="प्रकल्प" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etPrakalp"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvPrakalpMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/5" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2: तोंडीकाम | चाचणी -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="तोंडीकाम" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etTondiKam"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvTondiKamMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/10" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginStart="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="चाचणी" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etChachani"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvChachaniMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/5" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 3: प्रात्यक्षिक | स्वाध्याय -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="प्रात्यक्षिक" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etPratyakshik"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvPratyakshikAMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/10" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginStart="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="स्वाध्याय" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etSwadhyay"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvSwadhyayMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/5" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 4: उपक्रम | इतर -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="उपक्रम" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etUpkram"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvUpkramMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/5" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginStart="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="इतर" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etItar"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvItarMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/—" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- आकारिक SUBTOTAL bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/primary_container"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginBottom="14dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="आकारिक एकूण (A)"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/primary"/>
+
+                <TextView
+                    android:id="@+id/tvAkarikSubTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 / 50"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:textColor="@color/primary"/>
+            </LinearLayout>
+
+            <!-- ─────────────────────────────────────── -->
+            <!--  SECTION B: संकलित मूल्यमापन           -->
+            <!-- ─────────────────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="(B) संकलित मूल्यमापन"
+                    android:textColor="@color/secondary"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tvSanklitMaxBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/secondary_container"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="पैकी 50"
+                    android:textColor="@color/secondary"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
+
+            <!-- तोंडी | प्रात्यक्षिक -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="तोंडी" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etTondiB"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvTondiBMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/10" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginStart="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="प्रात्यक्षिक" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etPratyakshikB"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvPratyakshikBMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/10" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- लेखी — full width, larger box -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="लेखी (Written)" android:textSize="10sp"
+                    android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical">
+                    <EditText android:id="@+id/etLekhi"
+                        android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1"
+                        android:inputType="number" android:textSize="15sp" android:gravity="center"
+                        android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                    <TextView android:id="@+id/tvLekhiMax"
+                        android:layout_width="34dp" android:layout_height="wrap_content"
+                        android:text="/30" android:textSize="12sp"
+                        android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- संकलित SUBTOTAL bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/secondary_container"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="संकलित एकूण (B)"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/secondary"/>
+
+                <TextView
+                    android:id="@+id/tvSanklitSubTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 / 50"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:textColor="@color/secondary"/>
+            </LinearLayout>
+
+            <!-- ─────────────────────────────────────── -->
+            <!--  GRAND TOTAL BAR  (A + B = 100)        -->
+            <!-- ─────────────────────────────────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/primary"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="एकूण गुण (A + B)"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/white"/>
+
+                <TextView
+                    android:id="@+id/tvGrandTotalInDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 / 100"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-bold"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+
+            <!-- ─────────────────────────────────────── -->
+            <!--  REMARK                                 -->
+            <!-- ─────────────────────────────────────── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="विषयवार वर्णनात्मक नोंद (Qualitative Remark)"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="11sp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/etSubjectRemark"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:hint="वर्णनात्मक नोंद लिहा..."
+                android:textSize="12sp"
+                android:background="@drawable/bg_surface_rounded"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:singleLine="true"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

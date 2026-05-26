@@ -12,6 +12,18 @@ public class GradeCalculator {
         return "F";
     }
 
+    public static String getMyschoolGrade(double obtained, double max) {
+        if (max <= 0) return "—";
+        double pct = (obtained * 100.0) / max;
+        if (pct >= 91) return "अ-1";
+        if (pct >= 81) return "अ-2";
+        if (pct >= 71) return "ब-1";
+        if (pct >= 61) return "ब-2";
+        if (pct >= 51) return "क-1";
+        if (pct >= 41) return "क-2";
+        return "ड";
+    }
+
     public static String getResult(double percentage) {
         return percentage >= 35 ? "PASS" : "FAIL";
     }

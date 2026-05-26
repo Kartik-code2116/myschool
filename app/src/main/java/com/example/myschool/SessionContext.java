@@ -6,7 +6,7 @@ import com.example.myschool.model.School;
 import com.example.myschool.model.Semester;
 
 /**
- * Global session for Year → Semester → Class selection (CCE-style workflow).
+ * Global session for Year → Semester → Class selection (Myschool-style workflow).
  */
 public final class SessionContext {
 

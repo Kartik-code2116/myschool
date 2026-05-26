@@ -2,8 +2,6 @@ package com.example.myschool.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,14 +24,22 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         }
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(ReportTemplate template, int position);
+    }
+
     private final List<ReportTemplate> items = new ArrayList<>();
+    private OnItemClickListener listener;
 
     public ReportPrintingAdapter() {
-        // Pre-populate the 4 customized templates as described
-        items.add(new ReportTemplate("नोंदवही", "1. गुणपत्रक", "नोंदवही आकाराचे गुणपत्रक"));
-        items.add(new ReportTemplate("निकालपत्रक", "2. गुणवर्णनिका", "सत्र वर्तन गुणपत्रक"));
-        items.add(new ReportTemplate("गुणवत्तक", "3. गुणवंत", "A4 साईज प्रगतीपुस्तक"));
-        items.add(new ReportTemplate("तक्ते", "4. व्यक्तिमत्व विकास नोंदी", "A4 साईज कटलेले प्रगतीपुस्तक"));
+        items.add(new ReportTemplate("गुणपत्रक", "१. प्रगती व गुणपत्रक", "प्रथम व द्वितीय सत्र गुणांचे एकत्रित गुणपत्रक (A4)"));
+        items.add(new ReportTemplate("गुणवर्णनिका", "२. वर्णनात्मक नोंद वही", "विषयनिहाय शिक्षकांच्या गुणात्मक नोंदी (वर्णनिका)"));
+        items.add(new ReportTemplate("प्रगतीपुस्तक", "३. एकत्रित वर्ग निकाल तक्ता", "इयत्ता तुकडीनुसार वार्षिक वर्गवार निकाल पत्रक (Roster)"));
+        items.add(new ReportTemplate("नोंदी", "४. व्यक्तिमत्व विकास पुस्तिका", "विद्यार्थी मूलभूत, बँक व कौटुंबिक माहिती पुस्तिका (A5)"));
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -53,20 +59,17 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         b.tvReportTitle.setText(item.title);
         b.tvReportDescription.setText(item.description);
 
-        // Click card
-        b.cardReportItem.setOnClickListener(v -> Toast.makeText(v.getContext(), 
-                "Generating print preview for " + item.title + "...", 
-                Toast.LENGTH_SHORT).show());
+        b.cardReportItem.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(item, position);
+        });
 
-        // Top Outlined Action
-        b.btnReportAction.setOnClickListener(v -> Toast.makeText(v.getContext(), 
-                "Action triggered for " + item.title, 
-                Toast.LENGTH_SHORT).show());
+        b.btnReportAction.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(item, position);
+        });
 
-        // Settings gear icon click
-        b.btnReportSettings.setOnClickListener(v -> Toast.makeText(v.getContext(), 
-                "Settings for " + item.title, 
-                Toast.LENGTH_SHORT).show());
+        b.btnReportSettings.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(item, position);
+        });
     }
 
     @Override

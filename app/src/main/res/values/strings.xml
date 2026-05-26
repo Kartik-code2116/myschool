@@ -113,7 +113,7 @@
     <string name="change_password">Change Password</string>
     <string name="logout">Logout</string>
     <string name="save_changes">Save Changes</string>
-    <!-- CCE Drawer -->
+    <!-- Myschool Drawer -->
     <string name="drawer_app_name">MySchool Pro</string>
     <string name="drawer_stats">Statistics</string>
     <string name="drawer_settings">Settings</string>

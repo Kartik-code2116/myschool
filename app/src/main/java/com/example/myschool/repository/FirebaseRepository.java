@@ -27,6 +27,7 @@ public class FirebaseRepository {
     private static final java.util.Map<String, List<ClassModel>> cachedClassesForSchoolMap = new java.util.HashMap<>();
     private static List<Student> cachedStudentsForTeacher;
     private static final java.util.Map<String, List<Student>> cachedStudentsForClassMap = new java.util.HashMap<>();
+    private static final java.util.Map<String, java.util.Map<String, MarksRecord>> cachedClassSemesterMarksMap = new java.util.HashMap<>();
 
     public static void clearCache() {
         synchronized (FirebaseRepository.class) {
@@ -37,6 +38,7 @@ public class FirebaseRepository {
             cachedClassesForSchoolMap.clear();
             cachedStudentsForTeacher = null;
             cachedStudentsForClassMap.clear();
+            cachedClassSemesterMarksMap.clear();
         }
     }
     private final FirebaseFirestore db;
@@ -473,7 +475,10 @@ public class FirebaseRepository {
                 : db.collection(COL_MARKS).document();
         m.id = ref.getId();
         ref.set(m)
-                .addOnSuccessListener(v -> cb.onSuccess(m.id))
+                .addOnSuccessListener(v -> {
+                    cachedClassSemesterMarksMap.clear();
+                    cb.onSuccess(m.id);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
@@ -497,6 +502,27 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void getMarksForStudentAndSemester(String studentId, String classId, String semesterId, OnResult<MarksRecord> cb) {
+        if (studentId == null || classId == null || semesterId == null) {
+            cb.onError(new IllegalArgumentException("Arguments cannot be null"));
+            return;
+        }
+        db.collection(COL_MARKS)
+                .whereEqualTo("studentId", studentId)
+                .whereEqualTo("classId", classId)
+                .whereEqualTo("semesterId", semesterId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && !snap.isEmpty()) {
+                        cb.onSuccess(snap.getDocuments().get(0).toObject(MarksRecord.class));
+                    } else {
+                        cb.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
     public void getMarksForClass(String classId, OnResult<List<MarksRecord>> cb) {
         if (classId == null) {
             cb.onError(new IllegalArgumentException("Class ID cannot be null"));
@@ -507,6 +533,36 @@ public class FirebaseRepository {
                 .get()
                 // Bug #6 fix: return empty list instead of null
                 .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(MarksRecord.class) : new ArrayList<>()))
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getMarksForClassAndSemester(String classId, String semesterId, OnResult<java.util.Map<String, MarksRecord>> cb) {
+        if (classId == null || semesterId == null) {
+            cb.onError(new IllegalArgumentException("Class ID and Semester ID cannot be null"));
+            return;
+        }
+        String cacheKey = classId + "_" + semesterId;
+        if (cachedClassSemesterMarksMap.containsKey(cacheKey)) {
+            cb.onSuccess(new java.util.HashMap<>(cachedClassSemesterMarksMap.get(cacheKey)));
+            return;
+        }
+        db.collection(COL_MARKS)
+                .whereEqualTo("classId", classId)
+                .whereEqualTo("semesterId", semesterId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    java.util.Map<String, MarksRecord> marksMap = new java.util.HashMap<>();
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            MarksRecord m = doc.toObject(MarksRecord.class);
+                            if (m != null && m.studentId != null) {
+                                marksMap.put(m.studentId, m);
+                            }
+                        }
+                    }
+                    cachedClassSemesterMarksMap.put(cacheKey, marksMap);
+                    cb.onSuccess(new java.util.HashMap<>(marksMap));
+                })
                 .addOnFailureListener(cb::onError);
     }
 
