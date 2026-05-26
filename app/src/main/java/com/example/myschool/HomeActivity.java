@@ -106,6 +106,15 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_he_she_items) {
                 title = "He/She Items";
                 subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_extra) {
+                title = "See Extra Menus";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_print_report) {
+                title = "Report Printing";
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) ? SessionContext.selectedClass.className : "1";
+                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division : "1";
+                int sem = (SessionContext.selectedSemester != null) ? SessionContext.selectedSemester.number : 1;
+                subtitle = "• Class: " + cls + " • Div: " + div + " • Semester: " + sem;
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);

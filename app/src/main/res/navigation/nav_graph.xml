@@ -73,7 +73,7 @@
 
     <fragment
         android:id="@+id/nav_extra"
-        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:name="com.example.myschool.ui.ExtraDashboardFragment"
         android:label="@string/menu_extra_menus">
         <argument android:name="title" app:argType="string" android:defaultValue="Extra Menus"/>
     </fragment>
@@ -140,5 +140,10 @@
         android:label="He/She Items">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="he_she_items"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_print_report"
+        android:name="com.example.myschool.ui.ReportPrintingFragment"
+        android:label="Report Printing"/>
 
 </navigation>

@@ -56,46 +56,11 @@
             <item
                 android:id="@+id/nav_extra"
                 android:icon="@drawable/ic_expand_down"
-                android:title="@string/menu_extra_menus">
-                <menu>
-                    <item
-                        android:id="@+id/nav_school_info"
-                        android:icon="@drawable/ic_school"
-                        android:title="School Information" />
-                    <item
-                        android:id="@+id/nav_gender"
-                        android:icon="@drawable/ic_person"
-                        android:title="Gender" />
-                    <item
-                        android:id="@+id/nav_cast_category"
-                        android:icon="@drawable/ic_id_card"
-                        android:title="Cast Category" />
-                    <item
-                        android:id="@+id/nav_class_teacher"
-                        android:icon="@drawable/ic_person"
-                        android:title="Class Teacher" />
-                    <item
-                        android:id="@+id/nav_classes"
-                        android:icon="@drawable/ic_table_grid"
-                        android:title="Classes" />
-                    <item
-                        android:id="@+id/nav_subject"
-                        android:icon="@drawable/ic_book"
-                        android:title="Subject" />
-                    <item
-                        android:id="@+id/nav_default_values"
-                        android:icon="@drawable/ic_settings"
-                        android:title="Default Values" />
-                    <item
-                        android:id="@+id/nav_working_days"
-                        android:icon="@drawable/ic_calendar"
-                        android:title="Working Days" />
-                    <item
-                        android:id="@+id/nav_he_she_items"
-                        android:icon="@drawable/ic_person"
-                        android:title="He/She Items" />
-                </menu>
-            </item>
+                android:title="@string/menu_extra_menus"/>
+            <item
+                android:id="@+id/nav_print_report"
+                android:icon="@drawable/ic_reports"
+                android:title="Print Report" />
         </menu>
     </item>
 </menu>
