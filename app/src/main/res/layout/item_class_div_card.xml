@@ -98,5 +98,16 @@
                 android:textColor="@color/on_surface_variant"
                 android:textSize="12sp"/>
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnClassOptions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_more_vert"
+            app:tint="@color/on_surface_variant"
+            android:contentDescription="Class Options"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

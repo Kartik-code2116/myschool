@@ -152,6 +152,9 @@
     <string name="class_div_format">Class: %1$s, Div: %2$s</string>
     <string name="teacher_placeholder">First Teacher Name</string>
     <string name="add_class">Add Class</string>
+    <string name="edit_class">Edit Class</string>
+    <string name="delete_class">Delete Class</string>
+    <string name="delete_class_confirm">Are you sure you want to delete class %1$s? All student allocations in this class will be cleared.</string>
     <string name="add_student_short">Add Student</string>
     <string name="page_coming_soon">This section will be available in the next update.</string>
     <string name="select_school_first">Please complete your profile (UDISE) first.</string>

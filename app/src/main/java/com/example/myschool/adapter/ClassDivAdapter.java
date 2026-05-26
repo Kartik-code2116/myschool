@@ -19,6 +19,7 @@ public class ClassDivAdapter extends RecyclerView.Adapter<ClassDivAdapter.VH> {
     public interface Listener {
         void onClassClick(ClassModel c, int position);
         void onClassLongClick(ClassModel c);
+        void onClassOptionsClick(ClassModel c, View anchorView, int position);
     }
 
     private final List<ClassModel> data = new ArrayList<>();
@@ -82,6 +83,9 @@ public class ClassDivAdapter extends RecyclerView.Adapter<ClassDivAdapter.VH> {
         b.getRoot().setOnLongClickListener(v -> {
             if (listener != null) listener.onClassLongClick(c);
             return true;
+        });
+        b.btnClassOptions.setOnClickListener(v -> {
+            if (listener != null) listener.onClassOptionsClick(c, v, position);
         });
     }
 

@@ -356,6 +356,21 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void deleteClass(String classId, OnResult<Void> cb) {
+        if (classId == null) {
+            cb.onError(new IllegalArgumentException("Class ID cannot be null"));
+            return;
+        }
+        db.collection(COL_CLASSES).document(classId).delete()
+                .addOnSuccessListener(v -> {
+                    cachedClassesForYearMap.clear(); // Invalidate
+                    cachedClassesForSchoolMap.clear(); // Invalidate
+                    com.example.myschool.AppCache.cachedClasses = null; // Clear static AppCache
+                    cb.onSuccess(null);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
     public void getClassesForSchool(String schoolId, OnResult<List<ClassModel>> cb) {
         if (schoolId == null) {
             cb.onError(new IllegalArgumentException("School ID cannot be null"));

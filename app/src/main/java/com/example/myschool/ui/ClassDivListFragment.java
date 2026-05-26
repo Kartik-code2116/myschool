@@ -25,6 +25,7 @@ import com.example.myschool.model.ClassModel;
 import com.example.myschool.model.School;
 import com.example.myschool.repository.FirebaseRepository;
 import com.example.myschool.utils.UiAnimations;
+import androidx.appcompat.widget.PopupMenu;
 
 import java.util.List;
 
@@ -68,6 +69,11 @@ public class ClassDivListFragment extends Fragment {
             @Override
             public void onClassLongClick(ClassModel c) {
                 showClassOptions(c);
+            }
+
+            @Override
+            public void onClassOptionsClick(ClassModel c, View anchorView, int position) {
+                showClassPopupMenu(c, anchorView, position);
             }
         });
         b.rvClassDiv.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -194,6 +200,68 @@ public class ClassDivListFragment extends Fragment {
         if (b == null) return;
         b.tvClassDivYear.setText(getString(R.string.year_label, SessionContext.getYearLabel()));
         loadClasses();
+    }
+
+    private void showClassPopupMenu(ClassModel c, View anchorView, int position) {
+        PopupMenu popup = new PopupMenu(requireContext(), anchorView);
+        popup.getMenu().add(0, 1, 0, getString(R.string.menu_subjects));
+        popup.getMenu().add(0, 2, 1, getString(R.string.menu_student_list));
+        popup.getMenu().add(0, 3, 2, getString(R.string.add_student_short));
+        popup.getMenu().add(0, 4, 3, getString(R.string.edit_class));
+        popup.getMenu().add(0, 5, 4, getString(R.string.delete_class));
+
+        popup.setOnMenuItemClickListener(item -> {
+            SessionContext.selectedClass = c;
+            SessionContext.syncToAppCache();
+            switch (item.getItemId()) {
+                case 1: // Subjects
+                    if (getActivity() instanceof HomeActivity) {
+                        ((HomeActivity) getActivity()).navigateTo(R.id.nav_subjects);
+                    }
+                    return true;
+                case 2: // Students
+                    if (getActivity() instanceof HomeActivity) {
+                        ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
+                    }
+                    return true;
+                case 3: // Add Student
+                    AppCache.selectedStudent = new com.example.myschool.model.Student();
+                    startActivity(new Intent(requireContext(), StudentEditActivity.class)
+                            .putExtra("new_student", true));
+                    return true;
+                case 4: // Edit Class
+                    AppCache.selectedClass = c;
+                    startActivity(new Intent(requireContext(), ClassSetupActivity.class)
+                            .putExtra("edit", true));
+                    return true;
+                case 5: // Delete Class
+                    confirmDeleteClass(c);
+                    return true;
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    private void confirmDeleteClass(ClassModel c) {
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.delete_class))
+                .setMessage(getString(R.string.delete_class_confirm, c.getDisplayName()))
+                .setPositiveButton(getString(R.string.delete_class), (dialog, which) -> {
+                    FirebaseRepository.get().deleteClass(c.id, new FirebaseRepository.OnResult<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            Toast.makeText(requireContext(), "Class deleted successfully!", Toast.LENGTH_SHORT).show();
+                            loadClasses();
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     @Override

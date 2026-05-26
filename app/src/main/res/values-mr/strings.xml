@@ -152,6 +152,9 @@
     <string name="class_div_format">वर्ग: %1$s, तुकडी: %2$s</string>
     <string name="teacher_placeholder">पहिल्या शिक्षकाचे नाव</string>
     <string name="add_class">वर्ग जोडा</string>
+    <string name="edit_class">वर्ग संपादित करा</string>
+    <string name="delete_class">वर्ग हटवा</string>
+    <string name="delete_class_confirm">तुम्हाला खात्री आहे का की तुम्ही वर्ग %1$s हटवू इच्छिता? या वर्गातील सर्व विद्यार्थ्यांची माहिती वर्गमुक्त केली जाईल.</string>
     <string name="add_student_short">विद्यार्थी जोडा</string>
     <string name="page_coming_soon">हा विभाग पुढील अपडेटमध्ये उपलब्ध होईल.</string>
     <string name="select_school_first">कृपया प्रथम तुमची प्रोफाईल (युडायस) पूर्ण करा.</string>
