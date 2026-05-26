@@ -22,7 +22,6 @@ import com.example.myschool.databinding.FragmentAttendanceBinding;
 import com.example.myschool.model.AttendanceRecord;
 import com.example.myschool.model.Student;
 import com.example.myschool.repository.FirebaseRepository;
-import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +33,6 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     private FragmentAttendanceBinding b;
     private AttendanceAdapter adapter;
     private List<Student> studentsList = new ArrayList<>();
-    private final Map<String, AttendanceRecord> attendanceMap = new HashMap<>();
 
     @Nullable
     @Override
@@ -82,14 +80,22 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         // Chat/Help Icon click
         b.ivActionHelp.setOnClickListener(v -> showHelpDialog());
 
-        // Add Icon click (initialize record for student)
-        b.ivActionAdd.setOnClickListener(v -> showAddStudentAttendanceDialog());
+        // Add Icon click (Friendly instructions dialog)
+        b.ivActionAdd.setOnClickListener(v -> {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("नवीन हजेरी (New Attendance)")
+                    .setMessage("नवीन हजेरी जोडण्यासाठी संबंधित विद्यार्थ्याच्या कार्डवरील उजव्या ३-बिंदू चिन्हावर क्लिक करा आणि 'बदल करा' (Edit) पर्याय निवडा.")
+                    .setPositiveButton("ठीक आहे", null)
+                    .show();
+        });
 
         // Calculator/Report Icon click
         b.ivActionReport.setOnClickListener(v -> showClassReportDialog());
 
         // More Vertical click
-        b.ivActionMore.setOnClickListener(v -> showSettingsPopup());
+        b.ivActionMore.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "सेटिंग्ज लवकरच येत आहेत", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void loadData() {
@@ -105,26 +111,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
             public void onSuccess(List<Student> list) {
                 if (list != null) {
                     studentsList = list;
-                    
-                    // Fetch Attendance Records
-                    FirebaseRepository.get().getAttendanceRecordsForClass(classId, new FirebaseRepository.OnResult<List<AttendanceRecord>>() {
-                        @Override
-                        public void onSuccess(List<AttendanceRecord> records) {
-                            attendanceMap.clear();
-                            if (records != null) {
-                                for (AttendanceRecord r : records) {
-                                    if (r.studentId != null) attendanceMap.put(r.studentId, r);
-                                }
-                            }
-                            adapter.updateData(studentsList, attendanceMap);
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Toast.makeText(getContext(), "Failed to load attendance records", Toast.LENGTH_SHORT).show();
-                            adapter.updateData(studentsList, attendanceMap);
-                        }
-                    });
+                    adapter.updateData(studentsList);
                 }
             }
 
@@ -159,57 +146,8 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
                 .setTitle("उपस्थिती मदत (Help Guidelines)")
                 .setMessage("१. मासिक उपस्थिती बदल करण्यासाठी प्रत्येक कार्डच्या उजव्या बाजूला असलेल्या तीन-बिंदू मेनूवर क्लिक करा आणि 'बदल करा' निवडा.\n\n"
                         + "२. एका विद्यार्थ्याची मासिक हजेरी दुसऱ्या विद्यार्थ्यावर जशीच्या तशी कॉपी करण्यासाठी 'डुप्लिकेट' निवडा.\n\n"
-                        + "३. रेकॉर्ड डिलीट करण्यासाठी 'डिलीट करा' वर क्लिक करा.\n\n"
-                        + "४. हजेरी जोडण्यासाठी वर दिलेल्या '+' आयकॉनवर क्लिक करा.")
+                        + "३. रेकॉर्ड डिलीट करण्यासाठी 'डिलीट करा' वर क्लिक करा.")
                 .setPositiveButton("ठीक आहे", null)
-                .show();
-    }
-
-    private void showAddStudentAttendanceDialog() {
-        if (studentsList == null || studentsList.isEmpty()) {
-            Toast.makeText(getContext(), "No students found to add attendance", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Filter students who do NOT have attendance records yet
-        List<Student> eligibleStudents = new ArrayList<>();
-        for (Student s : studentsList) {
-            if (!attendanceMap.containsKey(s.id)) {
-                eligibleStudents.add(s);
-            }
-        }
-
-        if (eligibleStudents.isEmpty()) {
-            Toast.makeText(getContext(), "सर्व विद्यार्थ्यांची उपस्थिती आधीच तयार केली आहे!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String[] eligibleNames = new String[eligibleStudents.size()];
-        for (int i = 0; i < eligibleStudents.size(); i++) {
-            eligibleNames[i] = eligibleStudents.get(i).rollNo + ". " + eligibleStudents.get(i).name;
-        }
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("उपस्थिती तयार करा (Initialize Attendance)")
-                .setItems(eligibleNames, (dialog, which) -> {
-                    Student selected = eligibleStudents.get(which);
-                    AttendanceRecord newRecord = new AttendanceRecord();
-                    newRecord.studentId = selected.id;
-                    newRecord.classId = SessionContext.selectedClass.id;
-                    newRecord.academicYear = SessionContext.getYearLabel();
-                    
-                    FirebaseRepository.get().saveAttendanceRecord(newRecord, new FirebaseRepository.OnResult<String>() {
-                        @Override
-                        public void onSuccess(String id) {
-                            Toast.makeText(getContext(), selected.name + " ची उपस्थिती तयार झाली!", Toast.LENGTH_SHORT).show();
-                            loadData();
-                        }
-                        @Override
-                        public void onError(Exception e) {
-                            Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                })
                 .show();
     }
 
@@ -222,15 +160,16 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         int bestCount = -1;
 
         for (Student s : studentsList) {
-            AttendanceRecord r = attendanceMap.get(s.id);
-            if (r != null) {
-                r.recalculateTotals();
-                totalPresent += r.totalPresent;
-                totalWorking += r.totalWorking;
-                if (r.totalPresent > bestCount) {
-                    bestCount = r.totalPresent;
-                    bestStudent = s.name;
-                }
+            AttendanceRecord r = new AttendanceRecord();
+            if (s.monthlyAttendance != null) {
+                r.monthlyData.putAll(s.monthlyAttendance);
+            }
+            r.recalculateTotals();
+            totalPresent += r.totalPresent;
+            totalWorking += r.totalWorking;
+            if (r.totalPresent > bestCount) {
+                bestCount = r.totalPresent;
+                bestStudent = s.name;
             }
         }
 
@@ -247,10 +186,6 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
                         + "• सर्वाधिक उपस्थित विद्यार्थी (Best Attender): " + bestStudent + " (" + bestCount + " दिवस)")
                 .setPositiveButton("बंद करा", null)
                 .show();
-    }
-
-    private void showSettingsPopup() {
-        Toast.makeText(getContext(), "सेटिंग्ज लवकरच येत आहेत", Toast.LENGTH_SHORT).show();
     }
 
     private void showEditDialog(Student student, AttendanceRecord record) {
@@ -290,9 +225,12 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
             savePair(binding.etAprPresent, binding.etAprTotal, "एप्रिल", record);
             savePair(binding.etMayPresent, binding.etMayTotal, "मे", record);
 
-            record.recalculateTotals();
+            // Copy monthly data back to student object
+            if (student.monthlyAttendance == null) student.monthlyAttendance = new HashMap<>();
+            student.monthlyAttendance.clear();
+            student.monthlyAttendance.putAll(record.monthlyData);
 
-            FirebaseRepository.get().saveAttendanceRecord(record, new FirebaseRepository.OnResult<String>() {
+            FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
                 @Override
                 public void onSuccess(String id) {
                     Toast.makeText(getContext(), student.name + " ची उपस्थिती जतन झाली!", Toast.LENGTH_SHORT).show();
@@ -352,20 +290,13 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
                 .setItems(targetNames, (dialog, which) -> {
                     Student targetStudent = targets.get(which);
                     
-                    AttendanceRecord targetRecord = attendanceMap.get(targetStudent.id);
-                    if (targetRecord == null) {
-                        targetRecord = new AttendanceRecord();
-                        targetRecord.studentId = targetStudent.id;
-                        targetRecord.classId = SessionContext.selectedClass.id;
-                        targetRecord.academicYear = SessionContext.getYearLabel();
+                    if (targetStudent.monthlyAttendance == null) {
+                        targetStudent.monthlyAttendance = new HashMap<>();
                     }
+                    targetStudent.monthlyAttendance.clear();
+                    targetStudent.monthlyAttendance.putAll(srcRecord.monthlyData);
 
-                    // Copy monthly data map
-                    targetRecord.monthlyData.clear();
-                    targetRecord.monthlyData.putAll(srcRecord.monthlyData);
-                    targetRecord.recalculateTotals();
-
-                    FirebaseRepository.get().saveAttendanceRecord(targetRecord, new FirebaseRepository.OnResult<String>() {
+                    FirebaseRepository.get().saveStudent(targetStudent, new FirebaseRepository.OnResult<String>() {
                         @Override
                         public void onSuccess(String id) {
                             Toast.makeText(getContext(), srcStudent.name + " ची उपस्थिती " + targetStudent.name + " वर कॉपी झाली!", Toast.LENGTH_SHORT).show();
@@ -381,19 +312,17 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     }
 
     private void showDeleteConfirmation(Student student, AttendanceRecord record) {
-        if (record.id == null) {
-            Toast.makeText(getContext(), "या विद्यार्थ्याची उपस्थिती आधीच रिकामी आहे!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         new AlertDialog.Builder(getContext())
                 .setTitle("डिलीट करा?")
                 .setMessage("तुम्हाला खात्री आहे की तुम्ही " + student.name + " ची उपस्थिती नष्ट (डिलीट) करू इच्छिता?")
                 .setNegativeButton("रद्द करा", null)
                 .setPositiveButton("डिलीट", (dialog, which) -> {
-                    FirebaseRepository.get().deleteAttendanceRecord(record.id, new FirebaseRepository.OnResult<Void>() {
+                    if (student.monthlyAttendance != null) {
+                        student.monthlyAttendance.clear();
+                    }
+                    FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
                         @Override
-                        public void onSuccess(Void result) {
+                        public void onSuccess(String id) {
                             Toast.makeText(getContext(), "उपस्थिती डिलीट झाली!", Toast.LENGTH_SHORT).show();
                             loadData();
                         }
@@ -413,8 +342,24 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         super.onResume();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity ha = (HomeActivity) getActivity();
-            ha.findViewById(R.id.appBarLayout).setVisibility(View.GONE);
-            ha.findViewById(R.id.bottomNav).setVisibility(View.GONE);
+            View appBar = ha.findViewById(R.id.appBarLayout);
+            if (appBar != null) {
+                appBar.setVisibility(View.GONE);
+            }
+            View bottomNav = ha.findViewById(R.id.bottomNav);
+            if (bottomNav != null) {
+                bottomNav.setVisibility(View.GONE);
+            }
+            
+            // Fix CoordinatorLayout scrolling behavior offset bug:
+            View navHost = ha.findViewById(R.id.navHostFragment);
+            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
+                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
+                params.setBehavior(null);
+                params.bottomMargin = 0;
+                navHost.setLayoutParams(params);
+            }
         }
     }
 
@@ -423,8 +368,25 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         super.onPause();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity ha = (HomeActivity) getActivity();
-            ha.findViewById(R.id.appBarLayout).setVisibility(View.VISIBLE);
-            ha.findViewById(R.id.bottomNav).setVisibility(View.VISIBLE);
+            View appBar = ha.findViewById(R.id.appBarLayout);
+            if (appBar != null) {
+                appBar.setVisibility(View.VISIBLE);
+            }
+            View bottomNav = ha.findViewById(R.id.bottomNav);
+            if (bottomNav != null) {
+                bottomNav.setVisibility(View.VISIBLE);
+            }
+            
+            // Restore CoordinatorLayout scrolling behavior and margins:
+            View navHost = ha.findViewById(R.id.navHostFragment);
+            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
+                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
+                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
+                float density = getResources().getDisplayMetrics().density;
+                params.bottomMargin = (int) (64 * density);
+                navHost.setLayoutParams(params);
+            }
         }
     }
 }

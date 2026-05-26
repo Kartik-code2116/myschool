@@ -8,6 +8,7 @@ import com.example.myschool.model.Semester;
 import com.example.myschool.model.Student;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Simple static cache to pass complex objects between Activities
@@ -22,4 +23,10 @@ public class AppCache {
     public static List<AcademicYear> cachedYears;
     public static List<Semester>     cachedSemesters;
     public static List<ClassModel>   cachedClasses;
+
+    /** Teacher name — cached here for zero-latency display on home & profile screens. */
+    public static String cachedTeacherName;
+
+    /** classId → student count — cached to avoid re-fetching all students on every profile open. */
+    public static Map<String, Integer> cachedStudentCountByClassId;
 }

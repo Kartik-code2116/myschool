@@ -383,6 +383,10 @@ public class FirebaseRepository {
 
     // ---------- Student ----------
     public void saveStudent(Student s, OnResult<String> cb) {
+        String uid = currentUid();
+        if (uid != null) {
+            s.teacherId = uid;
+        }
         DocumentReference ref = s.id != null
                 ? db.collection(COL_STUDENTS).document(s.id)
                 : db.collection(COL_STUDENTS).document();
@@ -394,6 +398,20 @@ public class FirebaseRepository {
                         cachedStudentsForClassMap.remove(s.classId); // Invalidate
                     }
                     cb.onSuccess(s.id);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void deleteStudent(String studentId, OnResult<Void> cb) {
+        if (studentId == null) {
+            cb.onError(new IllegalArgumentException("Student ID cannot be null"));
+            return;
+        }
+        db.collection(COL_STUDENTS).document(studentId).delete()
+                .addOnSuccessListener(v -> {
+                    cachedStudentsForTeacher = null; // Invalidate
+                    cachedStudentsForClassMap.clear(); // Invalidate
+                    cb.onSuccess(null);
                 })
                 .addOnFailureListener(cb::onError);
     }

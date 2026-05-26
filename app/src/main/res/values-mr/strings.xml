@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">मायस्कूल</string>
+    <string name="app_tagline">स्मार्ट निकाल व्यवस्थापन</string>
+    <!-- Nav -->
+    <string name="nav_home">मुख्यपृष्ठ</string>
+    <string name="nav_schools">शाळा</string>
+    <string name="nav_students">विद्यार्थी</string>
+    <string name="nav_reports">अहवाल</string>
+    <!-- Login -->
+    <string name="login_title">पुन्हा स्वागत आहे</string>
+    <string name="login_subtitle">तुमच्या शिक्षक खात्यात लॉग इन करा</string>
+    <string name="btn_login">लॉग इन करा</string>
+    <string name="btn_forgot_password">पासवर्ड विसरलात?</string>
+    <string name="btn_google">गुगलसह पुढे जा</string>
+    <string name="link_no_account">खाते नाही? नोंदणी करा</string>
+    <!-- Register -->
+    <string name="register_title">खाते तयार करा</string>
+    <string name="register_subtitle">शिक्षक म्हणून नोंदणी करा</string>
+    <string name="btn_register">खाते तयार करा</string>
+    <string name="link_have_account">आधीच खाते आहे? लॉग इन करा</string>
+    <!-- Labels -->
+    <string name="label_email">ईमेल पत्ता</string>
+    <string name="label_password">पासवर्ड</string>
+    <string name="label_confirm_password">पासवर्डची पुष्टी करा</string>
+    <string name="label_full_name">पूर्ण नाव</string>
+    <string name="label_phone">फोन नंबर</string>
+    <string name="label_school_name">शाळेचे नाव</string>
+    <string name="label_udise_code">युडायस (UDISE) कोड</string>
+    <string name="label_board">बोर्ड (CBSE / स्टेट / ICSE)</string>
+    <string name="label_address">शाळेचा पत्ता</string>
+    <string name="label_principal_name">मुख्याध्यापकांचे नाव</string>
+    <string name="label_tap_to_add_logo">लोगो जोडण्यासाठी टॅप करा</string>
+    <string name="label_tap_to_add_photo">फोटो जोडण्यासाठी टॅप करा</string>
+
+    <string name="label_division">तुकडी</string>
+    <string name="label_exam_name">परीक्षेचे नाव (उदा. वार्षिक परीक्षा २०२५)</string>
+    <string name="label_academic_year">शैक्षणिक वर्ष (उदा. २०२५)</string>
+    <string name="label_subjects">विषय</string>
+    <string name="label_subject_name">विषयाचे नाव</string>
+    <string name="label_max_marks">एकूण गुण</string>
+    <string name="label_student_name">विद्यार्थ्याचे पूर्ण नाव</string>
+    <string name="label_roll_no">हजेरी क्रमांक</string>
+    <string name="label_dob">जन्मतारीख</string>
+    <string name="label_gender">लिंग</string>
+    <string name="label_parent_name">पालकांचे नाव</string>
+    <string name="label_select_school">शाळा निवडा</string>
+    <string name="label_select_class">वर्ग निवडा</string>
+    <string name="label_name">नाव :</string>
+    <string name="label_class">वर्ग :</string>
+    <string name="label_percentage">टक्केवारी</string>
+    <string name="label_result">निकाल</string>
+    <string name="label_class_teacher">वर्गशिक्षक</string>
+    <string name="label_principal">मुख्याध्यापक</string>
+    <string name="label_ocr_detected">ओसीआर (OCR) आढळलेली प्रतिमा</string>
+    <string name="label_schools">शाळा</string>
+    <string name="label_students">विद्यार्थी</string>
+    <string name="label_quick_actions">जलद कृती</string>
+    <string name="label_recent_schools">तुमच्या शाळा</string>
+    <!-- Titles -->
+    <string name="title_register_school">शाळेची नोंदणी करा</string>
+    <string name="title_class_setup">वर्ग आणि विषय संरचना</string>
+    <string name="title_add_student">विद्यार्थी जोडा</string>
+    <string name="title_enter_marks">गुण नोंदवा</string>
+    <string name="title_marksheet">प्रगती पत्रक</string>
+    <!-- Buttons -->
+    <string name="btn_save_school">शाळा जतन करा</string>
+    <string name="btn_save_class">वर्ग आणि विषय जतन करा</string>
+    <string name="btn_add_subject">विषय जोडा</string>
+    <string name="btn_save_student">विद्यार्थी जतन करा</string>
+    <string name="btn_save_marks">गुण जतन करा</string>
+    <string name="btn_scan">स्कॅन करा</string>
+    <string name="btn_print">प्रिंट करा</string>
+    <string name="btn_share">पीडीएफ शेअर करा</string>
+    <!-- Table columns -->
+    <string name="col_subject">विषय</string>
+    <string name="col_max">एकूण</string>
+    <string name="col_obtained">मिळालेले गुण</string>
+    <string name="col_grade">श्रेणी</string>
+    <string name="col_total">एकूण</string>
+    <!-- Chips / status -->
+    <string name="chip_all">सर्व</string>
+    <string name="chip_pending">प्रलंबित</string>
+    <string name="chip_done">पूर्ण</string>
+    <!-- Gender -->
+    <string name="gender_male">पुरुष</string>
+    <string name="gender_female">स्त्री</string>
+    <!-- Home -->
+    <string name="home_greeting">शुभ दिवस,</string>
+    <string name="home_pick_session">शैक्षणिक वर्ष, सत्र आणि वर्ग निवडा</string>
+    <string name="label_year_short">शैक्षणिक वर्ष</string>
+    <string name="label_semester_short">सत्र</string>
+    <string name="label_class_short">वर्ग आणि तुकडी</string>
+    <string name="btn_open_students">विद्यार्थी उघडा</string>
+    <string name="home_no_class_hint">अद्याप कोणताही वर्ग जोडलेला नाही - वर्ग जोडण्यासाठी \'विद्यार्थी उघडा\' वर टॅप करा.</string>
+    <string name="cd_previous">मागील</string>
+    <string name="cd_next">पुढील</string>
+    <string name="action_add_school">शाळा\nजोडा</string>
+    <string name="action_add_student">विद्यार्थी\nजोडा</string>
+    <string name="action_enter_marks">गुण\nनोंदवा</string>
+    <!-- Search -->
+    <string name="hint_search_student">नाव किंवा रोल नंबर द्वारे शोधा…</string>
+    <!-- Empty state -->
+    <string name="empty_no_students">अद्याप कोणतेही विद्यार्थी जोडलेले नाहीत</string>
+    <!-- OCR / MainActivity -->
+    <string name="error_no_numbers">प्रतिमेमध्ये कोणतेही गुण आढळले नाहीत</string>
+    <string name="success_saved">नोंद यशस्वीरित्या जतन झाली</string>
+    <string name="pdf_generated">पीडीएफ यशस्वीरित्या तयार झाली</string>
+    <string name="copied_to_clipboard">क्लिपबोर्डवर कॉपी केले</string>
+    <!-- Profile -->
+    <string name="profile_title">प्रोफाईल</string>
+    <string name="personal_info">वैयक्तिक माहिती</string>
+    <string name="change_password">पासवर्ड बदला</string>
+    <string name="logout">लॉग आउट</string>
+    <string name="save_changes">बदल जतन करा</string>
+    <!-- Myschool Drawer -->
+    <string name="drawer_app_name">मायस्कूल प्रो</string>
+    <string name="drawer_stats">सांख्यिकी</string>
+    <string name="drawer_settings">सेटिंग्ज</string>
+    <string name="drawer_print">प्रिंट</string>
+    <string name="section_about_student">विद्यार्थ्याबद्दल</string>
+    <string name="section_class_level">वर्ग पातळी</string>
+    <string name="section_school_level">शाळा पातळी</string>
+    <string name="menu_info_print">माहिती आणि प्रिंट रचना</string>
+    <string name="menu_formative_summative">आकारिक आणि संकलित</string>
+    <string name="menu_descriptive_entries">वर्णनात्मक नोंदी</string>
+    <string name="menu_attendance">उपस्थिती</string>
+    <string name="menu_list_students">वर्ग आणि तुकडी</string>
+    <string name="menu_student_list">विद्यार्थ्यांची यादी</string>
+    <string name="menu_subjects">विषय</string>
+    <string name="menu_declare_weightage">भारांश घोषित करा</string>
+    <string name="menu_dropdown_list">ड्रॉपडाउन यादी</string>
+    <string name="menu_extra_menus">इतर मेनू पहा</string>
+    <string name="menu_print_report">अहवाल प्रिंट करा</string>
+    <!-- Info & Print -->
+    <string name="title_info_print">माहिती आणि प्रिंट रचना</string>
+    <string name="subtitle_info_print">शैक्षणिक वर्ष · सत्र · वर्ग</string>
+    <string name="year_label">वर्ष: %1$s</string>
+    <string name="semester_easy_reports">सोपे अहवाल</string>
+    <string name="semester_print_hint">प्रिंट, पीडीएफ, प्रगती पत्रक…</string>
+    <string name="activate_class">तो सक्रिय करा</string>
+    <string name="tap_key_request">की विनंती पाठवण्यासाठी येथे टॅप करा.</string>
+    <string name="btn_go_to_class">वर्गात जा</string>
+    <string name="btn_all_classes">सर्व वर्ग</string>
+    <string name="btn_how_to_use">कसे वापरावे</string>
+    <string name="btn_online_help">ऑनलाइन मदत</string>
+    <string name="hint_fill_data">माहिती कशी भरायची हे जाणून घेण्यासाठी येथे स्पर्श करा.</string>
+    <string name="hint_question_mark">गोष्टी समजून घेण्यासाठी प्रत्येक पानावर प्रश्नचिन्हाचा वापर करा.</string>
+    <!-- Class & Div -->
+    <string name="title_class_div">वर्ग आणि तुकडी</string>
+    <string name="subtitle_class_div">शाळा: वर्ग आणि तुकडी</string>
+    <string name="class_div_format">वर्ग: %1$s, तुकडी: %2$s</string>
+    <string name="teacher_placeholder">पहिल्या शिक्षकाचे नाव</string>
+    <string name="add_class">वर्ग जोडा</string>
+    <string name="add_student_short">विद्यार्थी जोडा</string>
+    <string name="page_coming_soon">हा विभाग पुढील अपडेटमध्ये उपलब्ध होईल.</string>
+    <string name="select_school_first">कृपया प्रथम तुमची प्रोफाईल (युडायस) पूर्ण करा.</string>
+    <string name="select_class_first">कृपया प्रथम वर्ग निवडा.</string>
+    <!-- User profile -->
+    <string name="title_user">वापरकर्ता</string>
+    <string name="subtitle_user_detail">सविस्तर माहिती</string>
+    <string name="user_information">वापरकर्ता माहिती</string>
+    <string name="label_name_field">नाव</string>
+    <string name="label_udise_short">युडायस</string>
+    <string name="label_year_field">वर्ष</string>
+    <string name="hint_paste_link">निकाल लिंक येथे पेस्ट करा..</string>
+    <string name="your_classes">तुमचे वर्ग</string>
+    <string name="nav_profile">प्रोफाईल</string>
+    <string name="profile_subtitle">तुमचे खाते आणि वर्ग</string>
+    <string name="profile_section_details">शिक्षकाचा तपशील</string>
+    <string name="profile_class_hint">सक्रिय करण्यासाठी वर्गावर (इ. १-१२) टॅप करा. तपशील खाली दिसेल.</string>
+    <string name="your_classes_std">तुमचे वर्ग (इयत्ता १ ते १२)</string>
+    <string name="profile_active_class">सक्रिय वर्ग</string>
+    <string name="profile_std_empty">इयत्ता %1$d - जोडलेली नाही</string>
+    <string name="profile_add_from_home">मुख्यपृष्ठावरून जोडा</string>
+    <string name="profile_students_count">%1$d विद्यार्थी</string>
+    <string name="profile_division_line">तुकडी: %1$s</string>
+    <string name="profile_divisions_in_std">या इयत्तेतील सर्व तुकड्या: %1$s</string>
+    <string name="profile_class_teachers">शिक्षक: %1$s · %2$s</string>
+    <string name="profile_teacher_line">वर्गशिक्षक: %1$s</string>
+    <string name="profile_asst_teacher_line">सहाय्यक शिक्षक: %1$s</string>
+    <string name="profile_std_total_students">इयत्ता %1$d एकूण (सर्व तुकड्या): %2$d विद्यार्थी</string>
+    <string name="profile_summary_phone">फोन: %1$s</string>
+    <string name="profile_summary_udise">युडायस (UDISE): %1$s</string>
+    <string name="profile_tap_select">निवडण्यासाठी टॅप करा</string>
+    <string name="profile_class_selected">सक्रिय वर्ग</string>
+    <string name="profile_no_classes">अद्याप कोणतेही वर्ग जोडलेले नाहीत. मुख्यपृष्ठावरून वर्ग जोडा.</string>
+    <string name="profile_saved">प्रोफाईल यशस्वीरित्या जतन झाली</string>
+    <string name="logout_confirm">तुम्हाला खात्री आहे की तुम्ही लॉग आउट करू इच्छिता?</string>
+    <string name="error_name_required">नाव आवश्यक आहे</string>
+    <string name="edit_profile">प्रोफाईल संपादित करा</string>
+    <string name="back">मागे</string>
+    <!-- Student profile -->
+    <string name="standard_division_format">इयत्ता: %1$s आणि तुकडी: %2$s</string>
+    <string name="reg_format">नोंदणी क्रमांक: %1$s</string>
+    <string name="label_roll_no_1">हजेरी क्रमांक १</string>
+    <string name="label_roll_no_2">हजेरी क्रमांक २</string>
+    <string name="label_cast">जात</string>
+    <string name="family_details">कौटुंबिक तपशील</string>
+    <string name="bank_details">बँक तपशील</string>
+    <string name="label_mother_name">आईचे नाव</string>
+    <string name="label_mother_occupation">व्यवसाय</string>
+    <string name="label_mother_phone">फोन</string>
+    <string name="label_father_name">वडिलांचे नाव</string>
+    <string name="label_father_occupation">व्यवसाय</string>
+    <string name="label_father_phone">फोन</string>
+    <string name="label_home_address">पत्ता</string>
+    <string name="label_account_no">खाते क्रमांक</string>
+    <string name="label_branch">शाखा</string>
+    <string name="label_ifsc">आयएफएससी (IFSC)</string>
+    <string name="label_uid">आधार क्रमांक (UID)</string>
+    <string name="label_medium">माध्यम</string>
+    <string name="label_mother_tongue">मातृभाषा</string>
+    <string name="label_date_admission">प्रवेश तारीख</string>
+    <string name="label_student_id">विद्यार्थी आयडी</string>
+    <string name="edit_student">विद्यार्थी संपादित करा</string>
+    <string name="student_profile_title">विद्यार्थी</string>
+    <string name="student_not_found">विद्यार्थी आढळला नाही</string>
+    <string name="section_basic_info">मूलभूत माहिती</string>
+    <string name="section_academic_ids">शैक्षणिक आणि आयडी</string>
+    <string name="label_bank_uid">बँक आधार क्रमांक</string>
+    <string name="view_marksheet">प्रगती पत्रक पहा</string>
+    <string name="marks_entered_yes">गुण नोंदवले आहेत</string>
+    <string name="marks_entered_no">गुण प्रलंबित आहेत</string>
+    <string name="no_marks_yet">अद्याप गुण नोंदवलेले नाहीत</string>
+    <string name="basic_info">मूलभूत माहिती</string>
+    <string name="academic_info">शैक्षणिक माहिती</string>
+    <string name="label_reg_no">नोंदणी क्रमांक</string>
+    <string name="label_standard">इयत्ता</string>
+    <string name="action_profile">प्रोफाईल</string>
+</resources>

@@ -36,6 +36,11 @@ public class EnterMarksActivity extends AppCompatActivity {
     private ClassModel classModel;
     private MarksRecord existingMarks;
 
+    // ── Per-subject max-mark breakdowns (computed once in addMarksRow) ─────────
+    // Each array: [akarikMax, sanklitMax, nirikhshan, tondiKam, pratyakshik,
+    //              upkram, prakalp, chachani, swadhyay, itar, tondiB, pratyakshikB, lekhi]
+    private final List<int[]> subjectMaxBreakdown = new ArrayList<>();
+
     private final ActivityResultLauncher<Intent> cameraLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -68,29 +73,27 @@ public class EnterMarksActivity extends AppCompatActivity {
         setSupportActionBar(b.toolbar);
         b.toolbar.setNavigationOnClickListener(v -> finish());
 
-        ocrHelper = new OcrHelper();
-        student   = AppCache.selectedStudent;
-        classModel = AppCache.selectedClass;
+        ocrHelper   = new OcrHelper();
+        student     = AppCache.selectedStudent;
+        classModel  = AppCache.selectedClass;
 
         if (student == null || classModel == null) { finish(); return; }
 
-        // Fill header
         b.tvMarksStudentName.setText(student.name);
         b.tvMarksRollClass.setText("Roll: " + student.rollNo + " | " + classModel.getDisplayName());
 
-        // Build marks rows from class subjects
+        // Build one row per subject
         if (classModel.subjects != null) {
-            for (Subject sub : classModel.subjects) addMarksRow(sub.name, sub.maxMarks);
+            for (Subject sub : classModel.subjects) {
+                addMarksRow(sub);
+            }
         }
 
         // Load existing marks if any
         FirebaseRepository.get().getMarksForStudent(student.id, classModel.id,
                 new FirebaseRepository.OnResult<MarksRecord>() {
                     @Override public void onSuccess(MarksRecord m) {
-                        if (m != null) {
-                            existingMarks = m;
-                            fillExistingMarks(m);
-                        }
+                        if (m != null) { existingMarks = m; fillExistingMarks(m); }
                     }
                     @Override public void onError(Exception e) {}
                 });
@@ -99,68 +102,112 @@ public class EnterMarksActivity extends AppCompatActivity {
         b.btnSaveMarks.setOnClickListener(v -> saveMarks());
     }
 
-    private void addMarksRow(String subjectName, int maxMarks) {
+    // ── Row builder ────────────────────────────────────────────────────────────
+    private void addMarksRow(Subject sub) {
         ItemSubjectMarksRowBinding row = ItemSubjectMarksRowBinding.inflate(
                 LayoutInflater.from(this), b.llMarksRows, false);
-        row.tvSubjectName.setText(subjectName);
-        
-        // Header clicks toggle expand/collapse details
+
+        row.tvSubjectName.setText(sub.name);
+
+        int maxMarks = sub.maxMarks;
+        int nirikhshanMax   = sub.maxNirikhshan;
+        int tondiKamMax     = sub.maxTondiKam;
+        int pratyakshikAMax = sub.maxPratyakshik;
+        int upkramMax       = sub.maxUpkram;
+        int prakalpMax      = sub.maxPrakalp;
+        int chachaniMax     = sub.maxChachani;
+        int swadhyayMax     = sub.maxSwadhyay;
+        int itarMax         = sub.maxItar;
+
+        int tondiBMax       = sub.maxTondi;
+        int pratyakshikBMax = sub.maxPratyakshikB;
+        int lekhiMax        = sub.maxLekhi;
+
+        // Fallback to standard 50-50 scaling breakdown if sub-fields are not initialized
+        if (nirikhshanMax == 0 && tondiKamMax == 0 && pratyakshikAMax == 0 &&
+            upkramMax == 0 && prakalpMax == 0 && chachaniMax == 0 && swadhyayMax == 0 &&
+            tondiBMax == 0 && pratyakshikBMax == 0 && lekhiMax == 0) {
+
+            int akarikMax  = maxMarks / 2;
+            int sanklitMax = maxMarks - akarikMax;
+
+            nirikhshanMax   = akarikMax * 10 / 50;
+            tondiKamMax     = akarikMax * 10 / 50;
+            pratyakshikAMax = akarikMax * 10 / 50;
+            upkramMax       = akarikMax * 5  / 50;
+            prakalpMax      = akarikMax * 5  / 50;
+            chachaniMax     = akarikMax * 5  / 50;
+            swadhyayMax     = akarikMax * 5  / 50;
+            itarMax = akarikMax - nirikhshanMax - tondiKamMax - pratyakshikAMax
+                    - upkramMax - prakalpMax - chachaniMax - swadhyayMax;
+
+            tondiBMax       = sanklitMax * 10 / 50;
+            pratyakshikBMax = sanklitMax * 10 / 50;
+            lekhiMax        = sanklitMax - tondiBMax - pratyakshikBMax;
+        }
+
+        int akarikMax  = nirikhshanMax + tondiKamMax + pratyakshikAMax + upkramMax + prakalpMax + chachaniMax + swadhyayMax + itarMax;
+        int sanklitMax = tondiBMax + pratyakshikBMax + lekhiMax;
+        final int finalMaxMarks = akarikMax + sanklitMax;
+
+        // Store so updateSubjectHeader can read them without re-computing
+        int[] mx = {akarikMax, sanklitMax,
+                nirikhshanMax, tondiKamMax, pratyakshikAMax,
+                upkramMax, prakalpMax, chachaniMax, swadhyayMax, itarMax,
+                tondiBMax, pratyakshikBMax, lekhiMax};
+        subjectMaxBreakdown.add(mx);
+
+        // ── Set badge labels ───────────────────────────────────────────────────
+        row.tvAkarikMaxBadge.setText("पैकी " + akarikMax);
+        row.tvSanklitMaxBadge.setText("पैकी " + sanklitMax);
+
+        // ── Set individual sub-field max labels (shown as "/10", "/5" etc.) ───
+        row.tvNirikhshanMax.setText("/" + nirikhshanMax);
+        row.tvTondiKamMax.setText("/" + tondiKamMax);
+        row.tvPratyakshikAMax.setText("/" + pratyakshikAMax);
+        row.tvUpkramMax.setText("/" + upkramMax);
+        row.tvPrakalpMax.setText("/" + prakalpMax);
+        row.tvChachaniMax.setText("/" + chachaniMax);
+        row.tvSwadhyayMax.setText("/" + swadhyayMax);
+        row.tvItarMax.setText(itarMax > 0 ? "/" + itarMax : "/—");
+        row.tvTondiBMax.setText("/" + tondiBMax);
+        row.tvPratyakshikBMax.setText("/" + pratyakshikBMax);
+        row.tvLekhiMax.setText("/" + lekhiMax);
+
+        // Max marks validation to prevent typing marks > max
+        setupMaxMarksValidation(row.etNirikhshan, nirikhshanMax);
+        setupMaxMarksValidation(row.etTondiKam, tondiKamMax);
+        setupMaxMarksValidation(row.etPratyakshik, pratyakshikAMax);
+        setupMaxMarksValidation(row.etUpkram, upkramMax);
+        setupMaxMarksValidation(row.etPrakalp, prakalpMax);
+        setupMaxMarksValidation(row.etChachani, chachaniMax);
+        setupMaxMarksValidation(row.etSwadhyay, swadhyayMax);
+        setupMaxMarksValidation(row.etItar, itarMax);
+        setupMaxMarksValidation(row.etTondiB, tondiBMax);
+        setupMaxMarksValidation(row.etPratyakshikB, pratyakshikBMax);
+        setupMaxMarksValidation(row.etLekhi, lekhiMax);
+
+        // ── Initial display of totals ──────────────────────────────────────────
+        int rowIdx = marksRows.size();
+        updateRow(row, mx, finalMaxMarks);
+
+        // ── Expand / collapse on header tap ───────────────────────────────────
         row.layoutHeader.setOnClickListener(v -> {
-            boolean isVisible = row.layoutDetails.getVisibility() == View.VISIBLE;
-            row.layoutDetails.setVisibility(isVisible ? View.GONE : View.VISIBLE);
-            row.ivExpandArrow.setRotation(isVisible ? 0f : 180f);
+            boolean open = row.layoutDetails.getVisibility() == View.VISIBLE;
+            row.layoutDetails.setVisibility(open ? View.GONE : View.VISIBLE);
+            row.ivExpandArrow.setRotation(open ? 0f : 180f);
         });
 
-        // Initialize header
-        updateSubjectHeader(row, maxMarks);
-
-        // Bind TextWatchers to all inputs for real-time totals & grade updates
-        addListeners(row, maxMarks);
-
-        b.llMarksRows.addView(row.getRoot());
-        marksRows.add(row);
-    }
-
-    private int getInt(android.widget.EditText et) {
-        if (et == null || et.getText() == null) return 0;
-        String s = et.getText().toString().trim();
-        if (s.isEmpty()) return 0;
-        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
-    }
-
-    private void updateSubjectHeader(ItemSubjectMarksRowBinding row, int maxMarks) {
-        int nirikhshan = getInt(row.etNirikhshan);
-        int tondiKam = getInt(row.etTondiKam);
-        int pratyakshik = getInt(row.etPratyakshik);
-        int upkram = getInt(row.etUpkram);
-        int prakalp = getInt(row.etPrakalp);
-        int chachani = getInt(row.etChachani);
-        int swadhyay = getInt(row.etSwadhyay);
-        int itar = getInt(row.etItar);
-        
-        int formativeTotal = nirikhshan + tondiKam + pratyakshik + upkram + prakalp + chachani + swadhyay + itar;
-        
-        int tondiB = getInt(row.etTondiB);
-        int pratyakshikB = getInt(row.etPratyakshikB);
-        int lekhi = getInt(row.etLekhi);
-        
-        int summativeTotal = tondiB + pratyakshikB + lekhi;
-        int grandTotal = formativeTotal + summativeTotal;
-        
-        row.tvSubjectTotal.setText("Total: " + grandTotal + "/" + maxMarks);
-        String gr = GradeCalculator.getMyschoolGrade(grandTotal, maxMarks);
-        row.tvSubjectGrade.setText("Grade: " + gr);
-    }
-
-    private void addListeners(ItemSubjectMarksRowBinding row, int maxMarks) {
+        // ── Live recalculation on every keystroke ──────────────────────────────
         android.text.TextWatcher watcher = new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updateSubjectHeader(row, maxMarks);
-                recalcTotals();
+                updateRow(row, mx, finalMaxMarks);
+                recalcAllSubjectsTotals();
             }
             @Override public void afterTextChanged(android.text.Editable s) {}
         };
+
         row.etNirikhshan.addTextChangedListener(watcher);
         row.etTondiKam.addTextChangedListener(watcher);
         row.etPratyakshik.addTextChangedListener(watcher);
@@ -169,85 +216,68 @@ public class EnterMarksActivity extends AppCompatActivity {
         row.etChachani.addTextChangedListener(watcher);
         row.etSwadhyay.addTextChangedListener(watcher);
         row.etItar.addTextChangedListener(watcher);
-        
         row.etTondiB.addTextChangedListener(watcher);
         row.etPratyakshikB.addTextChangedListener(watcher);
         row.etLekhi.addTextChangedListener(watcher);
-        
-        row.etSubjectRemark.addTextChangedListener(watcher);
+
+        b.llMarksRows.addView(row.getRoot());
+        marksRows.add(row);
     }
 
-    private void fillExistingMarks(MarksRecord m) {
-        if (classModel.subjects == null) return;
-        
-        // Fill Attendance details
-        b.etPresentDays.setText(String.valueOf(m.presentDays));
-        b.etTotalDays.setText(String.valueOf(m.totalDays));
-        
-        for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
-            String subName = classModel.subjects.get(i).name;
-            ItemSubjectMarksRowBinding row = marksRows.get(i);
-            
-            if (m.detailedMarks != null && m.detailedMarks.containsKey(subName)) {
-                MarksRecord.SubjectMarksDetail detail = m.detailedMarks.get(subName);
-                if (detail != null) {
-                    row.etNirikhshan.setText(String.valueOf(detail.nirikhshan));
-                    row.etTondiKam.setText(String.valueOf(detail.tondiKam));
-                    row.etPratyakshik.setText(String.valueOf(detail.pratyakshik));
-                    row.etUpkram.setText(String.valueOf(detail.upkram));
-                    row.etPrakalp.setText(String.valueOf(detail.prakalp));
-                    row.etChachani.setText(String.valueOf(detail.chachani));
-                    row.etSwadhyay.setText(String.valueOf(detail.swadhyay));
-                    row.etItar.setText(String.valueOf(detail.itar));
-                    
-                    row.etTondiB.setText(String.valueOf(detail.tondi));
-                    row.etPratyakshikB.setText(String.valueOf(detail.pratyakshikB));
-                    row.etLekhi.setText(String.valueOf(detail.lekhi));
-                    
-                    row.etSubjectRemark.setText(detail.remark != null ? detail.remark : "");
-                }
-            } else if (m.subjectMarks.containsKey(subName)) {
-                // Fallback for flat map compatibility
-                double val = m.subjectMarks.get(subName);
-                row.etLekhi.setText(formatMark(val));
-            }
-            updateSubjectHeader(row, classModel.subjects.get(i).maxMarks);
-        }
-        recalcTotals();
+    /**
+     * Updates ALL live displays inside a single subject row:
+     *  - आकारिक subtotal bar
+     *  - संकलित subtotal bar
+     *  - Grand total bar (inside expanded section)
+     *  - Header chip (always-visible एकूण + श्रेणी)
+     */
+    private void updateRow(ItemSubjectMarksRowBinding row, int[] mx, int maxMarks) {
+        // mx layout: [akarikMax, sanklitMax, n, tk, pt, uk, pk, ch, sw, it, tb, pb, lk]
+        int akarikMax  = mx[0];
+        int sanklitMax = mx[1];
+
+        // Sum आकारिक fields
+        int akarikObtained = getInt(row.etNirikhshan)  + getInt(row.etTondiKam)
+                           + getInt(row.etPratyakshik) + getInt(row.etUpkram)
+                           + getInt(row.etPrakalp)     + getInt(row.etChachani)
+                           + getInt(row.etSwadhyay)    + getInt(row.etItar);
+
+        // Sum संकलित fields
+        int sanklitObtained = getInt(row.etTondiB) + getInt(row.etPratyakshikB) + getInt(row.etLekhi);
+
+        int grandTotal = akarikObtained + sanklitObtained;
+
+        // ── Subtotal bars inside expanded section ──────────────────────────────
+        row.tvAkarikSubTotal.setText(akarikObtained + " / " + akarikMax);
+        row.tvSanklitSubTotal.setText(sanklitObtained + " / " + sanklitMax);
+        row.tvGrandTotalInDetail.setText(grandTotal + " / " + maxMarks);
+
+        // ── Header chip (always visible, even when collapsed) ──────────────────
+        row.tvSubjectTotal.setText("एकूण: " + grandTotal + "/" + maxMarks);
+        row.tvSubjectGrade.setText("श्रेणी: " + GradeCalculator.getMyschoolGrade(grandTotal, maxMarks));
     }
 
-    private void recalcTotals() {
-        double total = 0;
-        int maxTotal = 0;
+    // ── Grand total footer card ────────────────────────────────────────────────
+    private void recalcAllSubjectsTotals() {
+        double total = 0; int maxTotal = 0;
         if (classModel.subjects == null) return;
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
             int maxMarks = classModel.subjects.get(i).maxMarks;
             maxTotal += maxMarks;
-            
+
             ItemSubjectMarksRowBinding row = marksRows.get(i);
-            int nirikhshan = getInt(row.etNirikhshan);
-            int tondiKam = getInt(row.etTondiKam);
-            int pratyakshik = getInt(row.etPratyakshik);
-            int upkram = getInt(row.etUpkram);
-            int prakalp = getInt(row.etPrakalp);
-            int chachani = getInt(row.etChachani);
-            int swadhyay = getInt(row.etSwadhyay);
-            int itar = getInt(row.etItar);
-            int akarikTotal = nirikhshan + tondiKam + pratyakshik + upkram + prakalp + chachani + swadhyay + itar;
-            
-            int tondiB = getInt(row.etTondiB);
-            int pratyakshikB = getInt(row.etPratyakshikB);
-            int lekhi = getInt(row.etLekhi);
-            int sanklit = tondiB + pratyakshikB + lekhi;
-            
-            int grandTotal = akarikTotal + sanklit;
-            total += grandTotal;
+            int akarik  = getInt(row.etNirikhshan)  + getInt(row.etTondiKam)
+                        + getInt(row.etPratyakshik) + getInt(row.etUpkram)
+                        + getInt(row.etPrakalp)     + getInt(row.etChachani)
+                        + getInt(row.etSwadhyay)    + getInt(row.etItar);
+            int sanklit = getInt(row.etTondiB) + getInt(row.etPratyakshikB) + getInt(row.etLekhi);
+            total += akarik + sanklit;
         }
         double pct = GradeCalculator.getPercentage(total, maxTotal);
         b.tvTotalMax.setText(String.valueOf(maxTotal));
         b.tvTotalObtained.setText(formatMark(total));
         b.tvPercentage.setText(String.format("%.2f%%", pct));
-        b.tvGrade.setText("Grade: " + GradeCalculator.getMyschoolGrade(total, maxTotal));
+        b.tvGrade.setText("श्रेणी: " + GradeCalculator.getMyschoolGrade(total, maxTotal));
         String result = GradeCalculator.getResult(pct);
         b.tvResult.setText(result);
         b.tvResult.setBackgroundResource("PASS".equals(result)
@@ -256,60 +286,46 @@ public class EnterMarksActivity extends AppCompatActivity {
                 "PASS".equals(result) ? R.color.success : R.color.error, null));
     }
 
-    private void showScanOptions() {
-        String[] opts = {"Camera", "Gallery"};
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Scan Marksheet")
-                .setItems(opts, (d, w) -> {
-                    if (w == 0) {
-                        Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        cameraLauncher.launch(cam);
-                    } else {
-                        Intent gallery = new Intent(Intent.ACTION_PICK,
-                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        galleryLauncher.launch(gallery);
-                    }
-                }).show();
-    }
-
-    private void processOcr(Bitmap bitmap) {
-        if (bitmap == null) return;
-        b.cardOcrPreview.setVisibility(View.VISIBLE);
-        b.ivOcrPreview.setImageBitmap(bitmap);
-        b.tvOcrRaw.setText("Processing...");
-
-        ocrHelper.processImage(bitmap, new OcrHelper.OcrCallback() {
-            @Override
-            public void onResult(List<String> numbers, String rawText) {
-                runOnUiThread(() -> {
-                    b.tvOcrRaw.setText("Detected: " + numbers);
-                    autoFillFromOcr(numbers);
-                });
-            }
-            @Override
-            public void onError(Exception e) {
-                runOnUiThread(() -> b.tvOcrRaw.setText("OCR Error: " + e.getMessage()));
-            }
-        });
-    }
-
-    private void autoFillFromOcr(List<String> numbers) {
+    // ── Fill existing saved marks back into the form ───────────────────────────
+    private void fillExistingMarks(MarksRecord m) {
         if (classModel.subjects == null) return;
-        int idx = 0;
-        for (int i = 0; i < marksRows.size() && idx < numbers.size() && i < classModel.subjects.size(); i++) {
-            String val = numbers.get(idx++);
-            try {
-                int d = Integer.parseInt(val);
-                int max = classModel.subjects.get(i).maxMarks;
-                if (d >= 0 && d <= max) {
-                    marksRows.get(i).etLekhi.setText(val);
+
+        if (b.etPresentDays != null) b.etPresentDays.setText(String.valueOf(m.presentDays));
+        if (b.etTotalDays   != null) b.etTotalDays.setText(String.valueOf(m.totalDays));
+
+        for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
+            String subName = classModel.subjects.get(i).name;
+            ItemSubjectMarksRowBinding row = marksRows.get(i);
+
+            if (m.detailedMarks != null && m.detailedMarks.containsKey(subName)) {
+                MarksRecord.SubjectMarksDetail d = m.detailedMarks.get(subName);
+                if (d != null) {
+                    row.etNirikhshan.setText(String.valueOf(d.nirikhshan));
+                    row.etTondiKam.setText(String.valueOf(d.tondiKam));
+                    row.etPratyakshik.setText(String.valueOf(d.pratyakshik));
+                    row.etUpkram.setText(String.valueOf(d.upkram));
+                    row.etPrakalp.setText(String.valueOf(d.prakalp));
+                    row.etChachani.setText(String.valueOf(d.chachani));
+                    row.etSwadhyay.setText(String.valueOf(d.swadhyay));
+                    row.etItar.setText(String.valueOf(d.itar));
+                    row.etTondiB.setText(String.valueOf(d.tondi));
+                    row.etPratyakshikB.setText(String.valueOf(d.pratyakshikB));
+                    row.etLekhi.setText(String.valueOf(d.lekhi));
+                    if (d.remark != null) row.etSubjectRemark.setText(d.remark);
                 }
-            } catch (NumberFormatException ignored) {}
+            } else if (m.subjectMarks != null && m.subjectMarks.containsKey(subName)) {
+                // Backward-compat: flat map → fill into लेखी
+                row.etLekhi.setText(formatMark(m.subjectMarks.get(subName)));
+            }
+
+            // Trigger display refresh after setting values
+            int[] mx = i < subjectMaxBreakdown.size() ? subjectMaxBreakdown.get(i) : null;
+            if (mx != null) updateRow(row, mx, classModel.subjects.get(i).maxMarks);
         }
-        recalcTotals();
-        Toast.makeText(this, "Marks filled into Written (लेखी) — please verify!", Toast.LENGTH_LONG).show();
+        recalcAllSubjectsTotals();
     }
 
+    // ── Save ──────────────────────────────────────────────────────────────────
     private void saveMarks() {
         MarksRecord m = existingMarks != null ? existingMarks : new MarksRecord();
         m.studentId = student.id;
@@ -318,63 +334,63 @@ public class EnterMarksActivity extends AppCompatActivity {
         m.subjectMarks.clear();
         m.subjectMax.clear();
         m.detailedMarks.clear();
-        
+
         // Attendance
-        try {
-            m.presentDays = Integer.parseInt(b.etPresentDays.getText().toString());
-        } catch (NumberFormatException ignored) {}
-        try {
-            m.totalDays = Integer.parseInt(b.etTotalDays.getText().toString());
-        } catch (NumberFormatException ignored) {}
-        
-        // Semester Details
+        try { m.presentDays = Integer.parseInt(b.etPresentDays.getText().toString()); } catch (Exception ignored) {}
+        try { m.totalDays   = Integer.parseInt(b.etTotalDays.getText().toString());   } catch (Exception ignored) {}
+
+        // Semester
         if (SessionContext.selectedSemester != null) {
-            m.semesterId = SessionContext.selectedSemester.id;
+            m.semesterId     = SessionContext.selectedSemester.id;
             m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
         } else {
-            m.semesterId = "sem_1";
+            m.semesterId     = "sem_1";
             m.semesterNumber = "1";
         }
 
-        double total = 0; int maxTotal = 0;
         if (classModel.subjects == null) {
             Toast.makeText(this, "No subjects configured", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        double total = 0; int maxTotal = 0;
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
             Subject sub = classModel.subjects.get(i);
             ItemSubjectMarksRowBinding row = marksRows.get(i);
-            
-            MarksRecord.SubjectMarksDetail detail = new MarksRecord.SubjectMarksDetail();
-            detail.nirikhshan = getInt(row.etNirikhshan);
-            detail.tondiKam = getInt(row.etTondiKam);
-            detail.pratyakshik = getInt(row.etPratyakshik);
-            detail.upkram = getInt(row.etUpkram);
-            detail.prakalp = getInt(row.etPrakalp);
-            detail.chachani = getInt(row.etChachani);
-            detail.swadhyay = getInt(row.etSwadhyay);
-            detail.itar = getInt(row.etItar);
-            detail.akarikTotal = detail.nirikhshan + detail.tondiKam + detail.pratyakshik + detail.upkram + detail.prakalp + detail.chachani + detail.swadhyay + detail.itar;
-            
-            detail.tondi = getInt(row.etTondiB);
-            detail.pratyakshikB = getInt(row.etPratyakshikB);
-            detail.lekhi = getInt(row.etLekhi);
-            detail.sanklit = detail.tondi + detail.pratyakshikB + detail.lekhi;
-            
-            detail.grandTotal = detail.akarikTotal + detail.sanklit;
-            detail.maxMarks = sub.maxMarks;
-            detail.grade = GradeCalculator.getMyschoolGrade(detail.grandTotal, detail.maxMarks);
-            detail.remark = row.etSubjectRemark.getText() != null ? row.etSubjectRemark.getText().toString() : "";
-            
-            m.detailedMarks.put(sub.name, detail);
-            
-            // Backward compatibility
-            m.subjectMarks.put(sub.name, (double) detail.grandTotal);
+
+            MarksRecord.SubjectMarksDetail d = new MarksRecord.SubjectMarksDetail();
+            d.nirikhshan    = getInt(row.etNirikhshan);
+            d.tondiKam      = getInt(row.etTondiKam);
+            d.pratyakshik   = getInt(row.etPratyakshik);
+            d.upkram        = getInt(row.etUpkram);
+            d.prakalp       = getInt(row.etPrakalp);
+            d.chachani      = getInt(row.etChachani);
+            d.swadhyay      = getInt(row.etSwadhyay);
+            d.itar          = getInt(row.etItar);
+            d.akarikTotal   = d.nirikhshan + d.tondiKam + d.pratyakshik + d.upkram
+                            + d.prakalp + d.chachani + d.swadhyay + d.itar;
+
+            d.tondi         = getInt(row.etTondiB);
+            d.pratyakshikB  = getInt(row.etPratyakshikB);
+            d.lekhi         = getInt(row.etLekhi);
+            d.sanklit       = d.tondi + d.pratyakshikB + d.lekhi;
+
+            d.grandTotal    = d.akarikTotal + d.sanklit;
+            d.maxMarks      = sub.maxMarks;
+            d.grade         = GradeCalculator.getMyschoolGrade(d.grandTotal, d.maxMarks);
+            d.remark        = row.etSubjectRemark.getText() != null
+                              ? row.etSubjectRemark.getText().toString() : "";
+
+            m.detailedMarks.put(sub.name, d);
+
+            // Backward compat (used by older MarksheetActivity / PDF legacy path)
+            m.subjectMarks.put(sub.name, (double) d.grandTotal);
             m.subjectMax.put(sub.name, sub.maxMarks);
-            
-            total    += detail.grandTotal;
+
+            total    += d.grandTotal;
             maxTotal += sub.maxMarks;
         }
+
         m.totalObtained = total;
         m.totalMax      = maxTotal;
         m.percentage    = GradeCalculator.getPercentage(total, maxTotal);
@@ -385,13 +401,12 @@ public class EnterMarksActivity extends AppCompatActivity {
         FirebaseRepository.get().saveMarks(m, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
                 showLoading(false);
-                // Mark student as done
                 student.marksEntered = true;
                 FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
                     @Override public void onSuccess(String i) {}
                     @Override public void onError(Exception e) {}
                 });
-                Toast.makeText(EnterMarksActivity.this, "Marks saved!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EnterMarksActivity.this, "गुण जतन केले!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }
@@ -402,9 +417,83 @@ public class EnterMarksActivity extends AppCompatActivity {
         });
     }
 
+    // ── OCR ───────────────────────────────────────────────────────────────────
+    private void showScanOptions() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Scan Marksheet")
+                .setItems(new String[]{"Camera", "Gallery"}, (d, w) -> {
+                    if (w == 0) {
+                        cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
+                    } else {
+                        galleryLauncher.launch(new Intent(Intent.ACTION_PICK,
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+                    }
+                }).show();
+    }
+
+    private void processOcr(Bitmap bitmap) {
+        if (bitmap == null) return;
+        b.cardOcrPreview.setVisibility(View.VISIBLE);
+        b.ivOcrPreview.setImageBitmap(bitmap);
+        b.tvOcrRaw.setText("Processing...");
+        ocrHelper.processImage(bitmap, new OcrHelper.OcrCallback() {
+            @Override public void onResult(List<String> numbers, String rawText) {
+                runOnUiThread(() -> { b.tvOcrRaw.setText("Detected: " + numbers); autoFillFromOcr(numbers); });
+            }
+            @Override public void onError(Exception e) {
+                runOnUiThread(() -> b.tvOcrRaw.setText("OCR Error: " + e.getMessage()));
+            }
+        });
+    }
+
+    private void autoFillFromOcr(List<String> numbers) {
+        if (classModel.subjects == null) return;
+        int idx = 0;
+        for (int i = 0; i < marksRows.size() && idx < numbers.size() && i < classModel.subjects.size(); i++) {
+            try {
+                int d = Integer.parseInt(numbers.get(idx++));
+                int max = classModel.subjects.get(i).maxMarks;
+                if (d >= 0 && d <= max) marksRows.get(i).etLekhi.setText(String.valueOf(d));
+            } catch (NumberFormatException ignored) {}
+        }
+        recalcAllSubjectsTotals();
+        Toast.makeText(this, "Marks filled into Written (लेखी) — please verify!", Toast.LENGTH_LONG).show();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    private int getInt(android.widget.EditText et) {
+        if (et == null || et.getText() == null) return 0;
+        String s = et.getText().toString().trim();
+        if (s.isEmpty()) return 0;
+        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
+    }
+
     private void showLoading(boolean show) {
         b.marksProgress.setVisibility(show ? View.VISIBLE : View.GONE);
         b.btnSaveMarks.setEnabled(!show);
+    }
+
+    private void setupMaxMarksValidation(android.widget.EditText et, int maxVal) {
+        et.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(android.text.Editable s) {
+                String valStr = s.toString().trim();
+                if (valStr.isEmpty()) return;
+                try {
+                    int val = Integer.parseInt(valStr);
+                    if (val > maxVal) {
+                        et.removeTextChangedListener(this);
+                        et.setText(String.valueOf(maxVal));
+                        et.setSelection(et.getText().length());
+                        et.addTextChangedListener(this);
+                        Toast.makeText(EnterMarksActivity.this, "Marks cannot exceed " + maxVal, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore
+                }
+            }
+        });
     }
 
     private String formatMark(double v) {

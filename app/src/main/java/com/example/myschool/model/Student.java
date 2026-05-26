@@ -22,6 +22,9 @@ public class Student {
     public String photoUrl;
     public boolean marksEntered;
 
+    // Monthly Attendance: e.g., "जून" -> "20/22"
+    public java.util.Map<String, String> monthlyAttendance = new java.util.HashMap<>();
+
     // Family
     public String motherName;
     public String motherOccupation;

@@ -97,7 +97,6 @@ public class StudentListFragment extends Fragment {
 
             @Override
             public void onEnterMarksClick(Student student, int position) {
-                // Bug #4 fix: this is now reachable (called on tap when marks are pending)
                 AppCache.selectedStudent = student;
                 loadClassForStudent(student, () -> {
                     if (AppCache.selectedClass == null) return;
@@ -107,10 +106,56 @@ public class StudentListFragment extends Fragment {
             }
 
             @Override
-            public void onViewMarksheetClick(Student student, int position) {
-                // Called on tap when marks are done
+            public void onAttendanceClick(Student student, int position) {
                 AppCache.selectedStudent = student;
-                loadMarksForStudent(student);
+                loadClassForStudent(student, () -> {
+                    if (AppCache.selectedClass == null) return;
+                    SessionContext.selectedClass = AppCache.selectedClass;
+                    SessionContext.save(requireContext());
+                    if (getActivity() instanceof HomeActivity) {
+                        ((HomeActivity) getActivity()).navigateTo(R.id.nav_attendance);
+                    }
+                });
+            }
+
+            @Override
+            public void onEditInfoClick(Student student, int position) {
+                AppCache.selectedStudent = student;
+                startActivity(new Intent(requireContext(), StudentEditActivity.class)
+                        .putExtra("new_student", false));
+            }
+
+            @Override
+            public void onDeleteClick(Student student, int position) {
+                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Delete Student")
+                        .setMessage("Are you sure you want to delete " + student.name + "?")
+                        .setPositiveButton("Delete", (d, w) -> {
+                            FirebaseRepository.get().deleteStudent(student.id, new FirebaseRepository.OnResult<Void>() {
+                                @Override
+                                public void onSuccess(Void v) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(() -> {
+                                            allStudents.remove(student);
+                                            filteredStudents.remove(student);
+                                            studentAdapter.setData(filteredStudents);
+                                            b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                                            android.widget.Toast.makeText(requireContext(), "Student deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(() -> {
+                                            android.widget.Toast.makeText(requireContext(), "Error: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                }
+                            });
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             }
         });
         b.rvStudents.setLayoutManager(new LinearLayoutManager(requireContext()));

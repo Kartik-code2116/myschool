@@ -10,6 +10,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myschool.R;
+import com.example.myschool.SessionContext;
 import com.example.myschool.databinding.ItemStudentAttendanceBinding;
 import com.example.myschool.model.AttendanceRecord;
 import com.example.myschool.model.Student;
@@ -28,20 +29,15 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.VH
     }
 
     private final List<Student> students = new ArrayList<>();
-    private final Map<String, AttendanceRecord> attendanceMap = new HashMap<>();
     private final OnOptionClickListener listener;
 
     public AttendanceAdapter(OnOptionClickListener listener) {
         this.listener = listener;
     }
 
-    public void updateData(List<Student> newStudents, Map<String, AttendanceRecord> newAttendance) {
+    public void updateData(List<Student> newStudents) {
         this.students.clear();
         if (newStudents != null) this.students.addAll(newStudents);
-        
-        this.attendanceMap.clear();
-        if (newAttendance != null) this.attendanceMap.putAll(newAttendance);
-        
         notifyDataSetChanged();
     }
 
@@ -61,12 +57,13 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.VH
         // Set serial number and name in purple
         b.tvStudentName.setText((position + 1) + ". " + s.name);
 
-        // Retrieve attendance or create placeholder
-        AttendanceRecord r = attendanceMap.get(s.id);
-        if (r == null) {
-            r = new AttendanceRecord();
-            r.studentId = s.id;
-            r.classId = s.classId;
+        // Retrieve attendance from Student object
+        AttendanceRecord r = new AttendanceRecord();
+        r.studentId = s.id;
+        r.classId = s.classId;
+        r.academicYear = SessionContext.getYearLabel();
+        if (s.monthlyAttendance != null) {
+            r.monthlyData.putAll(s.monthlyAttendance);
         }
 
         // Recalculate totals

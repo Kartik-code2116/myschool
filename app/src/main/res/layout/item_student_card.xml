@@ -34,11 +34,13 @@
                 android:layout_marginTop="2dp" android:text="School Name"
                 android:textSize="11sp" android:textColor="@color/on_surface_variant" android:alpha="0.7"/>
         </LinearLayout>
-        <!-- Marks status chip -->
-        <com.google.android.material.chip.Chip android:id="@+id/chipMarksStatus"
-            style="@style/Widget.MaterialComponents.Chip.Entry"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/chip_pending" android:textSize="10sp"
-            android:clickable="false" android:focusable="false"/>
+        <!-- Options Menu -->
+        <ImageButton android:id="@+id/btnOptions"
+            android:layout_width="40dp" android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Options"
+            android:src="@drawable/ic_more_vert"
+            android:focusable="true" android:clickable="true"
+            app:tint="@color/on_surface_variant"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

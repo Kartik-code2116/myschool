@@ -34,6 +34,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SessionContext.load(this);
         super.onCreate(savedInstanceState);
         b = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
@@ -48,6 +49,7 @@ public class HomeActivity extends AppCompatActivity {
         topLevel.add(R.id.nav_profile);
         topLevel.add(R.id.nav_class_div);
         topLevel.add(R.id.nav_students);
+        topLevel.add(R.id.nav_settings);
 
         appBarConfig = new AppBarConfiguration.Builder(topLevel)
                 .setOpenableLayout(b.drawerLayout)
@@ -121,6 +123,9 @@ public class HomeActivity extends AppCompatActivity {
                 String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division : "1";
                 int sem = (SessionContext.selectedSemester != null) ? SessionContext.selectedSemester.number : 1;
                 subtitle = "• Class: " + cls + " • Div: " + div + " • Semester: " + sem;
+            } else if (id == R.id.nav_settings) {
+                title = getString(R.string.drawer_settings);
+                subtitle = "App Settings & Configurations";
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
@@ -190,7 +195,7 @@ public class HomeActivity extends AppCompatActivity {
         });
         header.findViewById(R.id.btnDrawerSettings).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            navController.navigate(R.id.nav_info_print);
+            navigateToAnimated(R.id.nav_settings);
         });
         header.findViewById(R.id.btnDrawerPrint).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
@@ -203,9 +208,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadTeacherInfo() {
+        if (AppCache.cachedTeacherName != null) {
+            b.tvToolbarSubtitle.setText(AppCache.cachedTeacherName);
+        }
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
             @Override public void onSuccess(Teacher t) {
                 if (t != null && t.name != null) {
+                    AppCache.cachedTeacherName = t.name;
                     runOnUiThread(() -> b.tvToolbarSubtitle.setText(t.name));
                 }
             }

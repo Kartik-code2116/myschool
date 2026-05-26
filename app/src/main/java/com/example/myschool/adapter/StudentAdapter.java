@@ -21,7 +21,9 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
     public interface OnStudentClick {
         void onClick(Student student, int position);
         void onEnterMarksClick(Student student, int position);
-        void onViewMarksheetClick(Student student, int position);
+        void onAttendanceClick(Student student, int position);
+        void onEditInfoClick(Student student, int position);
+        void onDeleteClick(Student student, int position);
     }
 
     private final List<Student> items = new ArrayList<>();
@@ -54,22 +56,10 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         Student s = items.get(pos);
         h.tvName.setText(s.name);
 
-        // Bug #5 fix: display denormalized class name and school name instead of raw IDs
-        String classDisplay = (s.className != null && !s.className.isEmpty())
-                ? s.className : "Class N/A";
-        h.tvRollClass.setText("Roll: " + (s.rollNo != null ? s.rollNo : "—") + " | " + classDisplay);
-        h.tvSchool.setText(s.schoolName != null && !s.schoolName.isEmpty() ? s.schoolName : "");
-
-        // Status chip
-        if (s.marksEntered) {
-            h.chipStatus.setText("Done");
-            h.chipStatus.setChipBackgroundColorResource(R.color.success_container);
-            h.chipStatus.setTextColor(h.itemView.getContext().getResources().getColor(R.color.success, null));
-        } else {
-            h.chipStatus.setText("Pending");
-            h.chipStatus.setChipBackgroundColorResource(R.color.surface_variant);
-            h.chipStatus.setTextColor(h.itemView.getContext().getResources().getColor(R.color.on_surface_variant, null));
-        }
+        String rollDisplay = (s.rollNo != null && !s.rollNo.isEmpty()) ? s.rollNo : "—";
+        String regDisplay = (s.registrationNo != null && !s.registrationNo.isEmpty()) ? s.registrationNo : "—";
+        h.tvRollClass.setText("Roll No: " + rollDisplay + " | Reg No: " + regDisplay);
+        h.tvSchool.setText(""); // Hide school name or any exam related info as requested
 
         // Photo
         if (s.photoUrl != null && !s.photoUrl.isEmpty()) {
@@ -81,6 +71,32 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(s, pos);
         });
+
+        h.btnOptions.setOnClickListener(v -> {
+            android.widget.PopupMenu popup = new android.widget.PopupMenu(v.getContext(), v);
+            popup.getMenu().add(0, 1, 0, "Evaluation");
+            popup.getMenu().add(0, 2, 1, "Attendance");
+            popup.getMenu().add(0, 3, 2, "Edit Info");
+            popup.getMenu().add(0, 4, 3, "Delete");
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == 1) {
+                    if (listener != null) listener.onEnterMarksClick(s, pos);
+                    return true;
+                } else if (itemId == 2) {
+                    if (listener != null) listener.onAttendanceClick(s, pos);
+                    return true;
+                } else if (itemId == 3) {
+                    if (listener != null) listener.onEditInfoClick(s, pos);
+                    return true;
+                } else if (itemId == 4) {
+                    if (listener != null) listener.onDeleteClick(s, pos);
+                    return true;
+                }
+                return false;
+            });
+            popup.show();
+        });
     }
 
     @Override
@@ -91,7 +107,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
     static class VH extends RecyclerView.ViewHolder {
         ImageView ivPhoto;
         TextView tvName, tvRollClass, tvSchool;
-        com.google.android.material.chip.Chip chipStatus;
+        android.widget.ImageButton btnOptions;
 
         VH(@NonNull View v) {
             super(v);
@@ -99,7 +115,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             tvName = v.findViewById(R.id.tvStudentName);
             tvRollClass = v.findViewById(R.id.tvRollClass);
             tvSchool = v.findViewById(R.id.tvSchoolName);
-            chipStatus = v.findViewById(R.id.chipMarksStatus);
+            btnOptions = v.findViewById(R.id.btnOptions);
         }
     }
 }

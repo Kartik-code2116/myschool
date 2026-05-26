@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Collapsed Header Row (Main Info) -->
+        <LinearLayout
+            android:id="@+id/layoutHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground">
+
+            <!-- Left Colored Category Badge / Circle -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardColorIndicator"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="#EDE7F6">
+
+                <TextView
+                    android:id="@+id/tvSubjectInitial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="M"
+                    android:textColor="#5E35B1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Center Subject Details -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSubjectName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Marathi"
+                    android:textColor="#333333"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/tvWeightageBreakdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="आकारिक: 50 | संकलित: 50"
+                    android:textColor="#666666"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Main Total Marks Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilMaxMarks"
+                style="@style/Widget.Myschool.TextInputLayout"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:hint="पैकी"
+                android:layout_marginStart="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etMaxMarks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="100"
+                    android:gravity="center"
+                    android:maxLength="3"
+                    android:singleLine="true"
+                    android:textColor="#333333"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Expansion Arrow -->
+            <ImageView
+                android:id="@+id/ivExpandArrow"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_expand_down"
+                app:tint="#5E35B1"
+                android:padding="4dp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Divider Line inside card -->
+        <View
+            android:id="@+id/viewHeaderDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:visibility="gone" />
+
+        <!-- Collapsible Details Container (Sub-Subjects Inputs) -->
+        <LinearLayout
+            android:id="@+id/layoutSubFields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="#FBFBFC"
+            android:visibility="gone">
+
+            <!-- Title: Formative (आकारिक) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="आकारिक मूल्यमापन (Formative - Part A)"
+                android:textColor="#5E35B1"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Row 1: Nirikhshan & TondiKam -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="१. निरीक्षण"
+                    android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNirikhshanMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="२. तोंडीकाम"
+                    android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTondiKamMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Row 2: Pratyakshik & Upkram -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="३. प्रात्यक्षिक"
+                    android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPratyakshikMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="४. उपक्रम"
+                    android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etUpkramMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Row 3: Prakalp & Chachani -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="५. प्रकल्प"
+                    android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPrakalpMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="६. चाचणी"
+                    android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etChachaniMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Row 4: Swadhyay & Itar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="७. स्वाध्याय"
+                    android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSwadhyayMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="८. इतर"
+                    android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etItarMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Title: Summative (संकलित) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="संकलित मूल्यमापन (Summative - Part B)"
+                android:textColor="#E65100"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Row 5: Tondi & PratyakshikB -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="१. तोंडी"
+                    android:layout_marginEnd="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTondiMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="२. प्रात्यक्षिक"
+                    android:layout_marginStart="6dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPratyakshikBMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Row 6: Lekhi -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Myschool.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="३. लेखी">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etLekhiMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
