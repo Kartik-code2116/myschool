@@ -79,6 +79,33 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_subjects) {
                 title = "Subject";
                 subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_school_info) {
+                title = "School Information";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_gender) {
+                title = "Gender";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_cast_category) {
+                title = "Cast Category";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_class_teacher) {
+                title = "Class Teacher";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_classes) {
+                title = "Classes";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_subject) {
+                title = "Subject";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_default_values) {
+                title = "Default Values";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_working_days) {
+                title = "Working Days";
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_he_she_items) {
+                title = "He/She Items";
+                subtitle = SessionContext.getClassDivLabel();
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);

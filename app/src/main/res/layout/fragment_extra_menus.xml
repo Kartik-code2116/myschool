@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7FA">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Context Header Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvExtraContextTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Student Level Administration"
+                        android:textColor="@color/primary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvExtraContextSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="sans-serif"
+                        android:text="Year: 2026-27 Class: 1, Div: A"
+                        android:textColor="@color/on_surface_variant"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Unified Content Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="3dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- 1. SCHOOL INFORMATION -->
+                    <LinearLayout
+                        android:id="@+id/llSchoolInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="School Details"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:id="@+id/tvSchoolInfoName" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Name: My School" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoUdise" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="UDISE Code: 27240801234" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoBoard" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Board: State Board" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Address: Not Specified" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Student Stats Summary" android:textSize="14sp" android:textColor="@color/primary" android:fontFamily="sans-serif-medium" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoTotalStudents" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Total enrolled: 250 students" android:textSize="13sp" android:textColor="#666666"/>
+                    </LinearLayout>
+
+                    <!-- 2. GENDER -->
+                    <LinearLayout
+                        android:id="@+id/llGender"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gender Distribution"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="20dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BOYS" android:textSize="11sp" android:textColor="#1E88E5" android:fontFamily="sans-serif-medium"/>
+                                <TextView android:id="@+id/tvGenderBoysCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15" android:textSize="36sp" android:textColor="#1E88E5" android:fontFamily="sans-serif-thin"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="GIRLS" android:textSize="11sp" android:textColor="#EC407A" android:fontFamily="sans-serif-medium"/>
+                                <TextView android:id="@+id/tvGenderGirlsCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="18" android:textSize="36sp" android:textColor="#EC407A" android:fontFamily="sans-serif-thin"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:id="@+id/tvGenderRatio" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Active Class Gender Ratio: 45.4% Boys / 54.6% Girls" android:textSize="13sp" android:textColor="#666666" android:gravity="center"/>
+                    </LinearLayout>
+
+                    <!-- 3. CAST CATEGORY -->
+                    <LinearLayout
+                        android:id="@+id/llCastCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cast Categories"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:id="@+id/tvCastGeneral" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="General (Open) : 10 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvCastObc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="OBC Category : 12 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvCastSc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="SC Category : 6 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvCastSt" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="ST Category : 5 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Category distribution is calculated from active student profile records." android:textSize="12sp" android:textColor="#888888"/>
+                    </LinearLayout>
+
+                    <!-- 4. CLASS TEACHER -->
+                    <LinearLayout
+                        android:id="@+id/llClassTeacher"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Assigned Teachers"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:id="@+id/tvTeacherInfoPrimary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Class Teacher: Mrs. Sharma" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp" android:fontFamily="sans-serif-medium"/>
+                        <TextView android:id="@+id/tvTeacherInfoAsst" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Assistant Teacher: Mr. Patil" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Contact Information" android:textSize="14sp" android:textColor="@color/primary" android:fontFamily="sans-serif-medium" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Primary Email: teacher@school.edu\nPhone: +91 9876543210" android:textSize="13sp" android:textColor="#666666"/>
+                    </LinearLayout>
+
+                    <!-- 5. CLASSES -->
+                    <LinearLayout
+                        android:id="@+id/llClasses"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Classes Listing"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Standard 1: 1 Division, 33 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Standard 2: 1 Division, 28 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Standard 3: 2 Divisions, 45 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Standard 4: 1 Division, 30 students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Select Profile tab in sidebar to activate any class." android:textSize="12sp" android:textColor="#888888"/>
+                    </LinearLayout>
+
+                    <!-- 6. SUBJECT -->
+                    <LinearLayout
+                        android:id="@+id/llSubject"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Class Subjects Details"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1. Marathi: Max Marks 100 (FE: 70, SE: 30)" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="2. Hindi: Max Marks 100 (FE: 70, SE: 30)" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="3. English: Max Marks 100 (FE: 70, SE: 30)" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="4. Mathematics: Max Marks 100 (FE: 70, SE: 30)" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="You can toggle active subjects in the dedicated 'Subjects' screen." android:textSize="12sp" android:textColor="#888888"/>
+                    </LinearLayout>
+
+                    <!-- 7. DEFAULT VALUES -->
+                    <LinearLayout
+                        android:id="@+id/llDefaultValues"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admission Baseline Defaults"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Default Medium of Instruction"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Marathi" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:hint="Default Religion / State"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Maharashtra" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSaveDefaults"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="SAVE DEFAULT SETTINGS"
+                            app:backgroundTint="@color/primary"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+
+                    <!-- 8. WORKING DAYS -->
+                    <LinearLayout
+                        android:id="@+id/llWorkingDays"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Working Days Log"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Semester 1 Total Working Days: 110 days" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Semester 2 Total Working Days: 120 days" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Assigned Holidays: 45 days" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Calculates average student attendance baseline criteria automatically." android:textSize="12sp" android:textColor="#888888"/>
+                    </LinearLayout>
+
+                    <!-- 9. HE/SHE ITEMS -->
+                    <LinearLayout
+                        android:id="@+id/llHeSheItems"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="He/She Comment Helper"
+                            android:textSize="18sp"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Male Student comment descriptors: He, Him, His, Himself" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Female Student comment descriptors: She, Her, Her, Herself" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Comment descriptors are applied dynamically during final report card descriptive entries generation." android:textSize="12sp" android:textColor="#888888"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -71,6 +71,29 @@
                             android:alpha="0.85"/>
                     </LinearLayout>
 
+                    <!-- Subjects custom toolbar icons -->
+                    <ImageButton
+                        android:id="@+id/btnToolbarNotifications"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_notifications"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/white"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:contentDescription="Notifications"/>
+
+                    <ImageButton
+                        android:id="@+id/btnToolbarMore"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/white"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:contentDescription="More options"/>
+
                     <!-- Profile icon -->
                     <ImageView
                         android:id="@+id/ivProfilePic"

@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/nav_subjects"
-        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:name="com.example.myschool.ui.SubjectsFragment"
         android:label="@string/menu_subjects">
         <argument android:name="title" app:argType="string" android:defaultValue="Subjects"/>
     </fragment>
@@ -76,6 +76,69 @@
         android:name="com.example.myschool.ui.PlaceholderFragment"
         android:label="@string/menu_extra_menus">
         <argument android:name="title" app:argType="string" android:defaultValue="Extra Menus"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_school_info"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="School Information">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="school_info"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_gender"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Gender">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="gender"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_cast_category"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Cast Category">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="cast_category"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_class_teacher"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Class Teacher">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="class_teacher"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_classes"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Classes">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="classes"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_subject"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Subject">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="subject"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_default_values"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Default Values">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="default_values"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_working_days"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="Working Days">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="working_days"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_he_she_items"
+        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:label="He/She Items">
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="he_she_items"/>
     </fragment>
 
 </navigation>
