@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand -->
+    <color name="primary">#90CAF9</color>
+    <color name="primary_dark">#1565C0</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="primary_container">#1A237E</color>
+    <color name="on_primary">#111111</color>
+    <!-- Secondary -->
+    <color name="secondary">#80CBC4</color>
+    <color name="secondary_container">#004D40</color>
+    <color name="on_secondary">#111111</color>
+    <!-- Tertiary -->
+    <color name="tertiary">#D0BCFF</color>
+    <color name="tertiary_container">#4A148C</color>
+    <!-- Surface / background -->
+    <color name="background">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="surface_variant">#2C2C2E</color>
+    <color name="on_surface">#F2F2F7</color>
+    <color name="on_surface_variant">#A0A0A5</color>
+    <!-- Outlines -->
+    <color name="outline">#3A3A3C</color>
+    <color name="outline_variant">#2C2C2E</color>
+    <!-- Status -->
+    <color name="success">#81C784</color>
+    <color name="success_container">#1B5E20</color>
+    <color name="error">#E57373</color>
+    <color name="error_container">#B71C1C</color>
+    <color name="warning">#FFB74D</color>
+    <color name="warning_container">#E65100</color>
+    <!-- Misc -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Missing colors referenced in styles -->
+    <color name="on_primary_container">#BBDEFB</color>
+    <color name="gradient_surface_start">#1C1B1F</color>
+    <color name="gradient_surface_end">#121212</color>
+    <color name="scanner_frame">#90CAF9</color>
+
+    <!-- Myschool-style drawer & selectors -->
+    <color name="drawer_header">#2C2C2E</color>
+    <color name="drawer_header_dark">#121212</color>
+    <color name="class_card_selected">#3A3F58</color>
+    <color name="selector_purple">#D0BCFF</color>
+    <color name="info_header_blue">#1A237E</color>
+    <color name="btn_outline_green">#80CBC4</color>
+    <color name="activate_orange">#FFB74D</color>
+    <color name="accent_purple">#D0BCFF</color>
+    <color name="accent_orange">#FFB74D</color>
+    <color name="class_number_purple">#90CAF9</color>
+</resources>

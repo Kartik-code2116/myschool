@@ -11,6 +11,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.myschool.databinding.ActivityHomeBinding;
 import com.example.myschool.model.Teacher;
@@ -179,6 +181,19 @@ public class HomeActivity extends AppCompatActivity {
     private void setupDrawerHeader() {
         View header = b.navigationView.getHeaderView(0);
         if (header == null) return;
+
+        // Apply dynamic system window insets (notch / status bar) as top padding
+        ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
+            int statusBarTop = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            v.setPadding(
+                v.getPaddingLeft(),
+                statusBarTop + (int) (16 * v.getResources().getDisplayMetrics().density),
+                v.getPaddingRight(),
+                v.getPaddingBottom()
+            );
+            return insets;
+        });
+
         String uid = FirebaseRepository.get().currentUid();
         android.widget.TextView tvId = header.findViewById(R.id.tvDrawerTeacherId);
         if (tvId != null && uid != null) {
