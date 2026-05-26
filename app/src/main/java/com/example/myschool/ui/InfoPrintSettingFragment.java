@@ -81,6 +81,7 @@ public class InfoPrintSettingFragment extends Fragment {
     private int classIndex = 0;
 
     private boolean entrancePlayed;
+    private boolean isFirstLoad = true;
 
 
 
@@ -615,7 +616,11 @@ public class InfoPrintSettingFragment extends Fragment {
 
         if (isViewActive()) {
 
-            loadClasses();
+            if (isFirstLoad) {
+                isFirstLoad = false;
+            } else {
+                loadClasses();
+            }
 
         }
 

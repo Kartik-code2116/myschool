@@ -87,6 +87,81 @@
                             android:textColor="@color/on_surface_variant"
                             android:textSize="13sp"/>
 
+                        <!-- Highlight Badges for Critical Info (Roll No, Reg No, DOB) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:weightSum="3">
+
+                            <!-- Roll No badge -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_weight="1">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Roll No"
+                                    android:textSize="10sp"
+                                    android:textColor="@color/on_surface_variant" />
+                                <TextView
+                                    android:id="@+id/tvTopRollNo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textSize="12sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/on_surface" />
+                            </LinearLayout>
+
+                            <!-- Reg No badge -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_weight="1">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Reg No"
+                                    android:textSize="10sp"
+                                    android:textColor="@color/on_surface_variant" />
+                                <TextView
+                                    android:id="@+id/tvTopRegNo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textSize="12sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/on_surface" />
+                            </LinearLayout>
+
+                            <!-- DOB badge -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_weight="1">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="DOB"
+                                    android:textSize="10sp"
+                                    android:textColor="@color/on_surface_variant" />
+                                <TextView
+                                    android:id="@+id/tvTopDob"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textSize="12sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/on_surface" />
+                            </LinearLayout>
+                        </LinearLayout>
+
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipMarksStatus"
                             style="@style/Widget.MaterialComponents.Chip.Action"
@@ -98,6 +173,87 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Quick Section Navigation Chips Bar -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="4dp"
+                android:scrollbars="none"
+                android:overScrollMode="never">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNavBasic"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:text="Basic Info"
+                        android:textSize="12sp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:textColor="@color/primary"
+                        app:icon="@drawable/ic_person"
+                        app:iconSize="14dp"
+                        app:backgroundTint="#EDE7F6"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNavFamily"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:text="Family Details"
+                        android:textSize="12sp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:textColor="#EC407A"
+                        app:icon="@drawable/ic_person"
+                        app:iconSize="14dp"
+                        app:backgroundTint="#FCE4EC"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNavBank"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:text="Bank Details"
+                        android:textSize="12sp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:textColor="#E65100"
+                        app:icon="@drawable/ic_id_card"
+                        app:iconSize="14dp"
+                        app:backgroundTint="#FFF3E0"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNavAcademic"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Academic and ID"
+                        android:textSize="12sp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:textColor="#009688"
+                        app:icon="@drawable/ic_school"
+                        app:iconSize="14dp"
+                        app:backgroundTint="#E0F2F1"
+                        app:cornerRadius="18dp" />
+                </LinearLayout>
+            </HorizontalScrollView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBasic"

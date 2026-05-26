@@ -18,6 +18,27 @@ import java.util.List;
 public class FirebaseRepository {
 
     private static volatile FirebaseRepository instance;
+
+    // Smart In-Memory Caching to make UI transitions completely instant (0ms latency)
+    private static Teacher cachedTeacher;
+    private static List<AcademicYear> cachedYears;
+    private static final java.util.Map<String, List<Semester>> cachedSemestersMap = new java.util.HashMap<>();
+    private static final java.util.Map<String, List<ClassModel>> cachedClassesForYearMap = new java.util.HashMap<>();
+    private static final java.util.Map<String, List<ClassModel>> cachedClassesForSchoolMap = new java.util.HashMap<>();
+    private static List<Student> cachedStudentsForTeacher;
+    private static final java.util.Map<String, List<Student>> cachedStudentsForClassMap = new java.util.HashMap<>();
+
+    public static void clearCache() {
+        synchronized (FirebaseRepository.class) {
+            cachedTeacher = null;
+            cachedYears = null;
+            cachedSemestersMap.clear();
+            cachedClassesForYearMap.clear();
+            cachedClassesForSchoolMap.clear();
+            cachedStudentsForTeacher = null;
+            cachedStudentsForClassMap.clear();
+        }
+    }
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
 
@@ -57,18 +78,29 @@ public class FirebaseRepository {
         }
         t.id = uid;
         db.collection(COL_TEACHERS).document(t.id).set(t)
-                .addOnSuccessListener(v -> cb.onSuccess(null))
+                .addOnSuccessListener(v -> {
+                    cachedTeacher = t;
+                    cb.onSuccess(null);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
     public void getTeacher(OnResult<Teacher> cb) {
+        if (cachedTeacher != null) {
+            cb.onSuccess(cachedTeacher);
+            return;
+        }
         String uid = currentUid();
         if (uid == null) {
             cb.onError(new IllegalStateException("User not authenticated"));
             return;
         }
         db.collection(COL_TEACHERS).document(uid).get()
-                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObject(Teacher.class) : null))
+                .addOnSuccessListener(snap -> {
+                    Teacher t = snap != null ? snap.toObject(Teacher.class) : null;
+                    cachedTeacher = t;
+                    cb.onSuccess(t);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
@@ -164,11 +196,18 @@ public class FirebaseRepository {
                 : db.collection(COL_ACADEMIC_YEARS).document();
         y.id = ref.getId();
         ref.set(y)
-                .addOnSuccessListener(v -> cb.onSuccess(y.id))
+                .addOnSuccessListener(v -> {
+                    cachedYears = null; // Invalidate
+                    cb.onSuccess(y.id);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
     public void getAcademicYears(OnResult<List<AcademicYear>> cb) {
+        if (cachedYears != null) {
+            cb.onSuccess(new ArrayList<>(cachedYears));
+            return;
+        }
         String uid = currentUid();
         if (uid == null) {
             cb.onError(new IllegalStateException("User not authenticated"));
@@ -180,7 +219,8 @@ public class FirebaseRepository {
                 .addOnSuccessListener(snap -> {
                     List<AcademicYear> years = snap != null ? snap.toObjects(AcademicYear.class) : new ArrayList<>();
                     Collections.sort(years, (a, b) -> Integer.compare(b.startYear, a.startYear));
-                    cb.onSuccess(years);
+                    cachedYears = years;
+                    cb.onSuccess(new ArrayList<>(years));
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -198,7 +238,10 @@ public class FirebaseRepository {
                 : db.collection(COL_SEMESTERS).document();
         s.id = ref.getId();
         ref.set(s)
-                .addOnSuccessListener(v -> cb.onSuccess(s.id))
+                .addOnSuccessListener(v -> {
+                    cachedSemestersMap.clear(); // Invalidate
+                    cb.onSuccess(s.id);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
@@ -207,13 +250,18 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("Year ID cannot be null"));
             return;
         }
+        if (cachedSemestersMap.containsKey(yearId)) {
+            cb.onSuccess(new ArrayList<>(cachedSemestersMap.get(yearId)));
+            return;
+        }
         db.collection(COL_SEMESTERS)
                 .whereEqualTo("yearId", yearId)
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<Semester> list = snap != null ? snap.toObjects(Semester.class) : new ArrayList<>();
                     Collections.sort(list, (a, b) -> Integer.compare(a.number, b.number));
-                    cb.onSuccess(list);
+                    cachedSemestersMap.put(yearId, list);
+                    cb.onSuccess(new ArrayList<>(list));
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -263,6 +311,10 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("Year ID cannot be null"));
             return;
         }
+        if (cachedClassesForYearMap.containsKey(yearId)) {
+            cb.onSuccess(new ArrayList<>(cachedClassesForYearMap.get(yearId)));
+            return;
+        }
         db.collection(COL_CLASSES)
                 .whereEqualTo("yearId", yearId)
                 .get()
@@ -279,7 +331,8 @@ public class FirebaseRepository {
                             return na.compareTo(nb);
                         }
                     });
-                    cb.onSuccess(classes);
+                    cachedClassesForYearMap.put(yearId, classes);
+                    cb.onSuccess(new ArrayList<>(classes));
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -291,13 +344,22 @@ public class FirebaseRepository {
                 : db.collection(COL_CLASSES).document();
         c.id = ref.getId();
         ref.set(c)
-                .addOnSuccessListener(v -> cb.onSuccess(c.id))
+                .addOnSuccessListener(v -> {
+                    cachedClassesForYearMap.clear(); // Invalidate
+                    cachedClassesForSchoolMap.clear(); // Invalidate
+                    com.example.myschool.AppCache.cachedClasses = null; // Clear static AppCache
+                    cb.onSuccess(c.id);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
     public void getClassesForSchool(String schoolId, OnResult<List<ClassModel>> cb) {
         if (schoolId == null) {
             cb.onError(new IllegalArgumentException("School ID cannot be null"));
+            return;
+        }
+        if (cachedClassesForSchoolMap.containsKey(schoolId)) {
+            cb.onSuccess(new ArrayList<>(cachedClassesForSchoolMap.get(schoolId)));
             return;
         }
         db.collection(COL_CLASSES)
@@ -310,7 +372,8 @@ public class FirebaseRepository {
                         String nameB = b.className != null ? b.className : "";
                         return nameA.compareTo(nameB);
                     });
-                    cb.onSuccess(classes);
+                    cachedClassesForSchoolMap.put(schoolId, classes);
+                    cb.onSuccess(new ArrayList<>(classes));
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -322,7 +385,13 @@ public class FirebaseRepository {
                 : db.collection(COL_STUDENTS).document();
         s.id = ref.getId();
         ref.set(s)
-                .addOnSuccessListener(v -> cb.onSuccess(s.id))
+                .addOnSuccessListener(v -> {
+                    cachedStudentsForTeacher = null; // Invalidate
+                    if (s.classId != null) {
+                        cachedStudentsForClassMap.remove(s.classId); // Invalidate
+                    }
+                    cb.onSuccess(s.id);
+                })
                 .addOnFailureListener(cb::onError);
     }
 
@@ -331,6 +400,10 @@ public class FirebaseRepository {
     public void getStudentsForClass(String classId, OnResult<List<Student>> cb) {
         if (classId == null) {
             cb.onError(new IllegalArgumentException("Class ID cannot be null"));
+            return;
+        }
+        if (cachedStudentsForClassMap.containsKey(classId)) {
+            cb.onSuccess(new ArrayList<>(cachedStudentsForClassMap.get(classId)));
             return;
         }
         db.collection(COL_STUDENTS)
@@ -345,7 +418,8 @@ public class FirebaseRepository {
                         String rb = b.rollNo != null ? b.rollNo : "";
                         return ra.compareTo(rb);
                     });
-                    cb.onSuccess(students);
+                    cachedStudentsForClassMap.put(classId, students);
+                    cb.onSuccess(new ArrayList<>(students));
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -364,6 +438,10 @@ public class FirebaseRepository {
     }
 
     public void getAllStudentsForTeacher(OnResult<List<Student>> cb) {
+        if (cachedStudentsForTeacher != null) {
+            cb.onSuccess(new ArrayList<>(cachedStudentsForTeacher));
+            return;
+        }
         String uid = currentUid();
         if (uid == null) {
             cb.onError(new IllegalStateException("User not authenticated"));
@@ -373,7 +451,11 @@ public class FirebaseRepository {
                 .whereEqualTo("teacherId", uid)
                 .get()
                 // Bug #6 fix: return empty list instead of null
-                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : new ArrayList<>()))
+                .addOnSuccessListener(snap -> {
+                    List<Student> students = snap != null ? snap.toObjects(Student.class) : new ArrayList<>();
+                    cachedStudentsForTeacher = students;
+                    cb.onSuccess(new ArrayList<>(students));
+                })
                 .addOnFailureListener(cb::onError);
     }
 

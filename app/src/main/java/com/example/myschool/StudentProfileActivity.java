@@ -54,7 +54,30 @@ public class StudentProfileActivity extends AppCompatActivity {
             openReport();
         });
 
-        UiAnimations.staggerFadeIn(b.cardHeader, b.cardBasic, b.cardFamily, b.cardBank, b.cardAcademic);
+        // Set quick scroll section navigation click listeners with scale pulse feedback
+        b.btnNavBasic.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnNavBasic);
+            b.scrollStudentProfile.smoothScrollTo(0, b.cardBasic.getTop());
+        });
+        b.btnNavFamily.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnNavFamily);
+            b.scrollStudentProfile.smoothScrollTo(0, b.cardFamily.getTop());
+        });
+        b.btnNavBank.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnNavBank);
+            b.scrollStudentProfile.smoothScrollTo(0, b.cardBank.getTop());
+        });
+        b.btnNavAcademic.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnNavAcademic);
+            b.scrollStudentProfile.smoothScrollTo(0, b.cardAcademic.getTop());
+        });
+
+        // Animate elements entering staggered for highly premium micro-interactions
+        UiAnimations.staggerFadeIn(
+                b.cardHeader,
+                b.btnNavBasic, b.btnNavFamily, b.btnNavBank, b.btnNavAcademic,
+                b.cardBasic, b.cardFamily, b.cardBank, b.cardAcademic
+        );
         loadStudent();
     }
 
@@ -83,6 +106,11 @@ public class StudentProfileActivity extends AppCompatActivity {
         }
         String div = val(s.division);
         b.tvClassLine.setText(getString(R.string.standard_division_format, std, div));
+
+        // Bind the top card critical highlight badges
+        b.tvTopRollNo.setText(val(s.rollNo));
+        b.tvTopRegNo.setText(val(s.registrationNo));
+        b.tvTopDob.setText(val(s.dob));
 
         bindMarksChip(s);
 

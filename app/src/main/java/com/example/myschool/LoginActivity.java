@@ -40,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         showLoading(true);
         auth.signInWithEmailAndPassword(email, pass)
                 .addOnSuccessListener(r -> {
+                    com.example.myschool.repository.FirebaseRepository.clearCache();
                     showLoading(false);
                     startActivity(new Intent(this, HomeActivity.class));
                     finishAffinity();

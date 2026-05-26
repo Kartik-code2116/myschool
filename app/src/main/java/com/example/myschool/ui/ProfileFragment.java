@@ -46,6 +46,7 @@ public class ProfileFragment extends Fragment {
     private final List<ClassModel> loadedClasses = new ArrayList<>();
     private final List<ProfileClassItem> lastItems = new ArrayList<>();
     private boolean editMode;
+    private boolean isFirstLoad = true;
 
     @Nullable
     @Override
@@ -451,6 +452,7 @@ public class ProfileFragment extends Fragment {
                 .setMessage(R.string.logout_confirm)
                 .setPositiveButton(R.string.logout, (d, w) -> {
                     FirebaseAuth.getInstance().signOut();
+                    FirebaseRepository.clearCache();
                     startActivity(new Intent(requireContext(), LoginActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     requireActivity().finish();
@@ -471,7 +473,11 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (isViewActive()) {
-            loadClasses();
+            if (isFirstLoad) {
+                isFirstLoad = false;
+            } else {
+                loadClasses();
+            }
         }
     }
 
