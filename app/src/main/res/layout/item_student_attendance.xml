@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardStudentAttendance"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <!-- Left Section: Avatar & Total attendance -->
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#E1F5FE"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp">
+
+            <!-- Avatar Frame -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#B3E5FC"
+                app:cardBackgroundColor="#F5F7FA">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_person"
+                    android:padding="10dp"
+                    app:tint="#5E35B1"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="एकूण उपस्थिती"
+                android:textSize="9sp"
+                android:textColor="#555555"
+                android:layout_marginTop="8dp"/>
+
+            <!-- Large Green Total Number -->
+            <TextView
+                android:id="@+id/tvAttendanceTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="233"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"
+                android:fontFamily="sans-serif-bold"/>
+        </LinearLayout>
+
+        <!-- Right Section: Student name & Attendance grid table -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Header Row: Name & Option click -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tvStudentName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/ivOptions"
+                    android:text="1. भारती आयुष महादेव"
+                    android:textColor="#5E35B1"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <ImageView
+                    android:id="@+id/ivOptions"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:src="@drawable/ic_more_vert"
+                    app:tint="#5E35B1"
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </RelativeLayout>
+
+            <!-- Table Layout for Months (1st Row Group) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_table_border"
+                android:padding="1dp">
+
+                <!-- Months Row 1 Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="#EDE7F6">
+
+                    <TextView style="@style/AttendanceHeaderCell" android:text="जून"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="जुलै"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="ऑगस्ट"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="सप्टें"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="ऑक्टो"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="नोव्हे"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#D1C4E9"/>
+
+                <!-- Counts Row 1 Values -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@color/white">
+
+                    <TextView android:id="@+id/tvJun" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvJul" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvAug" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvSep" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvOct" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvNov" style="@style/AttendanceValueCell" android:text="0/0"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Spacer -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="6dp"/>
+
+            <!-- Table Layout for Months (2nd Row Group) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_table_border"
+                android:padding="1dp">
+
+                <!-- Months Row 2 Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="#EDE7F6">
+
+                    <TextView style="@style/AttendanceHeaderCell" android:text="डिसें"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="जाने"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="फेब्रु"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="मार्च"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="एप्रिल"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="मे"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#D1C4E9"/>
+
+                <!-- Counts Row 2 Values -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@color/white">
+
+                    <TextView android:id="@+id/tvDec" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvJan" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvFeb" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvMar" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvApr" style="@style/AttendanceValueCell" android:text="0/0"/>
+                    <View style="@style/AttendanceDivider"/>
+                    <TextView android:id="@+id/tvMay" style="@style/AttendanceValueCell" android:text="0/0"/>
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

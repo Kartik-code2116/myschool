@@ -51,6 +51,7 @@ public class FirebaseRepository {
     public static final String COL_CLASSES = "classes";
     public static final String COL_STUDENTS = "students";
     public static final String COL_MARKS = "marks";
+    public static final String COL_ATTENDANCE_RECORDS = "attendance_records";
 
     private FirebaseRepository() {
         db = FirebaseFirestore.getInstance();
@@ -562,6 +563,44 @@ public class FirebaseRepository {
                     }
                     cachedClassSemesterMarksMap.put(cacheKey, marksMap);
                     cb.onSuccess(new java.util.HashMap<>(marksMap));
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    // ---------- Attendance ----------
+    public void saveAttendanceRecord(com.example.myschool.model.AttendanceRecord r, OnResult<String> cb) {
+        String uid = currentUid();
+        if (uid == null) {
+            cb.onError(new IllegalStateException("User not authenticated"));
+            return;
+        }
+        DocumentReference ref = r.id != null
+                ? db.collection(COL_ATTENDANCE_RECORDS).document(r.id)
+                : db.collection(COL_ATTENDANCE_RECORDS).document();
+        r.id = ref.getId();
+        ref.set(r)
+                .addOnSuccessListener(v -> cb.onSuccess(r.id))
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void deleteAttendanceRecord(String id, OnResult<Void> cb) {
+        db.collection(COL_ATTENDANCE_RECORDS).document(id).delete()
+                .addOnSuccessListener(v -> cb.onSuccess(null))
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getAttendanceRecordsForClass(String classId, OnResult<List<com.example.myschool.model.AttendanceRecord>> cb) {
+        if (classId == null) {
+            cb.onError(new IllegalArgumentException("Class ID cannot be null"));
+            return;
+        }
+        db.collection(COL_ATTENDANCE_RECORDS)
+                .whereEqualTo("classId", classId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<com.example.myschool.model.AttendanceRecord> list =
+                            snap != null ? snap.toObjects(com.example.myschool.model.AttendanceRecord.class) : new ArrayList<>();
+                    cb.onSuccess(list);
                 })
                 .addOnFailureListener(cb::onError);
     }

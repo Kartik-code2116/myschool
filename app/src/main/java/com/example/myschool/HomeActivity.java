@@ -26,6 +26,12 @@ public class HomeActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfig;
 
+    public void openDrawer() {
+        if (b != null && b.drawerLayout != null) {
+            b.drawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

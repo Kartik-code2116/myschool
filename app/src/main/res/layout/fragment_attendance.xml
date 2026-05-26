@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:orientation="vertical">
+
+    <!-- Top Custom App Bar -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="0dp"
+        app:cardBackgroundColor="#5E35B1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <!-- Hamburger Menu Icon -->
+            <ImageView
+                android:id="@+id/ivMenu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_menu"
+                app:tint="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <!-- Title & Subtitle Container -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivMenu"
+                app:layout_constraintEnd_toStartOf="@id/layoutActions">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="उपस्थिती"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="महावर विद्यार्थी उपस्थिती"
+                    android:textColor="#E0F2F1"
+                    android:textSize="11sp"
+                    android:alpha="0.9" />
+            </LinearLayout>
+
+            <!-- Right Action Icons Row -->
+            <LinearLayout
+                android:id="@+id/layoutActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- Help / Chat icon -->
+                <ImageView
+                    android:id="@+id/ivActionHelp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_chat"
+                    app:tint="@color/white"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+                <!-- Add icon inside square -->
+                <ImageView
+                    android:id="@+id/ivActionAdd"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:padding="6dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_add_box"
+                    app:tint="@color/white"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+                <!-- Calculator / Report icon -->
+                <ImageView
+                    android:id="@+id/ivActionReport"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:padding="8dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_calculator"
+                    app:tint="@color/white"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+                <!-- Vertical 3-dot menu icon -->
+                <ImageView
+                    android:id="@+id/ivActionMore"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:padding="8dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_more_vert"
+                    app:tint="@color/white"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Context Info Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#EDE7F6"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvAttendanceContext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="सन : 2025-26 इयत्ता: 5, तुकडी: 1"
+            android:textColor="#5E35B1"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"/>
+    </LinearLayout>
+
+    <!-- Main List Scroll -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAttendanceStudents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"/>
+
+</LinearLayout>
