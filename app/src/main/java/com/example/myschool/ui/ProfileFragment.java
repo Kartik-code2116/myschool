@@ -89,8 +89,20 @@ public class ProfileFragment extends Fragment {
         });
         b.btnLogout.setOnClickListener(v -> confirmLogout());
 
+        b.fabAddClass.setOnClickListener(v -> {
+            UiAnimations.pulse(b.fabAddClass);
+            if (SessionContext.selectedSchool == null) {
+                Toast.makeText(requireContext(), R.string.select_school_first, Toast.LENGTH_LONG).show();
+                return;
+            }
+            AppCache.selectedSchool = SessionContext.selectedSchool;
+            AppCache.selectedClass = null;
+            startActivity(new Intent(requireContext(), com.example.myschool.ClassSetupActivity.class));
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+        });
+
         setViewMode(false);
-        UiAnimations.staggerFadeIn(b.cardProfileInfo, b.rvProfileClasses, b.btnLogout);
+        UiAnimations.staggerFadeIn(b.cardProfileInfo, b.rvProfileClasses, b.btnLogout, b.fabAddClass);
         loadProfile();
     }
 
@@ -152,6 +164,9 @@ public class ProfileFragment extends Fragment {
         b.cardActiveClassDetail.setVisibility(View.VISIBLE);
         UiAnimations.fadeIn(b.cardActiveClassDetail);
         Toast.makeText(requireContext(), R.string.profile_class_selected, Toast.LENGTH_SHORT).show();
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
+        }
     }
 
     private void showActiveClassDetail(ProfileClassItem item) {

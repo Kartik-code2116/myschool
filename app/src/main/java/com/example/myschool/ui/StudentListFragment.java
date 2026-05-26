@@ -18,6 +18,7 @@ import com.example.myschool.HomeActivity;
 import com.example.myschool.SessionContext;
 import com.example.myschool.EnterMarksActivity;
 import com.example.myschool.MarksheetActivity;
+import com.example.myschool.ClassSetupActivity;
 import com.example.myschool.R;
 import com.example.myschool.StudentEditActivity;
 import com.example.myschool.StudentProfileActivity;
@@ -57,7 +58,6 @@ public class StudentListFragment extends Fragment {
 
         setupRecycler();
         setupSearch();
-        b.chipGroupFilter.setVisibility(View.GONE);
         setupFab();
         UiAnimations.staggerFadeIn(b.etSearch, b.rvStudents, b.fabAddStudent);
 
@@ -139,49 +139,12 @@ public class StudentListFragment extends Fragment {
         });
     }
 
-    private void setupFilterChips() {
-        b.chipAll.setOnClickListener(v -> {
-            selectedSchool = null;
-            selectedClass = null;
-            loadAllStudents();
-        });
-    }
-
     private void setupFab() {
         b.fabAddStudent.setOnClickListener(v -> {
             AppCache.selectedStudent = new Student();
             startActivity(new Intent(requireContext(), StudentEditActivity.class)
                     .putExtra("new_student", true));
         });
-    }
-
-    private void loadSchoolsForFilter() {
-        FirebaseRepository.get().getSchools(new FirebaseRepository.OnResult<List<School>>() {
-            @Override
-            public void onSuccess(List<School> list) {
-                schools.clear();
-                schools.addAll(list);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> addSchoolChips(list));
-                }
-            }
-            @Override
-            public void onError(Exception e) {}
-        });
-    }
-
-    private void addSchoolChips(List<School> schoolList) {
-        for (School school : schoolList) {
-            com.google.android.material.chip.Chip chip = new com.google.android.material.chip.Chip(requireContext());
-            chip.setText(school.name);
-            chip.setCheckable(true);
-            chip.setClickable(true);
-            chip.setOnClickListener(v -> {
-                selectedSchool = school;
-                loadStudentsForSchool(school.id);
-            });
-            b.chipGroupFilter.addView(chip);
-        }
     }
 
     private void loadAllStudents() {
@@ -206,26 +169,6 @@ public class StudentListFragment extends Fragment {
                     getActivity().runOnUiThread(() -> b.emptyState.setVisibility(View.VISIBLE));
                 }
             }
-        });
-    }
-
-    private void loadStudentsForSchool(String schoolId) {
-        FirebaseRepository.get().getStudentsForSchool(schoolId, new FirebaseRepository.OnResult<List<Student>>() {
-            @Override
-            public void onSuccess(List<Student> list) {
-                allStudents.clear();
-                allStudents.addAll(list);
-                filteredStudents.clear();
-                filteredStudents.addAll(list);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        studentAdapter.setData(filteredStudents);
-                        b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
-                    });
-                }
-            }
-            @Override
-            public void onError(Exception e) {}
         });
     }
 
@@ -303,6 +246,7 @@ public class StudentListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        SessionContext.syncFromAppCache();
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).updateToolbar(
                     getString(R.string.menu_student_list), SessionContext.getClassDivLabel());

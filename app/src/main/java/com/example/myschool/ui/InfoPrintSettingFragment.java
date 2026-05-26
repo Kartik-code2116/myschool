@@ -117,47 +117,33 @@ public class InfoPrintSettingFragment extends Fragment {
 
 
         b.btnYearPrev.setOnClickListener(v -> cycleYear(-1));
-
         b.btnYearNext.setOnClickListener(v -> cycleYear(1));
-
         b.btnSemesterPrev.setOnClickListener(v -> cycleSemester(-1));
-
         b.btnSemesterNext.setOnClickListener(v -> cycleSemester(1));
-
         b.btnClassPrev.setOnClickListener(v -> cycleClass(-1));
-
         b.btnClassNext.setOnClickListener(v -> cycleClass(1));
 
-
-
         b.btnGoToClass.setOnClickListener(v -> {
-
             UiAnimations.pulse(b.btnGoToClass);
-
             goToClassStudents();
-
         });
-
         b.btnAllClasses.setOnClickListener(v -> {
-
             UiAnimations.pulse(b.btnAllClasses);
-
             navigateWithAnim(R.id.nav_class_div);
-
         });
 
-
-
-        b.panelClass.setOnClickListener(v -> {
-
+        setupSwipeListener(b.panelSemester, () -> cycleSemester(1), () -> cycleSemester(-1), this::showSemesterPickerDialog);
+        
+        setupSwipeListener(b.panelClass, () -> cycleClass(1), () -> cycleClass(-1), () -> {
             if (!classes.isEmpty()) {
-
                 UiAnimations.pulse(b.panelClass);
-
                 goToClassStudents();
-
             }
+        });
 
+        b.panelClass.setOnLongClickListener(v -> {
+            showClassPickerDialog();
+            return true;
         });
 
 
@@ -237,253 +223,208 @@ public class InfoPrintSettingFragment extends Fragment {
 
 
     private void initSessionData() {
+        // Load from cache first for instant UI responsiveness
+        if (AppCache.cachedYears != null && !AppCache.cachedYears.isEmpty()) {
+            years.clear();
+            years.addAll(AppCache.cachedYears);
+            if (SessionContext.selectedYear != null) {
+                for (int i = 0; i < years.size(); i++) {
+                    if (years.get(i).id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
+                        yearIndex = i;
+                        break;
+                    }
+                }
+            }
+            applyYear(0);
+        }
+        
+        if (AppCache.cachedSemesters != null && !AppCache.cachedSemesters.isEmpty()) {
+            semesters.clear();
+            semesters.addAll(AppCache.cachedSemesters);
+            if (SessionContext.selectedSemester != null) {
+                for (int i = 0; i < semesters.size(); i++) {
+                    if (semesters.get(i).id != null && semesters.get(i).id.equals(SessionContext.selectedSemester.id)) {
+                        semesterIndex = i;
+                        break;
+                    }
+                }
+            }
+            applySemester(0);
+        }
 
-        FirebaseRepository.get().ensureDefaultYearAndSemesters(new FirebaseRepository.OnResult<AcademicYear>() {
+        if (AppCache.cachedClasses != null && !AppCache.cachedClasses.isEmpty()) {
+            classes.clear();
+            classes.addAll(AppCache.cachedClasses);
+            if (SessionContext.selectedClass != null) {
+                for (int i = 0; i < classes.size(); i++) {
+                    if (classes.get(i).id != null && classes.get(i).id.equals(SessionContext.selectedClass.id)) {
+                        classIndex = i;
+                        break;
+                    }
+                }
+            }
+            applyClass(0);
+        }
 
-            @Override public void onSuccess(AcademicYear year) { loadYears(); }
-
-            @Override public void onError(Exception e) { loadYears(); }
-
-        });
-
+        loadYears();
         ensureSchoolSelected();
-
     }
-
-
 
     private void ensureSchoolSelected() {
-
         if (SessionContext.selectedSchool != null) return;
-
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
-
             @Override public void onSuccess(Teacher t) {
-
                 FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<School>() {
-
                     @Override public void onSuccess(School s) {
-
                         SessionContext.selectedSchool = s;
-
                         AppCache.selectedSchool = s;
-
                     }
-
                     @Override public void onError(Exception e) {}
-
                 });
-
             }
-
             @Override public void onError(Exception e) {}
-
         });
-
     }
-
-
 
     private void loadYears() {
-
         FirebaseRepository.get().getAcademicYears(new FirebaseRepository.OnResult<List<AcademicYear>>() {
-
             @Override public void onSuccess(List<AcademicYear> list) {
-
-                years.clear();
-
-                if (list != null) years.addAll(list);
-
-                if (years.isEmpty()) {
-
-                    years.add(new AcademicYear("2026-27", 2026, 2027));
-
-                }
-
-                if (SessionContext.selectedYear != null) {
-
-                    for (int i = 0; i < years.size(); i++) {
-
-                        if (years.get(i).id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
-
-                            yearIndex = i;
-
-                            break;
-
+                if (list == null || list.isEmpty()) {
+                    FirebaseRepository.get().ensureDefaultYearAndSemesters(new FirebaseRepository.OnResult<AcademicYear>() {
+                        @Override public void onSuccess(AcademicYear year) {
+                            List<AcademicYear> singleton = new ArrayList<>();
+                            singleton.add(year);
+                            bindYears(singleton);
                         }
-
-                    }
-
+                        @Override public void onError(Exception e) {
+                            bindYears(list);
+                        }
+                    });
+                } else {
+                    bindYears(list);
                 }
-
-                applyYear(0);
-
-                loadSemesters();
-
             }
 
             @Override public void onError(Exception e) {
-
-                years.clear();
-
-                years.add(new AcademicYear("2026-27", 2026, 2027));
-
-                applyYear(0);
-
+                bindYears(null);
             }
-
         });
-
     }
 
-
+    private void bindYears(List<AcademicYear> list) {
+        years.clear();
+        if (list != null) years.addAll(list);
+        if (years.isEmpty()) {
+            years.add(new AcademicYear("2026-27", 2026, 2027));
+        }
+        AppCache.cachedYears = new ArrayList<>(years);
+        if (SessionContext.selectedYear != null) {
+            for (int i = 0; i < years.size(); i++) {
+                if (years.get(i).id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
+                    yearIndex = i;
+                    break;
+                }
+            }
+        }
+        if (isViewActive()) {
+            applyYear(0);
+            loadSemesters();
+        }
+    }
 
     private void loadSemesters() {
-
         AcademicYear y = getCurrentYear();
-
         if (y == null || y.id == null) {
-
             semesters.clear();
-
             semesters.add(new Semester(1, "First Semester", "Easy Reports"));
-
             semesters.add(new Semester(2, "Second Semester", "Final Reports"));
-
+            AppCache.cachedSemesters = new ArrayList<>(semesters);
             applySemester(0);
-
             loadClasses();
-
             return;
-
         }
-
         FirebaseRepository.get().getSemestersForYear(y.id, new FirebaseRepository.OnResult<List<Semester>>() {
-
             @Override public void onSuccess(List<Semester> list) {
-
                 semesters.clear();
-
                 if (list != null && !list.isEmpty()) {
-
                     semesters.addAll(list);
-
                 } else {
-
                     semesters.add(new Semester(1, "First Semester", "Easy Reports"));
-
                     semesters.add(new Semester(2, "Second Semester", "Final Reports"));
-
                 }
-
-                semesterIndex = 0;
-
-                applySemester(0);
-
-                loadClasses();
-
+                AppCache.cachedSemesters = new ArrayList<>(semesters);
+                if (isViewActive()) {
+                    semesterIndex = 0;
+                    applySemester(0);
+                    loadClasses();
+                }
             }
 
             @Override public void onError(Exception e) {
-
                 semesters.clear();
-
                 semesters.add(new Semester(1, "First Semester", "Easy Reports"));
-
-                applySemester(0);
-
-                loadClasses();
-
+                AppCache.cachedSemesters = new ArrayList<>(semesters);
+                if (isViewActive()) {
+                    applySemester(0);
+                    loadClasses();
+                }
             }
-
         });
-
     }
 
-
-
     private void loadClasses() {
-
         AcademicYear y = getCurrentYear();
-
         if (y == null || y.id == null) {
-
             loadClassesForSchool();
-
             return;
-
         }
-
         FirebaseRepository.get().getClassesForYear(y.id, new FirebaseRepository.OnResult<List<ClassModel>>() {
-
             @Override public void onSuccess(List<ClassModel> list) {
-
                 classes.clear();
-
                 if (list != null && !list.isEmpty()) {
-
                     classes.addAll(list);
-
                 } else {
-
                     loadClassesForSchool();
-
                     return;
-
                 }
-
-                classIndex = 0;
-
-                applyClass(0);
-
+                AppCache.cachedClasses = new ArrayList<>(classes);
+                if (isViewActive()) {
+                    classIndex = 0;
+                    applyClass(0);
+                }
             }
 
             @Override public void onError(Exception e) { loadClassesForSchool(); }
-
         });
-
     }
 
-
-
     private void loadClassesForSchool() {
-
         if (SessionContext.selectedSchool == null) {
-
             classes.clear();
-
+            AppCache.cachedClasses = new ArrayList<>(classes);
             applyClass(0);
-
             return;
-
         }
-
         FirebaseRepository.get().getClassesForSchool(SessionContext.selectedSchool.id,
-
                 new FirebaseRepository.OnResult<List<ClassModel>>() {
-
                     @Override public void onSuccess(List<ClassModel> list) {
-
                         classes.clear();
-
                         if (list != null) classes.addAll(list);
-
-                        classIndex = 0;
-
-                        applyClass(0);
-
+                        AppCache.cachedClasses = new ArrayList<>(classes);
+                        if (isViewActive()) {
+                            classIndex = 0;
+                            applyClass(0);
+                        }
                     }
 
                     @Override public void onError(Exception e) {
-
                         classes.clear();
-
-                        applyClass(0);
-
+                        AppCache.cachedClasses = new ArrayList<>(classes);
+                        if (isViewActive()) {
+                            applyClass(0);
+                        }
                     }
-
                 });
-
     }
 
 
@@ -682,15 +623,74 @@ public class InfoPrintSettingFragment extends Fragment {
 
 
 
-    @Override
-
-    public void onDestroyView() {
-
-        super.onDestroyView();
-
-        b = null;
-
+    private void setupSwipeListener(View view, Runnable onSwipeLeft, Runnable onSwipeRight, Runnable onTap) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+            private float startX = 0f;
+            private float startY = 0f;
+            @Override
+            public boolean onTouch(View v, android.view.MotionEvent event) {
+                switch (event.getAction()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        startX = event.getX();
+                        startY = event.getY();
+                        return true;
+                    case android.view.MotionEvent.ACTION_UP:
+                        float endX = event.getX();
+                        float endY = event.getY();
+                        float diffX = endX - startX;
+                        float diffY = endY - startY;
+                        if (Math.abs(diffX) > 100 && Math.abs(diffX) > Math.abs(diffY)) {
+                            if (diffX < 0) {
+                                onSwipeLeft.run();
+                            } else {
+                                onSwipeRight.run();
+                            }
+                        } else if (Math.abs(diffX) < 15 && Math.abs(diffY) < 15) {
+                            onTap.run();
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
     }
 
+    private void showSemesterPickerDialog() {
+        if (semesters.isEmpty()) return;
+        String[] names = new String[semesters.size()];
+        for (int i = 0; i < semesters.size(); i++) {
+            names[i] = semesters.get(i).name;
+        }
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Select Semester")
+                .setItems(names, (dialog, which) -> {
+                    semesterIndex = which;
+                    applySemester(0);
+                })
+                .show();
+    }
+
+    private void showClassPickerDialog() {
+        if (classes.isEmpty()) return;
+        String[] names = new String[classes.size()];
+        for (int i = 0; i < classes.size(); i++) {
+            String classNum = classes.get(i).className != null ? classes.get(i).className : "";
+            String div = classes.get(i).division != null && !classes.get(i).division.isEmpty() ? classes.get(i).division : "-";
+            names[i] = getString(R.string.class_div_format, classNum, div);
+        }
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Select Class")
+                .setItems(names, (dialog, which) -> {
+                    classIndex = which;
+                    applyClass(0);
+                })
+                .show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        b = null;
+    }
 }
 

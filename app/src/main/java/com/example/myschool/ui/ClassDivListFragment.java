@@ -60,6 +60,9 @@ public class ClassDivListFragment extends Fragment {
                 adapter.setSelectedIndex(position);
                 SessionContext.selectedClass = c;
                 SessionContext.syncToAppCache();
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
+                }
             }
 
             @Override

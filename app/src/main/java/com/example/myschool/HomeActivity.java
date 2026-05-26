@@ -3,6 +3,7 @@ package com.example.myschool;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -41,7 +42,6 @@ public class HomeActivity extends AppCompatActivity {
         topLevel.add(R.id.nav_profile);
         topLevel.add(R.id.nav_class_div);
         topLevel.add(R.id.nav_students);
-        topLevel.add(R.id.nav_reports);
 
         appBarConfig = new AppBarConfiguration.Builder(topLevel)
                 .setOpenableLayout(b.drawerLayout)
@@ -51,11 +51,6 @@ public class HomeActivity extends AppCompatActivity {
         b.ivProfilePic.setOnClickListener(v -> navigateToAnimated(R.id.nav_profile));
 
         b.navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_print_report) {
-                b.drawerLayout.closeDrawer(GravityCompat.START);
-                navController.navigate(R.id.nav_reports);
-                return true;
-            }
             boolean handled = navigateToAnimated(item.getItemId());
             if (handled) b.drawerLayout.closeDrawer(GravityCompat.START);
             return handled;
@@ -81,6 +76,9 @@ public class HomeActivity extends AppCompatActivity {
                 title = getString(R.string.nav_home);
             } else if (id == R.id.nav_profile) {
                 subtitle = getString(R.string.profile_subtitle);
+            } else if (id == R.id.nav_subjects) {
+                title = "Subject";
+                subtitle = SessionContext.getClassDivLabel();
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
@@ -126,8 +124,7 @@ public class HomeActivity extends AppCompatActivity {
     private void syncBottomNavSelection(int destinationId) {
         if (destinationId == R.id.nav_info_print
                 || destinationId == R.id.nav_profile
-                || destinationId == R.id.nav_students
-                || destinationId == R.id.nav_reports) {
+                || destinationId == R.id.nav_students) {
             b.bottomNav.setSelectedItemId(destinationId);
         }
     }
@@ -155,7 +152,7 @@ public class HomeActivity extends AppCompatActivity {
         });
         header.findViewById(R.id.btnDrawerPrint).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            navController.navigate(R.id.nav_reports);
+            Toast.makeText(HomeActivity.this, "Reports feature coming soon!", Toast.LENGTH_SHORT).show();
         });
         header.findViewById(R.id.btnDrawerStats).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
@@ -177,6 +174,21 @@ public class HomeActivity extends AppCompatActivity {
     public void updateToolbar(String title, String subtitle) {
         if (title != null && !title.isEmpty()) b.tvToolbarTitle.setText(title);
         if (subtitle != null && !subtitle.isEmpty()) b.tvToolbarSubtitle.setText(subtitle);
+    }
+
+    public void showCustomToolbarActions(boolean show, View.OnClickListener onNotificationsClick, View.OnClickListener onMoreClick) {
+        if (b == null) return;
+        if (show) {
+            b.btnToolbarNotifications.setVisibility(View.VISIBLE);
+            b.btnToolbarMore.setVisibility(View.VISIBLE);
+            b.btnToolbarNotifications.setOnClickListener(onNotificationsClick);
+            b.btnToolbarMore.setOnClickListener(onMoreClick);
+            b.ivProfilePic.setVisibility(View.GONE);
+        } else {
+            b.btnToolbarNotifications.setVisibility(View.GONE);
+            b.btnToolbarMore.setVisibility(View.GONE);
+            b.ivProfilePic.setVisibility(View.VISIBLE);
+        }
     }
 
     public void navigateTo(int destId) {

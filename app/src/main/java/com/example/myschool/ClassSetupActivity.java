@@ -22,7 +22,7 @@ import java.util.List;
 public class ClassSetupActivity extends AppCompatActivity {
 
     private ActivityClassSetupBinding b;
-    private final List<ItemSubjectInputRowBinding> subjectRows = new ArrayList<>();
+    private boolean shouldNavigateToSubjects = false;
 
     private static final String[] CLASSES   = {"1","2","3","4","5","6","7","8","9","10","11","12"};
     private static final String[] DIVISIONS = {"A","B","C","D","E"};
@@ -41,12 +41,14 @@ public class ClassSetupActivity extends AppCompatActivity {
         b.actvDivision.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, DIVISIONS));
 
-        b.btnAddSubject.setOnClickListener(v -> addSubjectRow(null, 0));
-        b.btnSaveClass.setOnClickListener(v -> saveClass());
-
-        // Default subjects
-        String[] defaults = {"Mathematics", "Science", "English", "Social Studies", "Hindi"};
-        for (String s : defaults) addSubjectRow(s, 100);
+        b.btnAddSubject.setOnClickListener(v -> {
+            shouldNavigateToSubjects = true;
+            saveClass();
+        });
+        b.btnSaveClass.setOnClickListener(v -> {
+            shouldNavigateToSubjects = false;
+            saveClass();
+        });
 
         // Pre-fill if editing
         if (AppCache.selectedClass != null && getIntent().getBooleanExtra("edit", false)) {
@@ -55,57 +57,34 @@ public class ClassSetupActivity extends AppCompatActivity {
             b.actvDivision.setText(c.division, false);
             b.etExamName.setText(c.examName);
             b.etYear.setText(String.valueOf(c.year));
-            b.llSubjectsContainer.removeAllViews();
-            subjectRows.clear();
-            for (Subject s : c.subjects) addSubjectRow(s.name, s.maxMarks);
         }
-    }
-
-    private void addSubjectRow(String name, int max) {
-        ItemSubjectInputRowBinding row = ItemSubjectInputRowBinding.inflate(
-                LayoutInflater.from(this), b.llSubjectsContainer, false);
-        if (name != null) row.etSubjectName.setText(name);
-        if (max > 0) row.etMaxMarks.setText(String.valueOf(max));
-        row.btnRemoveSubject.setOnClickListener(v -> {
-            b.llSubjectsContainer.removeView(row.getRoot());
-            subjectRows.remove(row);
-        });
-        b.llSubjectsContainer.addView(row.getRoot());
-        subjectRows.add(row);
     }
 
     private void saveClass() {
         String className = b.actvClass.getText().toString().trim();
         String division  = b.actvDivision.getText().toString().trim();
-        String examName  = b.etExamName.getText() != null ? b.etExamName.getText().toString().trim() : "";
-        String yearStr   = b.etYear.getText() != null ? b.etYear.getText().toString().trim() : "";
+        
+        // Auto-populated fields (hidden fields)
+        String examName = SessionContext.selectedSemester != null && SessionContext.selectedSemester.name != null 
+                ? SessionContext.selectedSemester.name : "Semester Exam";
+        String yearStr = SessionContext.selectedYear != null 
+                ? String.valueOf(SessionContext.selectedYear.startYear) : "2026";
 
         if (TextUtils.isEmpty(className)) { b.tilClass.setError("Select class"); return; }
-        if (TextUtils.isEmpty(examName))  { b.tilExamName.setError("Required"); return; }
-        b.tilClass.setError(null); b.tilExamName.setError(null);
-
-        // Collect subjects
-        List<Subject> subjects = new ArrayList<>();
-        for (ItemSubjectInputRowBinding row : subjectRows) {
-            String sName = row.etSubjectName.getText() != null
-                    ? row.etSubjectName.getText().toString().trim() : "";
-            String sMax  = row.etMaxMarks.getText() != null
-                    ? row.etMaxMarks.getText().toString().trim() : "100";
-            if (!TextUtils.isEmpty(sName)) {
-                int max = 100;
-                try { max = Integer.parseInt(sMax); } catch (NumberFormatException ignored) {}
-                subjects.add(new Subject(sName, max));
-            }
-        }
-        if (subjects.isEmpty()) { Toast.makeText(this, "Add at least one subject", Toast.LENGTH_SHORT).show(); return; }
+        b.tilClass.setError(null);
 
         ClassModel c = (AppCache.selectedClass != null && getIntent().getBooleanExtra("edit", false))
                 ? AppCache.selectedClass : new ClassModel();
+        
+        // Preserve already assigned subjects
+        if (c.subjects == null) {
+            c.subjects = new ArrayList<>();
+        }
+        
         c.schoolId  = (AppCache.selectedSchool != null && AppCache.selectedSchool.id != null) ? AppCache.selectedSchool.id : "";
         c.className = className;
         c.division  = division;
         c.examName  = examName;
-        c.subjects  = subjects;
         try { c.year = Integer.parseInt(yearStr); } catch (NumberFormatException ignored) { c.year = 2025; }
 
         SessionContext.syncFromAppCache();
@@ -120,6 +99,9 @@ public class ClassSetupActivity extends AppCompatActivity {
         showLoading(true);
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.example.myschool.model.Teacher>() {
             @Override public void onSuccess(com.example.myschool.model.Teacher t) {
+                if (t != null) {
+                    c.teacherName = t.name;
+                }
                 FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<com.example.myschool.model.School>() {
                     @Override public void onSuccess(com.example.myschool.model.School school) {
                         c.schoolId = school.id;
@@ -145,7 +127,17 @@ public class ClassSetupActivity extends AppCompatActivity {
             @Override public void onSuccess(String id) {
                 showLoading(false);
                 Toast.makeText(ClassSetupActivity.this, "Class saved!", Toast.LENGTH_SHORT).show();
+                c.id = id;
+                SessionContext.selectedClass = c;
+                SessionContext.syncToAppCache();
                 setResult(RESULT_OK);
+                
+                if (shouldNavigateToSubjects) {
+                    android.content.Intent intent = new android.content.Intent(ClassSetupActivity.this, HomeActivity.class);
+                    intent.putExtra("navigate_to", R.id.nav_subjects);
+                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                }
                 finish();
             }
             @Override public void onError(Exception e) {
