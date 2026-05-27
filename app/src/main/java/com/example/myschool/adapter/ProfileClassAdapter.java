@@ -106,12 +106,25 @@ public class ProfileClassAdapter extends RecyclerView.Adapter<ProfileClassAdapte
             }
         }
 
-        int bg = selected ? R.color.class_card_selected : R.color.surface;
-        int stroke = selected ? R.color.success : R.color.outline_variant;
-        holder.b.cardProfileClass.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.getContext(), bg));
-        holder.b.cardProfileClass.setStrokeColor(
-                ContextCompat.getColor(holder.itemView.getContext(), stroke));
+        if (selected) {
+            holder.b.cardProfileClass.setCardBackgroundColor(android.graphics.Color.parseColor("#E8E6FF"));
+            holder.b.cardProfileClass.setStrokeColor(android.graphics.Color.parseColor("#5A4FCF"));
+            holder.b.cardProfileClass.setStrokeWidth((int) (2 * holder.itemView.getContext().getResources().getDisplayMetrics().density));
+            holder.b.tvProfileClassNum.setTextColor(android.graphics.Color.parseColor("#5A4FCF"));
+            holder.b.tvProfileClassNum.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            holder.b.tvProfileClassTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            holder.b.tvProfileClassTitle.setTextColor(android.graphics.Color.parseColor("#2E2E2E"));
+            holder.b.tvProfileClassStatus.setTextColor(android.graphics.Color.parseColor("#5A4FCF"));
+        } else {
+            holder.b.cardProfileClass.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.surface));
+            holder.b.cardProfileClass.setStrokeColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.outline_variant));
+            holder.b.cardProfileClass.setStrokeWidth((int) (1 * holder.itemView.getContext().getResources().getDisplayMetrics().density));
+            holder.b.tvProfileClassNum.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.class_number_purple));
+            holder.b.tvProfileClassNum.setTypeface(android.graphics.Typeface.DEFAULT);
+            holder.b.tvProfileClassTitle.setTypeface(android.graphics.Typeface.DEFAULT);
+            holder.b.tvProfileClassTitle.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.on_surface));
+            holder.b.tvProfileClassStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.on_surface_variant));
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null && hasClass) listener.onClassClick(item);

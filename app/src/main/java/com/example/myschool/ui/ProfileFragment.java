@@ -305,6 +305,20 @@ public class ProfileFragment extends Fragment {
     private void selectClass(ProfileClassItem item) {
         if (!item.hasClass()) return;
         ClassModel c = item.classModel;
+        
+        // Preassign default subjects if none exist for the class
+        if (c.subjects == null || c.subjects.isEmpty()) {
+            c.subjects = new ArrayList<>();
+            c.subjects.add(new com.example.myschool.model.Subject("English", 100));
+            c.subjects.add(new com.example.myschool.model.Subject("Mathematics", 100));
+            c.subjects.add(new com.example.myschool.model.Subject("Science", 100));
+            c.subjects.add(new com.example.myschool.model.Subject("Marathi", 100));
+            FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
+                @Override public void onSuccess(String id) {}
+                @Override public void onError(Exception e) {}
+            });
+        }
+        
         SessionContext.selectedClass = c;
         if (c.yearId != null && !c.yearId.isEmpty()) {
             SessionContext.selectedYear = new AcademicYear();

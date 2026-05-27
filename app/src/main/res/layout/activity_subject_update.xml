@@ -6,24 +6,18 @@
     android:background="#ECEDEF"
     android:fitsSystemWindows="true">
 
-    <!-- Top Purple Header Bar -->
-    <LinearLayout
+    <!-- Top White Header Bar -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/llHeaderBar"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="#5A43C2"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-thin"
-            android:text="Update Subject"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="normal" />
-    </LinearLayout>
+        android:layout_height="72dp"
+        android:background="#FFFFFF"
+        app:navigationIcon="@drawable/ic_close"
+        app:navigationIconTint="#5A4FCF"
+        app:title="Update Subject"
+        app:titleTextColor="#2E2E2E"
+        app:titleCentered="false"
+        app:elevation="2dp"/>
 
     <!-- Scrollable Form Container -->
     <ScrollView

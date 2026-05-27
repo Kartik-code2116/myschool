@@ -10,12 +10,14 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/bg_gradient_primary"
+        android:layout_height="72dp"
+        android:background="#FFFFFF"
         app:navigationIcon="@drawable/ic_close"
-        app:navigationIconTint="@color/white"
+        app:navigationIconTint="#5A4FCF"
         app:title="@string/edit_student"
-        app:titleTextColor="@color/white"/>
+        app:titleTextColor="#2E2E2E"
+        app:titleCentered="false"
+        app:elevation="2dp"/>
 
     <ScrollView
         android:layout_width="match_parent"

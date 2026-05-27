@@ -52,6 +52,7 @@ public class SubjectUpdateActivity extends AppCompatActivity {
         b.etDropdownNoteMedium.setText("1");
 
         // Action Buttons Setup
+        b.llHeaderBar.setNavigationOnClickListener(v -> finish());
         b.btnCancel.setOnClickListener(v -> finish());
 
         b.btnClear.setOnClickListener(v -> {
