@@ -7,6 +7,7 @@
     <string name="nav_schools">Schools</string>
     <string name="nav_students">Students</string>
     <string name="nav_reports">Reports</string>
+    <string name="nav_school_level">School Level</string>
     <!-- Login -->
     <string name="login_title">Welcome Back</string>
     <string name="login_subtitle">Sign in to your teacher account</string>
@@ -130,11 +131,11 @@
     <string name="menu_subjects">Subjects</string>
     <string name="menu_declare_weightage">Declare Weightage</string>
     <string name="menu_dropdown_list">Dropdown List</string>
-    <string name="menu_extra_menus">See Extra Menus</string>
+    <string name="menu_extra_menus">School Level Settings</string>
     <string name="menu_print_report">Print Report</string>
     <!-- Info & Print -->
     <string name="title_info_print">Info &amp; Print Setting</string>
-    <string name="subtitle_info_print">Year · Semester · Class</string>
+    <string name="subtitle_info_print">Setting for Editing | Printing</string>
     <string name="year_label">Year: %1$s</string>
     <string name="semester_easy_reports">Easy Reports</string>
     <string name="semester_print_hint">Print, PDF, Progress Card…</string>

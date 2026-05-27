@@ -177,4 +177,32 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">#D1C4E9</item>
     </style>
+
+    <!-- Navigation Drawer Custom Styling -->
+    <style name="Widget.Myschool.NavigationView" parent="Widget.Material3.NavigationView">
+        <item name="android:background">@drawable/bg_drawer_rounded</item>
+        <item name="backgroundTint">@null</item>
+        <item name="itemIconTint">#455A64</item>
+        <item name="itemTextColor">#37474F</item>
+        <item name="itemIconSize">24dp</item>
+        <item name="itemMinHeight">52dp</item>
+        <item name="itemMaxLines">1</item>
+        <item name="itemTextAppearance">@style/TextAppearance.Myschool.DrawerItem</item>
+        <item name="subheaderTextAppearance">@style/TextAppearance.Myschool.DrawerHeader</item>
+        <item name="itemShapeAppearance">@null</item>
+        <item name="itemShapeFillColor">@color/transparent</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.DrawerItem" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#37474F</item>
+    </style>
+
+    <style name="TextAppearance.Myschool.DrawerHeader" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">#78909C</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

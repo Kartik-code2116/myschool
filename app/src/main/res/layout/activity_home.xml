@@ -137,13 +137,12 @@
     <!-- ===== Navigation Drawer ===== -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
+        style="@style/Widget.Myschool.NavigationView"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="false"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_menu"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/on_surface"/>
+        app:menu="@menu/drawer_menu"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

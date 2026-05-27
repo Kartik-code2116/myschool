@@ -52,6 +52,14 @@ public class HomeActivity extends AppCompatActivity {
         topLevel.add(R.id.nav_class_div);
         topLevel.add(R.id.nav_students);
         topLevel.add(R.id.nav_settings);
+        topLevel.add(R.id.nav_formative);
+        topLevel.add(R.id.nav_descriptive);
+        topLevel.add(R.id.nav_attendance);
+        topLevel.add(R.id.nav_subjects);
+        topLevel.add(R.id.nav_weightage);
+        topLevel.add(R.id.nav_dropdown);
+        topLevel.add(R.id.nav_extra);
+        topLevel.add(R.id.nav_print_report);
 
         appBarConfig = new AppBarConfiguration.Builder(topLevel)
                 .setOpenableLayout(b.drawerLayout)
@@ -61,10 +69,13 @@ public class HomeActivity extends AppCompatActivity {
         b.ivProfilePic.setOnClickListener(v -> navigateToAnimated(R.id.nav_profile));
 
         b.navigationView.setNavigationItemSelectedListener(item -> {
-            boolean handled = navigateToAnimated(item.getItemId());
+            int id = item.getItemId();
+            boolean handled = navigateToAnimated(id);
             if (handled) b.drawerLayout.closeDrawer(GravityCompat.START);
             return handled;
         });
+
+        b.btnToolbarMore.setOnClickListener(this::handleHomeMoreClick);
 
         setupDrawerHeader();
         setupDrawerActions();
@@ -117,7 +128,7 @@ public class HomeActivity extends AppCompatActivity {
                 title = "He/She Items";
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_extra) {
-                title = "See Extra Menus";
+                title = getString(R.string.menu_extra_menus);
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_print_report) {
                 title = "Report Printing";
@@ -131,6 +142,14 @@ public class HomeActivity extends AppCompatActivity {
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
+
+            if (id == R.id.nav_info_print) {
+                b.btnToolbarMore.setVisibility(View.VISIBLE);
+                b.ivProfilePic.setVisibility(View.VISIBLE);
+            } else {
+                b.btnToolbarMore.setVisibility(View.GONE);
+                b.ivProfilePic.setVisibility(View.VISIBLE);
+            }
         });
 
         loadTeacherInfo();
@@ -173,7 +192,8 @@ public class HomeActivity extends AppCompatActivity {
     private void syncBottomNavSelection(int destinationId) {
         if (destinationId == R.id.nav_info_print
                 || destinationId == R.id.nav_profile
-                || destinationId == R.id.nav_students) {
+                || destinationId == R.id.nav_students
+                || destinationId == R.id.nav_extra) {
             b.bottomNav.setSelectedItemId(destinationId);
         }
     }
@@ -194,10 +214,23 @@ public class HomeActivity extends AppCompatActivity {
             return insets;
         });
 
-        String uid = FirebaseRepository.get().currentUid();
+        android.widget.TextView tvName = header.findViewById(R.id.tvDrawerAppName);
         android.widget.TextView tvId = header.findViewById(R.id.tvDrawerTeacherId);
-        if (tvId != null && uid != null) {
-            tvId.setText(uid.length() > 11 ? uid.substring(0, 11) : uid);
+
+        if (tvName != null) {
+            if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.name != null && !SessionContext.selectedSchool.name.isEmpty()) {
+                tvName.setText(SessionContext.selectedSchool.name);
+            } else {
+                tvName.setText("CCE110");
+            }
+        }
+
+        if (tvId != null) {
+            if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.udiseCode != null && !SessionContext.selectedSchool.udiseCode.isEmpty()) {
+                tvId.setText(SessionContext.selectedSchool.udiseCode);
+            } else {
+                tvId.setText("27251208204");
+            }
         }
     }
 
@@ -214,11 +247,11 @@ public class HomeActivity extends AppCompatActivity {
         });
         header.findViewById(R.id.btnDrawerPrint).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            Toast.makeText(HomeActivity.this, "Reports feature coming soon!", Toast.LENGTH_SHORT).show();
+            navigateToAnimated(R.id.nav_print_report);
         });
         header.findViewById(R.id.btnDrawerStats).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            navController.navigate(R.id.nav_info_print);
+            navigateToAnimated(R.id.nav_info_print);
         });
     }
 
@@ -252,7 +285,12 @@ public class HomeActivity extends AppCompatActivity {
             b.ivProfilePic.setVisibility(View.GONE);
         } else {
             b.btnToolbarNotifications.setVisibility(View.GONE);
-            b.btnToolbarMore.setVisibility(View.GONE);
+            b.btnToolbarMore.setOnClickListener(this::handleHomeMoreClick);
+            if (navController != null && navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() == R.id.nav_info_print) {
+                b.btnToolbarMore.setVisibility(View.VISIBLE);
+            } else {
+                b.btnToolbarMore.setVisibility(View.GONE);
+            }
             b.ivProfilePic.setVisibility(View.VISIBLE);
         }
     }
@@ -278,5 +316,63 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void handleHomeMoreClick(View v) {
+        if (navController != null && navController.getCurrentDestination() != null
+                && navController.getCurrentDestination().getId() == R.id.nav_info_print) {
+            androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, v);
+            
+            // Core options
+            popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 Home");
+            popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 Classes");
+            popup.getMenu().add(0, R.id.nav_students, 3, "👥 Students");
+            
+            // Utility options
+            popup.getMenu().add(0, 901, 4, "🌐 Language setting");
+            popup.getMenu().add(0, 902, 5, "⭐ Rate app");
+            popup.getMenu().add(0, 903, 6, "📱 More apps");
+            popup.getMenu().add(0, 904, 7, "ℹ️ About developers");
+            popup.getMenu().add(0, 999, 8, "🚪 " + getString(R.string.logout));
+
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                if (id == 901) {
+                    Toast.makeText(this, "Language Setting: English selected", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == 902) {
+                    Toast.makeText(this, "Thank you for rating us 5 stars!", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == 903) {
+                    Toast.makeText(this, "Opening More Apps on Play Store...", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == 904) {
+                    new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("About Developer")
+                            .setMessage("Developed with ❤️ by Sanjay Gore\nVersion 24.04.14")
+                            .setPositiveButton(android.R.string.ok, null).show();
+                    return true;
+                } else if (id == 999) {
+                    confirmLogout();
+                    return true;
+                }
+                navigateToAnimated(id);
+                return true;
+            });
+            popup.show();
+        }
+    }
+
+    private void confirmLogout() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.logout).setMessage(R.string.logout_confirm)
+                .setPositiveButton(R.string.logout, (d, w) -> {
+                    com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+                    SessionContext.clear(this);
+                    startActivity(new Intent(this, LoginActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                    finish();
+                })
+                .setNegativeButton(android.R.string.cancel, null).show();
     }
 }

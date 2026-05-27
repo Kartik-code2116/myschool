@@ -6,7 +6,7 @@
     android:background="@drawable/bg_drawer_header"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:padding="16dp">
+    android:padding="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,90 +14,111 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_circle_primary"
-            android:padding="10dp"
-            android:src="@drawable/ic_school"
-            app:tint="@color/white"/>
+        <!-- Large School Logo Frame on Left -->
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/shape_circle_white"
+            android:padding="8dp">
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_school"
+                app:tint="@color/drawer_header_dark"
+                android:contentDescription="School Logo"/>
+        </FrameLayout>
+
+        <!-- Vertically Centered School Name and ID -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvDrawerAppName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/drawer_app_name"
+                android:fontFamily="sans-serif-black"
+                android:text="CCE110"
                 android:textColor="@color/drawer_header_dark"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"/>
 
             <TextView
                 android:id="@+id/tvDrawerTeacherId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="12sp"/>
+                android:fontFamily="sans-serif-medium"
+                android:text="27251208204"
+                android:textColor="#2E7D32"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:letterSpacing="0.05"/>
         </LinearLayout>
     </LinearLayout>
 
+    <!-- 4 Square Rounded Quick Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="18dp"
+        android:orientation="horizontal"
+        android:gravity="center">
 
         <ImageButton
             android:id="@+id/btnDrawerStats"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/bg_surface_rounded"
+            android:backgroundTint="@color/white"
             android:contentDescription="@string/drawer_stats"
-            android:padding="10dp"
+            android:padding="12dp"
             android:src="@drawable/ic_chart"
+            android:scaleType="fitCenter"
             app:tint="@color/drawer_header_dark"/>
 
         <ImageButton
             android:id="@+id/btnDrawerSettings"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/bg_surface_rounded"
+            android:backgroundTint="@color/white"
             android:contentDescription="@string/drawer_settings"
-            android:padding="10dp"
+            android:padding="12dp"
             android:src="@drawable/ic_settings"
+            android:scaleType="fitCenter"
             app:tint="@color/drawer_header_dark"/>
 
         <ImageButton
             android:id="@+id/btnDrawerPrint"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/bg_surface_rounded"
+            android:backgroundTint="@color/white"
             android:contentDescription="@string/drawer_print"
-            android:padding="10dp"
+            android:padding="12dp"
             android:src="@drawable/ic_print"
+            android:scaleType="fitCenter"
             app:tint="@color/drawer_header_dark"/>
 
         <ImageButton
             android:id="@+id/btnDrawerProfile"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/bg_surface_rounded"
+            android:backgroundTint="@color/white"
             android:contentDescription="@string/profile_title"
-            android:padding="10dp"
+            android:padding="12dp"
             android:src="@drawable/ic_person"
+            android:scaleType="fitCenter"
             app:tint="@color/drawer_header_dark"/>
     </LinearLayout>
 </LinearLayout>

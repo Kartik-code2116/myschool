@@ -4,7 +4,7 @@
     android:id="@+id/scrollHome"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="#F0F2F8"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
@@ -14,259 +14,731 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="24dp">
+        android:paddingBottom="32dp">
 
-        <LinearLayout
+        <!-- ═══ HEADER BANNER (Sky Blue) ═══ -->
+        <FrameLayout
             android:id="@+id/headerBand"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_gradient_primary"
-            android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="24dp">
+            android:layout_height="200dp"
+            android:background="#1A237E"
+            android:clipChildren="false">
 
-            <TextView
+            <!-- Gradient overlay layer -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_header_anim_gradient"/>
+
+            <!-- ── Text info (left side) ── -->
+
+            <!-- ── Animated Illustration (right side) ── -->
+
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/home_greeting"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:alpha="0.9"/>
+                android:layout_height="97dp"
+                android:layout_gravity="start|center_vertical"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="23dp">
 
-            <TextView
-                android:id="@+id/tvTeacherNameHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/white"
-                android:textSize="22sp"/>
+                <!-- Version pill -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="#33FFFFFF"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:letterSpacing="0.12"
+                    android:paddingHorizontal="12dp"
+                    android:text="Myschool 1.0"
+                    android:textAllCaps="true"
+                    android:textColor="#BBDEFB"
+                    android:textSize="10sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/home_pick_session"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                android:alpha="0.85"/>
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvTeacherNameHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:letterSpacing="0.01"
+                    android:shadowColor="#33000000"
+                    android:shadowDx="0"
+                    android:shadowDy="2"
+                    android:shadowRadius="4"
+                    android:text="Kartik Thorat"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-        <com.google.android.material.card.MaterialCardView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.06"
+                    android:text="MySchool"
+                    android:textColor="#90CAF9"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:alpha="0.7"
+                    android:fontFamily="sans-serif"
+                    android:text="Smart School Management"
+                    android:textColor="#BBDEFB"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/frameHeaderAnim"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="12dp"
+                android:clipChildren="false">
+
+                <!-- Outer glow ring (pulsing) -->
+                <ImageView
+                    android:id="@+id/ivRingOuter"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_anim_ring_outer"
+                    android:alpha="0.5"/>
+
+                <!-- Middle ring -->
+                <ImageView
+                    android:id="@+id/ivRingInner"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_anim_ring_inner"
+                    android:alpha="0.7"/>
+
+                <!-- White center circle -->
+                <ImageView
+                    android:layout_width="76dp"
+                    android:layout_height="76dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_anim_ring_center"/>
+
+                <!-- Main school icon (center) -->
+                <ImageView
+                    android:id="@+id/ivAnimSchool"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_school"
+                    app:tint="#3F51B5"/>
+
+                <!-- Floating icon: Book (top-left area) -->
+                <FrameLayout
+                    android:id="@+id/frameBook"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="start|top"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_book"
+                        app:tint="#1565C0"/>
+                </FrameLayout>
+
+                <!-- Floating icon: Students (top-right area) -->
+                <FrameLayout
+                    android:id="@+id/frameStudents"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_students"
+                        app:tint="#388E3C"/>
+                </FrameLayout>
+
+                <!-- Floating icon: Chart (bottom-left) -->
+                <FrameLayout
+                    android:id="@+id/frameChart"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="start|bottom"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="18dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_chart"
+                        app:tint="#7B1FA2"/>
+                </FrameLayout>
+
+                <!-- Floating icon: Calendar (bottom-right) -->
+                <FrameLayout
+                    android:id="@+id/frameCalendar"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="22dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="#E65100"/>
+                </FrameLayout>
+
+                <!-- Sparkle dots -->
+                <View
+                    android:id="@+id/dotSpark1"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginBottom="44dp"
+                    android:background="@drawable/ic_sparkle_dot"/>
+
+                <View
+                    android:id="@+id/dotSpark2"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="26dp"
+                    android:layout_marginTop="36dp"
+                    android:background="@drawable/ic_sparkle_dot"/>
+
+                <View
+                    android:id="@+id/dotSpark3"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/ic_sparkle_dot"/>
+
+            </FrameLayout>
+        </FrameLayout>
+
+        <!-- ═══ OVERLAPPING WHITE ROUNDED CARD ═══ -->
+        <LinearLayout
             android:id="@+id/cardMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="-12dp"
-            app:cardBackgroundColor="@color/surface"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="3dp">
+            android:layout_marginTop="-36dp"
+            android:background="@drawable/bg_surface_rounded_top"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="12dp">
+
+            <!-- ─── SECTION: Year ─── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="20dp"
+                    android:background="#5E35B1"
+                    android:layout_marginEnd="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Academic Year"
+                    android:textColor="#1A237E"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.08"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_marginBottom="22dp">
 
-                <!-- Year -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_year_short"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif-medium"/>
+                <ImageButton
+                    android:id="@+id/btnYearPrev"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_previous"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="#90A4AE"
+                    android:padding="10dp"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    app:cardBackgroundColor="#EDE7F6"
+                    app:cardCornerRadius="18dp"
+                    app:strokeWidth="0dp"
+                    app:cardElevation="0dp">
 
-                    <ImageButton
-                        android:id="@+id/btnYearPrev"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_previous"
-                        android:src="@drawable/ic_chevron_left"
-                        app:tint="@color/primary"/>
-
-                    <TextView
-                        android:id="@+id/tvYearLabel"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-medium"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:gravity="center"
-                        android:textColor="@color/accent_purple"
-                        android:textSize="18sp"/>
+                        android:orientation="horizontal">
 
-                    <ImageButton
-                        android:id="@+id/btnYearNext"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_next"
-                        android:src="@drawable/ic_chevron_right"
-                        app:tint="@color/primary"/>
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="#5E35B1"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvYearLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                            android:gravity="center"
+                            android:text="2026-27"
+                            android:textColor="#5E35B1"
+                            android:textSize="19sp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <ImageButton
+                    android:id="@+id/btnYearNext"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_next"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#90A4AE"
+                    android:padding="10dp"/>
+            </LinearLayout>
+
+            <!-- Subtle divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F0F0F6"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- ─── SECTION: Semester ─── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
 
                 <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="14dp"
-                    android:background="@color/outline_variant"/>
+                    android:layout_width="4dp"
+                    android:layout_height="20dp"
+                    android:background="#7E57C2"
+                    android:layout_marginEnd="10dp"/>
 
-                <!-- Semester -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_semester_short"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif-medium"/>
+                    android:text="Semester"
+                    android:textColor="#1A237E"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.08"/>
+            </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/panelSemester"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/panelSemester"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_marginBottom="22dp">
 
-                    <ImageButton
-                        android:id="@+id/btnSemesterPrev"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_previous"
-                        android:src="@drawable/ic_chevron_left"
-                        app:tint="@color/primary"/>
+                <ImageButton
+                    android:id="@+id/btnSemesterPrev"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_previous"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="#90A4AE"
+                    android:padding="10dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="18dp"
+                    app:strokeWidth="1.5dp"
+                    app:strokeColor="#D1C4E9"
+                    app:cardElevation="1dp">
 
                     <TextView
                         android:id="@+id/tvSemesterName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
-                        android:textColor="@color/on_surface"
+                        android:text="First Semester"
+                        android:textColor="#333333"
                         android:textSize="16sp"/>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <ImageButton
-                        android:id="@+id/btnSemesterNext"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_next"
-                        android:src="@drawable/ic_chevron_right"
-                        app:tint="@color/primary"/>
-                </LinearLayout>
+                <ImageButton
+                    android:id="@+id/btnSemesterNext"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_next"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#90A4AE"
+                    android:padding="10dp"/>
+            </LinearLayout>
+
+            <!-- Subtle divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F0F0F6"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- ─── SECTION: Class Selection ─── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
 
                 <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="14dp"
-                    android:background="@color/outline_variant"/>
+                    android:layout_width="4dp"
+                    android:layout_height="20dp"
+                    android:background="#4CAF50"
+                    android:layout_marginEnd="10dp"/>
 
-                <!-- Class -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_class_short"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif-medium"/>
+                    android:text="Class Activation"
+                    android:textColor="#1A237E"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.08"/>
 
-                <LinearLayout
-                    android:id="@+id/panelClass"
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <!-- Live swipe hint badge -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_selector_card"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:text="← swipe →"
+                    android:textColor="#90A4AE"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif"
+                    android:letterSpacing="0.06"/>
+            </LinearLayout>
 
-                    <ImageButton
-                        android:id="@+id/btnClassPrev"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_previous"
-                        android:src="@drawable/ic_chevron_left"
-                        app:tint="@color/primary"/>
+            <!-- Class sliding row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnClassPrev"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_previous"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="#90A4AE"
+                    android:padding="10dp"/>
+
+                <!-- Class Activation Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/panelClass"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="20dp"
+                    app:strokeWidth="1.5dp"
+                    app:strokeColor="#E8EAF6"
+                    app:cardElevation="4dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
 
-                        <TextView
-                            android:id="@+id/tvClassNumberBig"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="1"
-                            android:textColor="@color/class_number_purple"
-                            android:textSize="32sp"/>
+                        <!-- Left: Class Number Circle -->
+                        <FrameLayout
+                            android:id="@+id/frameClassNumCircle"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:background="@drawable/bg_class_num_normal">
 
-                        <TextView
-                            android:id="@+id/tvClassDivLabel"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/tvClassNumberBig"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:fontFamily="sans-serif-black"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textColor="#5E35B1"
+                                android:textSize="22sp"
+                                android:textStyle="bold"/>
+                        </FrameLayout>
+
+                        <!-- Center: Class details -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:textColor="@color/on_surface"
-                            android:textSize="14sp"/>
+                            android:orientation="vertical"
+                            android:layout_weight="1"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:id="@+id/tvClassDivLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="Class: 1, Div: A"
+                                android:textColor="#1A237E"
+                                android:textSize="15sp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:fontFamily="sans-serif"
+                                android:text="Tap to manage students"
+                                android:textColor="#90A4AE"
+                                android:textSize="11sp"/>
+
+                            <!-- Status Badge Pill -->
+                            <TextView
+                                android:id="@+id/tvClassStatusBadge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_pill_activate"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="4dp"
+                                android:text="Activate it"
+                                android:textColor="#E65100"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif-medium"/>
+                        </LinearLayout>
+
+                        <!-- Right: Arrow -->
+                        <ImageView
+                            android:id="@+id/ivClassArrow"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="#C5CAE9"
+                            android:contentDescription="Select"/>
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <ImageButton
-                        android:id="@+id/btnClassNext"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_next"
-                        android:src="@drawable/ic_chevron_right"
-                        app:tint="@color/primary"/>
-                </LinearLayout>
+                <ImageButton
+                    android:id="@+id/btnClassNext"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_next"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#90A4AE"
+                    android:padding="10dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvNoClassHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="@string/home_no_class_hint"
+                android:textColor="#90A4AE"
+                android:textSize="12sp"
+                android:visibility="gone"/>
+
+            <!-- Subtle divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F0F0F6"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="22dp"/>
+
+            <!-- ═══ ACTION BUTTONS ═══ -->
+
+            <!-- Row 1: GO TO CLASS & ALL CLASSES -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGoToClass"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text="GO TO CLASS"
+                    android:textColor="#2E7D32"
+                    app:strokeColor="#66BB6A"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="14dp"
+                    android:fontFamily="sans-serif-black"
+                    android:textSize="12sp"
+                    app:icon="@drawable/ic_students"
+                    app:iconTint="#66BB6A"
+                    app:iconSize="16dp"
+                    app:iconGravity="textStart"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAllClasses"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="ALL CLASSES"
+                    android:textColor="#4527A0"
+                    app:strokeColor="#7E57C2"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="14dp"
+                    android:fontFamily="sans-serif-black"
+                    android:textSize="12sp"
+                    app:icon="@drawable/ic_table_grid"
+                    app:iconTint="#7E57C2"
+                    app:iconSize="16dp"
+                    app:iconGravity="textStart"/>
+            </LinearLayout>
+
+            <!-- Row 2: HOW TO USE & ONLINE HELP -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnHowToUse"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text="HOW TO USE"
+                    android:textColor="#546E7A"
+                    app:strokeColor="#B0BEC5"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="14dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="12sp"
+                    app:icon="@drawable/ic_chat"
+                    app:iconTint="#78909C"
+                    app:iconSize="16dp"
+                    app:iconGravity="textStart"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOnlineHelp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="ONLINE HELP"
+                    android:textColor="#546E7A"
+                    app:strokeColor="#B0BEC5"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="14dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="12sp"
+                    app:icon="@drawable/ic_book"
+                    app:iconTint="#78909C"
+                    app:iconSize="16dp"
+                    app:iconGravity="textStart"/>
+            </LinearLayout>
+
+            <!-- ─── Bottom Instruction Panel ─── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginTop="24dp"
+                android:background="#FAFBFF"
+                android:padding="14dp">
 
                 <TextView
-                    android:id="@+id/tvNoClassHint"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvHintFillData"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/hint_fill_data"
+                    android:textColor="#90A4AE"
+                    android:textSize="11sp"
                     android:gravity="center"
-                    android:text="@string/home_no_class_hint"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp"
-                    android:visibility="gone"/>
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvHintQuestionMark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/hint_question_mark"
+                    android:textColor="#90A4AE"
+                    android:textSize="10sp"
+                    android:gravity="center"/>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGoToClass"
-            style="@style/Widget.Myschool.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="20dp"
-            android:text="@string/btn_open_students"
-            app:icon="@drawable/ic_students"
-            app:iconGravity="textStart"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAllClasses"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/btn_all_classes"
-            android:textColor="@color/accent_purple"/>
+        </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

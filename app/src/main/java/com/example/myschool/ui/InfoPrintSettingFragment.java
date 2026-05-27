@@ -1,10 +1,19 @@
 package com.example.myschool.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -65,6 +74,17 @@ public class InfoPrintSettingFragment extends Fragment {
 
         b.btnGoToClass.setOnClickListener(v -> { UiAnimations.pulse(b.btnGoToClass); goToClassStudents(); });
         b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_class_div); });
+        b.btnHowToUse.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnHowToUse);
+            new android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("How to Use")
+                    .setMessage(getString(R.string.hint_question_mark))
+                    .setPositiveButton(android.R.string.ok, null).show();
+        });
+        b.btnOnlineHelp.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnOnlineHelp);
+            Toast.makeText(requireContext(), "Opening online help portal...", Toast.LENGTH_SHORT).show();
+        });
 
         setupSwipeListener(b.panelSemester,
                 () -> cycleSemester(1), () -> cycleSemester(-1), this::showSemesterPickerDialog);
@@ -437,17 +457,49 @@ public class InfoPrintSettingFragment extends Fragment {
             SessionContext.selectedClass = null;
             SessionContext.save(getContext());
             b.tvClassNumberBig.setText("—");
+            b.tvClassNumberBig.setTextColor(Color.parseColor("#5E35B1"));
             b.tvClassDivLabel.setText(getString(R.string.home_no_class_hint));
+            b.frameClassNumCircle.setBackground(
+                    requireContext().getDrawable(R.drawable.bg_class_num_normal));
+            b.panelClass.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#E8EAF6")));
+            b.tvClassStatusBadge.setText("Activate it");
+            b.tvClassStatusBadge.setTextColor(Color.parseColor("#E65100"));
+            b.tvClassStatusBadge.setBackground(
+                    requireContext().getDrawable(R.drawable.bg_pill_activate));
+            b.ivClassArrow.setImageTintList(ColorStateList.valueOf(Color.parseColor("#C5CAE9")));
             return;
         }
         classIndex = Math.max(0, Math.min(classIndex, classes.size() - 1));
         ClassModel c = classes.get(classIndex);
-        SessionContext.selectedClass = c; SessionContext.syncToAppCache();
+
+        // Check if this class is the globally activated session class
+        boolean isActivated = SessionContext.selectedClass != null
+                && SessionContext.selectedClass.id != null
+                && SessionContext.selectedClass.id.equals(c.id);
+
+        // Activate it when sliding to a new class (sets session class)
+        SessionContext.selectedClass = c;
+        SessionContext.syncToAppCache();
         SessionContext.save(getContext());
+
         String num = c.className != null ? c.className : "—";
         String div = c.division  != null && !c.division.isEmpty() ? c.division : "-";
         b.tvClassNumberBig.setText(num);
         b.tvClassDivLabel.setText(getString(R.string.class_div_format, num, div));
+
+        // Always activated when we select it via slider — mark green
+        // (First slide always activates, which is the desired behavior)
+        b.frameClassNumCircle.setBackground(
+                requireContext().getDrawable(R.drawable.bg_class_num_activated));
+        b.tvClassNumberBig.setTextColor(Color.parseColor("#2E7D32"));
+        b.panelClass.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#A5D6A7")));
+        b.panelClass.setCardBackgroundColor(Color.parseColor("#F9FFF9"));
+        b.tvClassStatusBadge.setText("✓  Activated");
+        b.tvClassStatusBadge.setTextColor(Color.parseColor("#2E7D32"));
+        b.tvClassStatusBadge.setBackground(
+                requireContext().getDrawable(R.drawable.bg_pill_activated));
+        b.ivClassArrow.setImageTintList(ColorStateList.valueOf(Color.parseColor("#66BB6A")));
+
         if (dir != 0) UiAnimations.animateSelectorChange(b.panelClass, dir);
     }
 
@@ -475,11 +527,101 @@ public class InfoPrintSettingFragment extends Fragment {
     // ── Entrance animation ────────────────────────────────────────────────────
     private void playEntranceIfNeeded() {
         if (entrancePlayed || b == null) return;
-        entrancePlayed = true; b.homeRoot.setAlpha(1f);
+        entrancePlayed = true;
+        b.homeRoot.setAlpha(1f);
         b.homeRoot.post(() -> {
             if (!isViewActive()) return;
             UiAnimations.staggerFadeIn(b.headerBand, b.cardMain, b.btnGoToClass, b.btnAllClasses);
+            startHeaderAnimations();
         });
+    }
+
+    // ── Header illustration animations ───────────────────────────────────────
+    private void startHeaderAnimations() {
+        if (!isViewActive()) return;
+
+        // 1. Outer ring: slow continuous pulse scale
+        ObjectAnimator outerScaleX = ObjectAnimator.ofFloat(b.ivRingOuter, "scaleX", 0.85f, 1.12f);
+        ObjectAnimator outerScaleY = ObjectAnimator.ofFloat(b.ivRingOuter, "scaleY", 0.85f, 1.12f);
+        ObjectAnimator outerAlpha  = ObjectAnimator.ofFloat(b.ivRingOuter, "alpha",  0.3f, 0.65f);
+        outerScaleX.setDuration(2000); outerScaleX.setRepeatMode(ValueAnimator.REVERSE); outerScaleX.setRepeatCount(ValueAnimator.INFINITE);
+        outerScaleY.setDuration(2000); outerScaleY.setRepeatMode(ValueAnimator.REVERSE); outerScaleY.setRepeatCount(ValueAnimator.INFINITE);
+        outerAlpha.setDuration(2000);  outerAlpha.setRepeatMode(ValueAnimator.REVERSE);  outerAlpha.setRepeatCount(ValueAnimator.INFINITE);
+        AnimatorSet outerSet = new AnimatorSet();
+        outerSet.playTogether(outerScaleX, outerScaleY, outerAlpha);
+        outerSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        outerSet.start();
+
+        // 2. Inner ring: counter-phase pulse (offset timing)
+        ObjectAnimator innerScaleX = ObjectAnimator.ofFloat(b.ivRingInner, "scaleX", 0.9f, 1.08f);
+        ObjectAnimator innerScaleY = ObjectAnimator.ofFloat(b.ivRingInner, "scaleY", 0.9f, 1.08f);
+        innerScaleX.setDuration(1600); innerScaleX.setRepeatMode(ValueAnimator.REVERSE); innerScaleX.setRepeatCount(ValueAnimator.INFINITE);
+        innerScaleY.setDuration(1600); innerScaleY.setRepeatMode(ValueAnimator.REVERSE); innerScaleY.setRepeatCount(ValueAnimator.INFINITE);
+        innerScaleX.setStartDelay(400); innerScaleY.setStartDelay(400);
+        AnimatorSet innerSet = new AnimatorSet();
+        innerSet.playTogether(innerScaleX, innerScaleY);
+        innerSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        innerSet.start();
+
+        // 3. School icon: slow breathe scale + gentle rotation
+        ObjectAnimator schoolBreath = ObjectAnimator.ofFloat(b.ivAnimSchool, "scaleX", 0.92f, 1.08f);
+        ObjectAnimator schoolBreathY = ObjectAnimator.ofFloat(b.ivAnimSchool, "scaleY", 0.92f, 1.08f);
+        schoolBreath.setDuration(1800);  schoolBreath.setRepeatMode(ValueAnimator.REVERSE);  schoolBreath.setRepeatCount(ValueAnimator.INFINITE);
+        schoolBreathY.setDuration(1800); schoolBreathY.setRepeatMode(ValueAnimator.REVERSE); schoolBreathY.setRepeatCount(ValueAnimator.INFINITE);
+        AnimatorSet schoolSet = new AnimatorSet();
+        schoolSet.playTogether(schoolBreath, schoolBreathY);
+        schoolSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        schoolSet.start();
+
+        // 4. Floating satellite icons — staggered bob up/down
+        float[] offsets = {0f, 500f, 900f, 1300f};
+        View[] floaters = {b.frameBook, b.frameStudents, b.frameChart, b.frameCalendar};
+        float[] amplitudes = {-16f, -12f, -14f, -10f};
+        int[] durations   = {2000,  1700,  2300,  1900};
+        for (int i = 0; i < floaters.length; i++) {
+            ObjectAnimator bobY = ObjectAnimator.ofFloat(floaters[i], "translationY", 0f, amplitudes[i]);
+            bobY.setDuration(durations[i]);
+            bobY.setRepeatMode(ValueAnimator.REVERSE);
+            bobY.setRepeatCount(ValueAnimator.INFINITE);
+            bobY.setStartDelay((long) offsets[i]);
+            bobY.setInterpolator(new AccelerateDecelerateInterpolator());
+            bobY.start();
+
+            // Entrance pop-in for each floater
+            floaters[i].setScaleX(0f); floaters[i].setScaleY(0f); floaters[i].setAlpha(0f);
+            ObjectAnimator popX = ObjectAnimator.ofFloat(floaters[i], "scaleX", 0f, 1f);
+            ObjectAnimator popY = ObjectAnimator.ofFloat(floaters[i], "scaleY", 0f, 1f);
+            ObjectAnimator popA = ObjectAnimator.ofFloat(floaters[i], "alpha",  0f, 1f);
+            popX.setDuration(500); popY.setDuration(500); popA.setDuration(400);
+            popX.setStartDelay(300 + (long)(i * 120));
+            popY.setStartDelay(300 + (long)(i * 120));
+            popA.setStartDelay(300 + (long)(i * 120));
+            popX.setInterpolator(new OvershootInterpolator(1.5f));
+            popY.setInterpolator(new OvershootInterpolator(1.5f));
+            AnimatorSet popSet = new AnimatorSet();
+            popSet.playTogether(popX, popY, popA);
+            popSet.start();
+        }
+
+        // 5. Sparkle dots — twinkle alpha
+        View[] dots = {b.dotSpark1, b.dotSpark2, b.dotSpark3};
+        long[] dotDelays = {0, 700, 1200};
+        int[] dotDurations = {1200, 900, 1500};
+        for (int i = 0; i < dots.length; i++) {
+            ObjectAnimator twinkle = ObjectAnimator.ofFloat(dots[i], "alpha", 0.1f, 1.0f);
+            twinkle.setDuration(dotDurations[i]);
+            twinkle.setRepeatMode(ValueAnimator.REVERSE);
+            twinkle.setRepeatCount(ValueAnimator.INFINITE);
+            twinkle.setStartDelay(dotDelays[i]);
+            twinkle.setInterpolator(new AccelerateDecelerateInterpolator());
+            twinkle.start();
+
+            ObjectAnimator twinkleScale = ObjectAnimator.ofFloat(dots[i], "scaleX", 0.5f, 1.3f);
+            ObjectAnimator twinkleScaleY = ObjectAnimator.ofFloat(dots[i], "scaleY", 0.5f, 1.3f);
+            twinkleScale.setDuration(dotDurations[i]);  twinkleScale.setRepeatMode(ValueAnimator.REVERSE);  twinkleScale.setRepeatCount(ValueAnimator.INFINITE); twinkleScale.setStartDelay(dotDelays[i]);
+            twinkleScaleY.setDuration(dotDurations[i]); twinkleScaleY.setRepeatMode(ValueAnimator.REVERSE); twinkleScaleY.setRepeatCount(ValueAnimator.INFINITE); twinkleScaleY.setStartDelay(dotDelays[i]);
+            twinkleScale.start(); twinkleScaleY.start();
+        }
     }
 
     // ── Picker dialogs ────────────────────────────────────────────────────────
