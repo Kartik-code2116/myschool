@@ -337,7 +337,21 @@ public class HomeActivity extends AppCompatActivity {
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
                 if (id == 901) {
-                    Toast.makeText(this, "Language Setting: English selected", Toast.LENGTH_SHORT).show();
+                    // Fully functional bilingual language selector dialog
+                    String[] languages = {"English", "मराठी (Marathi)"};
+                    android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
+                    String currentLang = prefs.getString("language", "en");
+                    int checkedItem = "mr".equals(currentLang) ? 1 : 0;
+
+                    new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("Select Language / भाषा निवडा")
+                            .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                                String selectedLang = (which == 1) ? "mr" : "en";
+                                changeLanguage(selectedLang);
+                                dialog.dismiss();
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
                     return true;
                 } else if (id == 902) {
                     Toast.makeText(this, "Thank you for rating us 5 stars!", Toast.LENGTH_SHORT).show();
@@ -377,5 +391,26 @@ public class HomeActivity extends AppCompatActivity {
                     finish();
                 })
                 .setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    public void changeLanguage(String lang) {
+        android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
+        String currentLang = prefs.getString("language", "en");
+        if (currentLang.equals(lang)) return;
+
+        prefs.edit().putString("language", lang).apply();
+
+        // Apply locale runtime change to application and context resources
+        java.util.Locale locale = new java.util.Locale(lang);
+        java.util.Locale.setDefault(locale);
+        android.content.res.Resources res = getResources();
+        android.content.res.Configuration config = new android.content.res.Configuration(res.getConfiguration());
+        config.setLocale(locale);
+        res.updateConfiguration(config, res.getDisplayMetrics());
+
+        Toast.makeText(this, "Language updated / भाषा बदलली", Toast.LENGTH_SHORT).show();
+
+        // Recreate activity to force reinflating components with new resource locale bundle
+        recreate();
     }
 }

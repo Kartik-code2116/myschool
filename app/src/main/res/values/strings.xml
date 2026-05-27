@@ -131,7 +131,7 @@
     <string name="menu_subjects">Subjects</string>
     <string name="menu_declare_weightage">Declare Weightage</string>
     <string name="menu_dropdown_list">Dropdown List</string>
-    <string name="menu_extra_menus">School Level Settings</string>
+    <string name="menu_extra_menus">School Settings</string>
     <string name="menu_print_report">Print Report</string>
     <!-- Info & Print -->
     <string name="title_info_print">Info &amp; Print Setting</string>
