@@ -59,9 +59,50 @@ public class StudentListFragment extends Fragment {
         setupRecycler();
         setupSearch();
         setupFab();
+        setupCustomToolbar();
         UiAnimations.staggerFadeIn(b.etSearch, b.rvStudents, b.fabAddStudent);
 
         applySessionFilterIfAny();
+    }
+
+    private void setupCustomToolbar() {
+        if (b.btnCustomMenu != null) {
+            b.btnCustomMenu.setOnClickListener(v -> {
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) getActivity()).openDrawer();
+                }
+            });
+        }
+
+        if (b.btnHelp != null) {
+            b.btnHelp.setOnClickListener(v -> {
+                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                        .setTitle("विद्यार्थी यादी मदत (Student List Help)")
+                        .setMessage("१. विद्यार्थ्याचे गुण भरण्यासाठी किंवा उपस्थिती बदलण्यासाठी प्रत्येक विद्यार्थ्याच्या कार्डवरील ३-बिंदू मेनूवर क्लिक करा.\n\n"
+                                + "२. नवीन विद्यार्थी जोडण्यासाठी खाली उजव्या कोपऱ्यातील '+' बटणावर क्लिक करा.\n\n"
+                                + "३. शोध घेण्यासाठी वरील सर्च बारचा वापर करा.")
+                        .setPositiveButton("ठीक आहे", null)
+                        .show();
+            });
+        }
+
+        if (b.btnCalc != null) {
+            b.btnCalc.setOnClickListener(v -> {
+                android.widget.Toast.makeText(requireContext(), "गुण/निकाल मोजणी विभाग लवकरच येत आहे", android.widget.Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        if (b.btnIdCard != null) {
+            b.btnIdCard.setOnClickListener(v -> {
+                android.widget.Toast.makeText(requireContext(), "आयडी कार्ड प्रिंटिंग लवकरच सुरू होईल", android.widget.Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        if (b.btnMoreOptions != null) {
+            b.btnMoreOptions.setOnClickListener(v -> {
+                android.widget.Toast.makeText(requireContext(), "सेटिंग्ज आणि इतर पर्याय लवकरच जोडले जातील", android.widget.Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private void applySessionFilterIfAny() {
@@ -293,14 +334,71 @@ public class StudentListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         SessionContext.syncFromAppCache();
+
+        // Hide parent top app bar & fix CoordinatorLayout scrolling behavior offset bug:
         if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).updateToolbar(
-                    getString(R.string.menu_student_list), SessionContext.getClassDivLabel());
+            HomeActivity ha = (HomeActivity) getActivity();
+            View appBar = ha.findViewById(R.id.appBarLayout);
+            if (appBar != null) {
+                appBar.setVisibility(View.GONE);
+            }
+            
+            View navHost = ha.findViewById(R.id.navHostFragment);
+            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
+                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
+                params.setBehavior(null);
+                float density = getResources().getDisplayMetrics().density;
+                params.bottomMargin = (int) (64 * density);
+                navHost.setLayoutParams(params);
+            }
         }
+
+        // Dynamically set sub-text and header section details
+        String yearLabel = SessionContext.getYearLabel();
+        String classVal = "1";
+        String divVal = "1";
+        if (SessionContext.selectedClass != null) {
+            classVal = SessionContext.selectedClass.className != null ? SessionContext.selectedClass.className : "1";
+            divVal = SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty() 
+                    ? SessionContext.selectedClass.division : "1";
+        }
+        
+        if (b.tvCustomSubtitle != null) {
+            b.tvCustomSubtitle.setText("• Class: " + classVal + " • Div: " + divVal + " •");
+        }
+        
+        if (b.tvHeaderSessionInfo != null) {
+            b.tvHeaderSessionInfo.setText("Year: " + yearLabel + " Class: " + classVal + ", Div: " + divVal);
+        }
+
         if (SessionContext.selectedClass != null) {
             applySessionFilterIfAny();
         } else {
             loadAllStudents();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Restore parent top app bar and scrolling behavior:
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity ha = (HomeActivity) getActivity();
+            View appBar = ha.findViewById(R.id.appBarLayout);
+            if (appBar != null) {
+                appBar.setVisibility(View.VISIBLE);
+            }
+            
+            View navHost = ha.findViewById(R.id.navHostFragment);
+            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
+                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
+                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
+                float density = getResources().getDisplayMetrics().density;
+                params.bottomMargin = (int) (64 * density);
+                navHost.setLayoutParams(params);
+            }
         }
     }
 }

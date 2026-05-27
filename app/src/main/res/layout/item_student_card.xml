@@ -1,46 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_marginStart="4dp" android:layout_marginEnd="4dp" android:layout_marginBottom="10dp"
-    app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/surface"
-    android:clickable="true" android:focusable="true">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:padding="14dp" android:gravity="center_vertical">
-        <!-- Avatar -->
-        <com.google.android.material.card.MaterialCardView android:id="@+id/cardAvatar"
-            android:layout_width="52dp" android:layout_height="52dp"
-            app:cardCornerRadius="26dp" app:cardElevation="0dp"
-            app:cardBackgroundColor="@color/primary_container">
-            <ImageView android:id="@+id/ivStudentAvatar"
-                android:layout_width="match_parent" android:layout_height="match_parent"
-                android:src="@drawable/ic_person" android:padding="12dp"
-                app:tint="@color/primary"/>
-        </com.google.android.material.card.MaterialCardView>
-        <!-- Info -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:orientation="vertical"
-            android:layout_marginStart="14dp">
-            <TextView android:id="@+id/tvStudentName"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Student Name" android:textSize="15sp"
-                android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"/>
-            <TextView android:id="@+id/tvRollClass"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="2dp" android:text="Roll: 01 | Class 7-A"
-                android:textSize="12sp" android:textColor="@color/on_surface_variant"/>
-            <TextView android:id="@+id/tvSchoolName"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="2dp" android:text="School Name"
-                android:textSize="11sp" android:textColor="@color/on_surface_variant" android:alpha="0.7"/>
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="14dp"
+    android:layout_marginEnd="14dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/outline_variant"
+    app:cardBackgroundColor="#FAF0F2"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <!-- Left Section of Card (Enlarged Compact Outlined Avatar & Semi-transparent overlay) -->
+        <FrameLayout
+            android:layout_width="84dp"
+            android:layout_height="104dp"
+            android:layout_gravity="center_vertical">
+
+            <!-- Outlined Cartoon Avatar Frame -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="#5A4FCF"
+                app:cardBackgroundColor="#FCECEF">
+
+                <ImageView
+                    android:id="@+id/ivStudentAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_person"
+                    android:padding="4dp"
+                    app:tint="#5A4FCF"
+                    android:scaleType="fitCenter" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Semi-transparent overlay box behind lower avatar area -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom"
+                android:background="#99555555"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp">
+
+                <TextView
+                    android:id="@+id/tvAvatarRegNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1011021645"
+                    android:textColor="@color/white"
+                    android:textSize="8.5sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:singleLine="true"/>
+
+                <TextView
+                    android:id="@+id/tvAvatarStd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4"
+                    android:textColor="@color/white"
+                    android:textSize="7.5sp"/>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Center/Right Section -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="14dp"
+            android:gravity="center_vertical">
+
+            <!-- Name and options top row -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvStudentName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/btnOptions"
+                    android:text="kartik"
+                    android:textColor="#5A4FCF"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-bold"/>
+
+                <ImageButton
+                    android:id="@+id/btnOptions"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Options"
+                    android:src="@drawable/ic_more_vert"
+                    app:tint="#5A4FCF"
+                    android:padding="2dp"/>
+            </RelativeLayout>
+
+            <!-- Thin Accent Divider Line -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#5A4FCF"
+                android:alpha="0.2"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Two-Column Student details section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <!-- Left Column: Roll numbers -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvRoll1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Roll 1 : 1"
+                        android:textSize="11.5sp"
+                        android:textColor="@color/on_surface_variant"/>
+
+                    <TextView
+                        android:id="@+id/tvRoll2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2.5dp"
+                        android:text="Roll 2 : 1"
+                        android:textSize="11.5sp"
+                        android:textColor="@color/on_surface_variant"/>
+                </LinearLayout>
+
+                <!-- Right Column: DOB and Registration Number -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:orientation="vertical"
+                    android:layout_marginStart="4dp">
+
+                    <TextView
+                        android:id="@+id/tvDob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DOB - 25-05-2012"
+                        android:textSize="11.5sp"
+                        android:textColor="@color/on_surface_variant"
+                        android:singleLine="true"/>
+
+                    <TextView
+                        android:id="@+id/tvRegNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2.5dp"
+                        android:text="Reg No: 215454"
+                        android:textSize="11.5sp"
+                        android:textColor="@color/on_surface_variant"
+                        android:singleLine="true"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Bottom-right corner gray square tags -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginTop="6dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:cardCornerRadius="4dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E6E6E6"
+                    android:layout_marginEnd="4dp">
+                    <TextView
+                        android:id="@+id/tvTag1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="1"
+                        android:textSize="9sp"
+                        android:gravity="center"
+                        android:textColor="#555555"
+                        android:fontFamily="sans-serif-bold"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:cardCornerRadius="4dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E6E6E6">
+                    <TextView
+                        android:id="@+id/tvTag2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="1"
+                        android:textSize="9sp"
+                        android:gravity="center"
+                        android:textColor="#555555"
+                        android:fontFamily="sans-serif-bold"/>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
         </LinearLayout>
-        <!-- Options Menu -->
-        <ImageButton android:id="@+id/btnOptions"
-            android:layout_width="40dp" android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Options"
-            android:src="@drawable/ic_more_vert"
-            android:focusable="true" android:clickable="true"
-            app:tint="@color/on_surface_variant"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

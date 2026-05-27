@@ -1,71 +1,250 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/background">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <!-- Custom Top App Bar (White background) -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:elevation="2dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/customToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:background="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Hamburger Icon -->
+                    <ImageButton
+                        android:id="@+id/btnCustomMenu"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_menu"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="12dp"
+                        android:contentDescription="Open Drawer"/>
+
+                    <!-- Title & Subtitle Group (Center/left side) -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Students"
+                            android:textColor="@color/black"
+                            android:textSize="20sp"
+                            android:fontFamily="sans-serif-black"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/tvCustomSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="• Class: 1 • Div: 1 •"
+                            android:textColor="@color/on_surface_variant"
+                            android:textSize="11sp"
+                            android:alpha="0.8"/>
+                    </LinearLayout>
+
+                    <!-- Right Side Icons -->
+                    <!-- Help / FAQ icon -->
+                    <ImageButton
+                        android:id="@+id/btnHelp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_chat"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:contentDescription="Help"/>
+
+                    <!-- Calculator icon -->
+                    <ImageButton
+                        android:id="@+id/btnCalc"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_calculator"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:contentDescription="Calculator"/>
+
+                    <!-- ID Card icon -->
+                    <ImageButton
+                        android:id="@+id/btnIdCard"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_id_card"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:contentDescription="ID Card"/>
+
+                    <!-- 3-Dot vertical icon -->
+                    <ImageButton
+                        android:id="@+id/btnMoreOptions"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:contentDescription="More"/>
+                </LinearLayout>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Large section header with gray background -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#E6E6E6"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHeaderSessionInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Year: 2026-27 Class: 1, Div: 1"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-black"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
         <!-- Search + filter bar -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-            android:layout_marginTop="12dp" android:layout_marginBottom="4dp"
-            app:cardCornerRadius="28dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/surface">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:paddingStart="16dp" android:paddingEnd="8dp">
-                <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                    android:src="@drawable/ic_reports" app:tint="@color/on_surface_variant"
-                    android:layout_marginEnd="10dp"/>
-                <EditText android:id="@+id/etSearch"
-                    android:layout_width="0dp" android:layout_height="match_parent"
-                    android:layout_weight="1" android:background="@null"
-                    android:hint="@string/hint_search_student" android:textSize="14sp"
-                    android:inputType="textPersonName" android:singleLine="true"
-                    android:textColor="@color/on_surface" android:textColorHint="@color/on_surface_variant"/>
-                <ImageView android:id="@+id/btnClearSearch"
-                    android:layout_width="32dp" android:layout_height="32dp"
-                    android:src="@drawable/ic_close" android:padding="6dp"
-                    android:visibility="gone" app:tint="@color/on_surface_variant"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/outline_variant"
+            app:cardBackgroundColor="@color/surface">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp">
+                
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_reports"
+                    app:tint="@color/on_surface_variant"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="Search Icon"/>
+                
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/hint_search_student"
+                    android:textSize="14sp"
+                    android:inputType="textPersonName"
+                    android:singleLine="true"
+                    android:textColor="@color/on_surface"
+                    android:textColorHint="@color/on_surface_variant"/>
+                
+                <ImageView
+                    android:id="@+id/btnClearSearch"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_close"
+                    android:padding="6dp"
+                    android:visibility="gone"
+                    app:tint="@color/on_surface_variant"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Clear Search"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-
-
         <!-- Empty state -->
-        <LinearLayout android:id="@+id/emptyState"
-            android:layout_width="match_parent" android:layout_height="0dp"
-            android:layout_weight="1" android:orientation="vertical"
-            android:gravity="center" android:visibility="gone">
-            <ImageView android:layout_width="80dp" android:layout_height="80dp"
-                android:src="@drawable/ic_students" android:alpha="0.3"
-                app:tint="@color/on_surface_variant"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" android:text="@string/empty_no_students"
-                android:textSize="15sp" android:textColor="@color/on_surface_variant"/>
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+            
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_students"
+                android:alpha="0.3"
+                app:tint="@color/on_surface_variant"
+                android:contentDescription="Empty State Icon"/>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/empty_no_students"
+                android:textSize="15sp"
+                android:textColor="@color/on_surface_variant"/>
         </LinearLayout>
 
         <!-- Students RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvStudents"
-            android:layout_width="match_parent" android:layout_height="0dp"
-            android:layout_weight="1" android:clipToPadding="false"
-            android:paddingStart="12dp" android:paddingEnd="12dp"
-            android:paddingTop="4dp" android:paddingBottom="80dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvStudents"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="96dp"/>
     </LinearLayout>
 
-    <!-- FAB: Add Student -->
+    <!-- FAB: Add Student with aligned styling -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddStudent"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp" android:layout_marginBottom="46dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/action_add_student"
         app:icon="@drawable/ic_add_circle"
-        app:backgroundTint="@color/primary"
+        app:backgroundTint="#5A4FCF"
         android:textColor="@color/white"
-        app:iconTint="@color/white"/>
+        app:iconTint="@color/white"
+        app:elevation="4dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
