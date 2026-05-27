@@ -74,7 +74,7 @@ public class StudentProfileActivity extends AppCompatActivity {
 
         // Animate elements entering staggered for highly premium micro-interactions
         UiAnimations.staggerFadeIn(
-                b.cardHeader,
+                b.layoutHeaderBanner, b.cardHeaderPhoto, b.cardStats,
                 b.btnNavBasic, b.btnNavFamily, b.btnNavBank, b.btnNavAcademic,
                 b.cardBasic, b.cardFamily, b.cardBank, b.cardAcademic
         );
@@ -105,12 +105,29 @@ public class StudentProfileActivity extends AppCompatActivity {
             std = extractStandardFromClassName(s.className);
         }
         String div = val(s.division);
-        b.tvClassLine.setText(getString(R.string.standard_division_format, std, div));
+        b.toolbar.setSubtitle("Standard: " + std + " and Division: " + div);
 
-        // Bind the top card critical highlight badges
-        b.tvTopRollNo.setText(val(s.rollNo));
-        b.tvTopRegNo.setText(val(s.registrationNo));
+        // Bind the top card critical highlight badges (Pills)
+        b.tvTopRegNo.setText("Reg: " + val(s.registrationNo));
         b.tvTopDob.setText(val(s.dob));
+
+        // Bind the 4-column green statistic card values
+        b.tvTopRollNo.setText(val(s.rollNo));
+        b.tvTopRollNo2.setText(val(s.rollNo2));
+        b.tvTopGender.setText(val(s.gender));
+        b.tvTopCast.setText(val(s.cast));
+
+        // Dynamically bind custom monoline outline avatars based on gender
+        if (s.gender != null) {
+            String g = s.gender.toLowerCase().trim();
+            if (g.contains("female") || g.contains("स्त्री") || g.contains("मुलगी")) {
+                b.ivStudentPhoto.setImageResource(R.drawable.ic_girl_avatar);
+            } else {
+                b.ivStudentPhoto.setImageResource(R.drawable.ic_boy_avatar);
+            }
+        } else {
+            b.ivStudentPhoto.setImageResource(R.drawable.ic_boy_avatar);
+        }
 
         bindMarksChip(s);
 
