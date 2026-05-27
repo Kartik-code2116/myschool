@@ -297,8 +297,8 @@ public class HomeActivity extends AppCompatActivity {
 
     public void navigateTo(int destId) {
         if (navController == null) return;
-        if (destId == R.id.nav_info_print || destId == R.id.nav_profile) {
-            navController.navigate(destId);
+        if (destId == R.id.nav_info_print || destId == R.id.nav_profile || destId == R.id.nav_students || destId == R.id.nav_extra) {
+            navController.navigate(destId, null, UiAnimations.navCrossFade());
         } else {
             navController.navigate(destId, null, UiAnimations.navSlideForward());
         }
