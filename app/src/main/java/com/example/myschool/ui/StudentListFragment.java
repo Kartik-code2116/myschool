@@ -100,7 +100,9 @@ public class StudentListFragment extends Fragment {
 
         if (b.btnMoreOptions != null) {
             b.btnMoreOptions.setOnClickListener(v -> {
-                android.widget.Toast.makeText(requireContext(), "सेटिंग्ज आणि इतर पर्याय लवकरच जोडले जातील", android.widget.Toast.LENGTH_SHORT).show();
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) getActivity()).showHomeMoreMenu(v);
+                }
             });
         }
     }

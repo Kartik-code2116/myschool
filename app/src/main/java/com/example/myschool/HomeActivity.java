@@ -143,7 +143,7 @@ public class HomeActivity extends AppCompatActivity {
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
 
-            if (id == R.id.nav_info_print) {
+            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_extra) {
                 b.btnToolbarMore.setVisibility(View.VISIBLE);
                 b.ivProfilePic.setVisibility(View.VISIBLE);
             } else {
@@ -318,10 +318,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void handleHomeMoreClick(View v) {
-        if (navController != null && navController.getCurrentDestination() != null
-                && navController.getCurrentDestination().getId() == R.id.nav_info_print) {
-            androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, v);
+    public void showHomeMoreMenu(View anchor) {
+        if (navController != null) {
+            androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, anchor);
             
             // Core options
             popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 Home");
@@ -361,6 +360,10 @@ public class HomeActivity extends AppCompatActivity {
             });
             popup.show();
         }
+    }
+
+    private void handleHomeMoreClick(View v) {
+        showHomeMoreMenu(v);
     }
 
     private void confirmLogout() {
