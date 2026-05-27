@@ -3,106 +3,178 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Title / Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="मासिक उपस्थिती बदल (Monthly Attendance)"
+            android:textColor="@color/primary"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="मासिक उपस्थिती बदल करा"
-            android:textColor="#5E35B1"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:text="प्रत्येक महिन्याचे हजर दिवस व एकूण कामकाजी दिवस भरा."
+            android:textColor="@color/on_surface_variant"
+            android:textSize="12sp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- 12 Months Grid Input Rows -->
-        <!-- June -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="जून" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etJunPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etJunTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
+        <!-- Column Headers -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/primary_container"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:layout_marginBottom="10dp">
+            
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="महिना (Month)"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:gravity="start"/>
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="हजर दिवस (Present)"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_marginEnd="12dp"/>
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="कामकाज दिवस (Working)"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:gravity="center"/>
         </LinearLayout>
 
-        <!-- July -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="जुलै" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etJulPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etJulTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+        <!-- 12 Months Grid Input Rows inside a Card for cleanliness -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/outline_variant"
+            app:cardBackgroundColor="@color/surface"
+            android:layout_marginBottom="20dp">
 
-        <!-- August -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="ऑगस्ट" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etAugPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etAugTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
 
-        <!-- September -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="सप्टें" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etSepPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etSepTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- June -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="जून (Jun)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etJunPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etJunTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- October -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="ऑक्टो" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etOctPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etOctTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- July -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="जुलै (Jul)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etJulPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etJulTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- November -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="नोव्हे" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etNovPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etNovTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- August -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="ऑगस्ट (Aug)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etAugPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etAugTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- December -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="डिसें" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etDecPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etDecTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- September -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="सप्टें (Sep)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etSepPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etSepTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- January -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="जाने" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etJanPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etJanTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- October -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="ऑक्टो (Oct)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etOctPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etOctTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- February -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="फेब्रु" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etFebPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etFebTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- November -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="नोव्हे (Nov)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etNovPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etNovTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- March -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="मार्च" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etMarPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etMarTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- December -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="डिसें (Dec)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etDecPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etDecTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- April -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="एप्रिल" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etAprPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etAprTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- January -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="जाने (Jan)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etJanPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etJanTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
 
-        <!-- May -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="मे" android:textStyle="bold" android:textColor="#5E35B1" android:textSize="14sp"/>
-            <EditText android:id="@+id/etMayPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/etMayTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded"/>
-        </LinearLayout>
+                <!-- February -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="फेब्रु (Feb)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etFebPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etFebTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
+
+                <!-- March -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="मार्च (Mar)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etMarPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etMarTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
+
+                <!-- April -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="एप्रिल (Apr)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etAprPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etAprTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
+
+                <!-- May -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView android:layout_width="80dp" android:layout_height="wrap_content" android:text="मे (May)" android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface" android:textSize="14sp" android:paddingStart="4dp"/>
+                    <EditText android:id="@+id/etMayPresent" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="हजर" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface" android:layout_marginEnd="12dp"/>
+                    <EditText android:id="@+id/etMayTotal" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:hint="एकूण" android:inputType="number" android:textSize="13sp" android:gravity="center" android:background="@drawable/bg_surface_rounded" android:textColor="@color/on_surface"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Actions -->
         <LinearLayout
@@ -116,16 +188,17 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="रद्द करा"
-                android:textColor="#555555"
+                android:text="रद्द करा (Cancel)"
+                android:textColor="@color/on_surface_variant"
                 android:layout_marginEnd="8dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
+                style="@style/Widget.Myschool.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="जतन करा"
-                app:backgroundTint="#5E35B1"
+                android:text="जतन करा (Save)"
+                app:backgroundTint="@color/primary"
                 android:textColor="@color/white"/>
         </LinearLayout>
     </LinearLayout>

@@ -196,7 +196,8 @@ public class StudentProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.select_class_first, Toast.LENGTH_SHORT).show();
                 return;
             }
-            FirebaseRepository.get().getMarksForStudent(student.id, student.classId,
+            String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
+            FirebaseRepository.get().getMarksForStudentAndSemester(student.id, student.classId, semId,
                     new FirebaseRepository.OnResult<MarksRecord>() {
                         @Override public void onSuccess(MarksRecord m) {
                             if (m != null) {

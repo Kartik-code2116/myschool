@@ -264,7 +264,8 @@ public class StudentListFragment extends Fragment {
     private void loadMarksForStudent(Student student) {
         loadClassForStudent(student, () -> {
             if (AppCache.selectedClass == null) return;
-            FirebaseRepository.get().getMarksForStudent(student.id, student.classId,
+            String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
+            FirebaseRepository.get().getMarksForStudentAndSemester(student.id, student.classId, semId,
                     new FirebaseRepository.OnResult<MarksRecord>() {
                         @Override
                         public void onSuccess(MarksRecord m) {
