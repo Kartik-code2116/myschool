@@ -168,4 +168,28 @@ public final class SessionContext {
         
         syncToAppCache();
     }
+
+    public static void clear(android.content.Context ctx) {
+        selectedYear = null;
+        selectedSemester = null;
+        selectedSchool = null;
+        selectedClass = null;
+
+        if (ctx != null) {
+            ctx.getSharedPreferences("myschool_session_prefs", android.content.Context.MODE_PRIVATE)
+                    .edit().clear().apply();
+        }
+
+        AppCache.selectedSchool = null;
+        AppCache.selectedClass = null;
+        AppCache.selectedStudent = null;
+        AppCache.selectedMarks = null;
+        AppCache.cachedYears = null;
+        AppCache.cachedSemesters = null;
+        AppCache.cachedClasses = null;
+        AppCache.cachedTeacherName = null;
+        AppCache.cachedStudentCountByClassId = null;
+
+        com.example.myschool.repository.FirebaseRepository.clearCache();
+    }
 }

@@ -3,7 +3,10 @@ package com.example.myschool;
 import android.app.Application;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.util.Log;
 import androidx.appcompat.app.AppCompatDelegate;
+
+import com.example.myschool.repository.FirebaseRepository;
 
 import java.util.Locale;
 
@@ -12,6 +15,11 @@ public class MySchoolApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Force FirebaseRepository to re-initialize so it always uses
+        // the current google-services.json project (not a stale cached instance)
+        FirebaseRepository.resetInstance();
+        Log.d("APP_INIT", "FirebaseRepository reset — will use google-services.json project on next call");
 
         // 1. Restore active selections from session SharedPreferences
         SessionContext.load(this);

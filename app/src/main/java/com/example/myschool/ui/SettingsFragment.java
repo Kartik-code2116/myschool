@@ -342,21 +342,13 @@ public class SettingsFragment extends Fragment {
 
     // ── Reset & Cache utilities ──────────────────────────────────────────────
     private void resetSession() {
-        SessionContext.selectedYear = null;
-        SessionContext.selectedSemester = null;
-        SessionContext.selectedClass = null;
-        SessionContext.save(requireContext());
-        Toast.makeText(requireContext(), "Active session reset. Please select details on Home.", Toast.LENGTH_LONG).show();
+        SessionContext.clear(requireContext());
+        Toast.makeText(requireContext(), "Active session reset successfully.", Toast.LENGTH_LONG).show();
     }
 
     private void clearCache() {
-        FirebaseRepository.clearCache();
-        AppCache.cachedYears = null;
-        AppCache.cachedSemesters = null;
-        AppCache.cachedClasses = null;
-        AppCache.cachedTeacherName = null;
-        AppCache.cachedStudentCountByClassId = null;
-        Toast.makeText(requireContext(), "Cache cleared successfully", Toast.LENGTH_SHORT).show();
+        SessionContext.clear(requireContext());
+        Toast.makeText(requireContext(), "Cache cleared successfully.", Toast.LENGTH_SHORT).show();
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────

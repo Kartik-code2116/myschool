@@ -66,7 +66,6 @@ import java.util.regex.Pattern;
 
 import androidx.room.Room;
 
-import com.example.myschool.data.AtlasDataApiClient;
 import com.example.myschool.data.OcrDatabase;
 import com.example.myschool.data.OcrRecordEntity;
 import com.example.myschool.ui.HistoryAdapter;
@@ -82,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
     private ExecutorService dbExecutor;
     private OcrDatabase db;
     private long latestRecordId = -1L;
-    private AtlasDataApiClient atlasClient;
 
     private static final String TAG = "SmartOCR";
     private HistoryAdapter historyAdapter;
@@ -121,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize local DB
         initDb();
-        initAtlas();
 
         // Setup click listeners
         binding.btnCapture.setOnClickListener(v -> captureImage());
@@ -177,16 +174,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initAtlas() {
-        // Configure via gradle.properties to avoid hardcoding secrets in code.
-        atlasClient = new AtlasDataApiClient(
-                BuildConfig.ATLAS_DATA_API_URL,
-                BuildConfig.ATLAS_DATA_API_KEY,
-                BuildConfig.ATLAS_DATA_SOURCE,
-                BuildConfig.ATLAS_DB,
-                BuildConfig.ATLAS_COLLECTION
-        );
-    }
+
 
     private boolean allPermissionsGranted() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
@@ -387,10 +375,7 @@ public class MainActivity extends AppCompatActivity {
                     );
                     refreshHistory();
 
-                    // Optional cloud sync (Atlas Data API)
-                    if (atlasClient != null && atlasClient.isConfigured()) {
-                        atlasClient.uploadRecord(record, null);
-                    }
+
                 } catch (Exception e) {
                     Log.e(TAG, "Database save failed: " + e.getMessage());
                 }

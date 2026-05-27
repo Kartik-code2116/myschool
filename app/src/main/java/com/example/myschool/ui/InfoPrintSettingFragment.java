@@ -134,8 +134,17 @@ public class InfoPrintSettingFragment extends Fragment {
                 }
             }
         } else if (SessionContext.selectedYear != null) {
+            if (SessionContext.selectedYear.label == null || SessionContext.selectedYear.label.trim().isEmpty()) {
+                SessionContext.selectedYear.label = "2026-27";
+            }
             years.clear(); years.add(SessionContext.selectedYear);
             yearIndex = 0;
+        } else {
+            years.clear();
+            years.add(new AcademicYear("2026-27", 2026, 2027));
+            yearIndex = 0;
+            SessionContext.selectedYear = years.get(0);
+            SessionContext.save(getContext());
         }
         applyYear(0);
     }
@@ -151,8 +160,16 @@ public class InfoPrintSettingFragment extends Fragment {
                 }
             }
         } else if (SessionContext.selectedSemester != null) {
+            if (SessionContext.selectedSemester.name == null || SessionContext.selectedSemester.name.trim().isEmpty()) {
+                SessionContext.selectedSemester.name = "First Semester";
+            }
             semesters.clear(); semesters.add(SessionContext.selectedSemester);
             semesterIndex = 0;
+        } else {
+            seedFallbackSemesters();
+            semesterIndex = 0;
+            SessionContext.selectedSemester = semesters.get(0);
+            SessionContext.save(getContext());
         }
         applySemester(0);
     }

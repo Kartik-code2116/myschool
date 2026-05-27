@@ -11,6 +11,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +43,14 @@ public class FirebaseRepository {
             cachedClassSemesterMarksMap.clear();
         }
     }
+
+    /** Call this when switching Firebase projects to force re-initialization. */
+    public static void resetInstance() {
+        synchronized (FirebaseRepository.class) {
+            clearCache();
+            instance = null; // forces constructor to run again on next get()
+        }
+    }
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
 
@@ -56,6 +66,21 @@ public class FirebaseRepository {
     private FirebaseRepository() {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+
+        // Diagnostic: confirm which Firebase project this instance is connected to
+        try {
+            com.google.firebase.FirebaseApp app = com.google.firebase.FirebaseApp.getInstance();
+            Log.d("FIREBASE_INIT", "=====================================");
+            Log.d("FIREBASE_INIT", "FirebaseApp name     : " + app.getName());
+            Log.d("FIREBASE_INIT", "Project ID           : " + app.getOptions().getProjectId());
+            Log.d("FIREBASE_INIT", "Application ID       : " + app.getOptions().getApplicationId());
+            Log.d("FIREBASE_INIT", "Storage bucket       : " + app.getOptions().getStorageBucket());
+            Log.d("FIREBASE_INIT", "Auth domain          : " + app.getOptions().getDatabaseUrl());
+            Log.d("FIREBASE_INIT", "Current Auth user    : " + (auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "none"));
+            Log.d("FIREBASE_INIT", "=====================================");
+        } catch (Exception e) {
+            Log.e("FIREBASE_INIT", "Could not read FirebaseApp options", e);
+        }
     }
 
     // Bug #6 fix: thread-safe singleton with double-checked locking
@@ -76,16 +101,22 @@ public class FirebaseRepository {
     public void saveTeacher(Teacher t, OnResult<Void> cb) {
         String uid = currentUid();
         if (uid == null) {
+            Log.e("FIRESTORE", "saveTeacher: uid is null — user not authenticated!");
             cb.onError(new IllegalStateException("User not authenticated"));
             return;
         }
         t.id = uid;
+        Log.d("FIRESTORE", "saveTeacher: saving uid=" + uid + " email=" + t.email);
         db.collection(COL_TEACHERS).document(t.id).set(t)
                 .addOnSuccessListener(v -> {
+                    Log.d("FIRESTORE", "saveTeacher: SUCCESS for uid=" + uid);
                     cachedTeacher = t;
                     cb.onSuccess(null);
                 })
-                .addOnFailureListener(cb::onError);
+                .addOnFailureListener(e -> {
+                    Log.e("FIRESTORE", "saveTeacher: FAILED for uid=" + uid, e);
+                    cb.onError(e);
+                });
     }
 
     public void getTeacher(OnResult<Teacher> cb) {
@@ -300,7 +331,144 @@ public class FirebaseRepository {
         s2.yearId = yearId;
         saveSemester(s1, new OnResult<String>() {
             @Override public void onSuccess(String id) {
+                s1.id = id;
                 saveSemester(s2, new OnResult<String>() {
+                    @Override public void onSuccess(String id2) {
+                        s2.id = id2;
+                        // Also seed default classes, subjects and students under the first semester!
+                        seedDefaultClassesAndSubjects(yearId, id, done);
+                    }
+                    @Override public void onError(Exception e) { done.run(); }
+                });
+            }
+            @Override public void onError(Exception e) { done.run(); }
+        });
+    }
+
+    private void seedDefaultClassesAndSubjects(String yearId, String semesterId, Runnable done) {
+        String uid = currentUid();
+        if (uid == null) {
+            done.run();
+            return;
+        }
+        String schoolId = com.example.myschool.SessionContext.selectedSchool != null ? com.example.myschool.SessionContext.selectedSchool.id : null;
+        if (schoolId == null) {
+            getSchools(new OnResult<List<School>>() {
+                @Override public void onSuccess(List<School> schools) {
+                    if (schools != null && !schools.isEmpty()) {
+                        createClasses(schools.get(0).id, yearId, semesterId, done);
+                    } else {
+                        done.run();
+                    }
+                }
+                @Override public void onError(Exception e) { done.run(); }
+            });
+        } else {
+            createClasses(schoolId, yearId, semesterId, done);
+        }
+    }
+
+    private void createClasses(String schoolId, String yearId, String semesterId, Runnable done) {
+        ClassModel c1 = new ClassModel();
+        c1.schoolId = schoolId;
+        c1.yearId = yearId;
+        c1.semesterId = semesterId;
+        c1.className = "1";
+        c1.division = "A";
+        c1.academicYearLabel = "2026-27";
+        c1.studentCount = 2;
+        c1.subjects.add(new com.example.myschool.model.Subject("English", 100));
+        c1.subjects.add(new com.example.myschool.model.Subject("Mathematics", 100));
+        c1.subjects.add(new com.example.myschool.model.Subject("Science", 100));
+        c1.subjects.add(new com.example.myschool.model.Subject("Marathi", 100));
+
+        ClassModel c2 = new ClassModel();
+        c2.schoolId = schoolId;
+        c2.yearId = yearId;
+        c2.semesterId = semesterId;
+        c2.className = "2";
+        c2.division = "A";
+        c2.academicYearLabel = "2026-27";
+        c2.studentCount = 2;
+        c2.subjects.add(new com.example.myschool.model.Subject("English", 100));
+        c2.subjects.add(new com.example.myschool.model.Subject("Mathematics", 100));
+        c2.subjects.add(new com.example.myschool.model.Subject("Science", 100));
+        c2.subjects.add(new com.example.myschool.model.Subject("Marathi", 100));
+
+        saveClass(c1, new OnResult<String>() {
+            @Override public void onSuccess(String classId1) {
+                seedDefaultStudents(classId1, schoolId, "1", "A", () -> {
+                    saveClass(c2, new OnResult<String>() {
+                        @Override public void onSuccess(String classId2) {
+                            seedDefaultStudents(classId2, schoolId, "2", "A", done);
+                        }
+                        @Override public void onError(Exception e) { done.run(); }
+                    });
+                });
+            }
+            @Override public void onError(Exception e) { done.run(); }
+        });
+    }
+
+    private void seedDefaultStudents(String classId, String schoolId, String className, String division, Runnable done) {
+        String uid = currentUid();
+        Student s1 = new Student();
+        s1.classId = classId;
+        s1.schoolId = schoolId;
+        s1.teacherId = uid;
+        s1.name = "Kartik Thorat";
+        s1.rollNo = "101";
+        s1.registrationNo = "101" + className + "01";
+        s1.dob = "25/05/2012";
+        s1.gender = "Male";
+        s1.className = className;
+        s1.standard = className;
+        s1.division = division;
+        s1.schoolName = "My School";
+
+        s1.monthlyAttendance.put("जून", "18/20");
+        s1.monthlyAttendance.put("जुलै", "20/22");
+        s1.monthlyAttendance.put("ऑगस्ट", "19/21");
+        s1.monthlyAttendance.put("सप्टें", "21/23");
+        s1.monthlyAttendance.put("ऑक्टो", "15/17");
+        s1.monthlyAttendance.put("नोव्हे", "16/18");
+        s1.monthlyAttendance.put("डिसें", "17/19");
+        s1.monthlyAttendance.put("जाने", "18/20");
+        s1.monthlyAttendance.put("फेब्रु", "19/21");
+        s1.monthlyAttendance.put("मार्च", "20/22");
+        s1.monthlyAttendance.put("एप्रिल", "21/23");
+        s1.monthlyAttendance.put("मे", "0/0");
+
+        Student s2 = new Student();
+        s2.classId = classId;
+        s2.schoolId = schoolId;
+        s2.teacherId = uid;
+        s2.name = "Priya Patil";
+        s2.rollNo = "102";
+        s2.registrationNo = "101" + className + "02";
+        s2.dob = "12/08/2012";
+        s2.gender = "Female";
+        s2.className = className;
+        s2.standard = className;
+        s2.division = division;
+        s2.schoolName = "My School";
+
+        s2.monthlyAttendance.put("जून", "17/20");
+        s2.monthlyAttendance.put("जुलै", "19/22");
+        s2.monthlyAttendance.put("ऑगस्ट", "20/21");
+        s2.monthlyAttendance.put("सप्टें", "20/23");
+        s2.monthlyAttendance.put("ऑक्टो", "14/17");
+        s2.monthlyAttendance.put("नोव्हे", "15/18");
+        s2.monthlyAttendance.put("डिसें", "18/19");
+        s2.monthlyAttendance.put("जाने", "19/20");
+        s2.monthlyAttendance.put("फेब्रु", "18/21");
+        s2.monthlyAttendance.put("मार्च", "21/22");
+        s2.monthlyAttendance.put("एप्रिल", "22/23");
+        s2.monthlyAttendance.put("मे", "0/0");
+
+        saveStudent(s1, new OnResult<String>() {
+            @Override public void onSuccess(String id) {
+                saveStudent(s2, new OnResult<String>() {
                     @Override public void onSuccess(String id2) { done.run(); }
                     @Override public void onError(Exception e) { done.run(); }
                 });

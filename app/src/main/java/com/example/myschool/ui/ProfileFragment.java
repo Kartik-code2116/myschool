@@ -312,11 +312,23 @@ public class ProfileFragment extends Fragment {
             SessionContext.selectedYear.label = c.academicYearLabel != null ? c.academicYearLabel : "";
         }
         if (c.semesterId != null && !c.semesterId.isEmpty()) {
-            SessionContext.selectedSemester = new Semester();
-            SessionContext.selectedSemester.id = c.semesterId;
-            SessionContext.selectedSemester.yearId = c.yearId;
-            SessionContext.selectedSemester.name = (SessionContext.selectedSemester != null && SessionContext.selectedSemester.name != null)
-                    ? SessionContext.selectedSemester.name : "First Semester";
+            Semester found = null;
+            if (AppCache.cachedSemesters != null) {
+                for (Semester s : AppCache.cachedSemesters) {
+                    if (c.semesterId.equals(s.id)) {
+                        found = s;
+                        break;
+                    }
+                }
+            }
+            if (found != null) {
+                SessionContext.selectedSemester = found;
+            } else {
+                SessionContext.selectedSemester = new Semester();
+                SessionContext.selectedSemester.id = c.semesterId;
+                SessionContext.selectedSemester.yearId = c.yearId;
+                SessionContext.selectedSemester.name = "First Semester"; // fallback
+            }
         }
         SessionContext.syncToAppCache();
         SessionContext.save(requireContext());
@@ -393,9 +405,7 @@ public class ProfileFragment extends Fragment {
                 .setTitle(R.string.logout).setMessage(R.string.logout_confirm)
                 .setPositiveButton(R.string.logout, (d, w) -> {
                     FirebaseAuth.getInstance().signOut();
-                    FirebaseRepository.clearCache();
-                    AppCache.cachedTeacherName = null;
-                    AppCache.cachedStudentCountByClassId = null;
+                    SessionContext.clear(requireContext());
                     startActivity(new Intent(requireContext(), LoginActivity.class)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     requireActivity().finish();

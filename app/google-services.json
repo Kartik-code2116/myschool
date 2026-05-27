@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "684292434700",
-    "project_id": "myschool-625ff",
-    "storage_bucket": "myschool-625ff.firebasestorage.app"
+    "project_number": "323006914636",
+    "project_id": "kartik-28deb",
+    "storage_bucket": "kartik-28deb.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:684292434700:android:fc3114ef4a307dd27bf729",
+        "mobilesdk_app_id": "1:323006914636:android:e598ecf7eb0332bc8114e9",
         "android_client_info": {
           "package_name": "com.example.myschool"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyATo8XzcgE7rVL3UCH8QDDuDPabQtwBDl8"
+          "current_key": "AIzaSyAQGltN_97tRW0-dhqJFvxL_c3IvJvR6xM"
         }
       ],
       "services": {
