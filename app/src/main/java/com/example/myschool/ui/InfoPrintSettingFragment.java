@@ -94,9 +94,59 @@ public class InfoPrintSettingFragment extends Fragment {
                 });
         b.panelClass.setOnLongClickListener(v -> { showClassPickerDialog(); return true; });
 
+        b.scrollHome.setOnScrollChangeListener(new androidx.core.widget.NestedScrollView.OnScrollChangeListener() {
+            private boolean headerVanished = false;
+            private int initialHeaderHeight = -1;
+
+            @Override
+            public void onScrollChange(androidx.core.widget.NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (initialHeaderHeight == -1 && b != null && b.headerBand != null) {
+                    initialHeaderHeight = b.headerBand.getHeight();
+                    if (initialHeaderHeight <= 0) {
+                        initialHeaderHeight = (int) (200 * v.getContext().getResources().getDisplayMetrics().density);
+                    }
+                }
+
+                if (scrollY > 40 && !headerVanished) {
+                    headerVanished = true;
+                    animateHeader(initialHeaderHeight, 0, 1f, 0f);
+                } else if (scrollY <= 10 && headerVanished) {
+                    headerVanished = false;
+                    animateHeader(0, initialHeaderHeight, 0f, 1f);
+                }
+            }
+        });
+
         playEntranceIfNeeded();
         loadTeacherName();   // instant from cache, then background refresh
         initSessionData();   // instant from AppCache, then background network sync
+    }
+
+    private void animateHeader(int startHeight, int endHeight, float startAlpha, float endAlpha) {
+        if (b == null || b.headerBand == null) return;
+        b.headerBand.animate().cancel();
+        
+        // 1. Height animation
+        ValueAnimator heightAnim = ValueAnimator.ofInt(startHeight, endHeight);
+        heightAnim.addUpdateListener(animation -> {
+            if (b != null && b.headerBand != null) {
+                int val = (int) animation.getAnimatedValue();
+                ViewGroup.LayoutParams lp = b.headerBand.getLayoutParams();
+                lp.height = val;
+                b.headerBand.setLayoutParams(lp);
+            }
+        });
+        heightAnim.setDuration(350);
+        heightAnim.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
+        heightAnim.start();
+
+        // 2. Alpha & TranslationY animation
+        b.headerBand.animate()
+                .alpha(endAlpha)
+                .translationY(endAlpha == 0f ? -60f : 0f)
+                .setDuration(300)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                .start();
     }
 
     // ── Teacher name ──────────────────────────────────────────────────────────
