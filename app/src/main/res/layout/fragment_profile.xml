@@ -20,6 +20,7 @@
             android:padding="16dp"
             android:paddingBottom="80dp">
 
+            <!-- Teacher Info Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardProfileInfo"
                 android:layout_width="match_parent"
@@ -254,6 +255,7 @@
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Classes Section Title -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -271,6 +273,7 @@
                 android:textColor="@color/on_surface_variant"
                 android:textSize="12sp"/>
 
+            <!-- Active Class Detail Banner -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardActiveClassDetail"
                 android:layout_width="match_parent"
@@ -332,6 +335,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- RecyclerView Class List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProfileClasses"
                 android:layout_width="match_parent"
@@ -350,6 +354,7 @@
                 android:textSize="13sp"
                 android:visibility="gone"/>
 
+            <!-- Logout Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

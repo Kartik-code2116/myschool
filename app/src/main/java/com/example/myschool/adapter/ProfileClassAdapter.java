@@ -77,9 +77,10 @@ public class ProfileClassAdapter extends RecyclerView.Adapter<ProfileClassAdapte
                             item.studentCount));
 
             holder.b.ivClassSelected.setVisibility(selected ? View.VISIBLE : View.GONE);
-
             if (selected) {
+                holder.b.ivClassSelected.setImageTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#5A4FCF")));
                 holder.b.panelClassExpanded.setVisibility(View.VISIBLE);
+                holder.b.panelClassExpanded.setBackgroundColor(android.graphics.Color.parseColor("#F1F0FF"));
                 holder.b.tvClassStudentCount.setText(
                         holder.itemView.getContext().getString(R.string.profile_students_count,
                                 item.studentCount));
