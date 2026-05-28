@@ -123,7 +123,8 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         // 1. Instant Cache rendering (zero-latency display):
         if (AppCache.cachedDescriptiveStudents != null 
-                && activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
+                && activeClass.id.equals(AppCache.cachedDescriptiveClassId)
+                && activeSemesterId.equals(AppCache.cachedDescriptiveSemesterId)) {
             List<Student> cachedList = AppCache.cachedDescriptiveStudents;
             Map<String, MarksRecord> cachedMarks = AppCache.cachedDescriptiveMarksMap != null ? AppCache.cachedDescriptiveMarksMap : new HashMap<>();
             
@@ -144,6 +145,20 @@ public class DescriptiveEntriesFragment extends Fragment {
                             public void onSuccess(Map<String, MarksRecord> marksMap) {
                                 Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
                                 
+                                // Merge network results with the fresh cache based on updatedAt
+                                if (AppCache.cachedDescriptiveMarksMap != null) {
+                                    for (Map.Entry<String, MarksRecord> entry : AppCache.cachedDescriptiveMarksMap.entrySet()) {
+                                        String sId = entry.getKey();
+                                        MarksRecord cachedRecord = entry.getValue();
+                                        MarksRecord fetchedRecord = finalMarks.get(sId);
+                                        
+                                        // If cache has a newer or same record, keep the cache!
+                                        if (cachedRecord != null && (fetchedRecord == null || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
+                                            finalMarks.put(sId, cachedRecord);
+                                        }
+                                    }
+                                }
+
                                 // Cache the loaded results
                                 AppCache.cachedDescriptiveStudents = finalList;
                                 AppCache.cachedDescriptiveMarksMap = finalMarks;
@@ -326,11 +341,11 @@ public class DescriptiveEntriesFragment extends Fragment {
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(sub.name)) {
                     MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(sub.name);
                     if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
-                        remarkVal = detail.remark;
+                        remarkVal = detail.remark.trim();
                     }
                 }
 
-                if (!remarkVal.trim().isEmpty()) {
+                if (!remarkVal.isEmpty()) {
                     // Remark EXISTS → show the remark text, hide empty state
                     cardB.tvSubjectRemark.setVisibility(View.VISIBLE);
                     cardB.tvSubjectRemark.setText(remarkVal);
@@ -377,6 +392,23 @@ public class DescriptiveEntriesFragment extends Fragment {
                 cardB.getRoot().setLayoutParams(param);
 
                 return cardB.getRoot();
+            }
+
+            private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
+                return detail.nirikhshan > 0
+                        || detail.tondiKam > 0
+                        || detail.pratyakshik > 0
+                        || detail.upkram > 0
+                        || detail.prakalp > 0
+                        || detail.chachani > 0
+                        || detail.swadhyay > 0
+                        || detail.itar > 0
+                        || detail.akarikTotal > 0
+                        || detail.tondi > 0
+                        || detail.pratyakshikB > 0
+                        || detail.lekhi > 0
+                        || detail.sanklit > 0
+                        || detail.grandTotal > 0;
             }
 
             private void openMarksEntry(Student student) {

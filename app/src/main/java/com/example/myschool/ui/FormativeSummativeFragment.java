@@ -159,7 +159,8 @@ public class FormativeSummativeFragment extends Fragment {
 
         // 1. Instant Cache rendering (zero-latency display):
         if (AppCache.cachedStudents != null
-                && activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
+                && activeClass.id.equals(AppCache.cachedClassIdForStudents)
+                && activeSemesterId.equals(AppCache.cachedSemesterIdForMarks)) {
             List<Student> cachedList = AppCache.cachedStudents;
             Map<String, MarksRecord> cachedMarks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap : new HashMap<>();
             
@@ -452,35 +453,95 @@ public class FormativeSummativeFragment extends Fragment {
                 return tv;
             }
 
+            private String formatVal(int val) {
+                return String.valueOf(val);
+            }
+
+            private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
+                return detail.nirikhshan > 0
+                        || detail.tondiKam > 0
+                        || detail.pratyakshik > 0
+                        || detail.upkram > 0
+                        || detail.prakalp > 0
+                        || detail.chachani > 0
+                        || detail.swadhyay > 0
+                        || detail.itar > 0
+                        || detail.akarikTotal > 0
+                        || detail.tondi > 0
+                        || detail.pratyakshikB > 0
+                        || detail.lekhi > 0
+                        || detail.sanklit > 0
+                        || detail.grandTotal > 0;
+            }
+
             private View createSubjectCard(Student student, Subject sub, int number, MarksRecord record) {
-                ItemSubjectMarksRowBinding dummy; // layout ref
                 ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(
                         LayoutInflater.from(itemView.getContext()), binding.layoutSubjectsHorizontal, false);
 
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
-                // Fetch details
-                int formativeObt = 0;
-                int summativeObt = 0;
-                int totalObt = 0;
+                // Default table values
+                String fe1 = "-", fe2 = "-", fe3 = "-", fe4 = "-", fe5 = "-", fe6 = "-", fe7 = "-", fe8 = "-";
+                String se1 = "-", se2 = "-", se3 = "-";
+                String fet = "-", set = "-", tet = "-";
                 String gradeVal = "—";
+                boolean hasMarks = false;
 
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(sub.name)) {
                     MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(sub.name);
                     if (d != null) {
-                        formativeObt = d.akarikTotal;
-                        summativeObt = d.sanklit;
-                        totalObt = d.grandTotal;
-                        gradeVal = d.grade != null && !d.grade.isEmpty() ? d.grade : "—";
+                        hasMarks = hasEnteredMarks(d);
+                        if (hasMarks) {
+                            fe1 = formatVal(d.nirikhshan);
+                            fe2 = formatVal(d.tondiKam);
+                            fe3 = formatVal(d.pratyakshik);
+                            fe4 = formatVal(d.upkram);
+                            fe5 = formatVal(d.prakalp);
+                            fe6 = formatVal(d.chachani);
+                            fe7 = formatVal(d.swadhyay);
+                            fe8 = formatVal(d.itar);
+
+                            se1 = formatVal(d.tondi);
+                            se2 = formatVal(d.pratyakshikB);
+                            se3 = formatVal(d.lekhi);
+
+                            fet = String.valueOf(d.akarikTotal);
+                            set = String.valueOf(d.sanklit);
+                            tet = String.valueOf(d.grandTotal);
+                            gradeVal = d.grade != null && !d.grade.isEmpty() ? d.grade : "—";
+                        }
                     }
                 }
 
-                cardB.tvObtainedFET.setText(String.valueOf(formativeObt));
-                cardB.tvObtainedSET.setText(String.valueOf(summativeObt));
-                cardB.tvObtainedTET.setText(String.valueOf(totalObt));
-                cardB.tvSubjectGrade.setText(gradeVal);
+                // Set table text views
+                cardB.tvFE1.setText(fe1);
+                cardB.tvFE2.setText(fe2);
+                cardB.tvFE3.setText(fe3);
+                cardB.tvFE4.setText(fe4);
+                cardB.tvFE5.setText(fe5);
+                cardB.tvFE6.setText(fe6);
+                cardB.tvFE7.setText(fe7);
+                cardB.tvFE8.setText(fe8);
 
-                // Style dynamic color block
+                cardB.tvSE1.setText(se1);
+                cardB.tvSE2.setText(se2);
+                cardB.tvSE3.setText(se3);
+
+                cardB.tvFET.setText(fet);
+                cardB.tvSET.setText(set);
+                cardB.tvTET.setText(tet);
+
+                // Tint card border orange to signal "needs entry" if no marks are entered yet
+                if (hasMarks) {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
+                            .setStrokeColor(0xFFE0E0E0);
+                } else {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
+                            .setStrokeColor(0xFFFFB74D);
+                }
+
+                // Style dynamic Grade Chip in header
+                float density = itemView.getResources().getDisplayMetrics().density;
                 int gradeColor = 0xFF90A4AE; // gray
                 if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) gradeColor = 0xFF6C4CCF;
                 else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) gradeColor = 0xFF00A5CF;
@@ -488,7 +549,16 @@ public class FormativeSummativeFragment extends Fragment {
                 else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) gradeColor = 0xFF9E9D24;
                 else if (!gradeVal.equals("—")) gradeColor = 0xFFE65100;
 
-                cardB.layoutGradeBlock.setBackgroundColor(gradeColor);
+                cardB.tvHeaderGrade.setText(gradeVal);
+                if (gradeVal.equals("—")) {
+                    cardB.tvHeaderGrade.setVisibility(View.GONE);
+                } else {
+                    cardB.tvHeaderGrade.setVisibility(View.VISIBLE);
+                    android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+                    gd.setColor(gradeColor);
+                    gd.setCornerRadius(6 * density);
+                    cardB.tvHeaderGrade.setBackground(gd);
+                }
 
                 // Setup 3-dot popup menu
                 cardB.btnSubjectMore.setOnClickListener(v -> {
@@ -509,11 +579,10 @@ public class FormativeSummativeFragment extends Fragment {
                 // JOIN TO ENTER MARKS PAGE: Click on the entire subject card opens marks entry!
                 cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
 
-                // Set consistent layout width and margins for horizontal scrolling
-                float density = itemView.getResources().getDisplayMetrics().density;
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                        (int) (190 * density),
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                // Set consistent layout width and margins for horizontal scrolling (300dp to fit table)
+                android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
+                        (int) (300 * density),
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
                 );
                 int margin = (int) (6 * density);
                 param.setMargins(margin, margin, margin, margin);

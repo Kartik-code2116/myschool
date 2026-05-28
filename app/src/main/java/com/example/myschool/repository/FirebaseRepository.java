@@ -826,9 +826,12 @@ public class FirebaseRepository {
                     Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: got " + totalDocs + " docs for classId=" + classId);
                     
                     int targetSemNum = 1;
-                    if (semesterId.contains("2") || semesterId.toLowerCase().contains("second") || semesterId.toLowerCase().contains("sem_2")) {
+                    if (com.example.myschool.SessionContext.selectedSemester != null 
+                            && semesterId.equals(com.example.myschool.SessionContext.selectedSemester.id)) {
+                        targetSemNum = com.example.myschool.SessionContext.selectedSemester.number;
+                    } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
                         targetSemNum = 2;
-                    } else if (semesterId.contains("1") || semesterId.toLowerCase().contains("first") || semesterId.toLowerCase().contains("sem_1")) {
+                    } else if (semesterId.equals("sem_1") || semesterId.toLowerCase().contains("first") || (semesterId.length() < 10 && semesterId.contains("1"))) {
                         targetSemNum = 1;
                     } else if (com.example.myschool.SessionContext.selectedSemester != null) {
                         targetSemNum = com.example.myschool.SessionContext.selectedSemester.number;

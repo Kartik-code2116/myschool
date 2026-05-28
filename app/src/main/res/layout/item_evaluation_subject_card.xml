@@ -2,11 +2,11 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="0dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="3dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
     app:strokeWidth="0.8dp"
     app:strokeColor="#E0E0E0"
     app:cardBackgroundColor="@color/white">
@@ -15,27 +15,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="12dp">
 
-        <!-- Subject Header -->
+        <!-- Subject Card Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp">
 
-            <TextView
-                android:id="@+id/tvSubjectName"
+            <!-- Subject name and Grade Badge container -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/btnSubjectMore"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="1. मराठी"
-                android:textColor="#37474F"
-                android:textSize="12sp" />
+                android:layout_toStartOf="@+id/btnSubjectMore">
 
+                <TextView
+                    android:id="@+id/tvSubjectName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="1. मराठी"
+                    android:textColor="#37474F"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <!-- Grade Chip in Header -->
+                <TextView
+                    android:id="@+id/tvHeaderGrade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="A-1"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="1.5dp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/bg_badge_pill" />
+            </LinearLayout>
+
+            <!-- Action: vertical 3-dot menu in top right -->
             <ImageView
                 android:id="@+id/btnSubjectMore"
                 android:layout_width="20dp"
@@ -44,198 +68,443 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_more_vert"
                 app:tint="#6C4CCF"
-                android:contentDescription="Options" />
+                android:contentDescription="Subject Action" />
         </RelativeLayout>
 
-        <!-- Marks + Grade Layout -->
+        <!-- Formative Evaluation Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Formative Evaluation Weightage"
+            android:textColor="#78909C"
+            android:textSize="10sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Formative Table (8 columns) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <!-- FE1 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE1"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE2 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE2"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE3 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE3"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE4 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE4"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE5 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE5"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE6 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE6"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE7 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE7"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- FE8 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FE8"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFE8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="11sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Summative Evaluation Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Summative Evaluation Weightage"
+            android:textColor="#78909C"
+            android:textSize="10sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Summative Row (SE1-3 and FET/SET/TET) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Left: Table style marks section -->
+            <!-- Left: SE1-3 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <!-- Header Row -->
+                <!-- SE1 -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginBottom="2dp">
-
+                    android:layout_weight="1"
+                    android:orientation="vertical">
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="SE1"
                         android:gravity="center"
-                        android:text="FET"
-                        android:textSize="8sp"
                         android:textColor="#78909C"
-                        android:fontFamily="sans-serif-bold" />
-
+                        android:textSize="9sp"
+                        android:padding="2dp"
+                        android:background="@drawable/bg_table_cell" />
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:id="@+id/tvSE1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="-"
                         android:gravity="center"
-                        android:text="SET"
-                        android:textSize="8sp"
-                        android:textColor="#78909C"
-                        android:fontFamily="sans-serif-bold" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="TET"
-                        android:textSize="8sp"
-                        android:textColor="#78909C"
-                        android:fontFamily="sans-serif-bold" />
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
                 </LinearLayout>
 
-                <!-- Max Marks Row -->
+                <!-- SE2 -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginBottom="4dp">
-
+                    android:layout_weight="1"
+                    android:orientation="vertical">
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="SE2"
                         android:gravity="center"
-                        android:text="50"
+                        android:textColor="#78909C"
                         android:textSize="9sp"
-                        android:textColor="#90A4AE"
-                        android:fontFamily="sans-serif-medium" />
-
+                        android:padding="2dp"
+                        android:background="@drawable/bg_table_cell" />
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:id="@+id/tvSE2"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="-"
                         android:gravity="center"
-                        android:text="50"
-                        android:textSize="9sp"
-                        android:textColor="#90A4AE"
-                        android:fontFamily="sans-serif-medium" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="100"
-                        android:textSize="9sp"
-                        android:textColor="#90A4AE"
-                        android:fontFamily="sans-serif-medium" />
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
                 </LinearLayout>
 
-                <!-- Separator -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="#CFD8DC"
-                    android:layout_marginBottom="4dp" />
-
-                <!-- Obtained Marks Row -->
+                <!-- SE3 -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
+                    android:layout_weight="1"
+                    android:orientation="vertical">
                     <TextView
-                        android:id="@+id/tvObtainedFET"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="SE3"
                         android:gravity="center"
-                        android:text="42"
-                        android:textSize="12sp"
-                        android:textColor="#263238"
-                        android:fontFamily="sans-serif-black" />
-
+                        android:textColor="#78909C"
+                        android:textSize="9sp"
+                        android:padding="2dp"
+                        android:background="@drawable/bg_table_cell" />
                     <TextView
-                        android:id="@+id/tvObtainedSET"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:id="@+id/tvSE3"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="-"
                         android:gravity="center"
-                        android:text="43"
-                        android:textSize="12sp"
-                        android:textColor="#263238"
-                        android:fontFamily="sans-serif-black" />
-
-                    <TextView
-                        android:id="@+id/tvObtainedTET"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="85"
-                        android:textSize="12sp"
-                        android:textColor="#6C4CCF"
-                        android:fontFamily="sans-serif-black" />
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
                 </LinearLayout>
-
             </LinearLayout>
 
-            <!-- Right: Dynamic Vertical Grade Box -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="40dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="6dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="#37474F">
+            <!-- Spacing -->
+            <View
+                android:layout_width="12dp"
+                android:layout_height="1dp" />
 
+            <!-- Right: FET/SET/TET -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:orientation="horizontal">
+
+                <!-- FET -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical">
-
-                    <!-- Dark Charcoal header "GRD" -->
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="14dp"
+                        android:layout_height="wrap_content"
+                        android:text="FET"
                         android:gravity="center"
-                        android:text="GRD"
-                        android:textSize="7sp"
-                        android:textColor="#CFD8DC"
-                        android:fontFamily="sans-serif-bold"
-                        android:background="#263238" />
-
-                    <!-- Bright Grade Color Block -->
-                    <FrameLayout
-                        android:id="@+id/layoutGradeBlock"
+                        android:textColor="#78909C"
+                        android:textSize="9sp"
+                        android:padding="2dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvFET"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="#00A5CF">
-
-                        <TextView
-                            android:id="@+id/tvSubjectGrade"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:text="A-2"
-                            android:textSize="12sp"
-                            android:textColor="@color/white"
-                            android:fontFamily="sans-serif-black" />
-                    </FrameLayout>
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:gravity="center"
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+                <!-- SET -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SET"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="9sp"
+                        android:padding="2dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSET"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:gravity="center"
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                </LinearLayout>
 
+                <!-- TET -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TET"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="9sp"
+                        android:padding="2dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvTET"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:gravity="center"
+                        android:textColor="#6C4CCF"
+                        android:textStyle="bold"
+                        android:textSize="11sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
