@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F3F1F7">
+
+    <!-- Custom Top App Bar (72dp) -->
+    <LinearLayout
+        android:id="@+id/customAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="#F3F1F7">
+
+        <!-- Hamburger Icon -->
+        <ImageButton
+            android:id="@+id/btnDrawerMenu"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_menu"
+            app:tint="#6C4CCF"
+            android:padding="10dp"
+            android:contentDescription="Menu" />
+
+        <!-- Title & Subtitle Container -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Evaluation"
+                android:textColor="#263238"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvAppSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• Class: 5 • Div: 1 • Semester: 2"
+                android:textColor="#78909C"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-medium"
+                android:alpha="0.9" />
+        </LinearLayout>
+
+        <!-- Help Outlined Icon -->
+        <FrameLayout
+            android:id="@+id/btnHelpSquare"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_outlined_square_icon"
+            android:padding="6dp"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_help_outline"
+                app:tint="#37474F" />
+        </FrameLayout>
+
+        <!-- Add Outlined Icon -->
+        <FrameLayout
+            android:id="@+id/btnAddSquare"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_outlined_square_icon"
+            android:padding="6dp"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_add_box"
+                app:tint="#37474F" />
+        </FrameLayout>
+
+        <!-- Calculator Outlined Icon -->
+        <FrameLayout
+            android:id="@+id/btnCalcSquare"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_outlined_square_icon"
+            android:padding="6dp"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_calculator"
+                app:tint="#37474F" />
+        </FrameLayout>
+
+        <!-- Vertical 3-Dot More Icon -->
+        <ImageButton
+            android:id="@+id/btnThreeDotMenu"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_more_vert"
+            app:tint="#37474F"
+            android:padding="8dp"
+            android:contentDescription="More" />
+
+    </LinearLayout>
+
+    <!-- Header Section (White/light card strip below app bar) -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="0.8dp"
+        app:strokeColor="#E0E0E0"
+        app:cardBackgroundColor="@color/white">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvHeaderStripInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/btnGridListToggle"
+                android:fontFamily="sans-serif-medium"
+                android:text="Year: 2025-26  Class: 5, Div: 1, Sem: 2"
+                android:textColor="#37474F"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnGridListToggle"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_table_grid"
+                app:tint="#37474F"
+                android:contentDescription="Toggle Grid/List" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Scrollable Student List Container -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEvaluationStudents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:scrollbars="vertical" />
+
+</LinearLayout>

@@ -154,7 +154,7 @@
                     android:orientation="vertical" android:padding="16dp">
                     
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="हजेरी तपशील (Attendance Details)" android:textSize="14sp"
+                        android:text="@string/label_attendance_details" android:textSize="14sp"
                         android:fontFamily="sans-serif-medium" android:textColor="@color/primary"
                         android:layout_marginBottom="12dp"/>
                     
@@ -162,26 +162,26 @@
                         android:orientation="horizontal">
                         
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:layout_marginEnd="8dp"
-                            android:hint="हजर दिवस (Present)"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etPresentDays"
-                                android:layout_width="match_parent" android:layout_height="wrap_content"
-                                android:inputType="number"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-                        
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:layout_marginStart="8dp"
-                            android:hint="एकूण दिवस (Total)"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etTotalDays"
-                                android:layout_width="match_parent" android:layout_height="wrap_content"
-                                android:inputType="number"/>
-                        </com.google.android.material.textfield.TextInputLayout>
+                             android:layout_width="0dp" android:layout_height="wrap_content"
+                             android:layout_weight="1" android:layout_marginEnd="8dp"
+                             android:hint="@string/label_present_days_hint"
+                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                             <com.google.android.material.textfield.TextInputEditText
+                                 android:id="@+id/etPresentDays"
+                                 android:layout_width="match_parent" android:layout_height="wrap_content"
+                                 android:inputType="number"/>
+                         </com.google.android.material.textfield.TextInputLayout>
+                         
+                         <com.google.android.material.textfield.TextInputLayout
+                             android:layout_width="0dp" android:layout_height="wrap_content"
+                             android:layout_weight="1" android:layout_marginStart="8dp"
+                             android:hint="@string/label_total_days_hint"
+                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                             <com.google.android.material.textfield.TextInputEditText
+                                 android:id="@+id/etTotalDays"
+                                 android:layout_width="match_parent" android:layout_height="wrap_content"
+                                 android:inputType="number"/>
+                         </com.google.android.material.textfield.TextInputLayout>
                         
                     </LinearLayout>
                 </LinearLayout>

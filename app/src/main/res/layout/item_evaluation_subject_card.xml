@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:strokeWidth="0.8dp"
+    app:strokeColor="#E0E0E0"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Subject Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvSubjectName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnSubjectMore"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="1. मराठी"
+                android:textColor="#37474F"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/btnSubjectMore"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                app:tint="#6C4CCF"
+                android:contentDescription="Options" />
+        </RelativeLayout>
+
+        <!-- Marks + Grade Layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Left: Table style marks section -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Header Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="2dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="FET"
+                        android:textSize="8sp"
+                        android:textColor="#78909C"
+                        android:fontFamily="sans-serif-bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="SET"
+                        android:textSize="8sp"
+                        android:textColor="#78909C"
+                        android:fontFamily="sans-serif-bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="TET"
+                        android:textSize="8sp"
+                        android:textColor="#78909C"
+                        android:fontFamily="sans-serif-bold" />
+                </LinearLayout>
+
+                <!-- Max Marks Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="50"
+                        android:textSize="9sp"
+                        android:textColor="#90A4AE"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="50"
+                        android:textSize="9sp"
+                        android:textColor="#90A4AE"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="100"
+                        android:textSize="9sp"
+                        android:textColor="#90A4AE"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Separator -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#CFD8DC"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- Obtained Marks Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvObtainedFET"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="42"
+                        android:textSize="12sp"
+                        android:textColor="#263238"
+                        android:fontFamily="sans-serif-black" />
+
+                    <TextView
+                        android:id="@+id/tvObtainedSET"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="43"
+                        android:textSize="12sp"
+                        android:textColor="#263238"
+                        android:fontFamily="sans-serif-black" />
+
+                    <TextView
+                        android:id="@+id/tvObtainedTET"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="85"
+                        android:textSize="12sp"
+                        android:textColor="#6C4CCF"
+                        android:fontFamily="sans-serif-black" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Right: Dynamic Vertical Grade Box -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="40dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="#37474F">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <!-- Dark Charcoal header "GRD" -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="14dp"
+                        android:gravity="center"
+                        android:text="GRD"
+                        android:textSize="7sp"
+                        android:textColor="#CFD8DC"
+                        android:fontFamily="sans-serif-bold"
+                        android:background="#263238" />
+
+                    <!-- Bright Grade Color Block -->
+                    <FrameLayout
+                        android:id="@+id/layoutGradeBlock"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00A5CF">
+
+                        <TextView
+                            android:id="@+id/tvSubjectGrade"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="A-2"
+                            android:textSize="12sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="sans-serif-black" />
+                    </FrameLayout>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

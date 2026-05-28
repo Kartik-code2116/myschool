@@ -79,6 +79,7 @@ public class HomeActivity extends AppCompatActivity {
 
         setupDrawerHeader();
         setupDrawerActions();
+        localizeSidebar();
 
         b.bottomNav.setOnItemSelectedListener(this::navigateBottomItem);
 
@@ -237,6 +238,17 @@ public class HomeActivity extends AppCompatActivity {
     private void setupDrawerActions() {
         View header = b.navigationView.getHeaderView(0);
         if (header == null) return;
+
+        // Force quick action content descriptions to bilingual resources
+        View btnStats = header.findViewById(R.id.btnDrawerStats);
+        if (btnStats != null) btnStats.setContentDescription(getString(R.string.drawer_stats));
+        View btnSettings = header.findViewById(R.id.btnDrawerSettings);
+        if (btnSettings != null) btnSettings.setContentDescription(getString(R.string.drawer_settings));
+        View btnPrint = header.findViewById(R.id.btnDrawerPrint);
+        if (btnPrint != null) btnPrint.setContentDescription(getString(R.string.drawer_print));
+        View btnProfile = header.findViewById(R.id.btnDrawerProfile);
+        if (btnProfile != null) btnProfile.setContentDescription(getString(R.string.profile_title));
+
         header.findViewById(R.id.btnDrawerProfile).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
             navigateToAnimated(R.id.nav_profile);
@@ -253,6 +265,66 @@ public class HomeActivity extends AppCompatActivity {
             b.drawerLayout.closeDrawer(GravityCompat.START);
             navigateToAnimated(R.id.nav_info_print);
         });
+    }
+
+    private void localizeSidebar() {
+        android.view.Menu menu = b.navigationView.getMenu();
+        if (menu == null) return;
+
+        // 1. Group 1: About Student
+        if (menu.size() > 0) {
+            android.view.MenuItem group1 = menu.getItem(0);
+            if (group1 != null) {
+                group1.setTitle(getString(R.string.section_about_student));
+            }
+        }
+        android.view.MenuItem itemFormative = menu.findItem(R.id.nav_formative);
+        if (itemFormative != null) itemFormative.setTitle(getString(R.string.menu_formative_summative));
+        
+        android.view.MenuItem itemDescriptive = menu.findItem(R.id.nav_descriptive);
+        if (itemDescriptive != null) itemDescriptive.setTitle(getString(R.string.menu_descriptive_entries));
+        
+        android.view.MenuItem itemAttendance = menu.findItem(R.id.nav_attendance);
+        if (itemAttendance != null) itemAttendance.setTitle(getString(R.string.menu_attendance));
+
+        // 2. Group 2: Class Level
+        if (menu.size() > 1) {
+            android.view.MenuItem group2 = menu.getItem(1);
+            if (group2 != null) {
+                group2.setTitle(getString(R.string.section_class_level));
+            }
+        }
+        android.view.MenuItem itemStudents = menu.findItem(R.id.nav_students);
+        if (itemStudents != null) itemStudents.setTitle(getString(R.string.menu_student_list));
+        
+        android.view.MenuItem itemSubjects = menu.findItem(R.id.nav_subjects);
+        if (itemSubjects != null) itemSubjects.setTitle(getString(R.string.menu_subjects));
+        
+        android.view.MenuItem itemWeightage = menu.findItem(R.id.nav_weightage);
+        if (itemWeightage != null) itemWeightage.setTitle(getString(R.string.menu_declare_weightage));
+        
+        android.view.MenuItem itemDropdown = menu.findItem(R.id.nav_dropdown);
+        if (itemDropdown != null) itemDropdown.setTitle(getString(R.string.menu_dropdown_list));
+
+        // 3. Group 3: School Level
+        if (menu.size() > 2) {
+            android.view.MenuItem group3 = menu.getItem(2);
+            if (group3 != null) {
+                group3.setTitle(getString(R.string.section_school_level));
+            }
+        }
+        android.view.MenuItem itemExtra = menu.findItem(R.id.nav_extra);
+        if (itemExtra != null) itemExtra.setTitle(getString(R.string.menu_extra_menus));
+
+        // 4. Group 4: Bottom Action
+        if (menu.size() > 3) {
+            android.view.MenuItem group4 = menu.getItem(3);
+            if (group4 != null) {
+                group4.setTitle(getString(R.string.section_bottom_action));
+            }
+        }
+        android.view.MenuItem itemPrint = menu.findItem(R.id.nav_print_report);
+        if (itemPrint != null) itemPrint.setTitle(getString(R.string.menu_print_report));
     }
 
     private void loadTeacherInfo() {
@@ -323,15 +395,15 @@ public class HomeActivity extends AppCompatActivity {
             androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, anchor);
             
             // Core options
-            popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 Home");
-            popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 Classes");
-            popup.getMenu().add(0, R.id.nav_students, 3, "👥 Students");
+            popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 " + getString(R.string.menu_3dot_home));
+            popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 " + getString(R.string.menu_3dot_classes));
+            popup.getMenu().add(0, R.id.nav_students, 3, "👥 " + getString(R.string.menu_3dot_students));
             
             // Utility options
-            popup.getMenu().add(0, 901, 4, "🌐 Language setting");
-            popup.getMenu().add(0, 902, 5, "⭐ Rate app");
-            popup.getMenu().add(0, 903, 6, "📱 More apps");
-            popup.getMenu().add(0, 904, 7, "ℹ️ About developers");
+            popup.getMenu().add(0, 901, 4, "🌐 " + getString(R.string.menu_3dot_language));
+            popup.getMenu().add(0, 902, 5, "⭐ " + getString(R.string.menu_3dot_rate));
+            popup.getMenu().add(0, 903, 6, "📱 " + getString(R.string.menu_3dot_more_apps));
+            popup.getMenu().add(0, 904, 7, "ℹ️ " + getString(R.string.menu_3dot_about));
             popup.getMenu().add(0, 999, 8, "🚪 " + getString(R.string.logout));
 
             popup.setOnMenuItemClickListener(item -> {

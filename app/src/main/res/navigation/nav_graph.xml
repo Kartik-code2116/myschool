@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/nav_formative"
-        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:name="com.example.myschool.ui.FormativeSummativeFragment"
         android:label="@string/menu_formative_summative">
         <argument android:name="title" app:argType="string" android:defaultValue="Formative Summative"/>
     </fragment>

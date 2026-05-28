@@ -231,4 +231,39 @@
     <string name="label_reg_no">नोंदणी क्रमांक</string>
     <string name="label_standard">इयत्ता</string>
     <string name="action_profile">प्रोफाईल</string>
+
+    <!-- 3-Dot Toolbar Menu -->
+    <string name="menu_3dot_home">मुख्यपृष्ठ</string>
+    <string name="menu_3dot_classes">वर्ग आणि तुकडी</string>
+    <string name="menu_3dot_students">विद्यार्थी</string>
+    <string name="menu_3dot_language">भाषा रचना</string>
+    <string name="menu_3dot_rate">ॲपला रेट करा</string>
+    <string name="menu_3dot_more_apps">इतर ॲप्स</string>
+    <string name="menu_3dot_about">डेव्हलपरबद्दल</string>
+    <string name="section_bottom_action">खालील क्रिया</string>
+
+    <!-- Enter Marks Page -->
+    <string name="label_marks_total">एकूण: </string>
+    <string name="label_marks_grade">श्रेणी: </string>
+    <string name="label_formative_evaluation">(A) आकारिक मूल्यमापन</string>
+    <string name="label_summative_evaluation">(B) संकलित मूल्यमापन</string>
+    <string name="label_out_of">पैकी </string>
+    <string name="label_observation">निरीक्षण</string>
+    <string name="label_project">प्रकल्प</string>
+    <string name="label_oral">तोंडी</string>
+    <string name="label_oral_work">तोंडीकाम</string>
+    <string name="label_test">चाचणी</string>
+    <string name="label_practical">प्रात्यक्षिक</string>
+    <string name="label_assignment">स्वाध्याय</string>
+    <string name="label_activity">उपक्रम</string>
+    <string name="label_other">इतर</string>
+    <string name="label_formative_total">आकारिक एकूण (A)</string>
+    <string name="label_summative_total">संकलित एकूण (B)</string>
+    <string name="label_grand_total_ab">एकूण गुण (A + B)</string>
+    <string name="label_written">लेखी</string>
+    <string name="label_subject_remark_title">विषयवार वर्णनात्मक नोंद (Qualitative Remark)</string>
+    <string name="label_attendance_details">हजेरी तपशील (Attendance Details)</string>
+    <string name="label_present_days_hint">हजर दिवस (Present)</string>
+    <string name="label_total_days_hint">एकूण दिवस (Total)</string>
+    <string name="hint_qualitative_remark">वर्णनात्मक नोंद लिहा...</string>
 </resources>

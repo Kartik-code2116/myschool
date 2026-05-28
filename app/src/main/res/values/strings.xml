@@ -232,4 +232,39 @@
     <string name="label_reg_no">Registration No</string>
     <string name="label_standard">Standard</string>
     <string name="action_profile">Profile</string>
+
+    <!-- 3-Dot Toolbar Menu -->
+    <string name="menu_3dot_home">Home</string>
+    <string name="menu_3dot_classes">Classes</string>
+    <string name="menu_3dot_students">Students</string>
+    <string name="menu_3dot_language">Language setting</string>
+    <string name="menu_3dot_rate">Rate app</string>
+    <string name="menu_3dot_more_apps">More apps</string>
+    <string name="menu_3dot_about">About developers</string>
+    <string name="section_bottom_action">Bottom Action</string>
+
+    <!-- Enter Marks Page -->
+    <string name="label_marks_total">Total: </string>
+    <string name="label_marks_grade">Grade: </string>
+    <string name="label_formative_evaluation">(A) Formative Evaluation</string>
+    <string name="label_summative_evaluation">(B) Summative Evaluation</string>
+    <string name="label_out_of">Out of </string>
+    <string name="label_observation">Observation</string>
+    <string name="label_project">Project</string>
+    <string name="label_oral">Oral</string>
+    <string name="label_oral_work">Oral Work</string>
+    <string name="label_test">Test</string>
+    <string name="label_practical">Practical</string>
+    <string name="label_assignment">Assignment</string>
+    <string name="label_activity">Activity</string>
+    <string name="label_other">Other</string>
+    <string name="label_formative_total">Formative Total (A)</string>
+    <string name="label_summative_total">Summative Total (B)</string>
+    <string name="label_grand_total_ab">Grand Total (A + B)</string>
+    <string name="label_written">Written</string>
+    <string name="label_subject_remark_title">Subject Qualitative Remark</string>
+    <string name="label_attendance_details">Attendance Details</string>
+    <string name="label_present_days_hint">Present Days</string>
+    <string name="label_total_days_hint">Total Days</string>
+    <string name="hint_qualitative_remark">Write qualitative remark...</string>
 </resources>

@@ -83,21 +83,27 @@ public class MarksheetActivity extends AppCompatActivity {
         // Marks rows
         b.llPrintMarksRows.removeAllViews();
         boolean alt = false;
-        if (classModel.subjects != null) {
-            for (Subject sub : classModel.subjects) {
-                ItemPrintMarksRowBinding row = ItemPrintMarksRowBinding.inflate(
-                        LayoutInflater.from(this), b.llPrintMarksRows, false);
-                double obt = marks.subjectMarks.containsKey(sub.name)
-                        ? marks.subjectMarks.get(sub.name) : 0;
-                double pct = GradeCalculator.getPercentage(obt, sub.maxMarks);
-                row.tvRowSubject.setText(sub.name);
-                row.tvRowMax.setText(String.valueOf(sub.maxMarks));
-                row.tvRowObtained.setText(formatMark(obt));
-                row.tvRowGrade.setText(GradeCalculator.getGrade(pct));
-                if (alt) row.getRoot().setBackgroundColor(0xFFF5F7FA);
-                alt = !alt;
-                b.llPrintMarksRows.addView(row.getRoot());
-            }
+        // Build rows per subject. Fallback to default subjects if none configured.
+        if (classModel.subjects == null || classModel.subjects.isEmpty()) {
+            classModel.subjects = new java.util.ArrayList<>();
+            classModel.subjects.add(new Subject("English", 100));
+            classModel.subjects.add(new Subject("Mathematics", 100));
+            classModel.subjects.add(new Subject("Science", 100));
+            classModel.subjects.add(new Subject("Marathi", 100));
+        }
+        for (Subject sub : classModel.subjects) {
+            ItemPrintMarksRowBinding row = ItemPrintMarksRowBinding.inflate(
+                    LayoutInflater.from(this), b.llPrintMarksRows, false);
+            double obt = marks.subjectMarks.containsKey(sub.name)
+                    ? marks.subjectMarks.get(sub.name) : 0;
+            double pct = GradeCalculator.getPercentage(obt, sub.maxMarks);
+            row.tvRowSubject.setText(sub.name);
+            row.tvRowMax.setText(String.valueOf(sub.maxMarks));
+            row.tvRowObtained.setText(formatMark(obt));
+            row.tvRowGrade.setText(GradeCalculator.getGrade(pct));
+            if (alt) row.getRoot().setBackgroundColor(0xFFF5F7FA);
+            alt = !alt;
+            b.llPrintMarksRows.addView(row.getRoot());
         }
 
         // Totals

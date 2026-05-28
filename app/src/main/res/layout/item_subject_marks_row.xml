@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="(A) आकारिक मूल्यमापन"
+                    android:text="@string/label_formative_evaluation"
                     android:textColor="@color/primary"
                     android:textSize="12sp"/>
 
@@ -136,7 +136,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="निरीक्षण" android:textSize="10sp"
+                        android:text="@string/label_observation" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -156,7 +156,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="प्रकल्प" android:textSize="10sp"
+                        android:text="@string/label_project" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -183,7 +183,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="तोंडीकाम" android:textSize="10sp"
+                        android:text="@string/label_oral_work" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -202,7 +202,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="चाचणी" android:textSize="10sp"
+                        android:text="@string/label_test" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -229,7 +229,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="प्रात्यक्षिक" android:textSize="10sp"
+                        android:text="@string/label_practical" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -248,7 +248,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="स्वाध्याय" android:textSize="10sp"
+                        android:text="@string/label_assignment" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -275,7 +275,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="उपक्रम" android:textSize="10sp"
+                        android:text="@string/label_activity" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -294,7 +294,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="इतर" android:textSize="10sp"
+                        android:text="@string/label_other" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -325,7 +325,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="आकारिक एकूण (A)"
+                    android:text="@string/label_formative_total"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/primary"/>
@@ -355,7 +355,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="(B) संकलित मूल्यमापन"
+                    android:text="@string/label_summative_evaluation"
                     android:textColor="@color/secondary"
                     android:textSize="12sp"/>
 
@@ -385,7 +385,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="तोंडी" android:textSize="10sp"
+                        android:text="@string/label_oral" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -404,7 +404,7 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="प्रात्यक्षिक" android:textSize="10sp"
+                        android:text="@string/label_practical" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
@@ -428,7 +428,7 @@
                 android:layout_marginBottom="8dp">
 
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="लेखी (Written)" android:textSize="10sp"
+                    android:text="@string/label_written" android:textSize="10sp"
                     android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -459,7 +459,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="संकलित एकूण (B)"
+                    android:text="@string/label_summative_total"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/secondary"/>
@@ -491,7 +491,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="एकूण गुण (A + B)"
+                    android:text="@string/label_grand_total_ab"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/white"/>
@@ -513,7 +513,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="विषयवार वर्णनात्मक नोंद (Qualitative Remark)"
+                android:text="@string/label_subject_remark_title"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="11sp"
                 android:layout_marginBottom="4dp"/>
@@ -522,7 +522,7 @@
                 android:id="@+id/etSubjectRemark"
                 android:layout_width="match_parent"
                 android:layout_height="42dp"
-                android:hint="वर्णनात्मक नोंद लिहा..."
+                android:hint="@string/hint_qualitative_remark"
                 android:textSize="12sp"
                 android:background="@drawable/bg_surface_rounded"
                 android:paddingStart="10dp"

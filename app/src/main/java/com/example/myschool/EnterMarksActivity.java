@@ -82,11 +82,16 @@ public class EnterMarksActivity extends AppCompatActivity {
         b.tvMarksStudentName.setText(student.name);
         b.tvMarksRollClass.setText("Roll: " + student.rollNo + " | " + classModel.getDisplayName());
 
-        // Build one row per subject
-        if (classModel.subjects != null) {
-            for (Subject sub : classModel.subjects) {
-                addMarksRow(sub);
-            }
+        // Build one row per subject. Fallback to default subjects if none configured.
+        if (classModel.subjects == null || classModel.subjects.isEmpty()) {
+            classModel.subjects = new ArrayList<>();
+            classModel.subjects.add(new Subject("English", 100));
+            classModel.subjects.add(new Subject("Mathematics", 100));
+            classModel.subjects.add(new Subject("Science", 100));
+            classModel.subjects.add(new Subject("Marathi", 100));
+        }
+        for (Subject sub : classModel.subjects) {
+            addMarksRow(sub);
         }
 
         // Load existing marks if any for the selected semester
@@ -169,8 +174,8 @@ public class EnterMarksActivity extends AppCompatActivity {
         subjectMaxBreakdown.add(mx);
 
         // ── Set badge labels ───────────────────────────────────────────────────
-        row.tvAkarikMaxBadge.setText("पैकी " + akarikMax);
-        row.tvSanklitMaxBadge.setText("पैकी " + sanklitMax);
+        row.tvAkarikMaxBadge.setText(getString(R.string.label_out_of) + akarikMax);
+        row.tvSanklitMaxBadge.setText(getString(R.string.label_out_of) + sanklitMax);
 
         // ── Set individual sub-field max labels (shown as "/10", "/5" etc.) ───
         row.tvNirikhshanMax.setText("/" + nirikhshanMax);
@@ -264,8 +269,8 @@ public class EnterMarksActivity extends AppCompatActivity {
         row.tvGrandTotalInDetail.setText(grandTotal + " / " + maxMarks);
 
         // ── Header chip (always visible, even when collapsed) ──────────────────
-        row.tvSubjectTotal.setText("एकूण: " + grandTotal + "/" + maxMarks);
-        row.tvSubjectGrade.setText("श्रेणी: " + GradeCalculator.getMyschoolGrade(grandTotal, maxMarks));
+        row.tvSubjectTotal.setText(getString(R.string.label_marks_total) + grandTotal + "/" + maxMarks);
+        row.tvSubjectGrade.setText(getString(R.string.label_marks_grade) + GradeCalculator.getMyschoolGrade(grandTotal, maxMarks));
     }
 
     // ── Grand total footer card ────────────────────────────────────────────────
@@ -288,7 +293,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         b.tvTotalMax.setText(String.valueOf(maxTotal));
         b.tvTotalObtained.setText(formatMark(total));
         b.tvPercentage.setText(String.format("%.2f%%", pct));
-        b.tvGrade.setText("श्रेणी: " + GradeCalculator.getMyschoolGrade(total, maxTotal));
+        b.tvGrade.setText(getString(R.string.label_marks_grade) + GradeCalculator.getMyschoolGrade(total, maxTotal));
         String result = GradeCalculator.getResult(pct);
         b.tvResult.setText(result);
         b.tvResult.setBackgroundResource("PASS".equals(result)

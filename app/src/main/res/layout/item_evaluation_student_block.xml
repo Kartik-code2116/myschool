@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="14dp"
+    android:layout_marginEnd="14dp"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:strokeWidth="0.8dp"
+    app:strokeColor="#E0E0E0"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Student Header Row -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <!-- Square Avatar Placeholder Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardStudentAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1.5dp"
+                app:strokeColor="#6C4CCF"
+                app:cardBackgroundColor="#F3EEFF">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_person"
+                    app:tint="#6C4CCF"
+                    android:padding="6dp"
+                    android:contentDescription="Avatar" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Student Name in Marathi/Purple -->
+            <TextView
+                android:id="@+id/tvStudentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/cardStudentAvatar"
+                android:layout_toStartOf="@id/btnStudentMore"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="1. भारती आयुष महादेव"
+                android:textColor="#6C4CCF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Horizontal 3-dot action menu in purple -->
+            <ImageView
+                android:id="@+id/btnStudentMore"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                app:tint="#6C4CCF"
+                android:contentDescription="Action Menu" />
+        </RelativeLayout>
+
+        <!-- Grade Chips Row -->
+        <LinearLayout
+            android:id="@+id/layoutGradeChips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp" />
+
+        <!-- Subject Cards Section: 2 columns grid -->
+        <GridLayout
+            android:id="@+id/gridSubjects"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:alignmentMode="alignBounds"
+            android:columnOrderPreserved="false" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
