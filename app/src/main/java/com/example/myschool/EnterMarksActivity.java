@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -67,6 +68,7 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SessionContext.load(this);
         super.onCreate(savedInstanceState);
         b = ActivityEnterMarksBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
@@ -78,6 +80,16 @@ public class EnterMarksActivity extends AppCompatActivity {
         classModel  = AppCache.selectedClass;
 
         if (student == null || classModel == null) { finish(); return; }
+
+        // Fallback for null selectedSemester using classModel's semesterId
+        if (SessionContext.selectedSemester == null && classModel.semesterId != null && !classModel.semesterId.isEmpty()) {
+            com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
+            fallbackSem.id = classModel.semesterId;
+            fallbackSem.yearId = classModel.yearId;
+            fallbackSem.number = classModel.semesterId.contains("2") ? 2 : 1;
+            fallbackSem.name = classModel.semesterId.contains("2") ? "Second Semester" : "First Semester";
+            SessionContext.selectedSemester = fallbackSem;
+        }
 
         b.tvMarksStudentName.setText(student.name);
         b.tvMarksRollClass.setText("Roll: " + student.rollNo + " | " + classModel.getDisplayName());
@@ -94,24 +106,75 @@ public class EnterMarksActivity extends AppCompatActivity {
             addMarksRow(sub);
         }
 
-        // Load existing marks if any for the selected semester
+        // ── Load existing marks (3-layer strategy) ───────────────────────────
+        // Layer 1: AppCache (same session, instant — already in RAM)
+        if (AppCache.selectedMarks != null
+                && student.id != null
+                && student.id.equals(AppCache.selectedMarks.studentId)
+                && classModel.id != null
+                && classModel.id.equals(AppCache.selectedMarks.classId)) {
+            Log.d("SAVE_MARKS", "Layer1: Using AppCache.selectedMarks student=" + student.id);
+            existingMarks = AppCache.selectedMarks;
+            fillExistingMarks(existingMarks);
+        }
+
+        // Layer 2: SharedPreferences (after app restart — fetch by stored doc ID)
+        // This is the most reliable approach: direct doc ID fetch, no query/index needed.
+        String prefKey = "marks_doc_" + student.id + "_" + classModel.id;
+        String storedDocId = getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
+                .getString(prefKey, null);
+        if (storedDocId != null && existingMarks == null) {
+            Log.d("SAVE_MARKS", "Layer2: Fetching marks by stored docId=" + storedDocId);
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("marks")
+                    .document(storedDocId)
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()) {
+                            MarksRecord m = doc.toObject(MarksRecord.class);
+                            if (m != null) {
+                                Log.d("SAVE_MARKS", "Layer2 SUCCESS: loaded marks docId=" + storedDocId);
+                                existingMarks = m;
+                                AppCache.selectedMarks = m;
+                                fillExistingMarks(m);
+                            }
+                        } else {
+                            Log.d("SAVE_MARKS", "Layer2: doc not found for id=" + storedDocId);
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("SAVE_MARKS", "Layer2 FAILED: " + e.getMessage(), e));
+        }
+
+        // Layer 3: Firestore query by studentId+classId (always runs in background for freshness)
         String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
+        Log.d("SAVE_MARKS", "Layer3: Firestore query student=" + student.id + " class=" + classModel.id + " sem=" + semId);
         FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classModel.id, semId,
                 new FirebaseRepository.OnResult<MarksRecord>() {
                     @Override public void onSuccess(MarksRecord m) {
                         if (m != null) {
+                            Log.d("SAVE_MARKS", "Layer3 SUCCESS: marks docId=" + m.id + " semId=" + m.semesterId);
                             existingMarks = m;
+                            AppCache.selectedMarks = m;
                             fillExistingMarks(m);
                         } else {
-                            // If no marks record exists yet, try to pre-populate attendance from monthly attendance
-                            int[] att = calculateAttendanceForSemester();
-                            if (att[1] > 0) {
-                                if (b.etPresentDays != null) b.etPresentDays.setText(String.valueOf(att[0]));
-                                if (b.etTotalDays != null) b.etTotalDays.setText(String.valueOf(att[1]));
+                            Log.d("SAVE_MARKS", "Layer3: No marks in Firestore for student=" + student.id);
+                            if (existingMarks == null) {
+                                // No marks at all — pre-fill attendance
+                                int[] att = calculateAttendanceForSemester();
+                                if (att[1] > 0) {
+                                    if (b.etPresentDays != null) b.etPresentDays.setText(String.valueOf(att[0]));
+                                    if (b.etTotalDays != null) b.etTotalDays.setText(String.valueOf(att[1]));
+                                }
                             }
                         }
                     }
-                    @Override public void onError(Exception e) {}
+                    @Override public void onError(Exception e) {
+                        Log.e("SAVE_MARKS", "Layer3 FAILED: " + e.getMessage(), e);
+                        if (existingMarks == null) {
+                            Toast.makeText(EnterMarksActivity.this,
+                                    "गुण लोड करताना त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 });
 
         b.btnScanMarksheet.setOnClickListener(v -> showScanOptions());
@@ -397,6 +460,17 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     // ── Save ──────────────────────────────────────────────────────────────────
     private void saveMarks() {
+        // ── Guard: check auth before doing any work ────────────────────────────
+        com.google.firebase.auth.FirebaseUser currentUser =
+                com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Log.e("SAVE_MARKS", "ABORT: User is NOT authenticated. Cannot save to Firestore.");
+            Toast.makeText(this,
+                    "लॉगिन आवश्यक आहे. कृपया पुन्हा लॉगिन करा.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Log.d("SAVE_MARKS", "Auth OK — UID: " + currentUser.getUid());
+
         MarksRecord m = existingMarks != null ? existingMarks : new MarksRecord();
         m.studentId = student.id;
         m.classId   = classModel.id;
@@ -417,6 +491,14 @@ public class EnterMarksActivity extends AppCompatActivity {
             m.semesterId     = "sem_1";
             m.semesterNumber = "1";
         }
+
+        // ── Diagnostic log before save ─────────────────────────────────────────
+        Log.d("SAVE_MARKS", "========== MARKS SAVE PAYLOAD ==========");
+        Log.d("SAVE_MARKS", "studentId  : " + m.studentId);
+        Log.d("SAVE_MARKS", "classId    : " + m.classId);
+        Log.d("SAVE_MARKS", "semesterId : " + m.semesterId);
+        Log.d("SAVE_MARKS", "existingId : " + (m.id != null ? m.id : "NEW"));
+        Log.d("SAVE_MARKS", "subjects   : " + (classModel.subjects != null ? classModel.subjects.size() : 0));
 
         if (classModel.subjects == null) {
             Toast.makeText(this, "No subjects configured", Toast.LENGTH_SHORT).show();
@@ -451,6 +533,9 @@ public class EnterMarksActivity extends AppCompatActivity {
             d.remark        = row.etSubjectRemark.getText() != null
                               ? row.etSubjectRemark.getText().toString() : "";
 
+            Log.d("SAVE_MARKS", "  [" + sub.name + "] akarik=" + d.akarikTotal
+                    + " sanklit=" + d.sanklit + " total=" + d.grandTotal + " grade=" + d.grade);
+
             m.detailedMarks.put(sub.name, d);
 
             // Backward compat (used by older MarksheetActivity / PDF legacy path)
@@ -467,30 +552,73 @@ public class EnterMarksActivity extends AppCompatActivity {
         m.grade         = GradeCalculator.getMyschoolGrade(total, maxTotal);
         m.result        = GradeCalculator.getResult(m.percentage);
 
+        Log.d("SAVE_MARKS", "totalObtained: " + total + " / " + maxTotal
+                + " | %: " + m.percentage + " | grade: " + m.grade);
+        Log.d("SAVE_MARKS", "Calling FirebaseRepository.saveMarks() now...");
+
         showLoading(true);
         FirebaseRepository.get().saveMarks(m, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
+                Log.d("SAVE_MARKS", "SUCCESS — Firestore doc id: " + id);
+                // Store saved marks in AppCache so next open shows them instantly (same session)
+                m.id = id;
+                AppCache.selectedMarks = m;
+
+                // Persist doc ID to SharedPreferences so it survives app restart.
+                // On next open, we fetch by doc ID directly — no query needed.
+                String prefKey = "marks_doc_" + m.studentId + "_" + m.classId;
+                getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
+                        .edit()
+                        .putString(prefKey, id)
+                        .apply();
+                Log.d("SAVE_MARKS", "Saved docId to SharedPreferences key=" + prefKey);
+
                 showLoading(false);
                 student.marksEntered = true;
                 FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
-                    @Override public void onSuccess(String i) {}
-                    @Override public void onError(Exception e) {}
+                    @Override public void onSuccess(String i) {
+                        Log.d("SAVE_MARKS", "saveStudent SUCCESS — id: " + i);
+                    }
+                    @Override public void onError(Exception e) {
+                        Log.e("SAVE_MARKS", "saveStudent FAILED: " + e.getMessage(), e);
+                    }
                 });
-                // Clear evaluation and descriptive cache to force UI refresh on resume
-                AppCache.cachedStudents = null;
-                AppCache.cachedMarksMap = null;
-                AppCache.cachedClassIdForStudents = null;
-                AppCache.cachedDescriptiveStudents = null;
-                AppCache.cachedDescriptiveMarksMap = null;
-                AppCache.cachedDescriptiveClassId = null;
+                // ── Direct cache patching for instant UI + clear repo cache for fresh fetch ──
+                // Patch AppCache so both dashboards render the new marks instantly (0ms).
+                // Then clear the repository's internal marks cache so the background
+                // re-fetch always hits Firestore for the freshest data (handles semester
+                // ID mismatches in cache keys).
+
+                // Patch Evaluation (Formative/Summative) AppCache
+                if (AppCache.cachedMarksMap != null
+                        && classModel.id.equals(AppCache.cachedClassIdForStudents)) {
+                    AppCache.cachedMarksMap.put(student.id, m);
+                    AppCache.cachedSemesterIdForMarks = m.semesterId;
+                    Log.d("SAVE_MARKS", "Patched AppCache.cachedMarksMap for student=" + student.id);
+                }
+
+                // Patch Descriptive Entries AppCache
+                if (AppCache.cachedDescriptiveMarksMap != null
+                        && classModel.id.equals(AppCache.cachedDescriptiveClassId)) {
+                    AppCache.cachedDescriptiveMarksMap.put(student.id, m);
+                    AppCache.cachedDescriptiveSemesterId = m.semesterId;
+                    Log.d("SAVE_MARKS", "Patched AppCache.cachedDescriptiveMarksMap for student=" + student.id);
+                }
+
+                // Clear the repository's internal marks cache so dashboards re-query
+                // Firestore in the background (eliminates stale cache-key mismatches).
+                FirebaseRepository.get().clearMarksCache();
+                Log.d("SAVE_MARKS", "Cleared repo marks cache — dashboards will re-fetch fresh from Firestore.");
 
                 Toast.makeText(EnterMarksActivity.this, "गुण जतन केले!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }
             @Override public void onError(Exception e) {
+                Log.e("SAVE_MARKS", "FIRESTORE ERROR: " + e.getMessage(), e);
                 showLoading(false);
-                Toast.makeText(EnterMarksActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(EnterMarksActivity.this,
+                        "❌ जतन अयशस्वी: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -165,6 +165,27 @@
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/progressLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminateTint="#6C4CCF"
+        android:visibility="gone" />
+
+    <!-- Empty state message -->
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:text="कोणतेही विद्यार्थी आढळले नाही"
+        android:textColor="#9E9E9E"
+        android:textSize="15sp"
+        android:visibility="gone" />
+
     <!-- Scrollable Student List Container -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEvaluationStudents"

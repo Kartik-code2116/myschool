@@ -3,6 +3,7 @@ package com.example.myschool.ui;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -150,16 +151,24 @@ public class FormativeSummativeFragment extends Fragment {
             activeClass.subjects.add(new Subject("Marathi", 100));
         }
 
+        // Show progress spinner while fetching
+        if (b != null) {
+            b.progressLoading.setVisibility(View.VISIBLE);
+            b.tvEmptyState.setVisibility(View.GONE);
+        }
+
         // 1. Instant Cache rendering (zero-latency display):
-        if (AppCache.cachedStudents != null && activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
+        if (AppCache.cachedStudents != null
+                && activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
             List<Student> cachedList = AppCache.cachedStudents;
             Map<String, MarksRecord> cachedMarks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap : new HashMap<>();
             
-            // Render instantly!
+            // Render instantly from cache and hide progress
+            if (b != null) b.progressLoading.setVisibility(View.GONE);
             adapter.setData(cachedList, cachedMarks);
         }
 
-        // 2. Background fetch (stale-while-revalidate):
+        // 2. Background fetch (always runs to get fresh data):
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
@@ -180,14 +189,27 @@ public class FormativeSummativeFragment extends Fragment {
                                 AppCache.cachedSemesterIdForMarks = activeSemesterId;
 
                                 if (isAdded() && b != null) {
+                                    b.progressLoading.setVisibility(View.GONE);
+                                    if (finalList.isEmpty()) {
+                                        b.tvEmptyState.setVisibility(View.VISIBLE);
+                                    } else {
+                                        b.tvEmptyState.setVisibility(View.GONE);
+                                    }
                                     adapter.setData(finalList, finalMarks);
                                 }
                             }
                             @Override
                             public void onError(Exception e) {
+                                Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + e.getMessage(), e);
                                 if (isAdded() && b != null) {
-                                    // Only fallback if we don't have valid cached data
-                                    if (AppCache.cachedStudents == null || !activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
+                                    b.progressLoading.setVisibility(View.GONE);
+                                    // FIX: only fallback to empty marks when there is truly no
+                                    // previously-cached data. Never wipe marks just because of a
+                                    // transient network error on resume.
+                                    boolean hasCachedMarks = AppCache.cachedMarksMap != null
+                                            && activeClass.id.equals(AppCache.cachedClassIdForStudents)
+                                            && activeSemesterId.equals(AppCache.cachedSemesterIdForMarks);
+                                    if (!hasCachedMarks) {
                                         adapter.setData(finalList, new HashMap<>());
                                     }
                                 }
@@ -197,7 +219,8 @@ public class FormativeSummativeFragment extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                if (isAdded()) {
+                if (isAdded() && b != null) {
+                    b.progressLoading.setVisibility(View.GONE);
                     // Only show network error toast if cache is fully empty
                     if (AppCache.cachedStudents == null || !activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
                         Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -210,6 +233,32 @@ public class FormativeSummativeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        // FIX: Re-read session context on every resume so that class/semester changes
+        // (e.g. user pressed back and switched class) are always reflected here.
+        if (SessionContext.selectedClass != null) {
+            activeClass = SessionContext.selectedClass;
+        }
+        
+        // Smart fallback if semester is null
+        if (SessionContext.selectedSemester == null && activeClass != null && activeClass.semesterId != null && !activeClass.semesterId.isEmpty()) {
+            com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
+            fallbackSem.id = activeClass.semesterId;
+            fallbackSem.yearId = activeClass.yearId;
+            fallbackSem.number = activeClass.semesterId.contains("2") ? 2 : 1;
+            fallbackSem.name = activeClass.semesterId.contains("2") ? "Second Semester" : "First Semester";
+            SessionContext.selectedSemester = fallbackSem;
+        }
+
+        if (SessionContext.selectedSemester != null) {
+            activeSemesterId = SessionContext.selectedSemester.id;
+            activeSemesterNumber = SessionContext.selectedSemester.number;
+        }
+
+        // Dynamically update toolbar and header strip text views on resume
+        setupCustomAppBar();
+        setupHeaderStrip();
+
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             View activityAppBar = activity.findViewById(R.id.appBarLayout);
@@ -363,19 +412,19 @@ public class FormativeSummativeFragment extends Fragment {
                 int borderColor = 0xFFE1D5FF;
                 int bgColor = 0xFFF3EEFF;
 
-                if (grade.startsWith("A-1")) {
+                if (grade.startsWith("A-1") || grade.startsWith("अ-1")) {
                     textColor = 0xFF6C4CCF;
                     borderColor = 0xFFD7C4FF;
                     bgColor = 0xFFF3EEFF;
-                } else if (grade.startsWith("A-2")) {
+                } else if (grade.startsWith("A-2") || grade.startsWith("अ-2")) {
                     textColor = 0xFF00A5CF;
                     borderColor = 0xFFB2E7F5;
                     bgColor = 0xFFE0F7FA;
-                } else if (grade.startsWith("B-1")) {
+                } else if (grade.startsWith("B-1") || grade.startsWith("ब-1")) {
                     textColor = 0xFF2E7D32;
                     borderColor = 0xFFC8E6C9;
                     bgColor = 0xFFE8F5E9;
-                } else if (grade.startsWith("B-2")) {
+                } else if (grade.startsWith("B-2") || grade.startsWith("ब-2")) {
                     textColor = 0xFF9E9D24;
                     borderColor = 0xFFF0F4C3;
                     bgColor = 0xFFF9FBE7;
@@ -433,10 +482,10 @@ public class FormativeSummativeFragment extends Fragment {
 
                 // Style dynamic color block
                 int gradeColor = 0xFF90A4AE; // gray
-                if (gradeVal.startsWith("A-1")) gradeColor = 0xFF6C4CCF;
-                else if (gradeVal.startsWith("A-2")) gradeColor = 0xFF00A5CF;
-                else if (gradeVal.startsWith("B-1")) gradeColor = 0xFF2E7D32;
-                else if (gradeVal.startsWith("B-2")) gradeColor = 0xFF9E9D24;
+                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) gradeColor = 0xFF6C4CCF;
+                else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) gradeColor = 0xFF00A5CF;
+                else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1")) gradeColor = 0xFF2E7D32;
+                else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) gradeColor = 0xFF9E9D24;
                 else if (!gradeVal.equals("—")) gradeColor = 0xFFE65100;
 
                 cardB.layoutGradeBlock.setBackgroundColor(gradeColor);

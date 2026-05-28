@@ -6,6 +6,7 @@ import java.util.List;
 public class ClassModel {
     public String id;
     public String schoolId;
+    public String teacherId; // Security rule compliance field
     public String yearId;
     public String academicYearLabel;
     public String semesterId;

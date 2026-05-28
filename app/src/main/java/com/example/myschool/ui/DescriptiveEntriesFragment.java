@@ -122,7 +122,8 @@ public class DescriptiveEntriesFragment extends Fragment {
         }
 
         // 1. Instant Cache rendering (zero-latency display):
-        if (AppCache.cachedDescriptiveStudents != null && activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
+        if (AppCache.cachedDescriptiveStudents != null 
+                && activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
             List<Student> cachedList = AppCache.cachedDescriptiveStudents;
             Map<String, MarksRecord> cachedMarks = AppCache.cachedDescriptiveMarksMap != null ? AppCache.cachedDescriptiveMarksMap : new HashMap<>();
             
@@ -178,6 +179,32 @@ public class DescriptiveEntriesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        // FIX: Re-read session context on every resume so that class/semester changes
+        // (e.g. user pressed back and switched class) are always reflected here.
+        if (SessionContext.selectedClass != null) {
+            activeClass = SessionContext.selectedClass;
+        }
+
+        // Smart fallback if semester is null
+        if (SessionContext.selectedSemester == null && activeClass != null && activeClass.semesterId != null && !activeClass.semesterId.isEmpty()) {
+            com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
+            fallbackSem.id = activeClass.semesterId;
+            fallbackSem.yearId = activeClass.yearId;
+            fallbackSem.number = activeClass.semesterId.contains("2") ? 2 : 1;
+            fallbackSem.name = activeClass.semesterId.contains("2") ? "Second Semester" : "First Semester";
+            SessionContext.selectedSemester = fallbackSem;
+        }
+
+        if (SessionContext.selectedSemester != null) {
+            activeSemesterId = SessionContext.selectedSemester.id;
+            activeSemesterNumber = SessionContext.selectedSemester.number;
+        }
+
+        // Dynamically update toolbar and header strip text views on resume
+        setupCustomAppBar();
+        setupHeaderStrip();
+
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             View activityAppBar = activity.findViewById(R.id.appBarLayout);
@@ -294,7 +321,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
-                // Load Descriptive Remark
+                // Load actual saved remark from Firestore data
                 String remarkVal = "";
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(sub.name)) {
                     MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(sub.name);
@@ -303,37 +330,22 @@ public class DescriptiveEntriesFragment extends Fragment {
                     }
                 }
 
-                // If remark is blank, use dynamic realistic academic fallbacks based on subject
-                if (remarkVal.trim().isEmpty()) {
-                    int roll = number + student.name.hashCode();
-                    if (sub.name.equalsIgnoreCase("Marathi") || sub.name.contains("मराठी")) {
-                        remarkVal = (roll % 2 == 0) 
-                                ? "अतिशय हुशार व अभ्यासू विद्यार्थी. वाचन आणि लेखन कौशल्य उत्तम आहे." 
-                                : "अभ्यासात प्रगती चांगली आहे. हस्ताक्षर सुंदर काढण्याचा अधिक सराव करावा.";
-                    } else if (sub.name.equalsIgnoreCase("Hindi") || sub.name.contains("हिंदी")) {
-                        remarkVal = (roll % 2 == 0) 
-                                ? "पढ़ाई में अच्छा है। मौखिक भाषा और कविता गायन में गहरी रुचि है।" 
-                                : "लेखन कार्य में थोड़ी गति बढ़ाने की आवश्यकता है, सुधार हो रहा है।";
-                    } else if (sub.name.equalsIgnoreCase("English") || sub.name.contains("इंग्रजी")) {
-                        remarkVal = (roll % 2 == 0) 
-                                ? "Excellent student, cooperative and speaks English with confidence." 
-                                : "Good listener, spelling and sentence construction need minor improvement.";
-                    } else if (sub.name.equalsIgnoreCase("Mathematics") || sub.name.contains("गणित")) {
-                        remarkVal = (roll % 2 == 0) 
-                                ? "तार्किक विचार व बौद्धिक क्षमता उत्कृष्ट. गणिते अचूक व जलद सोडवतो." 
-                                : "पाढे व्यवस्थित पाठ आहेत. बेरीज व वजाबाकी प्रक्रियेमध्ये प्रगती आवश्यक.";
-                    } else if (sub.name.equalsIgnoreCase("Science") || sub.name.contains("विज्ञान")) {
-                        remarkVal = (roll % 2 == 0) 
-                                ? "वैज्ञानिक दृष्टिकोन चांगला आहे. प्रयोगांमध्ये अधिक स्वारस्य दाखवतो." 
-                                : "निसर्ग आणि विज्ञानातील संकल्पना चांगल्या समजतात. जिज्ञासा वृत्ती चांगली आहे.";
-                    } else {
-                        remarkVal = (roll % 2 == 0) 
-                                ? "नियमित अभ्यास करतो. खेळांमध्ये व इतर उपक्रमांमध्ये नेहमी सहभागी होतो." 
-                                : "शांत व आज्ञाधारक आहे. वर्गातील सर्व उपक्रमांमध्ये सहकार्य दाखवतो.";
-                    }
+                if (!remarkVal.trim().isEmpty()) {
+                    // Remark EXISTS → show the remark text, hide empty state
+                    cardB.tvSubjectRemark.setVisibility(View.VISIBLE);
+                    cardB.tvSubjectRemark.setText(remarkVal);
+                    cardB.layoutEmptyRemark.setVisibility(View.GONE);
+                    // White card with normal border
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
+                            .setStrokeColor(0xFFE0E0E0);
+                } else {
+                    // Remark MISSING → show pencil icon empty state, hide remark text
+                    cardB.tvSubjectRemark.setVisibility(View.GONE);
+                    cardB.layoutEmptyRemark.setVisibility(View.VISIBLE);
+                    // Tint border orange to signal "needs entry"
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
+                            .setStrokeColor(0xFFFFB74D);
                 }
-
-                cardB.tvSubjectRemark.setText(remarkVal);
 
                 // Setup 3-dot popup menu for Subject Card
                 cardB.btnSubjectMore.setOnClickListener(v -> {

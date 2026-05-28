@@ -23,6 +23,7 @@ public class StudentProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SessionContext.load(this);
         super.onCreate(savedInstanceState);
         b = ActivityStudentProfileBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());

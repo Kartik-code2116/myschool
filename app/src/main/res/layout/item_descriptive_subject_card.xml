@@ -50,17 +50,47 @@
                 android:contentDescription="Subject Action" />
         </RelativeLayout>
 
-        <!-- Descriptive remarks content (left-aligned) -->
+        <!-- Descriptive remarks content (shown when remark exists) -->
         <TextView
             android:id="@+id/tvSubjectRemark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="अतिशय हुशार विद्यार्थी. अभ्यास आणि खेळात नेहमी पुढे असतो. भाषा विषयावर चांगली पकड आहे."
+            android:text="अतिशय हुशार विद्यार्थी."
             android:textColor="#37474F"
             android:textSize="11sp"
             android:lineSpacingMultiplier="1.15"
             android:gravity="start" />
+
+        <!-- Empty state: shown when no remark is saved -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyRemark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvEmptyIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✏️"
+                android:textSize="22sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvEmptyLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="नोंद प्रविष्ट करा"
+                android:textColor="#B0BEC5"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="italic" />
+        </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

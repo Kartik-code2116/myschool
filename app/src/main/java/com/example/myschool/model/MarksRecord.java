@@ -7,6 +7,7 @@ public class MarksRecord {
     public String id;
     public String studentId;
     public String classId;
+    public String teacherId; // Security rule compliance field
     public String examName;
     public Map<String, Double> subjectMarks = new HashMap<>(); // subjectName -> obtained
     public Map<String, Integer> subjectMax = new HashMap<>();  // subjectName -> max

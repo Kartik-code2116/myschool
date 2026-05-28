@@ -44,6 +44,28 @@ public class FirebaseRepository {
         }
     }
 
+    /** Clears only the marks cache, leaving student/class/year caches intact. */
+    public void clearMarksCache() {
+        synchronized (FirebaseRepository.class) {
+            cachedClassSemesterMarksMap.clear();
+        }
+    }
+
+    /** Directly updates/patches the marks cache for the specified class, semester, and student. */
+    public void updateMarksInCache(String classId, String semesterId, String studentId, MarksRecord record) {
+        if (classId == null || semesterId == null || studentId == null || record == null) return;
+        synchronized (FirebaseRepository.class) {
+            String cacheKey = classId + "_" + semesterId;
+            java.util.Map<String, MarksRecord> marksMap = cachedClassSemesterMarksMap.get(cacheKey);
+            if (marksMap == null) {
+                marksMap = new java.util.HashMap<>();
+                cachedClassSemesterMarksMap.put(cacheKey, marksMap);
+            }
+            marksMap.put(studentId, record);
+            Log.d("FIRESTORE_MARKS", "Directly updated internal memory cache for class=" + classId + " sem=" + semesterId + " student=" + studentId);
+        }
+    }
+
     /** Call this when switching Firebase projects to force re-initialization. */
     public static void resetInstance() {
         synchronized (FirebaseRepository.class) {
@@ -510,6 +532,10 @@ public class FirebaseRepository {
 
     // ---------- Class ----------
     public void saveClass(ClassModel c, OnResult<String> cb) {
+        String uid = currentUid();
+        if (uid != null) {
+            c.teacherId = uid;
+        }
         DocumentReference ref = c.id != null
                 ? db.collection(COL_CLASSES).document(c.id)
                 : db.collection(COL_CLASSES).document();
@@ -667,21 +693,35 @@ public class FirebaseRepository {
     public void saveMarks(MarksRecord m, OnResult<String> cb) {
         String uid = currentUid();
         if (uid == null) {
+            Log.e("FIRESTORE_MARKS", "saveMarks ABORTED: currentUid() is null — user not signed in.");
             cb.onError(new IllegalStateException("User not authenticated"));
             return;
         }
         m.editedBy = uid;
+        m.teacherId = uid; // Complies with Firestore security rules
         m.updatedAt = System.currentTimeMillis();
         DocumentReference ref = m.id != null
                 ? db.collection(COL_MARKS).document(m.id)
                 : db.collection(COL_MARKS).document();
         m.id = ref.getId();
+
+        Log.d("FIRESTORE_MARKS", "Saving marks doc: " + ref.getPath());
+        Log.d("FIRESTORE_MARKS", "  teacherId  = " + m.teacherId);
+        Log.d("FIRESTORE_MARKS", "  studentId  = " + m.studentId);
+        Log.d("FIRESTORE_MARKS", "  classId    = " + m.classId);
+        Log.d("FIRESTORE_MARKS", "  semesterId = " + m.semesterId);
+        Log.d("FIRESTORE_MARKS", "  subjects   = " + m.detailedMarks.size());
+
         ref.set(m)
                 .addOnSuccessListener(v -> {
+                    Log.d("FIRESTORE_MARKS", "SUCCESS: doc written at " + ref.getPath());
                     cachedClassSemesterMarksMap.clear();
                     cb.onSuccess(m.id);
                 })
-                .addOnFailureListener(cb::onError);
+                .addOnFailureListener(e -> {
+                    Log.e("FIRESTORE_MARKS", "FAILURE writing marks: " + e.getMessage(), e);
+                    cb.onError(e);
+                });
     }
 
     public void getMarksForStudent(String studentId, String classId, OnResult<MarksRecord> cb) {
@@ -709,20 +749,45 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("Arguments cannot be null"));
             return;
         }
+        // Query by studentId + classId (no composite index needed), then filter semesterId in memory.
         db.collection(COL_MARKS)
                 .whereEqualTo("studentId", studentId)
                 .whereEqualTo("classId", classId)
-                .whereEqualTo("semesterId", semesterId)
-                .limit(1)
                 .get()
                 .addOnSuccessListener(snap -> {
                     if (snap != null && !snap.isEmpty()) {
-                        cb.onSuccess(snap.getDocuments().get(0).toObject(MarksRecord.class));
+                        MarksRecord fallback = null; // best match ignoring semester
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            MarksRecord m = doc.toObject(MarksRecord.class);
+                            if (m == null) continue;
+                            if (semesterId.equals(m.semesterId)) {
+                                // Perfect match — return immediately
+                                Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: FOUND exact match semId=" + semesterId);
+                                cb.onSuccess(m);
+                                return;
+                            }
+                            // Keep the most-recently-updated doc as fallback
+                            if (fallback == null || m.updatedAt > fallback.updatedAt) {
+                                fallback = m;
+                            }
+                        }
+                        // If no exact semester match, return the most recent record so
+                        // the form is not blank (marks are still visible to the teacher).
+                        if (fallback != null) {
+                            Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no exact semId match, using fallback updatedAt=" + fallback.updatedAt);
+                            cb.onSuccess(fallback);
+                        } else {
+                            cb.onSuccess(null);
+                        }
                     } else {
+                        Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no docs found for student=" + studentId + " class=" + classId);
                         cb.onSuccess(null);
                     }
                 })
-                .addOnFailureListener(cb::onError);
+                .addOnFailureListener(e -> {
+                    Log.e("FIRESTORE_MARKS", "getMarksForStudentAndSemester FAILED: " + e.getMessage(), e);
+                    cb.onError(e);
+                });
     }
 
     public void getMarksForClass(String classId, OnResult<List<MarksRecord>> cb) {
@@ -745,27 +810,76 @@ public class FirebaseRepository {
         }
         String cacheKey = classId + "_" + semesterId;
         if (cachedClassSemesterMarksMap.containsKey(cacheKey)) {
+            Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: cache hit key=" + cacheKey
+                    + " size=" + cachedClassSemesterMarksMap.get(cacheKey).size());
             cb.onSuccess(new java.util.HashMap<>(cachedClassSemesterMarksMap.get(cacheKey)));
             return;
         }
+        Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: querying Firestore classId=" + classId + " semesterId=" + semesterId);
         db.collection(COL_MARKS)
                 .whereEqualTo("classId", classId)
-                .whereEqualTo("semesterId", semesterId)
                 .get()
                 .addOnSuccessListener(snap -> {
                     java.util.Map<String, MarksRecord> marksMap = new java.util.HashMap<>();
+                    java.util.Map<String, MarksRecord> fallbackMap = new java.util.HashMap<>();
+                    int totalDocs = snap != null ? snap.size() : 0;
+                    Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: got " + totalDocs + " docs for classId=" + classId);
+                    
+                    int targetSemNum = 1;
+                    if (semesterId.contains("2") || semesterId.toLowerCase().contains("second") || semesterId.toLowerCase().contains("sem_2")) {
+                        targetSemNum = 2;
+                    } else if (semesterId.contains("1") || semesterId.toLowerCase().contains("first") || semesterId.toLowerCase().contains("sem_1")) {
+                        targetSemNum = 1;
+                    } else if (com.example.myschool.SessionContext.selectedSemester != null) {
+                        targetSemNum = com.example.myschool.SessionContext.selectedSemester.number;
+                    }
+                    final int finalTargetSemNum = targetSemNum;
+                    Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: active target semester number is " + finalTargetSemNum);
+
                     if (snap != null) {
                         for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m != null && m.studentId != null) {
-                                marksMap.put(m.studentId, m);
+                                Log.d("FIRESTORE_MARKS", "  doc studentId=" + m.studentId
+                                        + " semesterId=" + m.semesterId
+                                        + " semesterNumber=" + m.semesterNumber
+                                        + " total=" + m.totalObtained);
+                                        
+                                int recordSemNum = 1;
+                                if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
+                                    try {
+                                        recordSemNum = Integer.parseInt(m.semesterNumber);
+                                    } catch (NumberFormatException ignored) {}
+                                } else if (m.semesterId != null && !m.semesterId.isEmpty()) {
+                                    if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
+                                        recordSemNum = 2;
+                                    }
+                                }
+                                
+                                if (semesterId.equals(m.semesterId) || finalTargetSemNum == recordSemNum) {
+                                    // Match — include
+                                    marksMap.put(m.studentId, m);
+                                } else if (m.semesterId == null || m.semesterId.isEmpty()) {
+                                    // No semesterId saved — include as fallback
+                                    fallbackMap.put(m.studentId, m);
+                                }
                             }
                         }
                     }
+                    // If exact/number matches found, use them; otherwise fall back to records
+                    // with no semesterId (handles older saves that didn't set semesterId)
+                    if (marksMap.isEmpty() && !fallbackMap.isEmpty()) {
+                        Log.d("FIRESTORE_MARKS", "No exact/number match — using " + fallbackMap.size() + " fallback records");
+                        marksMap = fallbackMap;
+                    }
+                    Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: returning " + marksMap.size() + " marks records");
                     cachedClassSemesterMarksMap.put(cacheKey, marksMap);
                     cb.onSuccess(new java.util.HashMap<>(marksMap));
                 })
-                .addOnFailureListener(cb::onError);
+                .addOnFailureListener(e -> {
+                    Log.e("FIRESTORE_MARKS", "getMarksForClassAndSemester FAILED: " + e.getMessage(), e);
+                    cb.onError(e);
+                });
     }
 
     // ---------- Attendance ----------
