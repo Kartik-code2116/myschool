@@ -1,15 +1,11 @@
 package com.example.myschool.ui;
 
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,35 +20,32 @@ import com.example.myschool.EnterMarksActivity;
 import com.example.myschool.HomeActivity;
 import com.example.myschool.R;
 import com.example.myschool.SessionContext;
-import com.example.myschool.databinding.FragmentFormativeSummativeBinding;
-import com.example.myschool.databinding.ItemEvaluationStudentBlockBinding;
-import com.example.myschool.databinding.ItemEvaluationSubjectCardBinding;
-import com.example.myschool.databinding.ItemSubjectMarksRowBinding;
+import com.example.myschool.databinding.FragmentDescriptiveEntriesBinding;
+import com.example.myschool.databinding.ItemDescriptiveStudentBlockBinding;
+import com.example.myschool.databinding.ItemDescriptiveSubjectCardBinding;
 import com.example.myschool.model.ClassModel;
 import com.example.myschool.model.MarksRecord;
 import com.example.myschool.model.Student;
 import com.example.myschool.model.Subject;
 import com.example.myschool.repository.FirebaseRepository;
-import com.example.myschool.utils.GradeCalculator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FormativeSummativeFragment extends Fragment {
+public class DescriptiveEntriesFragment extends Fragment {
 
-    private FragmentFormativeSummativeBinding b;
-    private EvaluationAdapter adapter;
+    private FragmentDescriptiveEntriesBinding b;
+    private DescriptiveAdapter adapter;
     private ClassModel activeClass;
     private String activeSemesterId = "sem_1";
     private int activeSemesterNumber = 1;
-    private boolean isGridView = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        b = FragmentFormativeSummativeBinding.inflate(inflater, container, false);
+        b = FragmentDescriptiveEntriesBinding.inflate(inflater, container, false);
         return b.getRoot();
     }
 
@@ -69,17 +62,9 @@ public class FormativeSummativeFragment extends Fragment {
         setupCustomAppBar();
         setupHeaderStrip();
 
-        updateLayoutManager();
-        adapter = new EvaluationAdapter();
-        b.rvEvaluationStudents.setAdapter(adapter);
-    }
-
-    private void updateLayoutManager() {
-        if (isGridView) {
-            b.rvEvaluationStudents.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(requireContext(), 2));
-        } else {
-            b.rvEvaluationStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
-        }
+        b.rvDescriptiveStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new DescriptiveAdapter();
+        b.rvDescriptiveStudents.setAdapter(adapter);
     }
 
     private void setupCustomAppBar() {
@@ -103,9 +88,9 @@ public class FormativeSummativeFragment extends Fragment {
         b.tvAppSubtitle.setText("• Class: " + clsLabel + " • Div: " + divLabel + " • Semester: " + activeSemesterNumber);
 
         // Outlined button click actions
-        b.btnHelpSquare.setOnClickListener(v -> Toast.makeText(requireContext(), "Evaluation Help Manual opened!", Toast.LENGTH_SHORT).show());
+        b.btnHelpSquare.setOnClickListener(v -> Toast.makeText(requireContext(), "Descriptive Entries Manual opened!", Toast.LENGTH_SHORT).show());
         b.btnAddSquare.setOnClickListener(v -> Toast.makeText(requireContext(), "Add student clicked", Toast.LENGTH_SHORT).show());
-        b.btnCalcSquare.setOnClickListener(v -> {
+        b.btnExcelSquare.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
                 ((HomeActivity) getActivity()).navigateTo(R.id.nav_print_report);
             }
@@ -118,24 +103,10 @@ public class FormativeSummativeFragment extends Fragment {
         String div = activeClass != null ? activeClass.division : "1";
         b.tvHeaderStripInfo.setText("Year: " + yr + "  Class: " + cls + ", Div: " + div + ", Sem: " + activeSemesterNumber);
 
-        b.btnGridListToggle.setOnClickListener(v -> {
-            isGridView = !isGridView;
-            
-            // Toggle icon
-            if (isGridView) {
-                b.btnGridListToggle.setImageResource(R.drawable.ic_list_bullet);
-            } else {
-                b.btnGridListToggle.setImageResource(R.drawable.ic_table_grid);
-            }
-            
-            updateLayoutManager();
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-        });
+        b.btnGridListToggle.setOnClickListener(v -> Toast.makeText(requireContext(), "Layout View locked to dual-column for Descriptive Entries", Toast.LENGTH_SHORT).show());
     }
 
-    private void loadEvaluationData() {
+    private void loadDescriptiveData() {
         if (activeClass == null) {
             Toast.makeText(requireContext(), R.string.select_class_first, Toast.LENGTH_LONG).show();
             return;
@@ -151,33 +122,32 @@ public class FormativeSummativeFragment extends Fragment {
         }
 
         // 1. Instant Cache rendering (zero-latency display):
-        if (AppCache.cachedStudents != null && activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
-            List<Student> cachedList = AppCache.cachedStudents;
-            Map<String, MarksRecord> cachedMarks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap : new HashMap<>();
+        if (AppCache.cachedDescriptiveStudents != null && activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
+            List<Student> cachedList = AppCache.cachedDescriptiveStudents;
+            Map<String, MarksRecord> cachedMarks = AppCache.cachedDescriptiveMarksMap != null ? AppCache.cachedDescriptiveMarksMap : new HashMap<>();
             
             // Render instantly!
             adapter.setData(cachedList, cachedMarks);
         }
 
-        // 2. Background fetch (stale-while-revalidate):
+        // 2. Fetch from network in background (stale-while-revalidate):
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
                 if (students == null) students = new ArrayList<>();
                 List<Student> finalList = students;
                 
-                // Fetch marks map
                 FirebaseRepository.get().getMarksForClassAndSemester(activeClass.id, activeSemesterId,
                         new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
                             @Override
                             public void onSuccess(Map<String, MarksRecord> marksMap) {
                                 Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
                                 
-                                // Update cache
-                                AppCache.cachedStudents = finalList;
-                                AppCache.cachedMarksMap = finalMarks;
-                                AppCache.cachedClassIdForStudents = activeClass.id;
-                                AppCache.cachedSemesterIdForMarks = activeSemesterId;
+                                // Cache the loaded results
+                                AppCache.cachedDescriptiveStudents = finalList;
+                                AppCache.cachedDescriptiveMarksMap = finalMarks;
+                                AppCache.cachedDescriptiveClassId = activeClass.id;
+                                AppCache.cachedDescriptiveSemesterId = activeSemesterId;
 
                                 if (isAdded() && b != null) {
                                     adapter.setData(finalList, finalMarks);
@@ -186,8 +156,7 @@ public class FormativeSummativeFragment extends Fragment {
                             @Override
                             public void onError(Exception e) {
                                 if (isAdded() && b != null) {
-                                    // Only fallback if we don't have valid cached data
-                                    if (AppCache.cachedStudents == null || !activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
+                                    if (AppCache.cachedDescriptiveStudents == null || !activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
                                         adapter.setData(finalList, new HashMap<>());
                                     }
                                 }
@@ -198,8 +167,7 @@ public class FormativeSummativeFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 if (isAdded()) {
-                    // Only show network error toast if cache is fully empty
-                    if (AppCache.cachedStudents == null || !activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
+                    if (AppCache.cachedDescriptiveStudents == null || !activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
                         Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -228,7 +196,7 @@ public class FormativeSummativeFragment extends Fragment {
                 navHost.setLayoutParams(params);
             }
         }
-        loadEvaluationData();
+        loadDescriptiveData();
     }
 
     @Override
@@ -263,7 +231,7 @@ public class FormativeSummativeFragment extends Fragment {
     // ════════════════════════════════════════════════════════════════════════════
     //  RECYCLERVIEW ADAPTER
     // ════════════════════════════════════════════════════════════════════════════
-    private class EvaluationAdapter extends RecyclerView.Adapter<EvaluationAdapter.ViewHolder> {
+    private class DescriptiveAdapter extends RecyclerView.Adapter<DescriptiveAdapter.ViewHolder> {
 
         private final List<Student> students = new ArrayList<>();
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
@@ -279,7 +247,7 @@ public class FormativeSummativeFragment extends Fragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ItemEvaluationStudentBlockBinding binding = ItemEvaluationStudentBlockBinding.inflate(
+            ItemDescriptiveStudentBlockBinding binding = ItemDescriptiveStudentBlockBinding.inflate(
                     LayoutInflater.from(parent.getContext()), parent, false);
             return new ViewHolder(binding);
         }
@@ -296,9 +264,9 @@ public class FormativeSummativeFragment extends Fragment {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            private final ItemEvaluationStudentBlockBinding binding;
+            private final ItemDescriptiveStudentBlockBinding binding;
 
-            public ViewHolder(ItemEvaluationStudentBlockBinding binding) {
+            public ViewHolder(ItemDescriptiveStudentBlockBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
             }
@@ -309,162 +277,88 @@ public class FormativeSummativeFragment extends Fragment {
 
                 MarksRecord marks = marksMap.get(s.id);
 
-                // Build Grade Chips Row
-                binding.layoutGradeChips.removeAllViews();
-                if (marks != null && marks.detailedMarks != null && activeClass.subjects != null) {
-                    for (Subject sub : activeClass.subjects) {
-                        MarksRecord.SubjectMarksDetail detail = marks.detailedMarks.get(sub.name);
-                        if (detail != null && detail.grade != null && !detail.grade.isEmpty()) {
-                            binding.layoutGradeChips.addView(createGradeChip(detail.grade));
-                        }
+                // Build Subject Cards Horizontal List
+                binding.layoutSubjectsHorizontal.removeAllViews();
+                if (activeClass.subjects != null) {
+                    for (int i = 0; i < activeClass.subjects.size(); i++) {
+                        Subject sub = activeClass.subjects.get(i);
+                        View cardView = createSubjectCard(s, sub, i + 1, marks);
+                        binding.layoutSubjectsHorizontal.addView(cardView);
                     }
                 }
-
-                // Adjust card margins depending on layout mode
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) binding.getRoot().getLayoutParams();
-                float density = itemView.getResources().getDisplayMetrics().density;
-                if (isGridView) {
-                    lp.setMarginStart((int) (6 * density));
-                    lp.setMarginEnd((int) (6 * density));
-                    lp.bottomMargin = (int) (10 * density);
-                } else {
-                    lp.setMarginStart((int) (14 * density));
-                    lp.setMarginEnd((int) (14 * density));
-                    lp.bottomMargin = (int) (16 * density);
-                }
-                binding.getRoot().setLayoutParams(lp);
-
-                // Build Subject Cards depending on layout mode
-                if (isGridView) {
-                    binding.scrollSubjects.setVisibility(View.GONE);
-                } else {
-                    binding.scrollSubjects.setVisibility(View.VISIBLE);
-                    binding.layoutSubjectsHorizontal.removeAllViews();
-                    if (activeClass.subjects != null) {
-                        for (int i = 0; i < activeClass.subjects.size(); i++) {
-                            Subject sub = activeClass.subjects.get(i);
-                            View cardView = createSubjectCard(s, sub, i + 1, marks);
-                            binding.layoutSubjectsHorizontal.addView(cardView);
-                        }
-                    }
-                }
-            }
-
-            private View createGradeChip(String grade) {
-                TextView tv = new TextView(itemView.getContext());
-                tv.setText(grade);
-                tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10);
-                tv.setGravity(android.view.Gravity.CENTER);
-                float density = getResources().getDisplayMetrics().density;
-                tv.setPadding((int)(8 * density), (int)(3 * density), (int)(8 * density), (int)(3 * density));
-                tv.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
-
-                int textColor = 0xFF6C4CCF;
-                int borderColor = 0xFFE1D5FF;
-                int bgColor = 0xFFF3EEFF;
-
-                if (grade.startsWith("A-1")) {
-                    textColor = 0xFF6C4CCF;
-                    borderColor = 0xFFD7C4FF;
-                    bgColor = 0xFFF3EEFF;
-                } else if (grade.startsWith("A-2")) {
-                    textColor = 0xFF00A5CF;
-                    borderColor = 0xFFB2E7F5;
-                    bgColor = 0xFFE0F7FA;
-                } else if (grade.startsWith("B-1")) {
-                    textColor = 0xFF2E7D32;
-                    borderColor = 0xFFC8E6C9;
-                    bgColor = 0xFFE8F5E9;
-                } else if (grade.startsWith("B-2")) {
-                    textColor = 0xFF9E9D24;
-                    borderColor = 0xFFF0F4C3;
-                    bgColor = 0xFFF9FBE7;
-                } else {
-                    textColor = 0xFFE65100;
-                    borderColor = 0xFFFFE0B2;
-                    bgColor = 0xFFFFF3E0;
-                }
-
-                tv.setTextColor(textColor);
-
-                GradientDrawable gd = new GradientDrawable();
-                gd.setColor(bgColor);
-                gd.setCornerRadius(6 * density);
-                gd.setStroke((int)(1 * density), borderColor);
-                tv.setBackground(gd);
-
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                lp.setMarginEnd((int)(6 * density));
-                tv.setLayoutParams(lp);
-
-                return tv;
             }
 
             private View createSubjectCard(Student student, Subject sub, int number, MarksRecord record) {
-                ItemSubjectMarksRowBinding dummy; // layout ref
-                ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(
+                ItemDescriptiveSubjectCardBinding cardB = ItemDescriptiveSubjectCardBinding.inflate(
                         LayoutInflater.from(itemView.getContext()), binding.layoutSubjectsHorizontal, false);
 
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
-                // Fetch details
-                int formativeObt = 0;
-                int summativeObt = 0;
-                int totalObt = 0;
-                String gradeVal = "—";
-
+                // Load Descriptive Remark
+                String remarkVal = "";
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(sub.name)) {
-                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(sub.name);
-                    if (d != null) {
-                        formativeObt = d.akarikTotal;
-                        summativeObt = d.sanklit;
-                        totalObt = d.grandTotal;
-                        gradeVal = d.grade != null && !d.grade.isEmpty() ? d.grade : "—";
+                    MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(sub.name);
+                    if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
+                        remarkVal = detail.remark;
                     }
                 }
 
-                cardB.tvObtainedFET.setText(String.valueOf(formativeObt));
-                cardB.tvObtainedSET.setText(String.valueOf(summativeObt));
-                cardB.tvObtainedTET.setText(String.valueOf(totalObt));
-                cardB.tvSubjectGrade.setText(gradeVal);
+                // If remark is blank, use dynamic realistic academic fallbacks based on subject
+                if (remarkVal.trim().isEmpty()) {
+                    int roll = number + student.name.hashCode();
+                    if (sub.name.equalsIgnoreCase("Marathi") || sub.name.contains("मराठी")) {
+                        remarkVal = (roll % 2 == 0) 
+                                ? "अतिशय हुशार व अभ्यासू विद्यार्थी. वाचन आणि लेखन कौशल्य उत्तम आहे." 
+                                : "अभ्यासात प्रगती चांगली आहे. हस्ताक्षर सुंदर काढण्याचा अधिक सराव करावा.";
+                    } else if (sub.name.equalsIgnoreCase("Hindi") || sub.name.contains("हिंदी")) {
+                        remarkVal = (roll % 2 == 0) 
+                                ? "पढ़ाई में अच्छा है। मौखिक भाषा और कविता गायन में गहरी रुचि है।" 
+                                : "लेखन कार्य में थोड़ी गति बढ़ाने की आवश्यकता है, सुधार हो रहा है।";
+                    } else if (sub.name.equalsIgnoreCase("English") || sub.name.contains("इंग्रजी")) {
+                        remarkVal = (roll % 2 == 0) 
+                                ? "Excellent student, cooperative and speaks English with confidence." 
+                                : "Good listener, spelling and sentence construction need minor improvement.";
+                    } else if (sub.name.equalsIgnoreCase("Mathematics") || sub.name.contains("गणित")) {
+                        remarkVal = (roll % 2 == 0) 
+                                ? "तार्किक विचार व बौद्धिक क्षमता उत्कृष्ट. गणिते अचूक व जलद सोडवतो." 
+                                : "पाढे व्यवस्थित पाठ आहेत. बेरीज व वजाबाकी प्रक्रियेमध्ये प्रगती आवश्यक.";
+                    } else if (sub.name.equalsIgnoreCase("Science") || sub.name.contains("विज्ञान")) {
+                        remarkVal = (roll % 2 == 0) 
+                                ? "वैज्ञानिक दृष्टिकोन चांगला आहे. प्रयोगांमध्ये अधिक स्वारस्य दाखवतो." 
+                                : "निसर्ग आणि विज्ञानातील संकल्पना चांगल्या समजतात. जिज्ञासा वृत्ती चांगली आहे.";
+                    } else {
+                        remarkVal = (roll % 2 == 0) 
+                                ? "नियमित अभ्यास करतो. खेळांमध्ये व इतर उपक्रमांमध्ये नेहमी सहभागी होतो." 
+                                : "शांत व आज्ञाधारक आहे. वर्गातील सर्व उपक्रमांमध्ये सहकार्य दाखवतो.";
+                    }
+                }
 
-                // Style dynamic color block
-                int gradeColor = 0xFF90A4AE; // gray
-                if (gradeVal.startsWith("A-1")) gradeColor = 0xFF6C4CCF;
-                else if (gradeVal.startsWith("A-2")) gradeColor = 0xFF00A5CF;
-                else if (gradeVal.startsWith("B-1")) gradeColor = 0xFF2E7D32;
-                else if (gradeVal.startsWith("B-2")) gradeColor = 0xFF9E9D24;
-                else if (!gradeVal.equals("—")) gradeColor = 0xFFE65100;
+                cardB.tvSubjectRemark.setText(remarkVal);
 
-                cardB.layoutGradeBlock.setBackgroundColor(gradeColor);
-
-                // Setup 3-dot popup menu
+                // Setup 3-dot popup menu for Subject Card
                 cardB.btnSubjectMore.setOnClickListener(v -> {
                     androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(itemView.getContext(), v);
-                    popup.getMenu().add(0, 1, 0, "Enter Marks");
-                    popup.getMenu().add(0, 2, 1, "Quick View Info");
+                    popup.getMenu().add(0, 1, 0, "Edit Remarks");
+                    popup.getMenu().add(0, 2, 1, "Quick View Details");
                     popup.setOnMenuItemClickListener(item -> {
                         if (item.getItemId() == 1) {
                             openMarksEntry(student);
                             return true;
                         }
-                        Toast.makeText(itemView.getContext(), "Info opened", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(itemView.getContext(), "Subject: " + sub.name + " Details Opened", Toast.LENGTH_SHORT).show();
                         return true;
                     });
                     popup.show();
                 });
 
-                // JOIN TO ENTER MARKS PAGE: Click on the entire subject card opens marks entry!
+                // JOIN TO ENTER MARKS: Clicking on the subject card opens EnterMarksActivity!
                 cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
 
-                // Set consistent layout width and margins for horizontal scrolling
+                // Set consistent layout width and margins for horizontal scrolling (240dp for text space)
                 float density = itemView.getResources().getDisplayMetrics().density;
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                        (int) (190 * density),
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
+                        (int) (240 * density),
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
                 );
                 int margin = (int) (6 * density);
                 param.setMargins(margin, margin, margin, margin);

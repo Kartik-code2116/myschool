@@ -7,7 +7,7 @@
     android:layout_marginStart="14dp"
     android:layout_marginEnd="14dp"
     android:layout_marginBottom="16dp"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="14dp"
     app:cardElevation="3dp"
     app:strokeWidth="0.8dp"
     app:strokeColor="#E0E0E0"
@@ -24,46 +24,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
-            <!-- Square Avatar Placeholder Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardStudentAvatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1.5dp"
-                app:strokeColor="#6C4CCF"
-                app:cardBackgroundColor="#F3EEFF">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_person"
-                    app:tint="#6C4CCF"
-                    android:padding="6dp"
-                    android:contentDescription="Avatar" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Student Name in Marathi/Purple -->
+            <!-- Student Name in Bold Charcoal -->
             <TextView
                 android:id="@+id/tvStudentName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/cardStudentAvatar"
-                android:layout_toStartOf="@id/btnStudentMore"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnStudentMore"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="12dp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif-bold"
                 android:text="1. भारती आयुष महादेव"
-                android:textColor="#6C4CCF"
+                android:textColor="#263238"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <!-- Horizontal 3-dot action menu in purple -->
+            <!-- Options icon consisting of three horizontal dots (vertical 3-dot rotated 90 degrees) -->
             <ImageView
                 android:id="@+id/btnStudentMore"
                 android:layout_width="24dp"
@@ -72,24 +49,13 @@
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_more_vert"
-                app:tint="#6C4CCF"
-                android:contentDescription="Action Menu" />
+                android:rotation="90"
+                app:tint="#78909C"
+                android:contentDescription="Options Menu" />
         </RelativeLayout>
-
-        <!-- Grade Chips Row -->
-        <LinearLayout
-            android:id="@+id/layoutGradeChips"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="12dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp" />
 
         <!-- Subject Cards Section: Horizontal Scrollable List -->
         <HorizontalScrollView
-            android:id="@+id/scrollSubjects"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"

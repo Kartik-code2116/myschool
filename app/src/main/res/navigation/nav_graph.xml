@@ -38,7 +38,7 @@
 
     <fragment
         android:id="@+id/nav_descriptive"
-        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:name="com.example.myschool.ui.DescriptiveEntriesFragment"
         android:label="@string/menu_descriptive_entries">
         <argument android:name="title" app:argType="string" android:defaultValue="Descriptive Entries"/>
     </fragment>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0.8dp"
+    app:strokeColor="#E0E0E0"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Subject Card Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <!-- Subject label (light purple text) -->
+            <TextView
+                android:id="@+id/tvSubjectName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnSubjectMore"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="1. मराठी"
+                android:textColor="#6C4CCF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Action: vertical 3-dot menu in top right -->
+            <ImageView
+                android:id="@+id/btnSubjectMore"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                app:tint="#78909C"
+                android:contentDescription="Subject Action" />
+        </RelativeLayout>
+
+        <!-- Descriptive remarks content (left-aligned) -->
+        <TextView
+            android:id="@+id/tvSubjectRemark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="अतिशय हुशार विद्यार्थी. अभ्यास आणि खेळात नेहमी पुढे असतो. भाषा विषयावर चांगली पकड आहे."
+            android:textColor="#37474F"
+            android:textSize="11sp"
+            android:lineSpacingMultiplier="1.15"
+            android:gravity="start" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

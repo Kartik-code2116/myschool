@@ -29,4 +29,16 @@ public class AppCache {
 
     /** classId → student count — cached to avoid re-fetching all students on every profile open. */
     public static Map<String, Integer> cachedStudentCountByClassId;
+
+    // Student & Marks Caching for zero-latency screen loading
+    public static List<Student> cachedStudents;
+    public static Map<String, MarksRecord> cachedMarksMap;
+    public static String cachedClassIdForStudents;
+    public static String cachedSemesterIdForMarks;
+
+    // Descriptive Entries Caching
+    public static List<Student> cachedDescriptiveStudents;
+    public static Map<String, MarksRecord> cachedDescriptiveMarksMap;
+    public static String cachedDescriptiveClassId;
+    public static String cachedDescriptiveSemesterId;
 }

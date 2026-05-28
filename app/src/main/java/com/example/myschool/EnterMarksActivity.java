@@ -476,6 +476,14 @@ public class EnterMarksActivity extends AppCompatActivity {
                     @Override public void onSuccess(String i) {}
                     @Override public void onError(Exception e) {}
                 });
+                // Clear evaluation and descriptive cache to force UI refresh on resume
+                AppCache.cachedStudents = null;
+                AppCache.cachedMarksMap = null;
+                AppCache.cachedClassIdForStudents = null;
+                AppCache.cachedDescriptiveStudents = null;
+                AppCache.cachedDescriptiveMarksMap = null;
+                AppCache.cachedDescriptiveClassId = null;
+
                 Toast.makeText(EnterMarksActivity.this, "गुण जतन केले!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
