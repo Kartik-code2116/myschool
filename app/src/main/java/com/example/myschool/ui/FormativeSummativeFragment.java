@@ -266,9 +266,12 @@ public class FormativeSummativeFragment extends Fragment {
             SessionContext.selectedSemester = fallbackSem;
         }
 
-        if (SessionContext.selectedSemester != null) {
+        if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             activeSemesterId = SessionContext.selectedSemester.id;
             activeSemesterNumber = SessionContext.selectedSemester.number;
+        } else {
+            activeSemesterId = "sem_1";
+            activeSemesterNumber = 1;
         }
 
         setupCustomAppBar();
@@ -479,9 +482,9 @@ public class FormativeSummativeFragment extends Fragment {
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
                 // Default table values
-                String fe1 = "0", fe2 = "0", fe3 = "0", fe4 = "0", fe5 = "0", fe6 = "0", fe7 = "0", fe8 = "0";
-                String se1 = "0", se2 = "0", se3 = "0";
-                String fet = "0", set = "0", tet = "0";
+                String fe1 = "-", fe2 = "-", fe3 = "-", fe4 = "-", fe5 = "-", fe6 = "-", fe7 = "-", fe8 = "-";
+                String se1 = "-", se2 = "-", se3 = "-";
+                String fet = "-", set = "-", tet = "-";
                 String gradeVal = "—";
                 boolean hasMarks = false;
 
@@ -489,24 +492,28 @@ public class FormativeSummativeFragment extends Fragment {
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
                     MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
                     if (d != null) {
-                        hasMarks = true;
-                        fe1 = formatVal(d.nirikhshan);
-                        fe2 = formatVal(d.tondiKam);
-                        fe3 = formatVal(d.pratyakshik);
-                        fe4 = formatVal(d.upkram);
-                        fe5 = formatVal(d.prakalp);
-                        fe6 = formatVal(d.chachani);
-                        fe7 = formatVal(d.swadhyay);
-                        fe8 = formatVal(d.itar);
+                        hasMarks = hasEnteredMarks(d);
+                        if (hasMarks) {
+                            fe1 = formatVal(d.nirikhshan);
+                            fe2 = formatVal(d.tondiKam);
+                            fe3 = formatVal(d.pratyakshik);
+                            fe4 = formatVal(d.upkram);
+                            fe5 = formatVal(d.prakalp);
+                            fe6 = formatVal(d.chachani);
+                            fe7 = formatVal(d.swadhyay);
+                            fe8 = formatVal(d.itar);
 
-                        se1 = formatVal(d.tondi);
-                        se2 = formatVal(d.pratyakshikB);
-                        se3 = formatVal(d.lekhi);
+                            se1 = formatVal(d.tondi);
+                            se2 = formatVal(d.pratyakshikB);
+                            se3 = formatVal(d.lekhi);
 
-                        fet = String.valueOf(d.akarikTotal);
-                        set = String.valueOf(d.sanklit);
-                        tet = String.valueOf(d.grandTotal);
-                        gradeVal = d.grade != null && !d.grade.isEmpty() ? d.grade : "—";
+                            fet = formatVal(d.akarikTotal);
+                            set = formatVal(d.sanklit);
+                            tet = formatVal(d.grandTotal);
+                        }
+                        if (d.grade != null && !d.grade.isEmpty()) {
+                            gradeVal = d.grade;
+                        }
                     }
                 }
 
@@ -600,6 +607,13 @@ public class FormativeSummativeFragment extends Fragment {
                 activeClass = freshClass;
                 Intent intent = new Intent(itemView.getContext(), EnterMarksActivity.class);
                 itemView.getContext().startActivity(intent);
+            }
+            private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
+                if (detail == null) return false;
+                return detail.nirikhshan > 0 || detail.tondiKam > 0 || detail.pratyakshik > 0
+                        || detail.upkram > 0 || detail.prakalp > 0 || detail.chachani > 0
+                        || detail.swadhyay > 0 || detail.itar > 0 || detail.tondi > 0
+                        || detail.pratyakshikB > 0 || detail.lekhi > 0;
             }
         }
     }

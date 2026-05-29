@@ -3,28 +3,27 @@ package com.example.myschool;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.myschool.databinding.ActivityMarksheetBinding;
-import com.example.myschool.databinding.ItemPrintMarksRowBinding;
 import com.example.myschool.model.ClassModel;
 import com.example.myschool.model.MarksRecord;
 import com.example.myschool.model.School;
 import com.example.myschool.model.Student;
 import com.example.myschool.model.Subject;
 import com.example.myschool.repository.FirebaseRepository;
-import com.example.myschool.utils.GradeCalculator;
 import com.example.myschool.utils.PdfGenerator;
 
 import java.io.File;
 import java.util.List;
-import java.util.Locale;
 
 public class MarksheetActivity extends AppCompatActivity {
 
@@ -39,7 +38,6 @@ public class MarksheetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         b = ActivityMarksheetBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
-        setSupportActionBar(b.toolbar);
         b.toolbar.setNavigationOnClickListener(v -> finish());
 
         student    = AppCache.selectedStudent;
@@ -60,66 +58,105 @@ public class MarksheetActivity extends AppCompatActivity {
             @Override public void onError(Exception e) { renderMarksheet(); }
         });
 
-        b.btnPrintMarksheet.setOnClickListener(v -> generateAndPrint());
-        b.btnShareMarksheet.setOnClickListener(v -> generateAndShare());
+        b.fabSavePdf.setOnClickListener(v -> generateAndPrint());
     }
 
     private void renderMarksheet() {
-        // School info
         if (school != null) {
-            b.tvPrintSchoolName.setText(school.name);
-            b.tvPrintSchoolAddress.setText(school.address != null ? school.address : "");
-            b.tvPrintBoard.setText("Board: " + (school.board != null ? school.board : ""));
+            String sch = school.name;
+            b.incPdfPaper.tvPdfMockSchool1.setText(sch);
+            b.incPdfPaper.tvPdfMockSchool2.setText(sch);
         }
-        // Guard against null examName
-        String examName = classModel.examName != null ? classModel.examName : "";
-        b.tvPrintExamTitle.setText(examName.toUpperCase(Locale.getDefault()) + " — REPORT CARD");
 
-        // Student info
-        b.tvPrintStudentName.setText(student.name);
-        b.tvPrintRollNo.setText(student.rollNo);
-        b.tvPrintClass.setText(classModel.getDisplayName());
+        String acYear = "2025-2026";
+        String subText = student.name + " | " + acYear + " | UID: " + student.rollNo;
+        b.incPdfPaper.tvPdfMockSub1.setText(subText);
+        b.incPdfPaper.tvPdfMockSub2.setText(subText);
 
-        // Marks rows
-        b.llPrintMarksRows.removeAllViews();
-        boolean alt = false;
-        // Build rows per subject.
-        if (classModel.subjects == null) {
-            classModel.subjects = new java.util.ArrayList<>();
-        }
+        b.incPdfPaper.llPdfMockRows1.removeAllViews();
+        b.incPdfPaper.llPdfMockRows2.removeAllViews();
+
+        if (classModel.subjects == null) classModel.subjects = new java.util.ArrayList<>();
+        
         for (Subject sub : classModel.subjects) {
-            ItemPrintMarksRowBinding row = ItemPrintMarksRowBinding.inflate(
-                    LayoutInflater.from(this), b.llPrintMarksRows, false);
             String safeKey = MarksRecord.sanitizeKey(sub.name);
-            double obt = marks.subjectMarks.containsKey(safeKey)
-                    ? marks.subjectMarks.get(safeKey) : 0;
-            double pct = GradeCalculator.getPercentage(obt, sub.maxMarks);
-            row.tvRowSubject.setText(sub.name);
-            row.tvRowMax.setText(String.valueOf(sub.maxMarks));
-            row.tvRowObtained.setText(formatMark(obt));
-            row.tvRowGrade.setText(GradeCalculator.getGrade(pct));
-            if (alt) row.getRoot().setBackgroundColor(0xFFF5F7FA);
-            alt = !alt;
-            b.llPrintMarksRows.addView(row.getRoot());
-        }
+            MarksRecord.SubjectMarksDetail d = null;
+            if (marks.detailedMarks != null && marks.detailedMarks.containsKey(safeKey)) {
+                d = marks.detailedMarks.get(safeKey);
+            }
 
-        // Totals
-        b.tvPrintTotalMax.setText(String.valueOf(marks.totalMax));
-        b.tvPrintTotalObtained.setText(formatMark(marks.totalObtained));
-        b.tvPrintGradeTotal.setText(marks.grade);
-        b.tvPrintPercentage.setText(String.format("%.2f%%", marks.percentage));
-        b.tvPrintResult.setText(marks.result);
-        boolean pass = "PASS".equals(marks.result);
-        b.tvPrintResult.setBackgroundResource(pass ? R.drawable.bg_result_pass : R.drawable.bg_result_fail);
-        b.tvPrintResult.setTextColor(getResources().getColor(
-                pass ? R.color.success : R.color.error, null));
+            // Row for Sem 1
+            b.incPdfPaper.llPdfMockRows1.addView(createMockRow(
+                sub.name, 
+                d != null && d.grade != null ? d.grade : "—", 
+                d != null && d.remark != null ? d.remark : ""
+            ));
+
+            // Row for Sem 2
+            b.incPdfPaper.llPdfMockRows2.addView(createMockRow(
+                sub.name, 
+                d != null && d.grade != null ? d.grade : "—", 
+                d != null && d.remark != null ? d.remark : ""
+            ));
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_print) { generateAndPrint(); return true; }
-        if (item.getItemId() == R.id.action_share) { generateAndShare(); return true; }
-        return super.onOptionsItemSelected(item);
+    private View createMockRow(String sub, String grade, String remark) {
+        LinearLayout row = new LinearLayout(this);
+        row.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        row.setOrientation(LinearLayout.HORIZONTAL);
+
+        TextView tvSub = new TextView(this);
+        tvSub.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3));
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 4);
+        tvSub.setTextColor(0xFF000000);
+        tvSub.setPadding(2, 2, 2, 2);
+        tvSub.setText(sub);
+
+        View div1 = new View(this);
+        div1.setLayoutParams(new LinearLayout.LayoutParams(1, LinearLayout.LayoutParams.MATCH_PARENT));
+        div1.setBackgroundColor(0xFF2962FF);
+
+        TextView tvGrade = new TextView(this);
+        tvGrade.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        tvGrade.setTextSize(TypedValue.COMPLEX_UNIT_SP, 4);
+        tvGrade.setTextColor(0xFF000000);
+        tvGrade.setPadding(2, 2, 2, 2);
+        tvGrade.setGravity(Gravity.CENTER);
+        tvGrade.setText(grade);
+
+        View div2 = new View(this);
+        div2.setLayoutParams(new LinearLayout.LayoutParams(1, LinearLayout.LayoutParams.MATCH_PARENT));
+        div2.setBackgroundColor(0xFF2962FF);
+
+        TextView tvRemark = new TextView(this);
+        tvRemark.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2));
+        tvRemark.setTextSize(TypedValue.COMPLEX_UNIT_SP, 4);
+        tvRemark.setTextColor(0xFF000000);
+        tvRemark.setPadding(2, 2, 2, 2);
+        tvRemark.setText(remark);
+
+        row.addView(tvSub);
+        row.addView(div1);
+        row.addView(tvGrade);
+        row.addView(div2);
+        row.addView(tvRemark);
+
+        LinearLayout wrapper = new LinearLayout(this);
+        wrapper.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        wrapper.setOrientation(LinearLayout.VERTICAL);
+        wrapper.addView(row);
+        
+        View bottomDiv = new View(this);
+        bottomDiv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        bottomDiv.setBackgroundColor(0xFF2962FF);
+        wrapper.addView(bottomDiv);
+
+        return wrapper;
     }
 
     private void generateAndPrint() {
@@ -128,13 +165,12 @@ public class MarksheetActivity extends AppCompatActivity {
         PdfGenerator.generate(this, school, classModel, student, marks, new PdfGenerator.PdfCallback() {
             @Override public void onSuccess(File f) {
                 runOnUiThread(() -> {
-                    // Bug #9 fix: removed unused PrintManager variable
                     Uri uri = FileProvider.getUriForFile(MarksheetActivity.this,
                             getPackageName() + ".fileprovider", f);
                     Intent view = new Intent(Intent.ACTION_VIEW);
                     view.setDataAndType(uri, "application/pdf");
                     view.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(view, "Open PDF to Print"));
+                    startActivity(Intent.createChooser(view, "Open PDF"));
                 });
             }
             @Override public void onError(Exception e) {
@@ -142,32 +178,5 @@ public class MarksheetActivity extends AppCompatActivity {
                         "PDF error: " + e.getMessage(), Toast.LENGTH_LONG).show());
             }
         });
-    }
-
-    private void generateAndShare() {
-        if (school == null) { Toast.makeText(this, "School data not loaded", Toast.LENGTH_SHORT).show(); return; }
-        Toast.makeText(this, "Generating PDF…", Toast.LENGTH_SHORT).show();
-        PdfGenerator.generate(this, school, classModel, student, marks, new PdfGenerator.PdfCallback() {
-            @Override public void onSuccess(File f) {
-                runOnUiThread(() -> {
-                    Uri uri = FileProvider.getUriForFile(MarksheetActivity.this,
-                            getPackageName() + ".fileprovider", f);
-                    Intent share = new Intent(Intent.ACTION_SEND);
-                    share.setType("application/pdf");
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                    share.putExtra(Intent.EXTRA_SUBJECT, "Report Card - " + student.name);
-                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(share, "Share Marksheet"));
-                });
-            }
-            @Override public void onError(Exception e) {
-                runOnUiThread(() -> Toast.makeText(MarksheetActivity.this,
-                        "PDF error: " + e.getMessage(), Toast.LENGTH_LONG).show());
-            }
-        });
-    }
-
-    private String formatMark(double v) {
-        return (v == Math.floor(v)) ? String.valueOf((int) v) : String.format("%.1f", v);
     }
 }

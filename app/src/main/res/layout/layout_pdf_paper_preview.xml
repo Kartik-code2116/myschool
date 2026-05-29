@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Miniature A4 PDF Preview Document -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llPdfPaperContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    android:background="@color/white"
+    android:padding="8dp">
+
+    <!-- LEFT PAGE (Semester 1) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/bg_pdf_mock_border">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp">
+            <TextView
+                android:id="@+id/tvPdfMockSchool1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="School Name"
+                android:textSize="6sp"
+                android:gravity="center"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/tvPdfMockSub1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Student Info | Academic Year | UID"
+                android:textSize="4sp"
+                android:gravity="center"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#2962FF"/>
+
+        <!-- Table Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#E3F2FD">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="3"
+                android:text="विषय" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+            <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="श्रेणी" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:gravity="center" android:fontFamily="sans-serif-medium"/>
+            <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"
+                android:text="वर्णनात्मक नोंद" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+        </LinearLayout>
+
+        <!-- Rows container -->
+        <LinearLayout
+            android:id="@+id/llPdfMockRows1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+            
+    </LinearLayout>
+
+    <!-- RIGHT PAGE (Semester 2) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="6dp"
+        android:background="@drawable/bg_pdf_mock_border">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp">
+            <TextView
+                android:id="@+id/tvPdfMockSchool2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="School Name"
+                android:textSize="6sp"
+                android:gravity="center"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/tvPdfMockSub2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Student Info | Academic Year | UID"
+                android:textSize="4sp"
+                android:gravity="center"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#2962FF"/>
+
+        <!-- Table Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#E3F2FD">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="3"
+                android:text="विषय" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+            <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="श्रेणी" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:gravity="center" android:fontFamily="sans-serif-medium"/>
+            <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"
+                android:text="वर्णनात्मक नोंद" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+        </LinearLayout>
+
+        <!-- Rows container -->
+        <LinearLayout
+            android:id="@+id/llPdfMockRows2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+            
+    </LinearLayout>
+
+</LinearLayout>

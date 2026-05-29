@@ -512,7 +512,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         try { m.totalDays   = Integer.parseInt(b.etTotalDays.getText().toString());   } catch (Exception ignored) {}
 
         // Semester
-        if (SessionContext.selectedSemester != null) {
+        if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             m.semesterId     = SessionContext.selectedSemester.id;
             m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
         } else {
