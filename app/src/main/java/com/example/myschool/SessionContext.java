@@ -101,8 +101,38 @@ public final class SessionContext {
             editor.putString("class_teacher", selectedClass.teacherName);
             editor.putString("class_asst_teacher", selectedClass.assistantTeacherName);
             editor.putInt("class_student_count", selectedClass.studentCount);
+            
+            // Serialize subjects
+            if (selectedClass.subjects != null) {
+                try {
+                    org.json.JSONArray arr = new org.json.JSONArray();
+                    for (com.example.myschool.model.Subject s : selectedClass.subjects) {
+                        org.json.JSONObject obj = new org.json.JSONObject();
+                        obj.put("name", s.name);
+                        obj.put("maxMarks", s.maxMarks);
+                        obj.put("maxNirikhshan", s.maxNirikhshan);
+                        obj.put("maxTondiKam", s.maxTondiKam);
+                        obj.put("maxPratyakshik", s.maxPratyakshik);
+                        obj.put("maxUpkram", s.maxUpkram);
+                        obj.put("maxPrakalp", s.maxPrakalp);
+                        obj.put("maxChachani", s.maxChachani);
+                        obj.put("maxSwadhyay", s.maxSwadhyay);
+                        obj.put("maxItar", s.maxItar);
+                        obj.put("maxTondi", s.maxTondi);
+                        obj.put("maxPratyakshikB", s.maxPratyakshikB);
+                        obj.put("maxLekhi", s.maxLekhi);
+                        arr.put(obj);
+                    }
+                    editor.putString("class_subjects_json", arr.toString());
+                } catch (org.json.JSONException e) {
+                    android.util.Log.e("SessionContext", "Error serializing subjects", e);
+                }
+            } else {
+                editor.remove("class_subjects_json");
+            }
         } else {
             editor.remove("class_id");
+            editor.remove("class_subjects_json");
         }
 
         editor.apply();
@@ -164,6 +194,35 @@ public final class SessionContext {
             selectedClass.teacherName = prefs.getString("class_teacher", "");
             selectedClass.assistantTeacherName = prefs.getString("class_asst_teacher", "");
             selectedClass.studentCount = prefs.getInt("class_student_count", 0);
+
+            // Deserialize subjects
+            String subjectsJson = prefs.getString("class_subjects_json", null);
+            if (subjectsJson != null) {
+                try {
+                    org.json.JSONArray arr = new org.json.JSONArray(subjectsJson);
+                    selectedClass.subjects = new java.util.ArrayList<>();
+                    for (int i = 0; i < arr.length(); i++) {
+                        org.json.JSONObject obj = arr.getJSONObject(i);
+                        com.example.myschool.model.Subject s = new com.example.myschool.model.Subject();
+                        s.name = obj.optString("name", "");
+                        s.maxMarks = obj.optInt("maxMarks", 100);
+                        s.maxNirikhshan = obj.optInt("maxNirikhshan", 0);
+                        s.maxTondiKam = obj.optInt("maxTondiKam", 0);
+                        s.maxPratyakshik = obj.optInt("maxPratyakshik", 0);
+                        s.maxUpkram = obj.optInt("maxUpkram", 0);
+                        s.maxPrakalp = obj.optInt("maxPrakalp", 0);
+                        s.maxChachani = obj.optInt("maxChachani", 0);
+                        s.maxSwadhyay = obj.optInt("maxSwadhyay", 0);
+                        s.maxItar = obj.optInt("maxItar", 0);
+                        s.maxTondi = obj.optInt("maxTondi", 0);
+                        s.maxPratyakshikB = obj.optInt("maxPratyakshikB", 0);
+                        s.maxLekhi = obj.optInt("maxLekhi", 0);
+                        selectedClass.subjects.add(s);
+                    }
+                } catch (org.json.JSONException e) {
+                    android.util.Log.e("SessionContext", "Error deserializing subjects", e);
+                }
+            }
         }
         
         syncToAppCache();

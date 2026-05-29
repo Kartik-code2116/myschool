@@ -73,12 +73,19 @@ public class ClassSetupActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(className)) { b.tilClass.setError("Select class"); return; }
         b.tilClass.setError(null);
 
-        ClassModel c = (AppCache.selectedClass != null && getIntent().getBooleanExtra("edit", false))
+        boolean isEdit = getIntent().getBooleanExtra("edit", false);
+        ClassModel c = (AppCache.selectedClass != null && isEdit)
                 ? AppCache.selectedClass : new ClassModel();
         
-        // Preserve already assigned subjects
+        // Preserve already assigned subjects or seed defaults for new classes
         if (c.subjects == null) {
             c.subjects = new ArrayList<>();
+        }
+        if (!isEdit && c.subjects.isEmpty()) {
+            c.subjects.add(new Subject("Marathi", 100));
+            c.subjects.add(new Subject("English", 100));
+            c.subjects.add(new Subject("Mathematics", 100));
+            c.subjects.add(new Subject("Science / EVS", 100));
         }
         
         c.schoolId  = (AppCache.selectedSchool != null && AppCache.selectedSchool.id != null) ? AppCache.selectedSchool.id : "";
@@ -129,7 +136,7 @@ public class ClassSetupActivity extends AppCompatActivity {
                 Toast.makeText(ClassSetupActivity.this, "Class saved!", Toast.LENGTH_SHORT).show();
                 c.id = id;
                 SessionContext.selectedClass = c;
-                SessionContext.syncToAppCache();
+                SessionContext.save(ClassSetupActivity.this);
                 setResult(RESULT_OK);
                 
                 if (shouldNavigateToSubjects) {

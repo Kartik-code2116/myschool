@@ -55,4 +55,17 @@ public class MarksRecord {
     }
 
     public MarksRecord() {}
+
+    public static String sanitizeKey(String key) {
+        if (key == null) return "unknown";
+        return key.replace(".", "_")
+                  .replace("#", "_")
+                  .replace("$", "_")
+                  .replace("[", "_")
+                  .replace("]", "_")
+                  .replace("/", "_")
+                  .replace("\\", "_")
+                  .replace("~", "_")
+                  .replace("*", "_");
+    }
 }

@@ -399,10 +399,7 @@ public class FirebaseRepository {
         c1.division = "A";
         c1.academicYearLabel = "2026-27";
         c1.studentCount = 2;
-        c1.subjects.add(new com.example.myschool.model.Subject("English", 100));
-        c1.subjects.add(new com.example.myschool.model.Subject("Mathematics", 100));
-        c1.subjects.add(new com.example.myschool.model.Subject("Science", 100));
-        c1.subjects.add(new com.example.myschool.model.Subject("Marathi", 100));
+        // No default subjects — teacher selects from the Subjects page
 
         ClassModel c2 = new ClassModel();
         c2.schoolId = schoolId;
@@ -412,10 +409,7 @@ public class FirebaseRepository {
         c2.division = "A";
         c2.academicYearLabel = "2026-27";
         c2.studentCount = 2;
-        c2.subjects.add(new com.example.myschool.model.Subject("English", 100));
-        c2.subjects.add(new com.example.myschool.model.Subject("Mathematics", 100));
-        c2.subjects.add(new com.example.myschool.model.Subject("Science", 100));
-        c2.subjects.add(new com.example.myschool.model.Subject("Marathi", 100));
+        // No default subjects — teacher selects from the Subjects page
 
         saveClass(c1, new OnResult<String>() {
             @Override public void onSuccess(String classId1) {

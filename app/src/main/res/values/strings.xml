@@ -7,7 +7,7 @@
     <string name="nav_schools">Schools</string>
     <string name="nav_students">Students</string>
     <string name="nav_reports">Reports</string>
-    <string name="nav_school_level">School Level</string>
+    <string name="nav_school_level" translatable="false">School Level</string>
     <!-- Login -->
     <string name="login_title">Welcome Back</string>
     <string name="login_subtitle">Sign in to your teacher account</string>

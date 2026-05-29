@@ -68,6 +68,10 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // FIX: Capture AppCache.selectedClass set by caller (openMarksEntry) BEFORE
+        // SessionContext.load() overwrites it with potentially stale SharedPrefs data.
+        ClassModel callerClass = AppCache.selectedClass;
+
         SessionContext.load(this);
         super.onCreate(savedInstanceState);
         b = ActivityEnterMarksBinding.inflate(getLayoutInflater());
@@ -77,7 +81,30 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         ocrHelper   = new OcrHelper();
         student     = AppCache.selectedStudent;
-        classModel  = AppCache.selectedClass;
+
+        // FIX: Build classModel by merging caller (in-memory, freshest) with SharedPrefs.
+        // Priority: callerClass subjects > SharedPrefs subjects > hardcoded fallback.
+        // This ensures subject toggle changes always appear immediately in marks entry.
+        classModel = AppCache.selectedClass; // from SessionContext.load()
+        if (classModel == null) classModel = callerClass;
+
+        // If same class but callerClass has fresher subject list — use it.
+        if (callerClass != null
+                && callerClass.subjects != null
+                && !callerClass.subjects.isEmpty()
+                && classModel != null) {
+            // callerClass was set by openMarksEntry from SessionContext.selectedClass
+            // just before starting this activity — it is always the freshest.
+            classModel.subjects = callerClass.subjects;
+            Log.d("ENTER_MARKS", "Using callerClass subjects: " + callerClass.subjects.size() + " subjects");
+        }
+
+        // Also keep AppCache and SessionContext in sync
+        AppCache.selectedClass = classModel;
+        if (SessionContext.selectedClass != null && classModel != null
+                && classModel.subjects != null) {
+            SessionContext.selectedClass.subjects = classModel.subjects;
+        }
 
         if (student == null || classModel == null) { finish(); return; }
 
@@ -94,13 +121,9 @@ public class EnterMarksActivity extends AppCompatActivity {
         b.tvMarksStudentName.setText(student.name);
         b.tvMarksRollClass.setText("Roll: " + student.rollNo + " | " + classModel.getDisplayName());
 
-        // Build one row per subject. Fallback to default subjects if none configured.
-        if (classModel.subjects == null || classModel.subjects.isEmpty()) {
+        // Build one row per subject.
+        if (classModel.subjects == null) {
             classModel.subjects = new ArrayList<>();
-            classModel.subjects.add(new Subject("English", 100));
-            classModel.subjects.add(new Subject("Mathematics", 100));
-            classModel.subjects.add(new Subject("Science", 100));
-            classModel.subjects.add(new Subject("Marathi", 100));
         }
         for (Subject sub : classModel.subjects) {
             addMarksRow(sub);
@@ -427,7 +450,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         }
 
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
-            String subName = classModel.subjects.get(i).name;
+            String subName = MarksRecord.sanitizeKey(classModel.subjects.get(i).name);
             ItemSubjectMarksRowBinding row = marksRows.get(i);
 
             if (m.detailedMarks != null && m.detailedMarks.containsKey(subName)) {
@@ -475,6 +498,11 @@ public class EnterMarksActivity extends AppCompatActivity {
         m.studentId = student.id;
         m.classId   = classModel.id;
         m.examName  = classModel.examName;
+
+        if (m.subjectMarks == null) m.subjectMarks = new java.util.HashMap<>();
+        if (m.subjectMax == null) m.subjectMax = new java.util.HashMap<>();
+        if (m.detailedMarks == null) m.detailedMarks = new java.util.HashMap<>();
+
         m.subjectMarks.clear();
         m.subjectMax.clear();
         m.detailedMarks.clear();
@@ -536,11 +564,12 @@ public class EnterMarksActivity extends AppCompatActivity {
             Log.d("SAVE_MARKS", "  [" + sub.name + "] akarik=" + d.akarikTotal
                     + " sanklit=" + d.sanklit + " total=" + d.grandTotal + " grade=" + d.grade);
 
-            m.detailedMarks.put(sub.name, d);
+            String safeKey = MarksRecord.sanitizeKey(sub.name);
+            m.detailedMarks.put(safeKey, d);
 
             // Backward compat (used by older MarksheetActivity / PDF legacy path)
-            m.subjectMarks.put(sub.name, (double) d.grandTotal);
-            m.subjectMax.put(sub.name, sub.maxMarks);
+            m.subjectMarks.put(safeKey, (double) d.grandTotal);
+            m.subjectMax.put(safeKey, sub.maxMarks);
 
             total    += d.grandTotal;
             maxTotal += sub.maxMarks;
@@ -560,18 +589,39 @@ public class EnterMarksActivity extends AppCompatActivity {
         FirebaseRepository.get().saveMarks(m, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
                 Log.d("SAVE_MARKS", "SUCCESS — Firestore doc id: " + id);
-                // Store saved marks in AppCache so next open shows them instantly (same session)
                 m.id = id;
                 AppCache.selectedMarks = m;
 
                 // Persist doc ID to SharedPreferences so it survives app restart.
-                // On next open, we fetch by doc ID directly — no query needed.
                 String prefKey = "marks_doc_" + m.studentId + "_" + m.classId;
                 getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
                         .edit()
                         .putString(prefKey, id)
                         .apply();
                 Log.d("SAVE_MARKS", "Saved docId to SharedPreferences key=" + prefKey);
+
+
+                // Patch the marks map immediately so instant-cache render shows new marks.
+                // Initialize the map if it was null (first save of the session).
+                if (AppCache.cachedMarksMap == null) {
+                    AppCache.cachedMarksMap = new java.util.HashMap<>();
+                }
+                AppCache.cachedMarksMap.put(student.id, m);
+                AppCache.cachedClassIdForStudents  = classModel.id;
+                AppCache.cachedSemesterIdForMarks  = m.semesterId;
+                Log.d("SAVE_MARKS", "Patched AppCache.cachedMarksMap for student=" + student.id);
+
+                // Patch descriptive entries cache too
+                if (AppCache.cachedDescriptiveMarksMap == null) {
+                    AppCache.cachedDescriptiveMarksMap = new java.util.HashMap<>();
+                }
+                AppCache.cachedDescriptiveMarksMap.put(student.id, m);
+                AppCache.cachedDescriptiveClassId     = classModel.id;
+                AppCache.cachedDescriptiveSemesterId  = m.semesterId;
+
+                // Clear repo marks cache so Firestore is queried fresh on next load
+                FirebaseRepository.get().clearMarksCache();
+                Log.d("SAVE_MARKS", "Cleared repo marks cache — fragment will re-fetch from Firestore.");
 
                 showLoading(false);
                 student.marksEntered = true;
@@ -583,34 +633,8 @@ public class EnterMarksActivity extends AppCompatActivity {
                         Log.e("SAVE_MARKS", "saveStudent FAILED: " + e.getMessage(), e);
                     }
                 });
-                // ── Direct cache patching for instant UI + clear repo cache for fresh fetch ──
-                // Patch AppCache so both dashboards render the new marks instantly (0ms).
-                // Then clear the repository's internal marks cache so the background
-                // re-fetch always hits Firestore for the freshest data (handles semester
-                // ID mismatches in cache keys).
 
-                // Patch Evaluation (Formative/Summative) AppCache
-                if (AppCache.cachedMarksMap != null
-                        && classModel.id.equals(AppCache.cachedClassIdForStudents)) {
-                    AppCache.cachedMarksMap.put(student.id, m);
-                    AppCache.cachedSemesterIdForMarks = m.semesterId;
-                    Log.d("SAVE_MARKS", "Patched AppCache.cachedMarksMap for student=" + student.id);
-                }
-
-                // Patch Descriptive Entries AppCache
-                if (AppCache.cachedDescriptiveMarksMap != null
-                        && classModel.id.equals(AppCache.cachedDescriptiveClassId)) {
-                    AppCache.cachedDescriptiveMarksMap.put(student.id, m);
-                    AppCache.cachedDescriptiveSemesterId = m.semesterId;
-                    Log.d("SAVE_MARKS", "Patched AppCache.cachedDescriptiveMarksMap for student=" + student.id);
-                }
-
-                // Clear the repository's internal marks cache so dashboards re-query
-                // Firestore in the background (eliminates stale cache-key mismatches).
-                FirebaseRepository.get().clearMarksCache();
-                Log.d("SAVE_MARKS", "Cleared repo marks cache — dashboards will re-fetch fresh from Firestore.");
-
-                Toast.makeText(EnterMarksActivity.this, "गुण जतन केले!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EnterMarksActivity.this, "गुण यशस्वीरित्या जतन केले गेले आहेत!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }
@@ -671,6 +695,19 @@ public class EnterMarksActivity extends AppCompatActivity {
         if (et == null || et.getText() == null) return 0;
         String s = et.getText().toString().trim();
         if (s.isEmpty()) return 0;
+        
+        // Convert Marathi digits to English digits
+        s = s.replace('०', '0')
+             .replace('१', '1')
+             .replace('२', '2')
+             .replace('३', '3')
+             .replace('४', '4')
+             .replace('५', '5')
+             .replace('६', '6')
+             .replace('७', '7')
+             .replace('८', '8')
+             .replace('९', '9');
+             
         try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
     }
 

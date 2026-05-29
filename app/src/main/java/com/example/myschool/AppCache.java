@@ -24,6 +24,8 @@ public class AppCache {
     public static List<Semester>     cachedSemesters;
     public static List<ClassModel>   cachedClasses;
 
+
+
     /** Teacher name — cached here for zero-latency display on home & profile screens. */
     public static String cachedTeacherName;
 

@@ -112,19 +112,15 @@ public class DescriptiveEntriesFragment extends Fragment {
             return;
         }
 
-        // Fallback default subjects if empty
-        if (activeClass.subjects == null || activeClass.subjects.isEmpty()) {
+        // Initialize subjects list if null
+        if (activeClass.subjects == null) {
             activeClass.subjects = new ArrayList<>();
-            activeClass.subjects.add(new Subject("English", 100));
-            activeClass.subjects.add(new Subject("Mathematics", 100));
-            activeClass.subjects.add(new Subject("Science", 100));
-            activeClass.subjects.add(new Subject("Marathi", 100));
         }
 
         // 1. Instant Cache rendering (zero-latency display):
         if (AppCache.cachedDescriptiveStudents != null 
-                && activeClass.id.equals(AppCache.cachedDescriptiveClassId)
-                && activeSemesterId.equals(AppCache.cachedDescriptiveSemesterId)) {
+                && java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)
+                && java.util.Objects.equals(activeSemesterId, AppCache.cachedDescriptiveSemesterId)) {
             List<Student> cachedList = AppCache.cachedDescriptiveStudents;
             Map<String, MarksRecord> cachedMarks = AppCache.cachedDescriptiveMarksMap != null ? AppCache.cachedDescriptiveMarksMap : new HashMap<>();
             
@@ -134,7 +130,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         // 2. Fetch from network in background (stale-while-revalidate):
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
-            @Override
+            @Override   
             public void onSuccess(List<Student> students) {
                 if (students == null) students = new ArrayList<>();
                 List<Student> finalList = students;
@@ -172,7 +168,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                             @Override
                             public void onError(Exception e) {
                                 if (isAdded() && b != null) {
-                                    if (AppCache.cachedDescriptiveStudents == null || !activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
+                                    if (AppCache.cachedDescriptiveStudents == null || !java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
                                         adapter.setData(finalList, new HashMap<>());
                                     }
                                 }
@@ -183,7 +179,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 if (isAdded()) {
-                    if (AppCache.cachedDescriptiveStudents == null || !activeClass.id.equals(AppCache.cachedDescriptiveClassId)) {
+                    if (AppCache.cachedDescriptiveStudents == null || !java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
                         Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -283,7 +279,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             students.addAll(list);
             marksMap.clear();
             marksMap.putAll(map);
-            notifyDataSetChanged();
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
         @NonNull
@@ -338,8 +334,9 @@ public class DescriptiveEntriesFragment extends Fragment {
 
                 // Load actual saved remark from Firestore data
                 String remarkVal = "";
-                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(sub.name)) {
-                    MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(sub.name);
+                String safeKey = MarksRecord.sanitizeKey(sub.name);
+                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
+                    MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
                     if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
                         remarkVal = detail.remark.trim();
                     }

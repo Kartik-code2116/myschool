@@ -626,7 +626,7 @@ public class PdfGenerator {
 
     private static MarksRecord.SubjectMarksDetail detail(MarksRecord rec, String subName) {
         if (rec == null || rec.detailedMarks == null) return null;
-        return rec.detailedMarks.get(subName);
+        return rec.detailedMarks.get(MarksRecord.sanitizeKey(subName));
     }
 
     private static String akarikMax(Subject sub) { return str(sub.maxMarks / 2); }
@@ -635,13 +635,13 @@ public class PdfGenerator {
     private static int sumAkarik(MarksRecord rec, List<Subject> subs) {
         int s = 0;
         if (rec == null || rec.detailedMarks == null) return s;
-        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(sub.name); if (d!=null) s += d.akarikTotal; }
+        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)); if (d!=null) s += d.akarikTotal; }
         return s;
     }
     private static int sumSanklit(MarksRecord rec, List<Subject> subs) {
         int s = 0;
         if (rec == null || rec.detailedMarks == null) return s;
-        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(sub.name); if (d!=null) s += d.sanklit; }
+        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)); if (d!=null) s += d.sanklit; }
         return s;
     }
 

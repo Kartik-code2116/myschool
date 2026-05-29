@@ -97,7 +97,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE1"
+                    android:text="निरी."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -124,7 +124,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE2"
+                    android:text="तोंडी."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -151,7 +151,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE3"
+                    android:text="प्रात्य."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -178,7 +178,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE4"
+                    android:text="उप."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -205,7 +205,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE5"
+                    android:text="प्रक."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -232,7 +232,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE6"
+                    android:text="चाच."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -259,7 +259,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE7"
+                    android:text="स्वा."
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -286,7 +286,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="FE8"
+                    android:text="इतर"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -338,7 +338,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="SE1"
+                        android:text="तोंडी."
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -365,7 +365,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="SE2"
+                        android:text="प्रात्य."
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -392,7 +392,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="SE3"
+                        android:text="लेखी"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -432,7 +432,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="FET"
+                        android:text="आका."
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -459,7 +459,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="SET"
+                        android:text="संक."
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -486,7 +486,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="TET"
+                        android:text="एकूण"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"

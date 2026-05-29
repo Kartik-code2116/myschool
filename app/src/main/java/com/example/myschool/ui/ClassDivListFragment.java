@@ -60,7 +60,7 @@ public class ClassDivListFragment extends Fragment {
                 selectedIndex = position;
                 adapter.setSelectedIndex(position);
                 SessionContext.selectedClass = c;
-                SessionContext.syncToAppCache();
+                SessionContext.save(getContext());
                 if (getActivity() instanceof HomeActivity) {
                     ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
                 }
@@ -173,7 +173,7 @@ public class ClassDivListFragment extends Fragment {
                 .setTitle(c.getDisplayName())
                 .setItems(opts, (d, which) -> {
                     SessionContext.selectedClass = c;
-                    SessionContext.syncToAppCache();
+                    SessionContext.save(getContext());
                     switch (which) {
                         case 0:
                             if (getActivity() instanceof HomeActivity) {
@@ -212,7 +212,7 @@ public class ClassDivListFragment extends Fragment {
 
         popup.setOnMenuItemClickListener(item -> {
             SessionContext.selectedClass = c;
-            SessionContext.syncToAppCache();
+            SessionContext.save(getContext());
             switch (item.getItemId()) {
                 case 1: // Subjects
                     if (getActivity() instanceof HomeActivity) {

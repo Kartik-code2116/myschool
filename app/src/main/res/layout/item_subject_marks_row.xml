@@ -124,7 +124,7 @@
                     android:fontFamily="sans-serif-medium"/>
             </LinearLayout>
 
-            <!-- Row 1: निरीक्षण | प्रकल्प -->
+            <!-- Row 1: निरीक्षण | तोंडीकाम -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -151,37 +151,10 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- प्रकल्प -->
+                <!-- तोंडीकाम -->
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_project" android:textSize="10sp"
-                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical">
-                        <EditText android:id="@+id/etPrakalp"
-                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
-                            android:inputType="number" android:textSize="14sp" android:gravity="center"
-                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
-                        <TextView android:id="@+id/tvPrakalpMax"
-                            android:layout_width="30dp" android:layout_height="wrap_content"
-                            android:text="/5" android:textSize="11sp"
-                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Row 2: तोंडीकाम | चाचणी -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="6dp">
-
-                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:orientation="vertical"
-                    android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:text="@string/label_oral_work" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
@@ -197,28 +170,9 @@
                             android:textColor="@color/on_surface_variant" android:gravity="center"/>
                     </LinearLayout>
                 </LinearLayout>
-
-                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:orientation="vertical"
-                    android:layout_marginStart="6dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_test" android:textSize="10sp"
-                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical">
-                        <EditText android:id="@+id/etChachani"
-                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
-                            android:inputType="number" android:textSize="14sp" android:gravity="center"
-                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
-                        <TextView android:id="@+id/tvChachaniMax"
-                            android:layout_width="30dp" android:layout_height="wrap_content"
-                            android:text="/5" android:textSize="11sp"
-                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
 
-            <!-- Row 3: प्रात्यक्षिक | स्वाध्याय -->
+            <!-- Row 2: प्रात्यक्षिक | उपक्रम -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -248,15 +202,15 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginStart="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_assignment" android:textSize="10sp"
+                        android:text="@string/label_activity" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
-                        <EditText android:id="@+id/etSwadhyay"
+                        <EditText android:id="@+id/etUpkram"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
-                        <TextView android:id="@+id/tvSwadhyayMax"
+                        <TextView android:id="@+id/tvUpkramMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
                             android:text="/5" android:textSize="11sp"
                             android:textColor="@color/on_surface_variant" android:gravity="center"/>
@@ -264,7 +218,53 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Row 4: उपक्रम | इतर -->
+            <!-- Row 3: प्रकल्प | चाचणी -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/label_project" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etPrakalp"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvPrakalpMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/5" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginStart="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="@string/label_test" android:textSize="10sp"
+                        android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <EditText android:id="@+id/etChachani"
+                            android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                            android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded" android:hint="0"/>
+                        <TextView android:id="@+id/tvChachaniMax"
+                            android:layout_width="30dp" android:layout_height="wrap_content"
+                            android:text="/5" android:textSize="11sp"
+                            android:textColor="@color/on_surface_variant" android:gravity="center"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 4: स्वाध्याय | इतर -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -275,15 +275,15 @@
                     android:layout_weight="1" android:orientation="vertical"
                     android:layout_marginEnd="6dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_activity" android:textSize="10sp"
+                        android:text="@string/label_assignment" android:textSize="10sp"
                         android:textColor="@color/on_surface_variant" android:layout_marginBottom="3dp"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="horizontal" android:gravity="center_vertical">
-                        <EditText android:id="@+id/etUpkram"
+                        <EditText android:id="@+id/etSwadhyay"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
-                        <TextView android:id="@+id/tvUpkramMax"
+                        <TextView android:id="@+id/tvSwadhyayMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
                             android:text="/5" android:textSize="11sp"
                             android:textColor="@color/on_surface_variant" android:gravity="center"/>
