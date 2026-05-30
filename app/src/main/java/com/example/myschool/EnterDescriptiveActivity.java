@@ -113,30 +113,44 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         }
 
         // Layer 2: SharedPreferences doc ID — fastest Firestore path, survives app restart
-        String prefKey = "marks_doc_" + student.id + "_" + classModel.id;
-        String storedDocId = getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
-                .getString(prefKey, null);
+        String prefKey = getMarksDocPrefKey();
+        String legacyPrefKey = "marks_doc_" + student.id + "_" + classModel.id;
+        android.content.SharedPreferences docPrefs = getSharedPreferences("marks_doc_ids", MODE_PRIVATE);
+        String storedDocId = docPrefs.getString(prefKey, null);
+        if (storedDocId == null) {
+            storedDocId = docPrefs.getString(legacyPrefKey, null);
+        }
+        final String finalStoredDocId = storedDocId;
         if (storedDocId != null) {
             Log.d("DESC_LOAD", "Layer2: fetching by stored docId=" + storedDocId);
             com.google.firebase.firestore.FirebaseFirestore.getInstance()
                     .collection("marks")
-                    .document(storedDocId)
+                    .document(finalStoredDocId)
                     .get()
                     .addOnSuccessListener(doc -> {
                         if (doc.exists()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m != null) {
+                                if (m.id == null || m.id.isEmpty()) {
+                                    m.id = doc.getId();
+                                }
+                                if (!isRecordForCurrentSelection(m)) {
+                                    Log.d("DESC_LOAD", "Layer2: stored doc belongs to a different student/class/semester");
+                                    runLayer3();
+                                    return;
+                                }
                                 // Only replace if this is a newer version than what we have
                                 if (existingMarks == null || m.updatedAt >= existingMarks.updatedAt) {
-                                    Log.d("DESC_LOAD", "Layer2 SUCCESS: loaded docId=" + storedDocId
+                                    Log.d("DESC_LOAD", "Layer2 SUCCESS: loaded docId=" + finalStoredDocId
                                             + " updatedAt=" + m.updatedAt);
                                     existingMarks = m;
                                     AppCache.selectedMarks = m;
+                                    docPrefs.edit().putString(prefKey, m.id).apply();
                                     fillExistingRemarks(m);
                                 }
                             }
                         } else {
-                            Log.d("DESC_LOAD", "Layer2: doc not found for id=" + storedDocId
+                            Log.d("DESC_LOAD", "Layer2: doc not found for id=" + finalStoredDocId
                                     + " — falling through to Layer3 query");
                             runLayer3();
                         }
@@ -153,8 +167,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     }
 
     private void runLayer3() {
-        String semId = SessionContext.selectedSemester != null
-                ? SessionContext.selectedSemester.id : "sem_1";
+        String semId = getActiveSemesterId();
         Log.d("DESC_LOAD", "Layer3: Firestore query student=" + student.id
                 + " class=" + classModel.id + " sem=" + semId);
         FirebaseRepository.get().getMarksForStudentAndSemester(
@@ -171,6 +184,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                                 if (m.id != null) {
                                     getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
                                             .edit()
+                                            .putString(getMarksDocPrefKey(), m.id)
                                             .putString("marks_doc_" + m.studentId + "_" + m.classId, m.id)
                                             .apply();
                                 }
@@ -184,6 +198,23 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                         Log.e("DESC_LOAD", "Layer3 FAILED: " + e.getMessage());
                     }
                 });
+    }
+
+    private String getActiveSemesterId() {
+        return SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null
+                ? SessionContext.selectedSemester.id : "sem_1";
+    }
+
+    private String getMarksDocPrefKey() {
+        return "marks_doc_" + student.id + "_" + classModel.id + "_" + getActiveSemesterId();
+    }
+
+    private boolean isRecordForCurrentSelection(MarksRecord record) {
+        if (record == null || student == null || classModel == null) return false;
+        if (student.id == null || !student.id.equals(record.studentId)) return false;
+        if (classModel.id == null || !classModel.id.equals(record.classId)) return false;
+        String semId = getActiveSemesterId();
+        return record.semesterId == null || record.semesterId.isEmpty() || semId.equals(record.semesterId);
     }
 
     private void addRemarkRow(Subject sub) {
@@ -267,6 +298,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         for (int i = 0; i < classModel.subjects.size() && i < remarkRows.size(); i++) {
             String subName = MarksRecord.sanitizeKey(classModel.subjects.get(i).name);
             ItemSubjectRemarkRowBinding row = remarkRows.get(i);
+            resetRemarkRow(row);
 
             if (m.detailedMarks != null && m.detailedMarks.containsKey(subName)) {
                 MarksRecord.SubjectMarksDetail d = m.detailedMarks.get(subName);
@@ -300,6 +332,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                         chip.setText(customRemark);
                         chip.setCheckable(true);
                         chip.setChecked(true);
+                        chip.setTag("custom_remark");
                         styleInteractiveChip(chip, true);
                         chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                             styleInteractiveChip(chip, isChecked);
@@ -310,6 +343,21 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                 }
             }
             updateSummaryText(row);
+        }
+    }
+
+    private void resetRemarkRow(ItemSubjectRemarkRowBinding row) {
+        for (int c = row.cgSelectedRemarks.getChildCount() - 1; c >= 0; c--) {
+            View child = row.cgSelectedRemarks.getChildAt(c);
+            if (child instanceof Chip) {
+                Chip chip = (Chip) child;
+                if ("custom_remark".equals(chip.getTag())) {
+                    row.cgSelectedRemarks.removeViewAt(c);
+                } else {
+                    chip.setChecked(false);
+                    styleInteractiveChip(chip, false);
+                }
+            }
         }
     }
 
@@ -368,9 +416,13 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                 AppCache.selectedMarks = m;
 
                 // Persist doc ID to SharedPreferences — both keys so both activities find it
-                String prefKey = "marks_doc_" + m.studentId + "_" + m.classId;
+                String prefKey = getMarksDocPrefKey();
+                String legacyPrefKey = "marks_doc_" + m.studentId + "_" + m.classId;
                 getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
-                        .edit().putString(prefKey, id).apply();
+                        .edit()
+                        .putString(prefKey, id)
+                        .putString(legacyPrefKey, id)
+                        .apply();
                 Log.d("SAVE_REMARKS", "Saved docId=" + id + " key=" + prefKey);
 
                 // ── Signal DescriptiveEntriesFragment to instant-patch this student's card ──
@@ -379,11 +431,15 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                 AppCache.descriptiveJustSavedRecord    = m;
 
                 // Also keep descriptive + formative caches in sync
-                if (AppCache.cachedDescriptiveMarksMap == null)
+                if (AppCache.cachedDescriptiveMarksMap == null
+                        || !java.util.Objects.equals(classModel.id, AppCache.cachedDescriptiveClassId)
+                        || !java.util.Objects.equals(m.semesterId, AppCache.cachedDescriptiveSemesterId)) {
                     AppCache.cachedDescriptiveMarksMap = new java.util.HashMap<>();
+                    AppCache.cachedDescriptiveClassId = classModel.id;
+                    AppCache.cachedDescriptiveSemesterId = m.semesterId;
+                    AppCache.cachedDescriptiveMarksComplete = true;
+                }
                 AppCache.cachedDescriptiveMarksMap.put(student.id, m);
-                AppCache.cachedDescriptiveClassId    = classModel.id;
-                AppCache.cachedDescriptiveSemesterId = m.semesterId;
 
                 if (AppCache.cachedMarksMap == null)
                     AppCache.cachedMarksMap = new java.util.HashMap<>();

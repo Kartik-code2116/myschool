@@ -665,13 +665,16 @@ public class EnterMarksActivity extends AppCompatActivity {
                 AppCache.cachedSemesterIdForMarks = m.semesterId;
                 Log.d("SAVE_MARKS", "Patched AppCache.cachedMarksMap for student=" + student.id);
 
-                // Patch descriptive entries cache too
-                if (AppCache.cachedDescriptiveMarksMap == null) {
+                // Patch descriptive entries cache too.
+                if (AppCache.cachedDescriptiveMarksMap == null
+                        || !java.util.Objects.equals(classModel.id, AppCache.cachedDescriptiveClassId)
+                        || !java.util.Objects.equals(m.semesterId, AppCache.cachedDescriptiveSemesterId)) {
                     AppCache.cachedDescriptiveMarksMap = new java.util.HashMap<>();
+                    AppCache.cachedDescriptiveClassId = classModel.id;
+                    AppCache.cachedDescriptiveSemesterId = m.semesterId;
+                    AppCache.cachedDescriptiveMarksComplete = true;
                 }
                 AppCache.cachedDescriptiveMarksMap.put(student.id, m);
-                AppCache.cachedDescriptiveClassId = classModel.id;
-                AppCache.cachedDescriptiveSemesterId = m.semesterId;
 
                 // Clear repo marks cache so Firestore is queried fresh on next load
                 FirebaseRepository.get().clearMarksCache();

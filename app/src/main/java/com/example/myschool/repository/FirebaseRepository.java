@@ -58,8 +58,8 @@ public class FirebaseRepository {
             String cacheKey = classId + "_" + semesterId;
             java.util.Map<String, MarksRecord> marksMap = cachedClassSemesterMarksMap.get(cacheKey);
             if (marksMap == null) {
-                marksMap = new java.util.HashMap<>();
-                cachedClassSemesterMarksMap.put(cacheKey, marksMap);
+                Log.d("FIRESTORE_MARKS", "Skipped creating partial marks cache for class=" + classId + " sem=" + semesterId + " student=" + studentId);
+                return;
             }
             marksMap.put(studentId, record);
             Log.d("FIRESTORE_MARKS", "Directly updated internal memory cache for class=" + classId + " sem=" + semesterId + " student=" + studentId);
@@ -755,6 +755,9 @@ public class FirebaseRepository {
                         for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m == null) continue;
+                            if (m.id == null || m.id.isEmpty()) {
+                                m.id = doc.getId();
+                            }
                             if (semesterId.equals(m.semesterId)) {
                                 // Perfect match — return immediately
                                 Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: FOUND exact match semId=" + semesterId);
@@ -838,6 +841,9 @@ public class FirebaseRepository {
                         for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m != null && m.studentId != null) {
+                                if (m.id == null || m.id.isEmpty()) {
+                                    m.id = doc.getId();
+                                }
                                 Log.d("FIRESTORE_MARKS", "  doc studentId=" + m.studentId
                                         + " semesterId=" + m.semesterId
                                         + " semesterNumber=" + m.semesterNumber

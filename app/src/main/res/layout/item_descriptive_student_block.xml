@@ -54,6 +54,16 @@
                 android:contentDescription="Options Menu" />
         </RelativeLayout>
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgSavedRemarkSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:singleLine="false"
+            app:chipSpacingHorizontal="4dp"
+            app:chipSpacingVertical="3dp" />
+
         <!-- Subject Cards Section: Horizontal Scrollable List (Slide Layout) -->
         <HorizontalScrollView
             android:id="@+id/layoutSubjectsScroll"

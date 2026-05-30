@@ -43,6 +43,7 @@ public class AppCache {
     public static Map<String, MarksRecord> cachedDescriptiveMarksMap;
     public static String cachedDescriptiveClassId;
     public static String cachedDescriptiveSemesterId;
+    public static boolean cachedDescriptiveMarksComplete = false;
 
     // ── Cross-screen save signals ─────────────────────────────────────────────
     // Set by EnterMarksActivity on success; consumed by FormativeSummativeFragment.onResume()
