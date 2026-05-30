@@ -118,6 +118,54 @@ public class PdfGenerator {
     // ═════════════════════════════════════════════════════════════════════════
     //  REPORT 1 — गुणपत्रक  (per-student, both semesters)
     // ═════════════════════════════════════════════════════════════════════════
+    //  COVER PAGE (Used by ReportPrintingFragment option 0)
+    // ═════════════════════════════════════════════════════════════════════════
+    public static void generateCoverPage(Context ctx,
+                                           School school,
+                                           ClassModel cls,
+                                           Student student,
+                                           MarksRecord sem1,
+                                           MarksRecord sem2,
+                                           PdfCallback cb) {
+        new Thread(() -> {
+            try {
+                ensureFonts(ctx);
+                File out = new File(outDir(ctx), "CoverPage_" + safeRoll(student) + "_" + ts() + ".pdf");
+                Document doc = new Document(PageSize.A4);
+                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                doc.open();
+                doc.setMargins(30, 30, 30, 30);
+                addCoverPageContent(doc, ctx, school, cls, student);
+                doc.close();
+                cb.onSuccess(out);
+            } catch (Exception e) { cb.onError(e); }
+        }).start();
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    //  INDEX PAGE (Used by ReportPrintingFragment option 1)
+    // ═════════════════════════════════════════════════════════════════════════
+    public static void generateIndexPage(Context ctx,
+                                           School school,
+                                           ClassModel cls,
+                                           java.util.List<Student> students,
+                                           PdfCallback cb) {
+        new Thread(() -> {
+            try {
+                ensureFonts(ctx);
+                File out = new File(outDir(ctx), "IndexPage_" + (cls != null ? nvl(cls.className).replaceAll("[^a-zA-Z0-9_-]", "") : "Class") + "_" + ts() + ".pdf");
+                Document doc = new Document(PageSize.A4);
+                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                doc.open();
+                doc.setMargins(30, 30, 30, 30);
+                addIndexPageContent(doc, ctx, school, cls, students);
+                doc.close();
+                cb.onSuccess(out);
+            } catch (Exception e) { cb.onError(e); }
+        }).start();
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
     public static void generateGunapattrak(Context ctx,
                                            School school,
                                            ClassModel cls,
@@ -133,76 +181,7 @@ public class PdfGenerator {
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
                 doc.setMargins(30, 30, 30, 30);
-
-                doc.add(buildSchoolHeader(school, cls));
-
-                Paragraph title = para("सातत्यपूर्ण सर्वकष मूल्यमापन — गुणपत्रक", colored(fHeader, C_DARK));
-                title.setAlignment(Element.ALIGN_CENTER);
-                title.setSpacingAfter(4);
-                doc.add(title);
-
-                doc.add(buildStudentInfoTable(school, cls, student));
-
-                // Marks table:  अ.नं | विषय | [Sem1: आकारिक|पैकी|संकलित|पैकी|एकूण|श्रेणी] | [Sem2: same]
-                PdfPTable tbl = new PdfPTable(new float[]{0.6f, 2.5f, 0.8f,0.5f,0.8f,0.5f,0.8f,0.7f, 0.8f,0.5f,0.8f,0.5f,0.8f,0.7f});
-                tbl.setWidthPercentage(100);
-                tbl.setSpacingBefore(6);
-                tbl.setSpacingAfter(4);
-
-                // Tier-1 headers
-                groupCell(tbl, "अ.नं",        C_PRIMARY,       C_WHITE,       1);
-                groupCell(tbl, "विषय",         C_PRIMARY,       C_WHITE,       1);
-                groupCell(tbl, "प्रथम सत्र",   C_PRIMARY_LIGHT, C_DARK,        6);
-                groupCell(tbl, "द्वितीय सत्र", C_PRIMARY,       C_WHITE,       6);
-
-                // Tier-2 sub-headers
-                String[] sem1H = {"आकारिक(अ)","पैकी","संकलित(ब)","पैकी","एकूण","श्रेणी"};
-                String[] sem2H = {"आकारिक(अ)","पैकी","संकलित(ब)","पैकी","एकूण","श्रेणी"};
-                cell(tbl, "", fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                cell(tbl, "", fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                for (String h : sem1H) cell(tbl, h, fSmallBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                for (String h : sem2H) cell(tbl, h, fSmallBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-
-                List<Subject> subjects = cls.subjects;
-                boolean alt = false;
-                for (int i = 0; i < subjects.size(); i++) {
-                    Subject sub = subjects.get(i);
-                    BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-                    cell(tbl, String.valueOf(i + 1), fNormal, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                    cell(tbl, sub.name,               fSmall,  bg, C_DARK, 1, Element.ALIGN_LEFT);
-                    for (MarksRecord rec : new MarksRecord[]{sem1, sem2}) {
-                        MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
-                        if (d != null) {
-                            cell(tbl, str(d.akarikTotal),  fNormal, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                            cell(tbl, akarikMax(sub),      fSmall,  bg, C_GREY, 1, Element.ALIGN_CENTER);
-                            cell(tbl, str(d.sanklit),      fNormal, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                            cell(tbl, sanklitMax(sub),     fSmall,  bg, C_GREY, 1, Element.ALIGN_CENTER);
-                            cell(tbl, str(d.grandTotal),   fBold,   bg, C_DARK, 1, Element.ALIGN_CENTER);
-                            cell(tbl, nvl(d.grade),        fBold,   bg, C_DARK, 1, Element.ALIGN_CENTER);
-                        } else {
-                            for (int k = 0; k < 6; k++) cell(tbl, "—", fSmall, bg, C_GREY, 1, Element.ALIGN_CENTER);
-                        }
-                    }
-                }
-
-                // Total row
-                cell(tbl, "",       fBold, C_PRIMARY_LIGHT, C_DARK, 1, Element.ALIGN_CENTER);
-                cell(tbl, "एकूण",  fBold, C_PRIMARY_LIGHT, C_DARK, 1, Element.ALIGN_LEFT);
-                for (MarksRecord rec : new MarksRecord[]{sem1, sem2}) {
-                    if (rec != null) {
-                        cell(tbl, str(sumAkarik(rec, subjects)),   fBold, C_PRIMARY_LIGHT, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "",                              fBold, C_PRIMARY_LIGHT, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, str(sumSanklit(rec, subjects)),  fBold, C_PRIMARY_LIGHT, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "",                              fBold, C_PRIMARY_LIGHT, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, fmt(rec.totalObtained),          fBold, C_PRIMARY_LIGHT, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, nvl(rec.grade),                  fBold, C_PRIMARY_LIGHT, C_DARK, 1, Element.ALIGN_CENTER);
-                    } else {
-                        for (int k = 0; k < 6; k++) cell(tbl, "—", fSmall, C_PRIMARY_LIGHT, C_GREY, 1, Element.ALIGN_CENTER);
-                    }
-                }
-                doc.add(tbl);
-                doc.add(buildAttendanceRow(sem1, sem2));
-                doc.add(buildSignatureRow(school, cls));
+                addGunapattrakContent(doc, ctx, school, cls, student, sem1, sem2);
                 doc.close();
                 cb.onSuccess(out);
             } catch (Exception e) { cb.onError(e); }
@@ -227,43 +206,50 @@ public class PdfGenerator {
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
                 doc.setMargins(30, 30, 30, 30);
+                addDescriptiveContent(doc, ctx, school, cls, student, sem1, sem2);
+                doc.close();
+                cb.onSuccess(out);
+            } catch (Exception e) { cb.onError(e); }
+        }).start();
+    }
 
-                doc.add(buildSchoolHeader(school, cls));
-
-                Paragraph title = para("सातत्यपूर्ण सर्वकष मूल्यमापन — गुणवर्णनिका", colored(fHeader, C_DARK));
-                title.setAlignment(Element.ALIGN_CENTER); title.setSpacingAfter(4);
-                doc.add(title);
-
-                doc.add(buildStudentInfoTable(school, cls, student));
-
-                // अ.नं | विषय | Sem1 remark | Sem2 remark
-                PdfPTable tbl = new PdfPTable(new float[]{0.5f, 2.2f, 3.1f, 3.1f});
-                tbl.setWidthPercentage(100); tbl.setSpacingBefore(6);
-
-                cell(tbl, "अ.नं",  fBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
-                cell(tbl, "विषय",  fBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
-                cell(tbl, "प्रथम सत्र — विषयवार वर्णनात्मक नोंद",   fBold, C_PRIMARY_LIGHT, C_DARK,  1, Element.ALIGN_CENTER);
-                cell(tbl, "द्वितीय सत्र — विषयवार वर्णनात्मक नोंद", fBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
-
-                String[] labels = subjectLabels(cls);
-                boolean alt = false;
-                for (int i = 0; i < labels.length; i++) {
-                    BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-                    String r1 = "", r2 = "";
-                    if (cls.subjects != null && i < cls.subjects.size()) {
-                        String sn = cls.subjects.get(i).name;
-                        MarksRecord.SubjectMarksDetail d1 = detail(sem1, sn);
-                        MarksRecord.SubjectMarksDetail d2 = detail(sem2, sn);
-                        if (d1 != null) r1 = nvl(d1.remark);
-                        if (d2 != null) r2 = nvl(d2.remark);
+    // ═════════════════════════════════════════════════════════════════════════
+    //  BULK COMBINED PDF GENERATOR (One file, Multiple Pages)
+    // ═════════════════════════════════════════════════════════════════════════
+    public static void generateBulkCombinedPdf(Context ctx,
+                                               School school,
+                                               ClassModel cls,
+                                               java.util.List<Student> students,
+                                               java.util.Map<String, MarksRecord> sem1Map,
+                                               java.util.Map<String, MarksRecord> sem2Map,
+                                               int reportPosition,
+                                               PdfCallback cb) {
+        new Thread(() -> {
+            try {
+                ensureFonts(ctx);
+                String rName = reportPosition == 2 ? "Gunapattrak" : (reportPosition == 3 ? "Descriptive" : "Personality");
+                File out = new File(outDir(ctx), "Bulk_" + rName + "_" + ts() + ".pdf");
+                Document doc = new Document(PageSize.A4);
+                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                doc.open();
+                
+                boolean isFirst = true;
+                for (Student student : students) {
+                    if (!isFirst) doc.newPage();
+                    isFirst = false;
+                    doc.setMargins(30, 30, 30, 30);
+                    MarksRecord s1 = sem1Map != null ? sem1Map.get(student.id) : null;
+                    MarksRecord s2 = sem2Map != null ? sem2Map.get(student.id) : null;
+                    
+                    if (reportPosition == 2) {
+                        addGunapattrakContent(doc, ctx, school, cls, student, s1, s2);
+                    } else if (reportPosition == 3) {
+                        addDescriptiveContent(doc, ctx, school, cls, student, s1, s2);
+                    } else {
+                        addPersonalityContent(doc, ctx, school, cls, student, s1, s2);
                     }
-                    PdfPCell nc = rawCell(String.valueOf(i + 1), fNormal, bg, C_DARK, Element.ALIGN_CENTER); tbl.addCell(nc);
-                    PdfPCell lc = rawCell(labels[i], fSmall, bg, C_DARK, Element.ALIGN_LEFT); tbl.addCell(lc);
-                    PdfPCell c1 = rawCell(r1, fNormal, bg, C_DARK, Element.ALIGN_LEFT); c1.setMinimumHeight(32f); tbl.addCell(c1);
-                    PdfPCell c2 = rawCell(r2, fNormal, bg, C_DARK, Element.ALIGN_LEFT); c2.setMinimumHeight(32f); tbl.addCell(c2);
                 }
-                doc.add(tbl);
-                doc.add(buildSignatureRow(school, cls));
+                
                 doc.close();
                 cb.onSuccess(out);
             } catch (Exception e) { cb.onError(e); }
@@ -284,86 +270,122 @@ public class PdfGenerator {
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Pragati_" + ts() + ".pdf");
-                Document doc = new Document(PageSize.A4.rotate());
+                Document doc = new Document(PageSize.A4);
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
-                doc.setMargins(18, 18, 18, 18);
+                doc.setMargins(30, 30, 30, 30);
 
-                List<Subject> subjects = cls.subjects;
-                if (subjects == null || subjects.isEmpty()) {
-                    doc.close(); cb.onError(new IllegalStateException("No subjects")); return;
+                // Page 1: Index (अनुक्रमणिका)
+                doc.add(buildAppHeader(ctx));
+                Paragraph indexTitle = para("अनुक्रमणिका", colored(fHeader, C_DARK));
+                indexTitle.setAlignment(Element.ALIGN_CENTER);
+                doc.add(indexTitle);
+                
+                PdfPTable indexTop = new PdfPTable(3);
+                indexTop.setWidthPercentage(100); indexTop.setSpacingBefore(10); indexTop.setSpacingAfter(10);
+                String udiseStr = "युडायस: " + (school.udiseCode!=null?school.udiseCode:"");
+                String schoolStr = "शाळा: " + (school.name!=null?school.name:"");
+                cellSpan(indexTop, udiseStr + "\n" + schoolStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
+                cellSpan(indexTop, "प्रथम सत्र", fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                String yearStr = "सन: " + (cls.academicYearLabel!=null?cls.academicYearLabel:"");
+                String classStr = "इयत्ता: " + (cls.className!=null?cls.className:"");
+                cellSpan(indexTop, yearStr + "\n" + classStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
+                doc.add(indexTop);
+
+                PdfPTable indexTbl = new PdfPTable(new float[]{0.6f, 3.0f, 1.0f, 1.2f, 0.8f});
+                indexTbl.setWidthPercentage(100);
+                cellSpan(indexTbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(indexTbl, "विद्यार्थ्याचे नाव", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(indexTbl, "रजि.नं.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(indexTbl, "जन्मतारीख", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(indexTbl, "पृष्ठ क्र.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+
+                boolean alt = false;
+                for (int i=0; i<students.size(); i++) {
+                    Student s = students.get(i);
+                    BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+                    cellSpan(indexTbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(indexTbl, nvl(s.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+                    cellSpan(indexTbl, "-", fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(indexTbl, "-", fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(indexTbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                 }
+                doc.add(indexTbl);
 
-                // Per-subject pages
-                for (int si = 0; si < subjects.size(); si++) {
-                    if (si > 0) doc.newPage();
-                    Subject sub = subjects.get(si);
-                    doc.add(buildProgressHeader(school, cls, sub.name));
+                // Pages 2+: Subjects
+                if (cls.subjects != null) {
+                    for (int si = 0; si < cls.subjects.size(); si++) {
+                        doc.newPage();
+                        Subject sub = cls.subjects.get(si);
+                        doc.add(buildAppHeader(ctx));
+                        
+                        PdfPTable top = new PdfPTable(3);
+                        top.setWidthPercentage(100); top.setSpacingBefore(10); top.setSpacingAfter(5);
+                        cellSpan(top, schoolStr + "\n" + classStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
+                        cellSpan(top, sub.name, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(top, yearStr + "\n" + "प्रथम सत्र", fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
+                        doc.add(top);
 
-                    // Cols: अ.नं | नाव | [Sem1: आकारिक|पैकी|संकलित|पैकी|एकूण|पैकी|श्रेणी] | [Sem2: same]
-                    PdfPTable tbl = new PdfPTable(new float[]{
-                            0.4f, 2.0f,
-                            0.65f,0.45f, 0.65f,0.45f, 0.7f,0.45f,0.6f,
-                            0.65f,0.45f, 0.65f,0.45f, 0.7f,0.45f,0.6f});
-                    tbl.setWidthPercentage(100); tbl.setSpacingBefore(3);
+                        float[] widths = {0.6f, 2.5f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
+                        PdfPTable tbl = new PdfPTable(widths);
+                        tbl.setWidthPercentage(100); tbl.setSpacingAfter(10);
 
-                    // Tier 1
-                    groupCell(tbl, "अ.नं",        C_HEADER_BG,     C_DARK,  1);
-                    groupCell(tbl, "विद्यार्थ्याचे नाव", C_HEADER_BG, C_DARK,  1);
-                    groupCell(tbl, "प्रथम सत्र",   C_PRIMARY_LIGHT, C_DARK,  7);
-                    groupCell(tbl, "द्वितीय सत्र", C_PRIMARY,       C_WHITE, 7);
+                        cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "आकारिक (अ)", fSmallBold, C_HEADER_BG, C_DARK, 8, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "संकलित (ब)", fSmallBold, C_HEADER_BG, C_DARK, 3, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "अ+ब", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "शे.गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
 
-                    // Tier 2
-                    cell(tbl, "", fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                    cell(tbl, "", fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                    for (int sem = 0; sem < 2; sem++) {
-                        for (String h : new String[]{"आकारिक","पैकी","संकलित","पैकी","एकूण","पैकी","श्रेणी"})
-                            cell(tbl, h, fSmallBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                    }
+                        String[] formatives = {"निरीक्षण", "तोंडीकाम", "प्रात्यक्षिक", "उपक्रम", "प्रकल्प", "चाचणी", "स्वाध्याय", "इतर"};
+                        for (String f : formatives) cellSpan(tbl, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "एकूण", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        String[] summatives = {"तोंडी", "प्रात्य.", "लेखी"};
+                        for (String s : summatives) cellSpan(tbl, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "एकूण", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
-                    // Max marks row
-                    cell(tbl, "", fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                    cell(tbl, "", fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                    for (int sem = 0; sem < 2; sem++) {
-                        cell(tbl, "",                     fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, akarikMax(sub),         fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "",                     fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, sanklitMax(sub),        fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "",                     fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, str(sub.maxMarks),      fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "",                     fSmallBold, C_HEADER_BG, C_GREY, 1, Element.ALIGN_CENTER);
-                    }
+                        alt = false;
+                        for (int i = 0; i < students.size(); i++) {
+                            Student s = students.get(i);
+                            BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+                            cellSpan(tbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                            cellSpan(tbl, nvl(s.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
 
-                    // Data
-                    boolean alt = false;
-                    for (int ri = 0; ri < students.size(); ri++) {
-                        Student st = students.get(ri);
-                        BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-                        cell(tbl, str(ri + 1),   fSmall, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, nvl(st.name),  fSmall, bg, C_DARK, 1, Element.ALIGN_LEFT);
-                        for (Map<String, MarksRecord> mp : new Map[]{sem1Marks, sem2Marks}) {
-                            MarksRecord rec = mp != null ? mp.get(st.id) : null;
-                            MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
+                            MarksRecord rec = null;
+                            if (sem1Marks != null) rec = sem1Marks.get(s.id);
+                            if (rec == null && sem2Marks != null) rec = sem2Marks.get(s.id);
+                            
+                            MarksRecord.SubjectMarksDetail d = rec != null ? detail(rec, sub.name) : null;
+
                             if (d != null) {
-                                cell(tbl, str(d.akarikTotal),  fSmall, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                                cell(tbl, akarikMax(sub),      fSmall, bg, C_GREY, 1, Element.ALIGN_CENTER);
-                                cell(tbl, str(d.sanklit),      fSmall, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                                cell(tbl, sanklitMax(sub),     fSmall, bg, C_GREY, 1, Element.ALIGN_CENTER);
-                                cell(tbl, str(d.grandTotal),   fSmall, bg, C_DARK, 1, Element.ALIGN_CENTER);
-                                cell(tbl, str(sub.maxMarks),   fSmall, bg, C_GREY, 1, Element.ALIGN_CENTER);
-                                cell(tbl, nvl(d.grade),        fSmall, bg, C_DARK, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.nirikhshan), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.tondiKam), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.pratyakshik), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.upkram), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.prakalp), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.chachani), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.swadhyay), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.itar), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, str(d.akarikTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                
+                                cellSpan(tbl, strZero(d.tondi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.pratyakshikB), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, strZero(d.lekhi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, str(d.sanklit), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                
+                                cellSpan(tbl, str(d.grandTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, calculatePercentageString(d.grandTotal, sub.maxMarks), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                                cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                             } else {
-                                for (int k = 0; k < 7; k++) cell(tbl, "—", fSmall, bg, C_GREY, 1, Element.ALIGN_CENTER);
+                                for (int k = 0; k < 16; k++) cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
                             }
                         }
+                        doc.add(tbl);
                     }
-                    doc.add(tbl);
                 }
-
-                // Summary page
-                doc.newPage();
-                doc.add(buildProgressHeader(school, cls, "सर्व विषय — एकत्रित निकाल"));
-                doc.add(buildSummaryTable(cls, students, sem1Marks, sem2Marks));
 
                 doc.close();
                 cb.onSuccess(out);
@@ -375,24 +397,446 @@ public class PdfGenerator {
     //  REPORT 4 — व्यक्तिमत्व नोंदी  (compact personality record)
     // ═════════════════════════════════════════════════════════════════════════
     public static void generatePersonalityRecord(Context ctx,
-                                                 School school,
-                                                 ClassModel cls,
-                                                 Student student,
-                                                 MarksRecord sem1,
-                                                 MarksRecord sem2,
-                                                 PdfCallback cb) {
+                                           School school,
+                                           ClassModel cls,
+                                           Student student,
+                                           MarksRecord sem1,
+                                           MarksRecord sem2,
+                                           PdfCallback cb) {
         new Thread(() -> {
             try {
                 ensureFonts(ctx);
-                File out = new File(outDir(ctx), "Vyaktimatva_" + safeRoll(student) + "_" + ts() + ".pdf");
+                File out = new File(outDir(ctx), "Personality_" + safeRoll(student) + "_" + ts() + ".pdf");
+                Document doc = new Document(PageSize.A4);
+                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                doc.open();
+                doc.setMargins(30, 30, 30, 30);
+                addPersonalityContent(doc, ctx, school, cls, student, sem1, sem2);
+                doc.close();
+                cb.onSuccess(out);
+            } catch (Exception e) { cb.onError(e); }
+        }).start();
+    }
+
+
+    // ═════════════════════════════════════════════════════════════════════════
+    //  COMBINED SINGLE-STUDENT REPORT (used by MarksheetActivity)
+    // ═════════════════════════════════════════════════════════════════════════
+    public static void generate(Context ctx, School school, ClassModel cls,
+                                Student student, MarksRecord marks, PdfCallback cb) {
+        new Thread(() -> {
+            try {
+                ensureFonts(ctx);
+                File out = new File(outDir(ctx), "CombinedReport_" + safeRoll(student) + "_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
                 doc.setMargins(30, 30, 30, 30);
 
+                // --- Page 1: Cover Page ---
+                addCoverPageContent(doc, ctx, school, cls, student);
+                doc.newPage();
+
+                // --- Page 2: Gunapattrak ---
+                addGunapattrakContent(doc, ctx, school, cls, student, marks, null);
+                
+                // --- Page 3: Descriptive ---
+                doc.newPage();
+                addDescriptiveContent(doc, ctx, school, cls, student, marks, null);
+
+                // --- Page 4: Personality ---
+                doc.newPage();
+                addPersonalityContent(doc, ctx, school, cls, student, marks, null);
+
+                doc.close();
+                cb.onSuccess(out);
+            } catch (Exception e) { cb.onError(e); }
+        }).start();
+    }
+
+    private static void addCoverPageContent(Document doc, Context ctx, School school, ClassModel cls, Student student) throws Exception {
+        // 1. Logo and Header
+        PdfPTable t = new PdfPTable(1);
+        t.setWidthPercentage(100);
+        PdfPCell c = new PdfPCell();
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+        try {
+            android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat.getDrawable(ctx, com.example.myschool.R.drawable.ic_school);
+            if (d != null) {
+                int w = d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : 100;
+                int h = d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : 100;
+                android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+                d.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                d.draw(canvas);
+
+                java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream);
+                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(stream.toByteArray());
+                img.setAlignment(Element.ALIGN_CENTER);
+                img.scaleToFit(60, 60);
+                c.addElement(img);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        Paragraph p1 = new Paragraph("जिल्हा परिषद", colored(fHeader, C_DARK));
+        p1.setAlignment(Element.ALIGN_CENTER);
+        p1.setSpacingBefore(10);
+        c.addElement(p1);
+        t.addCell(c);
+        doc.add(t);
+        
+        // 2. Year (सन)
+        String yearLabel = cls != null && cls.academicYearLabel != null ? cls.academicYearLabel : "2025-26";
+        Paragraph yearPara = new Paragraph("सन : " + yearLabel, colored(fHeader, C_DARK));
+        yearPara.setAlignment(Element.ALIGN_CENTER);
+        yearPara.setSpacingBefore(5);
+        yearPara.setSpacingAfter(40);
+        doc.add(yearPara);
+
+        // 3. Large Red Title
+        Font titleFont;
+        if (sMarathiBase != null) {
+            titleFont = new Font(sMarathiBase, 38, Font.BOLD, new BaseColor(244, 131, 145));
+        } else {
+            titleFont = new Font(Font.FontFamily.HELVETICA, 38, Font.BOLD, new BaseColor(244, 131, 145));
+        }
+        Paragraph title1 = new Paragraph("सातत्यपूर्ण सर्वंकष", titleFont);
+        title1.setAlignment(Element.ALIGN_CENTER);
+        doc.add(title1);
+        
+        Paragraph title2 = new Paragraph("मूल्यांकन", titleFont);
+        title2.setAlignment(Element.ALIGN_CENTER);
+        title2.setSpacingAfter(20);
+        doc.add(title2);
+
+        // Decorative light-blue divider
+        com.itextpdf.text.pdf.draw.LineSeparator ls = new com.itextpdf.text.pdf.draw.LineSeparator();
+        ls.setLineColor(new BaseColor(173, 216, 230)); // Light blue
+        ls.setLineWidth(1.5f);
+        ls.setPercentage(40);
+        ls.setAlignment(Element.ALIGN_CENTER);
+        doc.add(ls);
+        
+        // Additional spacing
+        Paragraph space = new Paragraph(" ");
+        space.setSpacingAfter(40);
+        doc.add(space);
+
+        // 4. White Information Box (clean left-aligned list)
+        PdfPTable box = new PdfPTable(1);
+        box.setWidthPercentage(85);
+        box.setSpacingBefore(30);
+        
+        PdfPCell boxCell = new PdfPCell();
+        boxCell.setBackgroundColor(C_WHITE); // White background
+        boxCell.setBorder(Rectangle.NO_BORDER);
+        boxCell.setPaddingTop(20);
+        boxCell.setPaddingBottom(20);
+        boxCell.setPaddingLeft(50);
+        boxCell.setPaddingRight(20);
+
+        PdfPTable tbl = new PdfPTable(new float[]{0.15f, 1.2f, 0.1f, 3.5f});
+        tbl.setWidthPercentage(100);
+
+        String[] keys = {"युडायस", "शाळा", "वर्गशिक्षक", "इयत्ता", "तुकडी"};
+        String[] vals = {
+            school != null ? nvl(school.udiseCode) : "",
+            school != null ? nvl(school.name) : "",
+            cls != null ? nvl(cls.teacherName) : "",
+            cls != null ? nvl(cls.className) : "",
+            cls != null ? nvl(cls.division) : "-"
+        };
+
+        for (int i = 0; i < keys.length; i++) {
+            PdfPCell c1 = new PdfPCell(new Phrase("●", colored(fHeader, C_DARK))); c1.setBorder(Rectangle.NO_BORDER); c1.setPaddingBottom(18);
+            PdfPCell c2 = new PdfPCell(new Phrase(keys[i], colored(fHeader, C_DARK))); c2.setBorder(Rectangle.NO_BORDER); c2.setPaddingBottom(18);
+            PdfPCell c3 = new PdfPCell(new Phrase(":", colored(fHeader, C_DARK))); c3.setBorder(Rectangle.NO_BORDER); c3.setPaddingBottom(18);
+            PdfPCell c4 = new PdfPCell(new Phrase(vals[i], colored(fHeader, C_DARK))); c4.setBorder(Rectangle.NO_BORDER); c4.setPaddingBottom(18);
+            tbl.addCell(c1); tbl.addCell(c2); tbl.addCell(c3); tbl.addCell(c4);
+        }
+
+        boxCell.addElement(tbl);
+        box.addCell(boxCell);
+        doc.add(box);
+    }
+
+    private static void addIndexPageContent(Document doc, Context ctx, School school, ClassModel cls, java.util.List<Student> students) throws Exception {
+        // Title
+        Paragraph title = new Paragraph("अनुक्रमणिका", colored(new Font(sMarathiBase, 22, Font.BOLD), new BaseColor(40, 40, 90)));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(15);
+        doc.add(title);
+
+        // Header Info table
+        PdfPTable headerTbl = new PdfPTable(3);
+        headerTbl.setWidthPercentage(100);
+        headerTbl.setWidths(new float[]{1.5f, 1f, 1f});
+
+        // Row 1
+        PdfPCell c1 = new PdfPCell(new Phrase("युडायस: " + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c2 = new PdfPCell(new Phrase("प्रथम सत्र", fBold)); c2.setBorder(Rectangle.NO_BORDER); c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell c3 = new PdfPCell(new Phrase("सन : " + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
+
+        // Row 2
+        PdfPCell c4 = new PdfPCell(new Phrase("शाळा: " + (school != null ? nvl(school.name) : ""), fBold)); c4.setBorder(Rectangle.NO_BORDER); c4.setColspan(2);
+        PdfPCell c5 = new PdfPCell(new Phrase("इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-"), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        headerTbl.addCell(c4); headerTbl.addCell(c5);
+        
+        headerTbl.setSpacingAfter(15);
+        doc.add(headerTbl);
+
+        // Students Table
+        PdfPTable tbl = new PdfPTable(5);
+        tbl.setWidthPercentage(100);
+        tbl.setWidths(new float[]{0.8f, 3.5f, 1.2f, 1.5f, 1f});
+
+        BaseColor headerBg = new BaseColor(218, 233, 245); // Light blue
+
+        String[] headers = {"अ.नं", "विद्यार्थ्याचे नाव", "रजि.नं.", "जन्मतारीख", "पृष्ठ क्र."};
+        for (String h : headers) {
+            PdfPCell c = new PdfPCell(new Phrase(h, fBold));
+            c.setBackgroundColor(headerBg);
+            c.setHorizontalAlignment(Element.ALIGN_CENTER);
+            c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            c.setPadding(8);
+            c.setBorderColor(C_DARK);
+            c.setBorderWidth(0.5f);
+            tbl.addCell(c);
+        }
+
+        if (students != null) {
+            int pageNo = 1;
+            for (int i = 0; i < students.size(); i++) {
+                Student s = students.get(i);
+                
+                PdfPCell[] row = new PdfPCell[5];
+                row[0] = new PdfPCell(new Phrase(String.valueOf(i + 1), fNormal));
+                row[1] = new PdfPCell(new Phrase(nvl(s.name), fNormal));
+                row[2] = new PdfPCell(new Phrase(nvl(s.registrationNo), fNormal));
+                row[3] = new PdfPCell(new Phrase(nvl(s.dob), fNormal));
+                row[4] = new PdfPCell(new Phrase(String.valueOf(pageNo++), fNormal));
+                
+                for (PdfPCell cell : row) {
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    cell.setPadding(8);
+                    cell.setBorderColor(C_DARK);
+                    cell.setBorderWidth(0.5f);
+                }
+                row[1].setHorizontalAlignment(Element.ALIGN_LEFT); // Align name to left
+                row[1].setPaddingLeft(10);
+                
+                for (PdfPCell cell : row) tbl.addCell(cell);
+            }
+        }
+        
+        doc.add(tbl);
+    }
+
+    private static void cellVerticalSpan(PdfPTable tbl, String text, Font font, BaseColor bg, BaseColor border, int colSpan, int rowSpan) {
+        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        if (bg != null) c.setBackgroundColor(bg);
+        if (border != null) c.setBorderColor(border);
+        c.setColspan(colSpan);
+        c.setRowspan(rowSpan);
+        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setPadding(4);
+        c.setRotation(90);
+        c.setMinimumHeight(80f);
+        tbl.addCell(c);
+    }
+
+    private static void addGunapattrakContent(Document doc, Context ctx, School school, ClassModel cls, Student student, MarksRecord sem1, MarksRecord sem2) throws Exception {
+
+        doc.add(buildAppHeader(ctx));
+        doc.add(buildSchoolHeader(school, cls));
+
+        // Title
+        Paragraph title = new Paragraph("सातत्यपूर्ण सर्वकष मूल्यमापन", new Font(sMarathiBase, 18, Font.BOLD, C_DARK));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(15);
+        doc.add(title);
+
+        // Header Info table
+        PdfPTable headerTbl = new PdfPTable(3);
+        headerTbl.setWidthPercentage(100);
+        headerTbl.setWidths(new float[]{1.5f, 1f, 1f});
+
+        // Row 1
+        PdfPCell c1 = new PdfPCell(new Phrase("नाव: " + (student != null ? nvl(student.name) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c2 = new PdfPCell(new Phrase(" ", fBold)); c2.setBorder(Rectangle.NO_BORDER); // Empty middle
+        PdfPCell c3 = new PdfPCell(new Phrase("सन : " + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
+
+        // Row 2
+        String termLabel = sem1 != null ? "प्रथम सत्र" : "द्वितीय सत्र";
+        PdfPCell c4 = new PdfPCell(new Phrase("इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-"), fBold)); c4.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c5 = new PdfPCell(new Phrase("रोल नं.: " + (student != null ? nvl(student.rollNo) : ""), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell c6 = new PdfPCell(new Phrase(termLabel, fBold)); c6.setBorder(Rectangle.NO_BORDER); c6.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        headerTbl.addCell(c4); headerTbl.addCell(c5); headerTbl.addCell(c6);
+        
+        headerTbl.setSpacingAfter(10);
+        doc.add(headerTbl);
+
+        // Marks table (19 columns)
+        float[] widths = {0.6f, 1.8f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
+        PdfPTable tbl = new PdfPTable(widths);
+        tbl.setWidthPercentage(100);
+        tbl.setSpacingBefore(6);
+        tbl.setSpacingAfter(4);
+
+        // Row 1
+        cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        cellSpan(tbl, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+        cellSpan(tbl, "आकारिक (अ)", fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
+        cellSpan(tbl, "संकलित (ब)", fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+        cellVerticalSpan(tbl, "अ+ब", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        cellVerticalSpan(tbl, "शे.गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        cellVerticalSpan(tbl, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+
+        // Row 2
+        cellSpan(tbl, "विषय", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(tbl, "गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        
+        String[] formatives = {"निरीक्षण", "तोंडीकाम", "प्रात्यक्षिक", "उपक्रम", "प्रकल्प", "चाचणी", "स्वाध्याय", "इतर", "एकूण"};
+        for (String f : formatives) cellVerticalSpan(tbl, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        
+        String[] summatives = {"तोंडी", "प्रात्य.", "लेखी", "एकूण"};
+        for (String s : summatives) cellVerticalSpan(tbl, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+
+        // Row 3
+        String[] numbers = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        for (String n : numbers) cellSpan(tbl, n, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Formative total empty
+        for (int i=0; i<4; i++) cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Summative empty
+
+                MarksRecord rec = sem1 != null ? sem1 : sem2;
+                List<Subject> subjects = cls.subjects;
+                boolean alt = false;
+                for (int i = 0; i < (subjects != null ? subjects.size() : 0); i++) {
+                    Subject sub = subjects.get(i);
+                    BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+                    MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
+
+                    // Row A: प्राप्त
+                    cellSpan(tbl, String.valueOf(i + 1), fSmall, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    cellSpan(tbl, sub.name, fSmall, bg, C_DARK, 1, 2, Element.ALIGN_LEFT);
+                    cellSpan(tbl, "प्राप्त", fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    
+                    if (d != null) {
+                        cellSpan(tbl, strZero(d.nirikhshan), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.tondiKam), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.pratyakshik), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.upkram), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.prakalp), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.chachani), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.swadhyay), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.itar), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.akarikTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        
+                        cellSpan(tbl, strZero(d.tondi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.pratyakshikB), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strZero(d.lekhi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.sanklit), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        
+                        cellSpan(tbl, str(d.grandTotal), fSmallBold, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, calculatePercentageString(d.grandTotal, sub.maxMarks), fSmall, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    } else {
+                        for (int k = 0; k < 13; k++) cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 2, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 2, Element.ALIGN_CENTER);
+                    }
+
+                    // Row B: पैकी
+                    cellSpan(tbl, "पैकी", fSmallBold, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxNirikhshan), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxTondiKam), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxPratyakshik), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxUpkram), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxPrakalp), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxChachani), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxSwadhyay), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxItar), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, str(sub.maxMarks / 2), fSmallBold, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    
+                    cellSpan(tbl, strZero(sub.maxTondi), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxPratyakshikB), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strZero(sub.maxLekhi), fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, str(sub.maxMarks - sub.maxMarks / 2), fSmallBold, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                }
+                doc.add(tbl);
+                
+                // Signature Row at bottom
+                PdfPTable sigTbl = new PdfPTable(3);
+                sigTbl.setWidthPercentage(100);
+                sigTbl.setSpacingBefore(40);
+                
+                PdfPCell cSig1 = new PdfPCell(new Phrase("वर्गशिक्षक स्वाक्षरी\n" + (cls != null ? nvl(cls.teacherName) : ""), fSmallBold));
+                cSig1.setBorder(Rectangle.NO_BORDER); cSig1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                
+                PdfPCell cSig2 = new PdfPCell(new Phrase(" ", fSmallBold));
+                cSig2.setBorder(Rectangle.NO_BORDER); cSig2.setHorizontalAlignment(Element.ALIGN_CENTER);
+                
+                PdfPCell cSig3 = new PdfPCell(new Phrase("मुख्याध्यापक स्वाक्षरी\n" + (school != null ? nvl(school.principalName) : ""), fSmallBold));
+                cSig3.setBorder(Rectangle.NO_BORDER); cSig3.setHorizontalAlignment(Element.ALIGN_CENTER);
+                
+                sigTbl.addCell(cSig1); sigTbl.addCell(cSig2); sigTbl.addCell(cSig3);
+                doc.add(sigTbl);
+    }
+
+    private static void addDescriptiveContent(Document doc, Context ctx, School school, ClassModel cls, Student student, MarksRecord sem1, MarksRecord sem2) throws Exception {
+
+
+                doc.add(buildAppHeader(ctx));
                 doc.add(buildSchoolHeader(school, cls));
 
-                Paragraph title = para("सातत्यपूर्ण सर्वकष मूल्यमापन — व्यक्तिमत्व विकास नोंदी", colored(fHeader, C_DARK));
+                Paragraph title = para("गुणवर्णनिका", colored(fHeader, C_DARK));
+                title.setAlignment(Element.ALIGN_CENTER); title.setSpacingAfter(4);
+                doc.add(title);
+
+                doc.add(buildStudentInfoTable(school, cls, student));
+
+                // अ.नं | विषय | विषयवार वर्णनात्मक नोंद
+                PdfPTable tbl = new PdfPTable(new float[]{0.6f, 2.5f, 6.0f});
+                tbl.setWidthPercentage(100); tbl.setSpacingBefore(6);
+
+                cell(tbl, "अ.नं",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
+                cell(tbl, "विषय",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
+                cell(tbl, "विषयवार वर्णनात्मक नोंद",   fBold, C_HEADER_BG, C_DARK,  1, Element.ALIGN_CENTER);
+
+                String[] labels = subjectLabels(cls);
+                boolean alt = false;
+                for (int i = 0; i < labels.length; i++) {
+                    BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+                    String remark = "";
+                    if (cls.subjects != null && i < cls.subjects.size()) {
+                        String sn = cls.subjects.get(i).name;
+                        MarksRecord.SubjectMarksDetail d = detail(sem1 != null ? sem1 : sem2, sn);
+                        if (d != null) remark = nvl(d.remark);
+                    }
+                    PdfPCell nc = rawCell(String.valueOf(i + 1), fNormal, bg, C_DARK, Element.ALIGN_CENTER); tbl.addCell(nc);
+                    PdfPCell lc = rawCell(labels[i], fNormal, bg, C_DARK, Element.ALIGN_LEFT); lc.setMinimumHeight(28f); tbl.addCell(lc);
+                    PdfPCell rc = rawCell(remark, fNormal, bg, C_DARK, Element.ALIGN_LEFT); rc.setMinimumHeight(28f); tbl.addCell(rc);
+                }
+                doc.add(tbl);
+                doc.add(buildSignatureRow(school, cls));
+                
+    }
+
+    private static void addPersonalityContent(Document doc, Context ctx, School school, ClassModel cls, Student student, MarksRecord sem1, MarksRecord sem2) throws Exception {
+
+
+                doc.add(buildAppHeader(ctx));
+                doc.add(buildSchoolHeader(school, cls));
+
+                Paragraph title = para("व्यक्तिमत्व विकास नोंदी", colored(fHeader, C_DARK));
                 title.setAlignment(Element.ALIGN_CENTER); title.setSpacingAfter(4);
                 doc.add(title);
 
@@ -427,23 +871,49 @@ public class PdfGenerator {
                 doc.add(tbl);
                 doc.add(buildMarksSummaryBox(sem1, sem2));
                 doc.add(buildSignatureRow(school, cls));
-                doc.close();
-                cb.onSuccess(out);
-            } catch (Exception e) { cb.onError(e); }
-        }).start();
+                
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  LEGACY — single-semester (used by MarksheetActivity)
-    // ═════════════════════════════════════════════════════════════════════════
-    public static void generate(Context context, School school, ClassModel classModel,
-                                Student student, MarksRecord marks, PdfCallback callback) {
-        generateGunapattrak(context, school, classModel, student, marks, null, callback);
-    }
 
     // ═════════════════════════════════════════════════════════════════════════
     //  SHARED BLOCKS
     // ═════════════════════════════════════════════════════════════════════════
+
+    private static PdfPTable buildAppHeader(Context ctx) throws DocumentException {
+        PdfPTable t = new PdfPTable(1);
+        t.setWidthPercentage(100);
+        t.setSpacingAfter(8);
+        PdfPCell c = new PdfPCell();
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+        try {
+            android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat.getDrawable(ctx, com.example.myschool.R.drawable.ic_school);
+            if (d != null) {
+                int w = d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : 100;
+                int h = d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : 100;
+                android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+                d.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                d.draw(canvas);
+
+                java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream);
+                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(stream.toByteArray());
+                img.setAlignment(Element.ALIGN_CENTER);
+                img.scaleToFit(50, 50);
+                c.addElement(img);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Paragraph p = new Paragraph("MySchool", colored(fTitle, C_DARK));
+        p.setAlignment(Element.ALIGN_CENTER);
+        c.addElement(p);
+        t.addCell(c);
+        return t;
+    }
 
     private static PdfPTable buildSchoolHeader(School school, ClassModel cls) throws DocumentException {
         PdfPTable t = new PdfPTable(1);
@@ -612,6 +1082,19 @@ public class PdfGenerator {
         return c;
     }
 
+    private static void cellSpan(PdfPTable t, String text, Font font, BaseColor bg, BaseColor textColor, int colspan, int rowspan, int align) {
+        PdfPCell c = rawCell(text, font, bg, textColor, align);
+        if (colspan > 1) c.setColspan(colspan);
+        if (rowspan > 1) c.setRowspan(rowspan);
+        t.addCell(c);
+    }
+
+    private static String calculatePercentageString(int obtained, int max) {
+        if (max == 0) return "-";
+        double p = (obtained * 100.0) / max;
+        return fmt(p);
+    }
+
     private static Font colored(Font src, BaseColor color) {
         Font f = new Font(src); f.setColor(color); return f;
     }
@@ -666,7 +1149,8 @@ public class PdfGenerator {
                 "आवड, छंद कला, क्रीडा","सुधारणा आवश्यक","व्यक्तिमत्व गुण विशेष"};
     }
 
-    private static String nvl(String s)   { return s != null ? s : "—"; }
+    private static String strZero(int v)  { return v > 0 ? String.valueOf(v) : "-"; }
+    private static String nvl(String s)   { return s != null && !s.isEmpty() ? s : "-"; }
     private static String str(int v)      { return String.valueOf(v); }
     private static String str(double v)   { return fmt(v); }
     private static String fmt(double v)   { return v==Math.floor(v)?str((int)v):String.format(Locale.getDefault(),"%.1f",v); }

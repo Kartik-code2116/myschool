@@ -32,10 +32,29 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
     private OnItemClickListener listener;
 
     public ReportPrintingAdapter() {
-        items.add(new ReportTemplate("गुणपत्रक", "१. प्रगती व गुणपत्रक", "प्रथम व द्वितीय सत्र गुणांचे एकत्रित गुणपत्रक (A4)"));
-        items.add(new ReportTemplate("गुणवर्णनिका", "२. वर्णनात्मक नोंद वही", "विषयनिहाय शिक्षकांच्या गुणात्मक नोंदी (वर्णनिका)"));
-        items.add(new ReportTemplate("प्रगतीपुस्तक", "३. एकत्रित वर्ग निकाल तक्ता", "इयत्ता तुकडीनुसार वार्षिक वर्गवार निकाल पत्रक (Roster)"));
-        items.add(new ReportTemplate("नोंदी", "४. व्यक्तिमत्व विकास पुस्तिका", "विद्यार्थी मूलभूत, बँक व कौटुंबिक माहिती पुस्तिका (A5)"));
+        // नोंदवही (Register/Book) reports
+        items.add(new ReportTemplate("नोंदवही",  "1. मुखपृष्ठ",                  "नोंदवहीचे आकर्षक मुखपृष्ठ"));
+        items.add(new ReportTemplate("नोंदवही",  "2. अनुक्रमणिका",               "सत्र एक वा दोन अनुसार अनुक्रमणिका"));
+        items.add(new ReportTemplate("नोंदवही",  "3. गुणनोंदी",                  "तंत्रे व श्रेणीसहित आकारिक-संकलित गुणनोंदी"));
+        items.add(new ReportTemplate("नोंदवही",  "4. वर्णनात्मक नोंदी",          "सत्रानुसार विद्यार्थ्यांच्या वर्णनात्मक नोंदी"));
+        items.add(new ReportTemplate("नोंदवही",  "5. श्रेणी तक्का",              "सत्र व विषयनुसार गुण व श्रेणी तक्का"));
+        // निकालपत्रक (Result Sheet) reports
+        items.add(new ReportTemplate("निकालपत्रक", "6. सर्वसामावेशक निकाल",     "आकारिक-संकलित गण श्रेणीयुक्त"));
+        items.add(new ReportTemplate("निकालपत्रक", "7. श्रेणी तक्का",            "सत्र, वर्गवार मुले-मुली श्रेणी तक्का"));
+        items.add(new ReportTemplate("निकालपत्रक", "8. गुण-श्रेणीयुक्त निकालपत्रक", "विषयवार एकूण गुण व श्रेणीयुक्त"));
+        // गुणपत्रक (Marksheet) reports
+        items.add(new ReportTemplate("गुणपत्रक",  "9. प्रगतीपत्रक मुखपृष्ठ",    "A4 साईज कलरफुल प्रगतीपत्रक"));
+        items.add(new ReportTemplate("गुणपत्रक",  "10. प्रगतीपत्रक पृष्ठ",       "A4 साईज प्रगतीपत्रक आतील पृष्ठ"));
+        // तक्के (Tables) reports
+        items.add(new ReportTemplate("तक्के",     "11. उपयुक्त रिपोर्ट",         "विषयवार गुणतक्के"));
+        // प्रगतीपुस्तक (Progress Book) reports
+        items.add(new ReportTemplate("प्रगतीपुस्तक", "12. पाचवी आठवी गुणपत्रक", "इयत्ता पाचवी / आठवी गुणपत्रक"));
+        // तक्के (Tables) reports continued
+        items.add(new ReportTemplate("तक्के",     "13. पाचवी आठवी वार्षिक तक्के", "इयत्ता पाचवी / आठवी गुणतक्का"));
+        // गुणपत्रक (Marksheet) reports continued
+        items.add(new ReportTemplate("गुणपत्रक",  "14. प्रगतीपत्रक मुखपृष्ठ",   "A4 साईज कलरफुल प्रगतीपत्रक"));
+        // निकालपत्रक (Result Sheet) continued
+        items.add(new ReportTemplate("निकालपत्रक", "15. वार्षिक निकालपत्रक",     "सत्र व विषयनुसार गुण व श्रेणी तक्का"));
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -58,6 +77,18 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         b.tvReportCategory.setText(item.category);
         b.tvReportTitle.setText(item.title);
         b.tvReportDescription.setText(item.description);
+
+        // Category colour-coding matches the screenshots
+        int categoryColor;
+        switch (item.category) {
+            case "नोंदवही":       categoryColor = 0xFF5A4FCF; break; // indigo
+            case "निकालपत्रक":  categoryColor = 0xFFD32F2F; break; // red
+            case "गुणपत्रक":   categoryColor = 0xFF6A5ACD; break; // purple
+            case "तक्के":      categoryColor = 0xFF757575; break; // grey
+            case "प्रगतीपुस्तक": categoryColor = 0xFF388E3C; break; // green
+            default:              categoryColor = 0xFF888888; break;
+        }
+        b.tvReportCategory.setTextColor(categoryColor);
 
         b.cardReportItem.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item, position);

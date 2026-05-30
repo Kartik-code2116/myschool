@@ -682,6 +682,13 @@ public class EnterMarksActivity extends AppCompatActivity {
                 }
                 AppCache.cachedDescriptiveMarksMap.put(student.id, m);
 
+                // Set cross-screen save signals so FormativeSummativeFragment
+                // can instantly patch this student's card without waiting for Firestore.
+                AppCache.marksJustSaved = true;
+                AppCache.marksJustSavedStudentId = student.id;
+                AppCache.marksJustSavedRecord = m;
+                Log.d("SAVE_MARKS", "Set marksJustSaved signals for student=" + student.id);
+
                 // Clear repo marks cache so Firestore is queried fresh on next load
                 FirebaseRepository.get().clearMarksCache();
                 Log.d("SAVE_MARKS", "Cleared repo marks cache — fragment will re-fetch from Firestore.");
