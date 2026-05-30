@@ -331,6 +331,30 @@ public class FormativeSummativeFragment extends Fragment {
             }
         }
 
+        // FIX: If marks were just saved in EnterMarksActivity:
+        // 1. Instantly patch only that student's card — 0ms, no network
+        // 2. Then do a full Firestore reload in background to confirm
+        if (AppCache.marksJustSaved
+                && AppCache.marksJustSavedStudentId != null
+                && AppCache.marksJustSavedRecord != null) {
+
+            android.util.Log.d("FORMATIVE_SUMMATIVE", "marksJustSaved=true for student="
+                    + AppCache.marksJustSavedStudentId + " — patching adapter instantly");
+
+            // Instant patch: update only the one card that changed
+            adapter.patchStudentMarks(
+                    AppCache.marksJustSavedStudentId,
+                    AppCache.marksJustSavedRecord);
+
+            // Consume the flags so next unrelated resume doesn’t re-patch
+            AppCache.marksJustSaved          = false;
+            AppCache.marksJustSavedStudentId = null;
+            AppCache.marksJustSavedRecord    = null;
+
+            // Clear selectedMarks so it doesn't bleed into other students
+            AppCache.selectedMarks = null;
+        }
+
         loadEvaluationData();
     }
 
@@ -380,6 +404,35 @@ public class FormativeSummativeFragment extends Fragment {
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
+        /** Instantly updates one student's card without a full list reload.
+         *  Called by onResume() immediately after returning from EnterMarksActivity. */
+        public void patchStudentMarks(String studentId, MarksRecord record) {
+            // Update the adapter's marks map
+            marksMap.put(studentId, record);
+            // Also update the marks AppCache so future renders are correct
+            if (AppCache.cachedMarksMap == null
+                    || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
+                    || !java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
+                AppCache.cachedMarksMap = new HashMap<>();
+                AppCache.cachedClassIdForStudents = activeClass.id;
+                AppCache.cachedSemesterIdForMarks = activeSemesterId;
+            }
+            AppCache.cachedMarksMap.put(studentId, record);
+            // Notify only the changed item for a smooth, flicker-free update
+            for (int i = 0; i < students.size(); i++) {
+                if (java.util.Objects.equals(studentId, students.get(i).id)) {
+                    final int pos = i;
+                    new android.os.Handler(android.os.Looper.getMainLooper())
+                            .post(() -> notifyItemChanged(pos));
+                    android.util.Log.d("FORMATIVE_SUMMATIVE",
+                            "patchStudentMarks: notified pos=" + pos + " student=" + studentId);
+                    return;
+                }
+            }
+            // Student not in list yet — do a full refresh
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
+        }
+
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -420,8 +473,16 @@ public class FormativeSummativeFragment extends Fragment {
                     for (Subject sub : activeClass.subjects) {
                         MarksRecord.SubjectMarksDetail detail = marks.detailedMarks
                                 .get(MarksRecord.sanitizeKey(sub.name));
-                        if (detail != null && detail.grade != null && !detail.grade.isEmpty()) {
-                            binding.layoutGradeChips.addView(createGradeChip(detail.grade));
+                        if (detail != null) {
+                            android.util.Log.d("GRADE_BUG", "Student: " + s.name 
+                                + " | Subject: " + sub.name 
+                                + " | grade: " + detail.grade 
+                                + " | nirikhshan: " + detail.nirikhshan
+                                + " | grandTotal: " + detail.grandTotal
+                                + " | entered: " + hasEnteredMarks(detail));
+                            if (detail.grade != null && !detail.grade.isEmpty() && hasEnteredMarks(detail)) {
+                                binding.layoutGradeChips.addView(createGradeChip(detail.grade));
+                            }
                         }
                     }
                 }
@@ -528,8 +589,8 @@ public class FormativeSummativeFragment extends Fragment {
                 String safeKey = MarksRecord.sanitizeKey(sub.name);
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
                     MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
-                    if (d != null) {
-                        hasMarks = true; // Always treat as entered when a record exists to show 0s
+                    if (d != null && hasEnteredMarks(d)) {
+                        hasMarks = true;
                         fe1 = formatVal(d.nirikhshan);
                         fe2 = formatVal(d.tondiKam);
                         fe3 = formatVal(d.pratyakshik);

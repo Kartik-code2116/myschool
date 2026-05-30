@@ -125,14 +125,30 @@ public class ReportPrintingFragment extends Fragment {
                 .show();
     }
 
+    private String[] getSemesterIds() {
+        String sem1Id = "sem_1";
+        String sem2Id = "sem_2";
+        if (com.example.myschool.AppCache.cachedSemesters != null) {
+            for (com.example.myschool.model.Semester sem : com.example.myschool.AppCache.cachedSemesters) {
+                if (sem.number == 1) {
+                    sem1Id = sem.id;
+                } else if (sem.number == 2) {
+                    sem2Id = sem.id;
+                }
+            }
+        }
+        return new String[] { sem1Id, sem2Id };
+    }
+
     private void generateIndividualReport(Student student, int reportPosition) {
         Toast.makeText(getContext(), student.name + " चा रिपोर्ट तयार होत आहे...", Toast.LENGTH_SHORT).show();
         
         String classId = SessionContext.selectedClass.id;
-        FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, "sem_1", new FirebaseRepository.OnResult<MarksRecord>() {
+        String[] sids = getSemesterIds();
+        FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[0], new FirebaseRepository.OnResult<MarksRecord>() {
             @Override
             public void onSuccess(MarksRecord s1) {
-                FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, "sem_2", new FirebaseRepository.OnResult<MarksRecord>() {
+                FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[1], new FirebaseRepository.OnResult<MarksRecord>() {
                     @Override
                     public void onSuccess(MarksRecord s2) {
                         triggerIndividualGenerator(student, s1, s2, reportPosition);
@@ -189,10 +205,11 @@ public class ReportPrintingFragment extends Fragment {
         Toast.makeText(getContext(), "पार्श्वभूमीत संपूर्ण वर्गाचे रिपोर्ट तयार होत आहेत, कृपया थांबा...", Toast.LENGTH_LONG).show();
         
         String classId = SessionContext.selectedClass.id;
-        FirebaseRepository.get().getMarksForClassAndSemester(classId, "sem_1", new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+        String[] sids = getSemesterIds();
+        FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[0], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
             @Override
             public void onSuccess(Map<String, MarksRecord> sem1Map) {
-                FirebaseRepository.get().getMarksForClassAndSemester(classId, "sem_2", new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+                FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[1], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
                     @Override
                     public void onSuccess(Map<String, MarksRecord> sem2Map) {
                         generateBulkPdfs(sem1Map, sem2Map, reportPosition);
@@ -211,7 +228,8 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private void generateBulkPdfs(Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map, int reportPosition) {
-        new Thread(() -> {
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
             int successCount = 0;
             File lastFile = null;
             
@@ -238,7 +256,8 @@ public class ReportPrintingFragment extends Fragment {
                     }
                 });
             }
-        }).start();
+        });
+        executor.shutdown();
     }
 
     private File generateReportSync(Student student, MarksRecord s1, MarksRecord s2, int reportPosition) throws Exception {
@@ -281,10 +300,11 @@ public class ReportPrintingFragment extends Fragment {
         Toast.makeText(getContext(), "वर्गवार एकूण निकाल तक्ता तयार होत आहे...", Toast.LENGTH_SHORT).show();
         
         String classId = SessionContext.selectedClass.id;
-        FirebaseRepository.get().getMarksForClassAndSemester(classId, "sem_1", new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+        String[] sids = getSemesterIds();
+        FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[0], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
             @Override
             public void onSuccess(Map<String, MarksRecord> sem1Map) {
-                FirebaseRepository.get().getMarksForClassAndSemester(classId, "sem_2", new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+                FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[1], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
                     @Override
                     public void onSuccess(Map<String, MarksRecord> sem2Map) {
                         PdfGenerator.generateProgressBook(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,

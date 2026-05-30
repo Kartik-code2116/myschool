@@ -286,7 +286,7 @@ public class StudentListFragment extends Fragment {
             @Override
             public void onSuccess(List<ClassModel> list) {
                 for (ClassModel c : list) {
-                    if (c.id.equals(student.classId)) {
+                    if (java.util.Objects.equals(c.id, student.classId)) {
                         AppCache.selectedClass = c;
                         break;
                     }

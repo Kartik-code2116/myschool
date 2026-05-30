@@ -292,7 +292,7 @@ public class ProfileFragment extends Fragment {
         classAdapter.setSelectedClassId(selectedId);
         if (selectedId != null) {
             for (ProfileClassItem item : items) {
-                if (item.hasClass() && selectedId.equals(item.classModel.id)) {
+                if (item.hasClass() && java.util.Objects.equals(selectedId, item.classModel.id)) {
                     showActiveClassDetail(item);
                     b.cardActiveClassDetail.setVisibility(View.VISIBLE);
                     return;
@@ -329,7 +329,7 @@ public class ProfileFragment extends Fragment {
             Semester found = null;
             if (AppCache.cachedSemesters != null) {
                 for (Semester s : AppCache.cachedSemesters) {
-                    if (c.semesterId.equals(s.id)) {
+                    if (java.util.Objects.equals(c.semesterId, s.id)) {
                         found = s;
                         break;
                     }

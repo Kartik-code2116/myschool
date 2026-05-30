@@ -640,7 +640,12 @@ public class FirebaseRepository {
                     Collections.sort(students, (a, b) -> {
                         String ra = a.rollNo != null ? a.rollNo : "";
                         String rb = b.rollNo != null ? b.rollNo : "";
-                        return ra.compareTo(rb);
+                        // Numeric sort so roll 2 < 10 (not string "10" < "2")
+                        try {
+                            return Integer.compare(Integer.parseInt(ra), Integer.parseInt(rb));
+                        } catch (NumberFormatException e) {
+                            return ra.compareTo(rb);
+                        }
                     });
                     cachedStudentsForClassMap.put(classId, students);
                     cb.onSuccess(new ArrayList<>(students));
@@ -738,7 +743,7 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
-    public void getMarksForStudentAndSemester(String studentId,                                                                                                                                                                                                                                                                                                                                 
+    public void getMarksForStudentAndSemester(String studentId,
     String classId, String semesterId, OnResult<MarksRecord> cb) {
         if (studentId == null || classId == null || semesterId == null) {
             cb.onError(new IllegalArgumentException("Arguments cannot be null"));
@@ -751,32 +756,65 @@ public class FirebaseRepository {
                 .get()
                 .addOnSuccessListener(snap -> {
                     if (snap != null && !snap.isEmpty()) {
-                        MarksRecord fallback = null; // best match ignoring semester
+                        int targetSemNum = 1;
+                        if (com.example.myschool.SessionContext.selectedSemester != null 
+                                && java.util.Objects.equals(semesterId, com.example.myschool.SessionContext.selectedSemester.id)) {
+                            targetSemNum = com.example.myschool.SessionContext.selectedSemester.number;
+                        } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
+                            targetSemNum = 2;
+                        } else if (semesterId.equals("sem_1") || semesterId.toLowerCase().contains("first") || (semesterId.length() < 10 && semesterId.contains("1"))) {
+                            targetSemNum = 1;
+                        } else if (com.example.myschool.SessionContext.selectedSemester != null) {
+                            targetSemNum = com.example.myschool.SessionContext.selectedSemester.number;
+                        }
+                        final int finalTargetSemNum = targetSemNum;
+
+                        List<MarksRecord> matches = new ArrayList<>();
+                        List<MarksRecord> fallbacks = new ArrayList<>();
+
                         for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m == null) continue;
                             if (m.id == null || m.id.isEmpty()) {
                                 m.id = doc.getId();
                             }
-                            if (semesterId.equals(m.semesterId)) {
-                                // Perfect match — return immediately
-                                Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: FOUND exact match semId=" + semesterId);
-                                cb.onSuccess(m);
-                                return;
+                            
+                            int recordSemNum = 1;
+                            if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
+                                try {
+                                    recordSemNum = Integer.parseInt(m.semesterNumber);
+                                } catch (NumberFormatException ignored) {}
+                            } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
+                                if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
+                                    recordSemNum = 2;
+                                }
                             }
-                            // Keep the most-recently-updated doc as fallback
-                            if (fallback == null || m.updatedAt > fallback.updatedAt) {
-                                fallback = m;
+                            
+                            if (semesterId.equals(m.semesterId) || finalTargetSemNum == recordSemNum) {
+                                matches.add(m);
+                            } else if (m.semesterId == null || m.semesterId.isEmpty()) {
+                                fallbacks.add(m);
                             }
                         }
-                        // If no exact semester match, return the most recent record so
-                        // the form is not blank (marks are still visible to the teacher).
-                        if (fallback != null) {
-                            Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no exact semId match, using fallback updatedAt=" + fallback.updatedAt);
-                            cb.onSuccess(fallback);
-                        } else {
-                            cb.onSuccess(null);
+
+                        MarksRecord result = null;
+                        if (!matches.isEmpty()) {
+                            Collections.sort(matches, (a, b) -> Long.compare(a.updatedAt, b.updatedAt));
+                            result = matches.get(matches.size() - 1);
+                            for (int i = 0; i < matches.size() - 1; i++) {
+                                mergeRecords(result, matches.get(i));
+                            }
+                            Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: found " + matches.size() + " matches, merged into result id=" + result.id);
+                        } else if (!fallbacks.isEmpty()) {
+                            Collections.sort(fallbacks, (a, b) -> Long.compare(a.updatedAt, b.updatedAt));
+                            result = fallbacks.get(fallbacks.size() - 1);
+                            for (int i = 0; i < fallbacks.size() - 1; i++) {
+                                mergeRecords(result, fallbacks.get(i));
+                            }
+                            Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no matches, found " + fallbacks.size() + " fallbacks, merged into result id=" + result.id);
                         }
+
+                        cb.onSuccess(result);
                     } else {
                         Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no docs found for student=" + studentId + " class=" + classId);
                         cb.onSuccess(null);
@@ -825,7 +863,7 @@ public class FirebaseRepository {
                     
                     int targetSemNum = 1;
                     if (com.example.myschool.SessionContext.selectedSemester != null 
-                            && semesterId.equals(com.example.myschool.SessionContext.selectedSemester.id)) {
+                            && java.util.Objects.equals(semesterId, com.example.myschool.SessionContext.selectedSemester.id)) {
                         targetSemNum = com.example.myschool.SessionContext.selectedSemester.number;
                     } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
                         targetSemNum = 2;
@@ -854,35 +892,58 @@ public class FirebaseRepository {
                                     try {
                                         recordSemNum = Integer.parseInt(m.semesterNumber);
                                     } catch (NumberFormatException ignored) {}
-                                } else if (m.semesterId != null && !m.semesterId.isEmpty()) {
+                                } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
                                     if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
                                         recordSemNum = 2;
                                     }
                                 }
                                 
                                 if (semesterId.equals(m.semesterId) || finalTargetSemNum == recordSemNum) {
-                                    // Match — include (prefer most-recently-updated doc per student)
+                                    // Match — include & merge duplicate docs per student
                                     MarksRecord existing = marksMap.get(m.studentId);
-                                    if (existing == null || m.updatedAt >= existing.updatedAt) {
+                                    if (existing == null) {
                                         marksMap.put(m.studentId, m);
+                                    } else {
+                                        if (m.updatedAt >= existing.updatedAt) {
+                                            mergeRecords(m, existing);
+                                            marksMap.put(m.studentId, m);
+                                        } else {
+                                            mergeRecords(existing, m);
+                                        }
                                     }
                                 } else if (m.semesterId == null || m.semesterId.isEmpty()) {
                                     // No semesterId saved — include as fallback
                                     MarksRecord fallbackExisting = fallbackMap.get(m.studentId);
-                                    if (fallbackExisting == null || m.updatedAt >= fallbackExisting.updatedAt) {
+                                    if (fallbackExisting == null) {
                                         fallbackMap.put(m.studentId, m);
+                                    } else {
+                                        if (m.updatedAt >= fallbackExisting.updatedAt) {
+                                            mergeRecords(m, fallbackExisting);
+                                            fallbackMap.put(m.studentId, m);
+                                        } else {
+                                            mergeRecords(fallbackExisting, m);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    // If exact/number matches found, use them; otherwise fall back to records
-                    // with no semesterId (handles older saves that didn't set semesterId)
+                    // Merge fallback records into marksMap
                     if (!fallbackMap.isEmpty()) {
-                        Log.d("FIRESTORE_MARKS", "No exact/number match — using " + fallbackMap.size() + " fallback records");
+                        Log.d("FIRESTORE_MARKS", "Merging fallback records: " + fallbackMap.size());
                         for (java.util.Map.Entry<String, MarksRecord> entry : fallbackMap.entrySet()) {
-                            if (!marksMap.containsKey(entry.getKey())) {
-                                marksMap.put(entry.getKey(), entry.getValue());
+                            String studentId = entry.getKey();
+                            MarksRecord fallbackRec = entry.getValue();
+                            if (!marksMap.containsKey(studentId)) {
+                                marksMap.put(studentId, fallbackRec);
+                            } else {
+                                MarksRecord existing = marksMap.get(studentId);
+                                if (fallbackRec.updatedAt >= existing.updatedAt) {
+                                    mergeRecords(fallbackRec, existing);
+                                    marksMap.put(studentId, fallbackRec);
+                                } else {
+                                    mergeRecords(existing, fallbackRec);
+                                }
                             }
                         }
                     }
@@ -932,6 +993,99 @@ public class FirebaseRepository {
                     cb.onSuccess(list);
                 })
                 .addOnFailureListener(cb::onError);
+    }
+
+    private void mergeRecords(MarksRecord target, MarksRecord source) {
+        if (target == null || source == null) return;
+        
+        // Merge detailedMarks maps
+        if (source.detailedMarks != null) {
+            if (target.detailedMarks == null) {
+                target.detailedMarks = new java.util.HashMap<>();
+            }
+            for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : source.detailedMarks.entrySet()) {
+                String subName = entry.getKey();
+                MarksRecord.SubjectMarksDetail sourceDetail = entry.getValue();
+                if (sourceDetail == null) continue;
+                
+                MarksRecord.SubjectMarksDetail targetDetail = target.detailedMarks.get(subName);
+                if (targetDetail == null) {
+                    target.detailedMarks.put(subName, sourceDetail);
+                } else {
+                    // Merge subject sub-fields
+                    if (sourceDetail.nirikhshan > 0) targetDetail.nirikhshan = sourceDetail.nirikhshan;
+                    if (sourceDetail.tondiKam > 0) targetDetail.tondiKam = sourceDetail.tondiKam;
+                    if (sourceDetail.pratyakshik > 0) targetDetail.pratyakshik = sourceDetail.pratyakshik;
+                    if (sourceDetail.upkram > 0) targetDetail.upkram = sourceDetail.upkram;
+                    if (sourceDetail.prakalp > 0) targetDetail.prakalp = sourceDetail.prakalp;
+                    if (sourceDetail.chachani > 0) targetDetail.chachani = sourceDetail.chachani;
+                    if (sourceDetail.swadhyay > 0) targetDetail.swadhyay = sourceDetail.swadhyay;
+                    if (sourceDetail.itar > 0) targetDetail.itar = sourceDetail.itar;
+                    if (sourceDetail.akarikTotal > 0) targetDetail.akarikTotal = sourceDetail.akarikTotal;
+                    
+                    if (sourceDetail.tondi > 0) targetDetail.tondi = sourceDetail.tondi;
+                    if (sourceDetail.pratyakshikB > 0) targetDetail.pratyakshikB = sourceDetail.pratyakshikB;
+                    if (sourceDetail.lekhi > 0) targetDetail.lekhi = sourceDetail.lekhi;
+                    if (sourceDetail.sanklit > 0) targetDetail.sanklit = sourceDetail.sanklit;
+                    
+                    if (sourceDetail.grandTotal > 0) targetDetail.grandTotal = sourceDetail.grandTotal;
+                    if (sourceDetail.maxMarks > 0) targetDetail.maxMarks = sourceDetail.maxMarks;
+                    if (sourceDetail.grade != null && !sourceDetail.grade.isEmpty()) targetDetail.grade = sourceDetail.grade;
+                    
+                    // Merge remarks
+                    if (sourceDetail.remark != null && !sourceDetail.remark.trim().isEmpty()) {
+                        if (targetDetail.remark == null || targetDetail.remark.trim().isEmpty()) {
+                            targetDetail.remark = sourceDetail.remark;
+                        } else if (!targetDetail.remark.contains(sourceDetail.remark)) {
+                            // Merge distinct parts
+                            java.util.LinkedHashSet<String> parts = new java.util.LinkedHashSet<>();
+                            for (String p : targetDetail.remark.split("\\|\\|")) {
+                                if (!p.trim().isEmpty()) parts.add(p.trim());
+                            }
+                            for (String p : sourceDetail.remark.split("\\|\\|")) {
+                                if (!p.trim().isEmpty()) parts.add(p.trim());
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            java.util.List<String> list = new java.util.ArrayList<>(parts);
+                            for (int i = 0; i < list.size(); i++) {
+                                sb.append(list.get(i));
+                                if (i < list.size() - 1) sb.append("||");
+                            }
+                            targetDetail.remark = sb.toString();
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Merge attendance
+        if (source.presentDays > 0) target.presentDays = source.presentDays;
+        if (source.totalDays > 0) target.totalDays = source.totalDays;
+        
+        // Merge top-level subjectMarks & subjectMax for legacy/compat compatibility
+        if (source.subjectMarks != null) {
+            if (target.subjectMarks == null) target.subjectMarks = new java.util.HashMap<>();
+            for (java.util.Map.Entry<String, Double> entry : source.subjectMarks.entrySet()) {
+                if (entry.getValue() > 0) {
+                    target.subjectMarks.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        if (source.subjectMax != null) {
+            if (target.subjectMax == null) target.subjectMax = new java.util.HashMap<>();
+            for (java.util.Map.Entry<String, Integer> entry : source.subjectMax.entrySet()) {
+                if (entry.getValue() > 0) {
+                    target.subjectMax.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        
+        // Merge total marks
+        if (source.totalObtained > 0) target.totalObtained = source.totalObtained;
+        if (source.totalMax > 0) target.totalMax = source.totalMax;
+        if (source.percentage > 0) target.percentage = source.percentage;
+        if (source.grade != null && !source.grade.isEmpty()) target.grade = source.grade;
+        if (source.result != null && !source.result.isEmpty()) target.result = source.result;
     }
 
     // ---------- Callback interface ----------

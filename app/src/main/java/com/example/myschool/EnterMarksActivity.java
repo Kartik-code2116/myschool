@@ -148,28 +148,32 @@ public class EnterMarksActivity extends AppCompatActivity {
         }
 
         // Layer 2: SharedPreferences (after app restart — fetch by stored doc ID)
-        // This is the most reliable approach: direct doc ID fetch, no query/index
-        // needed.
-        String prefKey = "marks_doc_" + student.id + "_" + classModel.id;
-        String storedDocId = getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
-                .getString(prefKey, null);
-        if (storedDocId != null && existingMarks == null) {
-            Log.d("SAVE_MARKS", "Layer2: Fetching marks by stored docId=" + storedDocId);
+        String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
+        String prefKey = "marks_doc_" + student.id + "_" + classModel.id + "_" + semId;
+        String legacyPrefKey = "marks_doc_" + student.id + "_" + classModel.id;
+        android.content.SharedPreferences docPrefs = getSharedPreferences("marks_doc_ids", MODE_PRIVATE);
+        String storedDocId = docPrefs.getString(prefKey, null);
+        if (storedDocId == null) {
+            storedDocId = docPrefs.getString(legacyPrefKey, null);
+        }
+        final String finalStoredDocId = storedDocId;
+        if (finalStoredDocId != null && existingMarks == null) {
+            Log.d("SAVE_MARKS", "Layer2: Fetching marks by stored docId=" + finalStoredDocId);
             com.google.firebase.firestore.FirebaseFirestore.getInstance()
                     .collection("marks")
-                    .document(storedDocId)
+                    .document(finalStoredDocId)
                     .get()
                     .addOnSuccessListener(doc -> {
                         if (doc.exists()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m != null) {
-                                Log.d("SAVE_MARKS", "Layer2 SUCCESS: loaded marks docId=" + storedDocId);
+                                Log.d("SAVE_MARKS", "Layer2 SUCCESS: loaded marks docId=" + finalStoredDocId);
                                 existingMarks = m;
                                 AppCache.selectedMarks = m;
                                 fillExistingMarks(m);
                             }
                         } else {
-                            Log.d("SAVE_MARKS", "Layer2: doc not found for id=" + storedDocId);
+                            Log.d("SAVE_MARKS", "Layer2: doc not found for id=" + finalStoredDocId);
                         }
                     })
                     .addOnFailureListener(e -> Log.e("SAVE_MARKS", "Layer2 FAILED: " + e.getMessage(), e));
@@ -177,7 +181,6 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         // Layer 3: Firestore query by studentId+classId (always runs in background for
         // freshness)
-        String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
         Log.d("SAVE_MARKS",
                 "Layer3: Firestore query student=" + student.id + " class=" + classModel.id + " sem=" + semId);
         FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classModel.id, semId,
@@ -485,18 +488,17 @@ public class EnterMarksActivity extends AppCompatActivity {
             if (m.detailedMarks != null && m.detailedMarks.containsKey(subName)) {
                 MarksRecord.SubjectMarksDetail d = m.detailedMarks.get(subName);
                 if (d != null) {
-                    row.etNirikhshan.setText(String.valueOf(d.nirikhshan));
-                    row.etTondiKam.setText(String.valueOf(d.tondiKam));
-                    row.etPratyakshik.setText(String.valueOf(d.pratyakshik));
-                    row.etUpkram.setText(String.valueOf(d.upkram));
-                    row.etPrakalp.setText(String.valueOf(d.prakalp));
-                    row.etChachani.setText(String.valueOf(d.chachani));
-                    row.etSwadhyay.setText(String.valueOf(d.swadhyay));
-                    row.etItar.setText(String.valueOf(d.itar));
-                    row.etTondiB.setText(String.valueOf(d.tondi));
-                    row.etPratyakshikB.setText(String.valueOf(d.pratyakshikB));
-                    row.etLekhi.setText(String.valueOf(d.lekhi));
-
+                    if (d.nirikhshan > 0) row.etNirikhshan.setText(String.valueOf(d.nirikhshan));
+                    if (d.tondiKam > 0)   row.etTondiKam.setText(String.valueOf(d.tondiKam));
+                    if (d.pratyakshik > 0) row.etPratyakshik.setText(String.valueOf(d.pratyakshik));
+                    if (d.upkram > 0)     row.etUpkram.setText(String.valueOf(d.upkram));
+                    if (d.prakalp > 0)    row.etPrakalp.setText(String.valueOf(d.prakalp));
+                    if (d.chachani > 0)   row.etChachani.setText(String.valueOf(d.chachani));
+                    if (d.swadhyay > 0)   row.etSwadhyay.setText(String.valueOf(d.swadhyay));
+                    if (d.itar > 0)       row.etItar.setText(String.valueOf(d.itar));
+                    if (d.tondi > 0)      row.etTondiB.setText(String.valueOf(d.tondi));
+                    if (d.pratyakshikB > 0) row.etPratyakshikB.setText(String.valueOf(d.pratyakshikB));
+                    if (d.lekhi > 0)      row.etLekhi.setText(String.valueOf(d.lekhi));
                 }
             } else if (m.subjectMarks != null && m.subjectMarks.containsKey(subName)) {
                 // Backward-compat: flat map → fill into लेखी
@@ -648,12 +650,16 @@ public class EnterMarksActivity extends AppCompatActivity {
                 AppCache.selectedMarks = m;
 
                 // Persist doc ID to SharedPreferences so it survives app restart.
-                String prefKey = "marks_doc_" + m.studentId + "_" + m.classId;
+                String semId = m.semesterId != null && !m.semesterId.isEmpty() ? m.semesterId 
+                        : (SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1");
+                String prefKey = "marks_doc_" + m.studentId + "_" + m.classId + "_" + semId;
+                String legacyPrefKey = "marks_doc_" + m.studentId + "_" + m.classId;
                 getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
                         .edit()
                         .putString(prefKey, id)
+                        .putString(legacyPrefKey, id)
                         .apply();
-                Log.d("SAVE_MARKS", "Saved docId to SharedPreferences key=" + prefKey);
+                Log.d("SAVE_MARKS", "Saved docId to SharedPreferences key=" + prefKey + " and " + legacyPrefKey);
 
                 // Patch the marks map immediately so instant-cache render shows new marks.
                 // Initialize the map if it was null (first save of the session).

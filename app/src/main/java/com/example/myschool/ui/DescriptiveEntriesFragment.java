@@ -394,7 +394,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             AppCache.cachedDescriptiveMarksMap.put(studentId, record);
             // Notify only the changed item for a smooth, flicker-free update
             for (int i = 0; i < students.size(); i++) {
-                if (studentId.equals(students.get(i).id)) {
+                if (java.util.Objects.equals(studentId, students.get(i).id)) {
                     final int pos = i;
                     new android.os.Handler(android.os.Looper.getMainLooper())
                             .post(() -> notifyItemChanged(pos));
@@ -858,19 +858,19 @@ public class DescriptiveEntriesFragment extends Fragment {
                 MarksRecord selectedRecord = AppCache.selectedMarks;
                 if (selectedRecord == null
                         || student.id == null
-                        || !student.id.equals(selectedRecord.studentId)) {
+                        || !java.util.Objects.equals(student.id, selectedRecord.studentId)) {
                     // selectedRecord is null or belongs to a DIFFERENT student — ignore it
                     return record;
                 }
                 if (activeClass == null
                         || activeClass.id == null
-                        || !activeClass.id.equals(selectedRecord.classId)) {
+                        || !java.util.Objects.equals(activeClass.id, selectedRecord.classId)) {
                     return record;
                 }
                 if (selectedRecord.semesterId != null
                         && activeSemesterId != null
                         && !selectedRecord.semesterId.isEmpty()
-                        && !activeSemesterId.equals(selectedRecord.semesterId)) {
+                        && !java.util.Objects.equals(activeSemesterId, selectedRecord.semesterId)) {
                     return record;
                 }
                 // selectedRecord belongs to this student; use whichever is newer

@@ -272,7 +272,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         // Choose a target student to copy attendance to
         List<Student> targets = new ArrayList<>();
         for (Student s : studentsList) {
-            if (!s.id.equals(srcStudent.id)) targets.add(s);
+            if (!java.util.Objects.equals(s.id, srcStudent.id)) targets.add(s);
         }
 
         if (targets.isEmpty()) {
@@ -364,23 +364,33 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Restore bottomNav in case onPause() was skipped (e.g., back stack pop)
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity ha = (HomeActivity) getActivity();
+            View bottomNav = ha.findViewById(R.id.bottomNav);
+            if (bottomNav != null) bottomNav.setVisibility(View.VISIBLE);
+            View appBar = ha.findViewById(R.id.appBarLayout);
+            if (appBar != null) appBar.setVisibility(View.VISIBLE);
+        }
+        b = null;
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity ha = (HomeActivity) getActivity();
             View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) {
-                appBar.setVisibility(View.VISIBLE);
-            }
+            if (appBar != null) appBar.setVisibility(View.VISIBLE);
             View bottomNav = ha.findViewById(R.id.bottomNav);
-            if (bottomNav != null) {
-                bottomNav.setVisibility(View.VISIBLE);
-            }
-            
+            if (bottomNav != null) bottomNav.setVisibility(View.VISIBLE);
+
             // Restore CoordinatorLayout scrolling behavior and margins:
             View navHost = ha.findViewById(R.id.navHostFragment);
             if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
                         (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
                 params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
                 float density = getResources().getDisplayMetrics().density;

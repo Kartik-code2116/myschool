@@ -99,7 +99,7 @@ public class StudentRegisterActivity extends AppCompatActivity {
                         ? SessionContext.selectedSchool : AppCache.selectedSchool;
                 if (preSchool != null) {
                     for (int i = 0; i < schools.size(); i++) {
-                        if (schools.get(i).id.equals(preSchool.id)) {
+                        if (java.util.Objects.equals(schools.get(i).id, preSchool.id)) {
                             b.actvSelectSchool.setText(schools.get(i).name, false);
                             selectedSchool = schools.get(i);
                             loadClassesForSchool(selectedSchool.id);

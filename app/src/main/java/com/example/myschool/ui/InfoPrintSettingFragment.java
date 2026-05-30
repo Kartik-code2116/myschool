@@ -524,8 +524,7 @@ public class InfoPrintSettingFragment extends Fragment {
 
         // Check if this class is the globally activated session class
         boolean isActivated = SessionContext.selectedClass != null
-                && SessionContext.selectedClass.id != null
-                && SessionContext.selectedClass.id.equals(c.id);
+                && java.util.Objects.equals(SessionContext.selectedClass.id, c.id);
 
         // Activate it when sliding to a new class (sets session class)
         SessionContext.selectedClass = c;
