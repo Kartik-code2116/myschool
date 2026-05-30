@@ -39,11 +39,11 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     // ── Per-subject max-mark breakdowns (computed once in addMarksRow) ─────────
     // Each array: [akarikMax, sanklitMax, nirikhshan, tondiKam, pratyakshik,
-    //              upkram, prakalp, chachani, swadhyay, itar, tondiB, pratyakshikB, lekhi]
+    // upkram, prakalp, chachani, swadhyay, itar, tondiB, pratyakshikB, lekhi]
     private final List<int[]> subjectMaxBreakdown = new ArrayList<>();
 
-    private final ActivityResultLauncher<Intent> cameraLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    private final ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Bundle extras = result.getData().getExtras();
                     if (extras != null) {
@@ -53,8 +53,8 @@ public class EnterMarksActivity extends AppCompatActivity {
                 }
             });
 
-    private final ActivityResultLauncher<Intent> galleryLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri uri = result.getData().getData();
                     try {
@@ -79,14 +79,16 @@ public class EnterMarksActivity extends AppCompatActivity {
         setSupportActionBar(b.toolbar);
         b.toolbar.setNavigationOnClickListener(v -> finish());
 
-        ocrHelper   = new OcrHelper();
-        student     = AppCache.selectedStudent;
+        ocrHelper = new OcrHelper();
+        student = AppCache.selectedStudent;
 
-        // FIX: Build classModel by merging caller (in-memory, freshest) with SharedPrefs.
+        // FIX: Build classModel by merging caller (in-memory, freshest) with
+        // SharedPrefs.
         // Priority: callerClass subjects > SharedPrefs subjects > hardcoded fallback.
         // This ensures subject toggle changes always appear immediately in marks entry.
         classModel = AppCache.selectedClass; // from SessionContext.load()
-        if (classModel == null) classModel = callerClass;
+        if (classModel == null)
+            classModel = callerClass;
 
         // If same class but callerClass has fresher subject list — use it.
         if (callerClass != null
@@ -106,10 +108,14 @@ public class EnterMarksActivity extends AppCompatActivity {
             SessionContext.selectedClass.subjects = classModel.subjects;
         }
 
-        if (student == null || classModel == null) { finish(); return; }
+        if (student == null || classModel == null) {
+            finish();
+            return;
+        }
 
         // Fallback for null selectedSemester using classModel's semesterId
-        if (SessionContext.selectedSemester == null && classModel.semesterId != null && !classModel.semesterId.isEmpty()) {
+        if (SessionContext.selectedSemester == null && classModel.semesterId != null
+                && !classModel.semesterId.isEmpty()) {
             com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
             fallbackSem.id = classModel.semesterId;
             fallbackSem.yearId = classModel.yearId;
@@ -142,7 +148,8 @@ public class EnterMarksActivity extends AppCompatActivity {
         }
 
         // Layer 2: SharedPreferences (after app restart — fetch by stored doc ID)
-        // This is the most reliable approach: direct doc ID fetch, no query/index needed.
+        // This is the most reliable approach: direct doc ID fetch, no query/index
+        // needed.
         String prefKey = "marks_doc_" + student.id + "_" + classModel.id;
         String storedDocId = getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
                 .getString(prefKey, null);
@@ -168,12 +175,15 @@ public class EnterMarksActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> Log.e("SAVE_MARKS", "Layer2 FAILED: " + e.getMessage(), e));
         }
 
-        // Layer 3: Firestore query by studentId+classId (always runs in background for freshness)
+        // Layer 3: Firestore query by studentId+classId (always runs in background for
+        // freshness)
         String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
-        Log.d("SAVE_MARKS", "Layer3: Firestore query student=" + student.id + " class=" + classModel.id + " sem=" + semId);
+        Log.d("SAVE_MARKS",
+                "Layer3: Firestore query student=" + student.id + " class=" + classModel.id + " sem=" + semId);
         FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classModel.id, semId,
                 new FirebaseRepository.OnResult<MarksRecord>() {
-                    @Override public void onSuccess(MarksRecord m) {
+                    @Override
+                    public void onSuccess(MarksRecord m) {
                         if (m != null) {
                             Log.d("SAVE_MARKS", "Layer3 SUCCESS: marks docId=" + m.id + " semId=" + m.semesterId);
                             existingMarks = m;
@@ -185,13 +195,17 @@ public class EnterMarksActivity extends AppCompatActivity {
                                 // No marks at all — pre-fill attendance
                                 int[] att = calculateAttendanceForSemester();
                                 if (att[1] > 0) {
-                                    if (b.etPresentDays != null) b.etPresentDays.setText(String.valueOf(att[0]));
-                                    if (b.etTotalDays != null) b.etTotalDays.setText(String.valueOf(att[1]));
+                                    if (b.etPresentDays != null)
+                                        b.etPresentDays.setText(String.valueOf(att[0]));
+                                    if (b.etTotalDays != null)
+                                        b.etTotalDays.setText(String.valueOf(att[1]));
                                 }
                             }
                         }
                     }
-                    @Override public void onError(Exception e) {
+
+                    @Override
+                    public void onError(Exception e) {
                         Log.e("SAVE_MARKS", "Layer3 FAILED: " + e.getMessage(), e);
                         if (existingMarks == null) {
                             Toast.makeText(EnterMarksActivity.this,
@@ -212,51 +226,53 @@ public class EnterMarksActivity extends AppCompatActivity {
         row.tvSubjectName.setText(sub.name);
 
         int maxMarks = sub.maxMarks;
-        int nirikhshanMax   = sub.maxNirikhshan;
-        int tondiKamMax     = sub.maxTondiKam;
+        int nirikhshanMax = sub.maxNirikhshan;
+        int tondiKamMax = sub.maxTondiKam;
         int pratyakshikAMax = sub.maxPratyakshik;
-        int upkramMax       = sub.maxUpkram;
-        int prakalpMax      = sub.maxPrakalp;
-        int chachaniMax     = sub.maxChachani;
-        int swadhyayMax     = sub.maxSwadhyay;
-        int itarMax         = sub.maxItar;
+        int upkramMax = sub.maxUpkram;
+        int prakalpMax = sub.maxPrakalp;
+        int chachaniMax = sub.maxChachani;
+        int swadhyayMax = sub.maxSwadhyay;
+        int itarMax = sub.maxItar;
 
-        int tondiBMax       = sub.maxTondi;
+        int tondiBMax = sub.maxTondi;
         int pratyakshikBMax = sub.maxPratyakshikB;
-        int lekhiMax        = sub.maxLekhi;
+        int lekhiMax = sub.maxLekhi;
 
-        // Fallback to standard 50-50 scaling breakdown if sub-fields are not initialized
+        // Fallback to standard 50-50 scaling breakdown if sub-fields are not
+        // initialized
         if (nirikhshanMax == 0 && tondiKamMax == 0 && pratyakshikAMax == 0 &&
-            upkramMax == 0 && prakalpMax == 0 && chachaniMax == 0 && swadhyayMax == 0 &&
-            tondiBMax == 0 && pratyakshikBMax == 0 && lekhiMax == 0) {
+                upkramMax == 0 && prakalpMax == 0 && chachaniMax == 0 && swadhyayMax == 0 &&
+                tondiBMax == 0 && pratyakshikBMax == 0 && lekhiMax == 0) {
 
-            int akarikMax  = maxMarks / 2;
+            int akarikMax = maxMarks / 2;
             int sanklitMax = maxMarks - akarikMax;
 
-            nirikhshanMax   = akarikMax * 10 / 50;
-            tondiKamMax     = akarikMax * 10 / 50;
+            nirikhshanMax = akarikMax * 10 / 50;
+            tondiKamMax = akarikMax * 10 / 50;
             pratyakshikAMax = akarikMax * 10 / 50;
-            upkramMax       = akarikMax * 5  / 50;
-            prakalpMax      = akarikMax * 5  / 50;
-            chachaniMax     = akarikMax * 5  / 50;
-            swadhyayMax     = akarikMax * 5  / 50;
+            upkramMax = akarikMax * 5 / 50;
+            prakalpMax = akarikMax * 5 / 50;
+            chachaniMax = akarikMax * 5 / 50;
+            swadhyayMax = akarikMax * 5 / 50;
             itarMax = akarikMax - nirikhshanMax - tondiKamMax - pratyakshikAMax
                     - upkramMax - prakalpMax - chachaniMax - swadhyayMax;
 
-            tondiBMax       = sanklitMax * 10 / 50;
+            tondiBMax = sanklitMax * 10 / 50;
             pratyakshikBMax = sanklitMax * 10 / 50;
-            lekhiMax        = sanklitMax - tondiBMax - pratyakshikBMax;
+            lekhiMax = sanklitMax - tondiBMax - pratyakshikBMax;
         }
 
-        int akarikMax  = nirikhshanMax + tondiKamMax + pratyakshikAMax + upkramMax + prakalpMax + chachaniMax + swadhyayMax + itarMax;
+        int akarikMax = nirikhshanMax + tondiKamMax + pratyakshikAMax + upkramMax + prakalpMax + chachaniMax
+                + swadhyayMax + itarMax;
         int sanklitMax = tondiBMax + pratyakshikBMax + lekhiMax;
         final int finalMaxMarks = akarikMax + sanklitMax;
 
         // Store so updateSubjectHeader can read them without re-computing
-        int[] mx = {akarikMax, sanklitMax,
+        int[] mx = { akarikMax, sanklitMax,
                 nirikhshanMax, tondiKamMax, pratyakshikAMax,
                 upkramMax, prakalpMax, chachaniMax, swadhyayMax, itarMax,
-                tondiBMax, pratyakshikBMax, lekhiMax};
+                tondiBMax, pratyakshikBMax, lekhiMax };
         subjectMaxBreakdown.add(mx);
 
         // ── Set badge labels ───────────────────────────────────────────────────
@@ -302,12 +318,19 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         // ── Live recalculation on every keystroke ──────────────────────────────
         android.text.TextWatcher watcher = new android.text.TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateRow(row, mx, finalMaxMarks);
                 recalcAllSubjectsTotals();
             }
-            @Override public void afterTextChanged(android.text.Editable s) {}
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+            }
         };
 
         row.etNirikhshan.addTextChangedListener(watcher);
@@ -328,21 +351,21 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     /**
      * Updates ALL live displays inside a single subject row:
-     *  - आकारिक subtotal bar
-     *  - संकलित subtotal bar
-     *  - Grand total bar (inside expanded section)
-     *  - Header chip (always-visible एकूण + श्रेणी)
+     * - आकारिक subtotal bar
+     * - संकलित subtotal bar
+     * - Grand total bar (inside expanded section)
+     * - Header chip (always-visible एकूण + श्रेणी)
      */
     private void updateRow(ItemSubjectMarksRowBinding row, int[] mx, int maxMarks) {
         // mx layout: [akarikMax, sanklitMax, n, tk, pt, uk, pk, ch, sw, it, tb, pb, lk]
-        int akarikMax  = mx[0];
+        int akarikMax = mx[0];
         int sanklitMax = mx[1];
 
         // Sum आकारिक fields
-        int akarikObtained = getInt(row.etNirikhshan)  + getInt(row.etTondiKam)
-                           + getInt(row.etPratyakshik) + getInt(row.etUpkram)
-                           + getInt(row.etPrakalp)     + getInt(row.etChachani)
-                           + getInt(row.etSwadhyay)    + getInt(row.etItar);
+        int akarikObtained = getInt(row.etNirikhshan) + getInt(row.etTondiKam)
+                + getInt(row.etPratyakshik) + getInt(row.etUpkram)
+                + getInt(row.etPrakalp) + getInt(row.etChachani)
+                + getInt(row.etSwadhyay) + getInt(row.etItar);
 
         // Sum संकलित fields
         int sanklitObtained = getInt(row.etTondiB) + getInt(row.etPratyakshikB) + getInt(row.etLekhi);
@@ -356,22 +379,25 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         // ── Header chip (always visible, even when collapsed) ──────────────────
         row.tvSubjectTotal.setText(getString(R.string.label_marks_total) + grandTotal + "/" + maxMarks);
-        row.tvSubjectGrade.setText(getString(R.string.label_marks_grade) + GradeCalculator.getMyschoolGrade(grandTotal, maxMarks));
+        row.tvSubjectGrade.setText(
+                getString(R.string.label_marks_grade) + GradeCalculator.getMyschoolGrade(grandTotal, maxMarks));
     }
 
     // ── Grand total footer card ────────────────────────────────────────────────
     private void recalcAllSubjectsTotals() {
-        double total = 0; int maxTotal = 0;
-        if (classModel.subjects == null) return;
+        double total = 0;
+        int maxTotal = 0;
+        if (classModel.subjects == null)
+            return;
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
             int maxMarks = classModel.subjects.get(i).maxMarks;
             maxTotal += maxMarks;
 
             ItemSubjectMarksRowBinding row = marksRows.get(i);
-            int akarik  = getInt(row.etNirikhshan)  + getInt(row.etTondiKam)
-                        + getInt(row.etPratyakshik) + getInt(row.etUpkram)
-                        + getInt(row.etPrakalp)     + getInt(row.etChachani)
-                        + getInt(row.etSwadhyay)    + getInt(row.etItar);
+            int akarik = getInt(row.etNirikhshan) + getInt(row.etTondiKam)
+                    + getInt(row.etPratyakshik) + getInt(row.etUpkram)
+                    + getInt(row.etPrakalp) + getInt(row.etChachani)
+                    + getInt(row.etSwadhyay) + getInt(row.etItar);
             int sanklit = getInt(row.etTondiB) + getInt(row.etPratyakshikB) + getInt(row.etLekhi);
             total += akarik + sanklit;
         }
@@ -383,7 +409,8 @@ public class EnterMarksActivity extends AppCompatActivity {
         String result = GradeCalculator.getResult(pct);
         b.tvResult.setText(result);
         b.tvResult.setBackgroundResource("PASS".equals(result)
-                ? R.drawable.bg_result_pass : R.drawable.bg_result_fail);
+                ? R.drawable.bg_result_pass
+                : R.drawable.bg_result_fail);
         b.tvResult.setTextColor(getResources().getColor(
                 "PASS".equals(result) ? R.color.success : R.color.error, null));
     }
@@ -396,14 +423,14 @@ public class EnterMarksActivity extends AppCompatActivity {
             if (SessionContext.selectedSemester != null) {
                 semNum = SessionContext.selectedSemester.number;
             }
-            
+
             String[] months;
             if (semNum == 2) {
-                months = new String[]{"डिसें", "जाने", "फेब्रु", "मार्च", "एप्रिल", "मे"};
+                months = new String[] { "डिसें", "जाने", "फेब्रु", "मार्च", "एप्रिल", "मे" };
             } else {
-                months = new String[]{"जून", "जुलै", "ऑगस्ट", "सप्टें", "ऑक्टो", "नोव्हे"};
+                months = new String[] { "जून", "जुलै", "ऑगस्ट", "सप्टें", "ऑक्टो", "नोव्हे" };
             }
-            
+
             for (String m : months) {
                 String val = student.monthlyAttendance.get(m);
                 if (val != null && val.contains("/")) {
@@ -412,17 +439,19 @@ public class EnterMarksActivity extends AppCompatActivity {
                         try {
                             present += Integer.parseInt(parts[0].trim());
                             total += Integer.parseInt(parts[1].trim());
-                        } catch (NumberFormatException ignored) {}
+                        } catch (NumberFormatException ignored) {
+                        }
                     }
                 }
             }
         }
-        return new int[]{present, total};
+        return new int[] { present, total };
     }
 
     // ── Fill existing saved marks back into the form ───────────────────────────
     private void fillExistingMarks(MarksRecord m) {
-        if (classModel.subjects == null) return;
+        if (classModel.subjects == null)
+            return;
 
         if (b.etPresentDays != null) {
             if (m.totalDays > 0) {
@@ -467,7 +496,7 @@ public class EnterMarksActivity extends AppCompatActivity {
                     row.etTondiB.setText(String.valueOf(d.tondi));
                     row.etPratyakshikB.setText(String.valueOf(d.pratyakshikB));
                     row.etLekhi.setText(String.valueOf(d.lekhi));
-                    if (d.remark != null) row.etSubjectRemark.setText(d.remark);
+
                 }
             } else if (m.subjectMarks != null && m.subjectMarks.containsKey(subName)) {
                 // Backward-compat: flat map → fill into लेखी
@@ -476,7 +505,8 @@ public class EnterMarksActivity extends AppCompatActivity {
 
             // Trigger display refresh after setting values
             int[] mx = i < subjectMaxBreakdown.size() ? subjectMaxBreakdown.get(i) : null;
-            if (mx != null) updateRow(row, mx, classModel.subjects.get(i).maxMarks);
+            if (mx != null)
+                updateRow(row, mx, classModel.subjects.get(i).maxMarks);
         }
         recalcAllSubjectsTotals();
     }
@@ -484,8 +514,8 @@ public class EnterMarksActivity extends AppCompatActivity {
     // ── Save ──────────────────────────────────────────────────────────────────
     private void saveMarks() {
         // ── Guard: check auth before doing any work ────────────────────────────
-        com.google.firebase.auth.FirebaseUser currentUser =
-                com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance()
+                .getCurrentUser();
         if (currentUser == null) {
             Log.e("SAVE_MARKS", "ABORT: User is NOT authenticated. Cannot save to Firestore.");
             Toast.makeText(this,
@@ -496,27 +526,45 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         MarksRecord m = existingMarks != null ? existingMarks : new MarksRecord();
         m.studentId = student.id;
-        m.classId   = classModel.id;
-        m.examName  = classModel.examName;
+        m.classId = classModel.id;
+        m.examName = classModel.examName;
 
-        if (m.subjectMarks == null) m.subjectMarks = new java.util.HashMap<>();
-        if (m.subjectMax == null) m.subjectMax = new java.util.HashMap<>();
-        if (m.detailedMarks == null) m.detailedMarks = new java.util.HashMap<>();
+        if (m.subjectMarks == null)
+            m.subjectMarks = new java.util.HashMap<>();
+        if (m.subjectMax == null)
+            m.subjectMax = new java.util.HashMap<>();
+        if (m.detailedMarks == null)
+            m.detailedMarks = new java.util.HashMap<>();
+
+        java.util.Map<String, String> oldRemarks = new java.util.HashMap<>();
+        if (existingMarks != null && existingMarks.detailedMarks != null) {
+            for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : existingMarks.detailedMarks.entrySet()) {
+                if (entry.getValue() != null && entry.getValue().remark != null) {
+                    oldRemarks.put(entry.getKey(), entry.getValue().remark);
+                }
+            }
+        }
 
         m.subjectMarks.clear();
         m.subjectMax.clear();
         m.detailedMarks.clear();
 
         // Attendance
-        try { m.presentDays = Integer.parseInt(b.etPresentDays.getText().toString()); } catch (Exception ignored) {}
-        try { m.totalDays   = Integer.parseInt(b.etTotalDays.getText().toString());   } catch (Exception ignored) {}
+        try {
+            m.presentDays = Integer.parseInt(b.etPresentDays.getText().toString());
+        } catch (Exception ignored) {
+        }
+        try {
+            m.totalDays = Integer.parseInt(b.etTotalDays.getText().toString());
+        } catch (Exception ignored) {
+        }
 
         // Semester
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
-            m.semesterId     = SessionContext.selectedSemester.id;
+            m.semesterId = SessionContext.selectedSemester.id;
             m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
         } else {
-            m.semesterId     = "sem_1";
+            m.semesterId = "sem_1";
             m.semesterNumber = "1";
         }
 
@@ -533,53 +581,59 @@ public class EnterMarksActivity extends AppCompatActivity {
             return;
         }
 
-        double total = 0; int maxTotal = 0;
+        double total = 0;
+        int maxTotal = 0;
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
             Subject sub = classModel.subjects.get(i);
             ItemSubjectMarksRowBinding row = marksRows.get(i);
 
             MarksRecord.SubjectMarksDetail d = new MarksRecord.SubjectMarksDetail();
-            d.nirikhshan    = getInt(row.etNirikhshan);
-            d.tondiKam      = getInt(row.etTondiKam);
-            d.pratyakshik   = getInt(row.etPratyakshik);
-            d.upkram        = getInt(row.etUpkram);
-            d.prakalp       = getInt(row.etPrakalp);
-            d.chachani      = getInt(row.etChachani);
-            d.swadhyay      = getInt(row.etSwadhyay);
-            d.itar          = getInt(row.etItar);
-            d.akarikTotal   = d.nirikhshan + d.tondiKam + d.pratyakshik + d.upkram
-                            + d.prakalp + d.chachani + d.swadhyay + d.itar;
+            d.nirikhshan = getInt(row.etNirikhshan);
+            d.tondiKam = getInt(row.etTondiKam);
+            d.pratyakshik = getInt(row.etPratyakshik);
+            d.upkram = getInt(row.etUpkram);
+            d.prakalp = getInt(row.etPrakalp);
+            d.chachani = getInt(row.etChachani);
+            d.swadhyay = getInt(row.etSwadhyay);
+            d.itar = getInt(row.etItar);
+            d.akarikTotal = d.nirikhshan + d.tondiKam + d.pratyakshik + d.upkram
+                    + d.prakalp + d.chachani + d.swadhyay + d.itar;
 
-            d.tondi         = getInt(row.etTondiB);
-            d.pratyakshikB  = getInt(row.etPratyakshikB);
-            d.lekhi         = getInt(row.etLekhi);
-            d.sanklit       = d.tondi + d.pratyakshikB + d.lekhi;
+            d.tondi = getInt(row.etTondiB);
+            d.pratyakshikB = getInt(row.etPratyakshikB);
+            d.lekhi = getInt(row.etLekhi);
+            d.sanklit = d.tondi + d.pratyakshikB + d.lekhi;
 
-            d.grandTotal    = d.akarikTotal + d.sanklit;
-            d.maxMarks      = sub.maxMarks;
-            d.grade         = GradeCalculator.getMyschoolGrade(d.grandTotal, d.maxMarks);
-            d.remark        = row.etSubjectRemark.getText() != null
-                              ? row.etSubjectRemark.getText().toString() : "";
+            d.grandTotal = d.akarikTotal + d.sanklit;
+            d.maxMarks = sub.maxMarks;
+            d.grade = GradeCalculator.getMyschoolGrade(d.grandTotal, d.maxMarks);
+
+            String safeKey = MarksRecord.sanitizeKey(sub.name);
+
+            // Preserve existing remark if any
+            d.remark = "";
+            if (oldRemarks.containsKey(safeKey)) {
+                d.remark = oldRemarks.get(safeKey);
+            }
 
             Log.d("SAVE_MARKS", "  [" + sub.name + "] akarik=" + d.akarikTotal
                     + " sanklit=" + d.sanklit + " total=" + d.grandTotal + " grade=" + d.grade);
 
-            String safeKey = MarksRecord.sanitizeKey(sub.name);
             m.detailedMarks.put(safeKey, d);
 
             // Backward compat (used by older MarksheetActivity / PDF legacy path)
             m.subjectMarks.put(safeKey, (double) d.grandTotal);
             m.subjectMax.put(safeKey, sub.maxMarks);
 
-            total    += d.grandTotal;
+            total += d.grandTotal;
             maxTotal += sub.maxMarks;
         }
 
         m.totalObtained = total;
-        m.totalMax      = maxTotal;
-        m.percentage    = GradeCalculator.getPercentage(total, maxTotal);
-        m.grade         = GradeCalculator.getMyschoolGrade(total, maxTotal);
-        m.result        = GradeCalculator.getResult(m.percentage);
+        m.totalMax = maxTotal;
+        m.percentage = GradeCalculator.getPercentage(total, maxTotal);
+        m.grade = GradeCalculator.getMyschoolGrade(total, maxTotal);
+        m.result = GradeCalculator.getResult(m.percentage);
 
         Log.d("SAVE_MARKS", "totalObtained: " + total + " / " + maxTotal
                 + " | %: " + m.percentage + " | grade: " + m.grade);
@@ -587,7 +641,8 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         showLoading(true);
         FirebaseRepository.get().saveMarks(m, new FirebaseRepository.OnResult<String>() {
-            @Override public void onSuccess(String id) {
+            @Override
+            public void onSuccess(String id) {
                 Log.d("SAVE_MARKS", "SUCCESS — Firestore doc id: " + id);
                 m.id = id;
                 AppCache.selectedMarks = m;
@@ -600,15 +655,14 @@ public class EnterMarksActivity extends AppCompatActivity {
                         .apply();
                 Log.d("SAVE_MARKS", "Saved docId to SharedPreferences key=" + prefKey);
 
-
                 // Patch the marks map immediately so instant-cache render shows new marks.
                 // Initialize the map if it was null (first save of the session).
                 if (AppCache.cachedMarksMap == null) {
                     AppCache.cachedMarksMap = new java.util.HashMap<>();
                 }
                 AppCache.cachedMarksMap.put(student.id, m);
-                AppCache.cachedClassIdForStudents  = classModel.id;
-                AppCache.cachedSemesterIdForMarks  = m.semesterId;
+                AppCache.cachedClassIdForStudents = classModel.id;
+                AppCache.cachedSemesterIdForMarks = m.semesterId;
                 Log.d("SAVE_MARKS", "Patched AppCache.cachedMarksMap for student=" + student.id);
 
                 // Patch descriptive entries cache too
@@ -616,8 +670,8 @@ public class EnterMarksActivity extends AppCompatActivity {
                     AppCache.cachedDescriptiveMarksMap = new java.util.HashMap<>();
                 }
                 AppCache.cachedDescriptiveMarksMap.put(student.id, m);
-                AppCache.cachedDescriptiveClassId     = classModel.id;
-                AppCache.cachedDescriptiveSemesterId  = m.semesterId;
+                AppCache.cachedDescriptiveClassId = classModel.id;
+                AppCache.cachedDescriptiveSemesterId = m.semesterId;
 
                 // Clear repo marks cache so Firestore is queried fresh on next load
                 FirebaseRepository.get().clearMarksCache();
@@ -626,19 +680,25 @@ public class EnterMarksActivity extends AppCompatActivity {
                 showLoading(false);
                 student.marksEntered = true;
                 FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
-                    @Override public void onSuccess(String i) {
+                    @Override
+                    public void onSuccess(String i) {
                         Log.d("SAVE_MARKS", "saveStudent SUCCESS — id: " + i);
                     }
-                    @Override public void onError(Exception e) {
+
+                    @Override
+                    public void onError(Exception e) {
                         Log.e("SAVE_MARKS", "saveStudent FAILED: " + e.getMessage(), e);
                     }
                 });
 
-                Toast.makeText(EnterMarksActivity.this, "गुण यशस्वीरित्या जतन केले गेले आहेत!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EnterMarksActivity.this, "गुण यशस्वीरित्या जतन केले गेले आहेत!", Toast.LENGTH_SHORT)
+                        .show();
                 setResult(RESULT_OK);
                 finish();
             }
-            @Override public void onError(Exception e) {
+
+            @Override
+            public void onError(Exception e) {
                 Log.e("SAVE_MARKS", "FIRESTORE ERROR: " + e.getMessage(), e);
                 showLoading(false);
                 Toast.makeText(EnterMarksActivity.this,
@@ -651,7 +711,7 @@ public class EnterMarksActivity extends AppCompatActivity {
     private void showScanOptions() {
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Scan Marksheet")
-                .setItems(new String[]{"Camera", "Gallery"}, (d, w) -> {
+                .setItems(new String[] { "Camera", "Gallery" }, (d, w) -> {
                     if (w == 0) {
                         cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
                     } else {
@@ -662,29 +722,39 @@ public class EnterMarksActivity extends AppCompatActivity {
     }
 
     private void processOcr(Bitmap bitmap) {
-        if (bitmap == null) return;
+        if (bitmap == null)
+            return;
         b.cardOcrPreview.setVisibility(View.VISIBLE);
         b.ivOcrPreview.setImageBitmap(bitmap);
         b.tvOcrRaw.setText("Processing...");
         ocrHelper.processImage(bitmap, new OcrHelper.OcrCallback() {
-            @Override public void onResult(List<String> numbers, String rawText) {
-                runOnUiThread(() -> { b.tvOcrRaw.setText("Detected: " + numbers); autoFillFromOcr(numbers); });
+            @Override
+            public void onResult(List<String> numbers, String rawText) {
+                runOnUiThread(() -> {
+                    b.tvOcrRaw.setText("Detected: " + numbers);
+                    autoFillFromOcr(numbers);
+                });
             }
-            @Override public void onError(Exception e) {
+
+            @Override
+            public void onError(Exception e) {
                 runOnUiThread(() -> b.tvOcrRaw.setText("OCR Error: " + e.getMessage()));
             }
         });
     }
 
     private void autoFillFromOcr(List<String> numbers) {
-        if (classModel.subjects == null) return;
+        if (classModel.subjects == null)
+            return;
         int idx = 0;
         for (int i = 0; i < marksRows.size() && idx < numbers.size() && i < classModel.subjects.size(); i++) {
             try {
                 int d = Integer.parseInt(numbers.get(idx++));
                 int max = classModel.subjects.get(i).maxMarks;
-                if (d >= 0 && d <= max) marksRows.get(i).etLekhi.setText(String.valueOf(d));
-            } catch (NumberFormatException ignored) {}
+                if (d >= 0 && d <= max)
+                    marksRows.get(i).etLekhi.setText(String.valueOf(d));
+            } catch (NumberFormatException ignored) {
+            }
         }
         recalcAllSubjectsTotals();
         Toast.makeText(this, "Marks filled into Written (लेखी) — please verify!", Toast.LENGTH_LONG).show();
@@ -692,23 +762,29 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     private int getInt(android.widget.EditText et) {
-        if (et == null || et.getText() == null) return 0;
+        if (et == null || et.getText() == null)
+            return 0;
         String s = et.getText().toString().trim();
-        if (s.isEmpty()) return 0;
-        
+        if (s.isEmpty())
+            return 0;
+
         // Convert Marathi digits to English digits
         s = s.replace('०', '0')
-             .replace('१', '1')
-             .replace('२', '2')
-             .replace('३', '3')
-             .replace('४', '4')
-             .replace('५', '5')
-             .replace('६', '6')
-             .replace('७', '7')
-             .replace('८', '8')
-             .replace('९', '9');
-             
-        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
+                .replace('१', '1')
+                .replace('२', '2')
+                .replace('३', '3')
+                .replace('४', '4')
+                .replace('५', '5')
+                .replace('६', '6')
+                .replace('७', '7')
+                .replace('८', '8')
+                .replace('९', '9');
+
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private void showLoading(boolean show) {
@@ -718,11 +794,19 @@ public class EnterMarksActivity extends AppCompatActivity {
 
     private void setupMaxMarksValidation(android.widget.EditText et, int maxVal) {
         et.addTextChangedListener(new android.text.TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(android.text.Editable s) {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
                 String valStr = s.toString().trim();
-                if (valStr.isEmpty()) return;
+                if (valStr.isEmpty())
+                    return;
                 try {
                     int val = Integer.parseInt(valStr);
                     if (val > maxVal) {
@@ -730,7 +814,8 @@ public class EnterMarksActivity extends AppCompatActivity {
                         et.setText(String.valueOf(maxVal));
                         et.setSelection(et.getText().length());
                         et.addTextChangedListener(this);
-                        Toast.makeText(EnterMarksActivity.this, "Marks cannot exceed " + maxVal, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EnterMarksActivity.this, "Marks cannot exceed " + maxVal, Toast.LENGTH_SHORT)
+                                .show();
                     }
                 } catch (NumberFormatException e) {
                     // Ignore
@@ -743,5 +828,9 @@ public class EnterMarksActivity extends AppCompatActivity {
         return (v == Math.floor(v)) ? String.valueOf((int) v) : String.valueOf(v);
     }
 
-    @Override protected void onDestroy() { super.onDestroy(); ocrHelper.close(); }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ocrHelper.close();
+    }
 }

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.AppBarLayout android:id="@+id/appBar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="#FFFFFF" app:elevation="2dp">
+        <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+            android:layout_width="match_parent" android:layout_height="72dp"
+            android:background="#FFFFFF"
+            app:navigationIcon="@drawable/ic_close" app:navigationIconTint="#5A4FCF"
+            app:title="Descriptive Entries" app:titleTextColor="#2E2E2E"
+            app:titleCentered="false"/>
+        <!-- Student info strip -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingStart="20dp" android:paddingEnd="20dp" android:paddingBottom="16dp"
+            android:background="#FFFFFF">
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cardStudentAvatarMarks"
+                android:layout_width="44dp" android:layout_height="44dp"
+                app:cardCornerRadius="22dp" app:cardElevation="0dp" app:cardBackgroundColor="#F1F3F4">
+                <ImageView android:id="@+id/ivStudentAvatarMarks"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:src="@drawable/ic_person" android:padding="10dp" app:tint="#5A4FCF"/>
+            </com.google.android.material.card.MaterialCardView>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="12dp">
+                <TextView android:id="@+id/tvMarksStudentName"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Student Name" android:textColor="#2E2E2E"
+                    android:textSize="16sp" android:fontFamily="sans-serif-medium"/>
+                <TextView android:id="@+id/tvMarksRollClass"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Roll: 01 | Class 7-A" android:textColor="#757575"
+                    android:textSize="12sp" android:alpha="0.85"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <!-- Remarks Instructions Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp" app:cardElevation="0dp" 
+                app:cardBackgroundColor="@color/primary_container"
+                app:strokeWidth="1dp" app:strokeColor="@color/outline_variant">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                        android:src="@drawable/ic_edit_pencil" app:tint="@color/primary"
+                        android:layout_marginEnd="12dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Select standard remarks from the predefined list or add your own custom remarks for each subject."
+                        android:textSize="13sp" android:textColor="@color/on_surface_variant"
+                        android:fontFamily="sans-serif"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Rows container (populated dynamically) -->
+            <LinearLayout android:id="@+id/llRemarkRows"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Save button fixed at bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:padding="16dp">
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveRemarks"
+            style="@style/Widget.Myschool.Button"
+            android:layout_width="match_parent" android:layout_height="54dp"
+            android:text="Save Remarks"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
+    
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/marksProgress" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_gravity="bottom"
+        android:layout_marginBottom="86dp"
+        android:indeterminate="true" android:visibility="gone"
+        app:indicatorColor="@color/primary" app:trackColor="@color/primary_container"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

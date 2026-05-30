@@ -506,28 +506,6 @@
                     android:textColor="@color/white"/>
             </LinearLayout>
 
-            <!-- ─────────────────────────────────────── -->
-            <!--  REMARK                                 -->
-            <!-- ─────────────────────────────────────── -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/label_subject_remark_title"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="11sp"
-                android:layout_marginBottom="4dp"/>
-
-            <EditText
-                android:id="@+id/etSubjectRemark"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:hint="@string/hint_qualitative_remark"
-                android:textSize="12sp"
-                android:background="@drawable/bg_surface_rounded"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:singleLine="true"/>
 
         </LinearLayout>
     </LinearLayout>

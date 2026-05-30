@@ -738,12 +738,13 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
-    public void getMarksForStudentAndSemester(String studentId, String classId, String semesterId, OnResult<MarksRecord> cb) {
+    public void getMarksForStudentAndSemester(String studentId,                                                                                                                                                                                                                                                                                                                                 
+    String classId, String semesterId, OnResult<MarksRecord> cb) {
         if (studentId == null || classId == null || semesterId == null) {
             cb.onError(new IllegalArgumentException("Arguments cannot be null"));
             return;
         }
-        // Query by studentId + classId (no composite index needed), then filter semesterId in memory.
+        // Query by studentId + classId (no composite index needed via merge), then filter semesterId in memory.
         db.collection(COL_MARKS)
                 .whereEqualTo("studentId", studentId)
                 .whereEqualTo("classId", classId)
@@ -854,20 +855,30 @@ public class FirebaseRepository {
                                 }
                                 
                                 if (semesterId.equals(m.semesterId) || finalTargetSemNum == recordSemNum) {
-                                    // Match — include
-                                    marksMap.put(m.studentId, m);
+                                    // Match — include (prefer most-recently-updated doc per student)
+                                    MarksRecord existing = marksMap.get(m.studentId);
+                                    if (existing == null || m.updatedAt >= existing.updatedAt) {
+                                        marksMap.put(m.studentId, m);
+                                    }
                                 } else if (m.semesterId == null || m.semesterId.isEmpty()) {
                                     // No semesterId saved — include as fallback
-                                    fallbackMap.put(m.studentId, m);
+                                    MarksRecord fallbackExisting = fallbackMap.get(m.studentId);
+                                    if (fallbackExisting == null || m.updatedAt >= fallbackExisting.updatedAt) {
+                                        fallbackMap.put(m.studentId, m);
+                                    }
                                 }
                             }
                         }
                     }
                     // If exact/number matches found, use them; otherwise fall back to records
                     // with no semesterId (handles older saves that didn't set semesterId)
-                    if (marksMap.isEmpty() && !fallbackMap.isEmpty()) {
+                    if (!fallbackMap.isEmpty()) {
                         Log.d("FIRESTORE_MARKS", "No exact/number match — using " + fallbackMap.size() + " fallback records");
-                        marksMap = fallbackMap;
+                        for (java.util.Map.Entry<String, MarksRecord> entry : fallbackMap.entrySet()) {
+                            if (!marksMap.containsKey(entry.getKey())) {
+                                marksMap.put(entry.getKey(), entry.getValue());
+                            }
+                        }
                     }
                     Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: returning " + marksMap.size() + " marks records");
                     cachedClassSemesterMarksMap.put(cacheKey, marksMap);

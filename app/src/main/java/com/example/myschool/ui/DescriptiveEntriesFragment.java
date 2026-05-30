@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myschool.AppCache;
-import com.example.myschool.EnterMarksActivity;
+import com.example.myschool.EnterDescriptiveActivity;
 import com.example.myschool.HomeActivity;
 import com.example.myschool.R;
 import com.example.myschool.SessionContext;
@@ -28,8 +27,11 @@ import com.example.myschool.model.MarksRecord;
 import com.example.myschool.model.Student;
 import com.example.myschool.model.Subject;
 import com.example.myschool.repository.FirebaseRepository;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,8 @@ public class DescriptiveEntriesFragment extends Fragment {
     private ClassModel activeClass;
     private String activeSemesterId = "sem_1";
     private int activeSemesterNumber = 1;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
+    private boolean isGridViewMode = false;
 
     @Nullable
     @Override
@@ -61,6 +65,18 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         setupCustomAppBar();
         setupHeaderStrip();
+
+        swipeRefresh = b.swipeRefreshLayout;
+        swipeRefresh.setColorSchemeColors(0xFF6C4CCF, 0xFF9C27B0, 0xFF00A5CF);
+        swipeRefresh.setProgressBackgroundColorSchemeColor(0xFFFFFFFF);
+        swipeRefresh.setOnRefreshListener(() -> {
+            AppCache.cachedDescriptiveStudents = null;
+            AppCache.cachedDescriptiveMarksMap = null;
+            AppCache.cachedDescriptiveClassId = null;
+            AppCache.cachedDescriptiveSemesterId = null;
+            FirebaseRepository.get().clearMarksCache();
+            loadDescriptiveData();
+        });
 
         b.rvDescriptiveStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new DescriptiveAdapter();
@@ -103,7 +119,15 @@ public class DescriptiveEntriesFragment extends Fragment {
         String div = activeClass != null ? activeClass.division : "1";
         b.tvHeaderStripInfo.setText("Year: " + yr + "  Class: " + cls + ", Div: " + div + ", Sem: " + activeSemesterNumber);
 
-        b.btnGridListToggle.setOnClickListener(v -> Toast.makeText(requireContext(), "Layout View locked to dual-column for Descriptive Entries", Toast.LENGTH_SHORT).show());
+        // Set initial icon (show grid icon when in slide mode, show list/bullet icon when in grid mode)
+        b.btnGridListToggle.setImageResource(isGridViewMode ? R.drawable.ic_list_bullet : R.drawable.ic_table_grid);
+
+        b.btnGridListToggle.setOnClickListener(v -> {
+            isGridViewMode = !isGridViewMode;
+            b.btnGridListToggle.setImageResource(isGridViewMode ? R.drawable.ic_list_bullet : R.drawable.ic_table_grid);
+            Toast.makeText(requireContext(), isGridViewMode ? "Grid View Enabled" : "Slide View Enabled", Toast.LENGTH_SHORT).show();
+            adapter.notifyDataSetChanged();
+        });
     }
 
     private void loadDescriptiveData() {
@@ -126,7 +150,14 @@ public class DescriptiveEntriesFragment extends Fragment {
             
             // Render instantly!
             adapter.setData(cachedList, cachedMarks);
+            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
         }
+
+        // ★ FIX: Do NOT clear repo marks cache here.
+        // Clearing on every resume wipes data that was just saved or loaded,
+        // causing the fragment to always show stale/empty data until Firestore returns.
+        // The cache is cleared selectively (by EnterDescriptiveActivity on save,
+        // or by the swipe-to-refresh gesture).
 
         // 2. Fetch from network in background (stale-while-revalidate):
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
@@ -141,7 +172,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                             public void onSuccess(Map<String, MarksRecord> marksMap) {
                                 Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
                                 
-                                // Merge network results with the fresh cache based on updatedAt
+                                // Merge network results with the fresh AppCache based on updatedAt
                                 if (AppCache.cachedDescriptiveMarksMap != null) {
                                     for (Map.Entry<String, MarksRecord> entry : AppCache.cachedDescriptiveMarksMap.entrySet()) {
                                         String sId = entry.getKey();
@@ -155,6 +186,18 @@ public class DescriptiveEntriesFragment extends Fragment {
                                     }
                                 }
 
+                                android.util.Log.d("DESCRIPTIVE_DEBUG", "Loaded finalMarks size=" + finalMarks.size() + " for classId=" + activeClass.id + " sem=" + activeSemesterId);
+                                for (Map.Entry<String, MarksRecord> entry : finalMarks.entrySet()) {
+                                    MarksRecord rec = entry.getValue();
+                                    if (rec != null && rec.detailedMarks != null) {
+                                        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> d : rec.detailedMarks.entrySet()) {
+                                            if (d.getValue() != null && d.getValue().remark != null && !d.getValue().remark.isEmpty()) {
+                                                android.util.Log.d("DESCRIPTIVE_DEBUG", "  student=" + entry.getKey() + " subject=" + d.getKey() + " remark=" + d.getValue().remark);
+                                            }
+                                        }
+                                    }
+                                }
+
                                 // Cache the loaded results
                                 AppCache.cachedDescriptiveStudents = finalList;
                                 AppCache.cachedDescriptiveMarksMap = finalMarks;
@@ -163,11 +206,13 @@ public class DescriptiveEntriesFragment extends Fragment {
 
                                 if (isAdded() && b != null) {
                                     adapter.setData(finalList, finalMarks);
+                                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                                 }
                             }
                             @Override
                             public void onError(Exception e) {
                                 if (isAdded() && b != null) {
+                                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                                     if (AppCache.cachedDescriptiveStudents == null || !java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
                                         adapter.setData(finalList, new HashMap<>());
                                     }
@@ -179,6 +224,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 if (isAdded()) {
+                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                     if (AppCache.cachedDescriptiveStudents == null || !java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
                         Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -191,14 +237,12 @@ public class DescriptiveEntriesFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // FIX: Re-read session context on every resume so that class/semester changes
-        // (e.g. user pressed back and switched class) are always reflected here.
         if (SessionContext.selectedClass != null) {
             activeClass = SessionContext.selectedClass;
         }
 
-        // Smart fallback if semester is null
-        if (SessionContext.selectedSemester == null && activeClass != null && activeClass.semesterId != null && !activeClass.semesterId.isEmpty()) {
+        if (SessionContext.selectedSemester == null && activeClass != null
+                && activeClass.semesterId != null && !activeClass.semesterId.isEmpty()) {
             com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
             fallbackSem.id = activeClass.semesterId;
             fallbackSem.yearId = activeClass.yearId;
@@ -212,21 +256,17 @@ public class DescriptiveEntriesFragment extends Fragment {
             activeSemesterNumber = SessionContext.selectedSemester.number;
         }
 
-        // Dynamically update toolbar and header strip text views on resume
         setupCustomAppBar();
         setupHeaderStrip();
 
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             View activityAppBar = activity.findViewById(R.id.appBarLayout);
-            if (activityAppBar != null) {
-                activityAppBar.setVisibility(View.GONE);
-            }
+            if (activityAppBar != null) activityAppBar.setVisibility(View.GONE);
 
-            // Fix CoordinatorLayout scrolling behavior offset bug:
             View navHost = activity.findViewById(R.id.navHostFragment);
             if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
                         (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
                 params.setBehavior(null);
                 float density = getResources().getDisplayMetrics().density;
@@ -234,6 +274,28 @@ public class DescriptiveEntriesFragment extends Fragment {
                 navHost.setLayoutParams(params);
             }
         }
+
+        // FIX: If remarks were just saved in EnterDescriptiveActivity:
+        // 1. Instantly patch only that student's card — 0ms, no network
+        // 2. Then do a full Firestore reload in background to confirm
+        if (AppCache.descriptiveJustSaved
+                && AppCache.descriptiveJustSavedStudentId != null
+                && AppCache.descriptiveJustSavedRecord != null) {
+
+            android.util.Log.d("DESCRIPTIVE", "descriptiveJustSaved=true for student="
+                    + AppCache.descriptiveJustSavedStudentId + " — patching adapter instantly");
+
+            // Instant patch: update only the one card that changed
+            adapter.patchStudentMarks(
+                    AppCache.descriptiveJustSavedStudentId,
+                    AppCache.descriptiveJustSavedRecord);
+
+            // Consume the flags so next unrelated resume doesn’t re-patch
+            AppCache.descriptiveJustSaved          = false;
+            AppCache.descriptiveJustSavedStudentId = null;
+            AppCache.descriptiveJustSavedRecord    = null;
+        }
+
         loadDescriptiveData();
     }
 
@@ -282,6 +344,31 @@ public class DescriptiveEntriesFragment extends Fragment {
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
+        /** Instantly updates one student's card without a full list reload.
+         *  Called by onResume() immediately after returning from EnterDescriptiveActivity. */
+        public void patchStudentMarks(String studentId, MarksRecord record) {
+            // Update the adapter's marks map
+            marksMap.put(studentId, record);
+            // Also update the descriptive AppCache so future renders are correct
+            if (AppCache.cachedDescriptiveMarksMap == null) {
+                AppCache.cachedDescriptiveMarksMap = new java.util.HashMap<>();
+            }
+            AppCache.cachedDescriptiveMarksMap.put(studentId, record);
+            // Notify only the changed item for a smooth, flicker-free update
+            for (int i = 0; i < students.size(); i++) {
+                if (studentId.equals(students.get(i).id)) {
+                    final int pos = i;
+                    new android.os.Handler(android.os.Looper.getMainLooper())
+                            .post(() -> notifyItemChanged(pos));
+                    android.util.Log.d("DESCRIPTIVE",
+                            "patchStudentMarks: notified pos=" + pos + " student=" + studentId);
+                    return;
+                }
+            }
+            // Student not in list yet — do a full refresh
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
+        }
+
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -313,82 +400,230 @@ public class DescriptiveEntriesFragment extends Fragment {
                 binding.tvStudentName.setText(index + ". " + s.name);
                 binding.btnStudentMore.setOnClickListener(v -> Toast.makeText(itemView.getContext(), "Options for " + s.name, Toast.LENGTH_SHORT).show());
 
-                MarksRecord marks = marksMap.get(s.id);
+                MarksRecord marks = getDisplayMarksForStudent(s);
 
-                // Build Subject Cards Horizontal List
-                binding.layoutSubjectsHorizontal.removeAllViews();
-                if (activeClass.subjects != null) {
-                    for (int i = 0; i < activeClass.subjects.size(); i++) {
-                        Subject sub = activeClass.subjects.get(i);
-                        View cardView = createSubjectCard(s, sub, i + 1, marks);
-                        binding.layoutSubjectsHorizontal.addView(cardView);
+                if (isGridViewMode) {
+                    // Show 2-Column Grid, Hide Horizontal Scroll
+                    binding.layoutSubjectsScroll.setVisibility(View.GONE);
+                    binding.layoutSubjectsGridContainer.setVisibility(View.VISIBLE);
+                    binding.layoutSubjectsGridContainer.removeAllViews();
+                    
+                    if (activeClass.subjects != null) {
+                        LinearLayout currentRow = null;
+                        for (int i = 0; i < activeClass.subjects.size(); i++) {
+                            if (i % 2 == 0) {
+                                currentRow = new LinearLayout(itemView.getContext());
+                                currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                                currentRow.setWeightSum(2f);
+                                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                                currentRow.setLayoutParams(rowParams);
+                                binding.layoutSubjectsGridContainer.addView(currentRow);
+                            }
+
+                            Subject sub = activeClass.subjects.get(i);
+                            View cardView = createSubjectCard(s, sub, i + 1, marks);
+
+                            // Set layout params for 2-column grid item
+                            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                                    0,
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    1f);
+                            
+                            float density = itemView.getResources().getDisplayMetrics().density;
+                            int margin = (int) (4 * density);
+                            param.setMargins(margin, margin, margin, margin);
+                            cardView.setLayoutParams(param);
+
+                            if (currentRow != null) {
+                                currentRow.addView(cardView);
+                            }
+                        }
+
+                        // If odd number of subjects, add an empty placeholder view to balance the last row
+                        if (activeClass.subjects.size() % 2 != 0 && currentRow != null) {
+                            View placeholder = new View(itemView.getContext());
+                            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                                    0,
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    1f);
+                            placeholder.setLayoutParams(param);
+                            currentRow.addView(placeholder);
+                        }
+                    }
+                } else {
+                    // Show Horizontal Scroll (Slide Layout), Hide Grid
+                    binding.layoutSubjectsGridContainer.setVisibility(View.GONE);
+                    binding.layoutSubjectsScroll.setVisibility(View.VISIBLE);
+                    binding.layoutSubjectsHorizontal.removeAllViews();
+
+                    if (activeClass.subjects != null) {
+                        for (int i = 0; i < activeClass.subjects.size(); i++) {
+                            Subject sub = activeClass.subjects.get(i);
+                            View cardView = createSubjectCard(s, sub, i + 1, marks);
+                            binding.layoutSubjectsHorizontal.addView(cardView);
+                        }
                     }
                 }
             }
 
             private View createSubjectCard(Student student, Subject sub, int number, MarksRecord record) {
                 ItemDescriptiveSubjectCardBinding cardB = ItemDescriptiveSubjectCardBinding.inflate(
-                        LayoutInflater.from(itemView.getContext()), binding.layoutSubjectsHorizontal, false);
+                        LayoutInflater.from(itemView.getContext()), 
+                        isGridViewMode ? binding.layoutSubjectsGridContainer : binding.layoutSubjectsHorizontal, 
+                        false);
 
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
-                // Load actual saved remark from Firestore data
-                String remarkVal = "";
-                String safeKey = MarksRecord.sanitizeKey(sub.name);
-                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
-                    MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
-                    if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
-                        remarkVal = detail.remark.trim();
+                List<String> remarks = new ArrayList<>();
+                MarksRecord.SubjectMarksDetail detail = getSubjectDetail(record, sub);
+                if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
+                    String[] parts = detail.remark.trim().split("\\|\\|");
+                    for (String p : parts) {
+                        String trimmed = p.trim();
+                        if (!trimmed.isEmpty()) {
+                            remarks.add(trimmed);
+                        }
                     }
                 }
 
-                if (!remarkVal.isEmpty()) {
-                    // Remark EXISTS → show the remark text, hide empty state
-                    cardB.tvSubjectRemark.setVisibility(View.VISIBLE);
-                    cardB.tvSubjectRemark.setText(remarkVal);
+                com.google.android.material.card.MaterialCardView cardRoot =
+                        (com.google.android.material.card.MaterialCardView) cardB.getRoot();
+
+                if (!remarks.isEmpty()) {
+                    // ── Has remarks → show compact chips, hide empty state ────────────────
+                    cardB.cgRemarkChips.setVisibility(View.VISIBLE);
                     cardB.layoutEmptyRemark.setVisibility(View.GONE);
-                    // White card with normal border
-                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
-                            .setStrokeColor(0xFFE0E0E0);
+                    cardB.cgRemarkChips.removeAllViews();
+
+                    float density = itemView.getResources().getDisplayMetrics().density;
+                    // Show max 2 chips to keep card compact; rest shown as "+N more"
+                    int maxVisible = 2;
+                    int shown = Math.min(remarks.size(), maxVisible);
+
+                    for (int r = 0; r < shown; r++) {
+                        String full  = remarks.get(r);
+                        // Truncate to 28 chars so chip stays on 1 line
+                        String label = full.length() > 28
+                                ? full.substring(0, 26) + "…"
+                                : full;
+
+                        Chip chip = new Chip(itemView.getContext());
+                        chip.setText(label);
+                        chip.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 9.5f);
+                        chip.setChipBackgroundColorResource(android.R.color.transparent);
+                        chip.setChipStrokeWidth(1f * density);
+                        chip.setChipStrokeColor(
+                                android.content.res.ColorStateList.valueOf(0xFF6C4CCF));
+                        chip.setTextColor(0xFF6C4CCF);
+                        chip.setClickable(false);
+                        chip.setFocusable(false);
+                        chip.setCloseIconVisible(false);
+                        chip.setChipMinHeight((int) (24 * density));
+                        chip.setEnsureMinTouchTargetSize(false);
+                        chip.setPadding(
+                                (int) (2 * density), 0,
+                                (int) (2 * density), 0);
+                        cardB.cgRemarkChips.addView(chip);
+                    }
+
+                    // "+N more" overflow chip
+                    int overflow = remarks.size() - shown;
+                    if (overflow > 0) {
+                        Chip more = new Chip(itemView.getContext());
+                        more.setText("+" + overflow + " more");
+                        more.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 9f);
+                        more.setChipBackgroundColor(
+                                android.content.res.ColorStateList.valueOf(0xFFEDE7F6));
+                        more.setTextColor(0xFF6C4CCF);
+                        more.setChipStrokeWidth(0f);
+                        more.setClickable(false);
+                        more.setFocusable(false);
+                        more.setCloseIconVisible(false);
+                        more.setChipMinHeight((int) (24 * density));
+                        more.setEnsureMinTouchTargetSize(false);
+                        cardB.cgRemarkChips.addView(more);
+                    }
+
+                    // Green border = filled
+                    cardRoot.setStrokeColor(0xFF81C784);
                 } else {
-                    // Remark MISSING → show pencil icon empty state, hide remark text
-                    cardB.tvSubjectRemark.setVisibility(View.GONE);
+                    // ── No remarks → show empty state ──────────────────────
+                    cardB.cgRemarkChips.setVisibility(View.GONE);
                     cardB.layoutEmptyRemark.setVisibility(View.VISIBLE);
-                    // Tint border orange to signal "needs entry"
-                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
-                            .setStrokeColor(0xFFFFB74D);
+                    // Orange border signals needs-entry
+                    cardRoot.setStrokeColor(0xFFFFB74D);
                 }
 
-                // Setup 3-dot popup menu for Subject Card
-                cardB.btnSubjectMore.setOnClickListener(v -> {
-                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(itemView.getContext(), v);
-                    popup.getMenu().add(0, 1, 0, "Edit Remarks");
-                    popup.getMenu().add(0, 2, 1, "Quick View Details");
-                    popup.setOnMenuItemClickListener(item -> {
-                        if (item.getItemId() == 1) {
-                            openMarksEntry(student);
-                            return true;
-                        }
-                        Toast.makeText(itemView.getContext(), "Subject: " + sub.name + " Details Opened", Toast.LENGTH_SHORT).show();
-                        return true;
-                    });
-                    popup.show();
-                });
-
-                // JOIN TO ENTER MARKS: Clicking on the subject card opens EnterMarksActivity!
+                // Tap anywhere on card → open entry screen
                 cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
 
-                // Set consistent layout width and margins for horizontal scrolling (240dp for text space)
+                // Layout params configured depending on active mode (Grid mode has weight, Slide mode has fixed 240dp width)
                 float density = itemView.getResources().getDisplayMetrics().density;
-                android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
-                        (int) (240 * density),
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                int margin = (int) (6 * density);
-                param.setMargins(margin, margin, margin, margin);
+                android.widget.LinearLayout.LayoutParams param;
+                if (isGridViewMode) {
+                    param = new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    int margin = (int) (4 * density);
+                    param.setMargins(margin, margin, margin, margin);
+                } else {
+                    param = new android.widget.LinearLayout.LayoutParams(
+                            (int) (240 * density),
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    int margin = (int) (6 * density);
+                    param.setMargins(margin, margin, margin, margin);
+                }
                 cardB.getRoot().setLayoutParams(param);
 
                 return cardB.getRoot();
+            }
+
+            private MarksRecord.SubjectMarksDetail getSubjectDetail(MarksRecord record, Subject sub) {
+                if (record == null || record.detailedMarks == null || sub == null || sub.name == null) {
+                    return null;
+                }
+
+                String safeKey = MarksRecord.sanitizeKey(sub.name);
+                MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
+                if (detail != null) {
+                    return detail;
+                }
+
+                detail = record.detailedMarks.get(sub.name);
+                if (detail != null) {
+                    return detail;
+                }
+
+                for (Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : record.detailedMarks.entrySet()) {
+                    String key = entry.getKey();
+                    if (key != null && MarksRecord.sanitizeKey(key).equals(safeKey)) {
+                        return entry.getValue();
+                    }
+                }
+                return null;
+            }
+
+            private MarksRecord getDisplayMarksForStudent(Student student) {
+                MarksRecord record = marksMap.get(student.id);
+                MarksRecord selectedRecord = AppCache.selectedMarks;
+                if (selectedRecord == null || student.id == null || !student.id.equals(selectedRecord.studentId)) {
+                    return record;
+                }
+                if (activeClass == null || activeClass.id == null || !activeClass.id.equals(selectedRecord.classId)) {
+                    return record;
+                }
+                if (selectedRecord.semesterId != null && activeSemesterId != null
+                        && !activeSemesterId.equals(selectedRecord.semesterId)
+                        && selectedRecord.semesterNumber != null
+                        && !String.valueOf(activeSemesterNumber).equals(selectedRecord.semesterNumber)) {
+                    return record;
+                }
+                if (record == null || selectedRecord.updatedAt >= record.updatedAt) {
+                    return selectedRecord;
+                }
+                return record;
             }
 
             private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
@@ -410,8 +645,19 @@ public class DescriptiveEntriesFragment extends Fragment {
 
             private void openMarksEntry(Student student) {
                 AppCache.selectedStudent = student;
-                AppCache.selectedClass = activeClass;
-                Intent intent = new Intent(itemView.getContext(), EnterMarksActivity.class);
+                // FIX: Always use SessionContext.selectedClass for the freshest subjects.
+                ClassModel freshClass = SessionContext.selectedClass != null
+                        ? SessionContext.selectedClass : activeClass;
+                AppCache.selectedClass = freshClass;
+                activeClass = freshClass;
+                // FIX: Pass the existing marks record from the adapter's marksMap.
+                // This ensures EnterDescriptiveActivity loads the correct existing doc
+                // (with proper id) so it UPDATE rather than INSERT a new document.
+                MarksRecord existingRecord = marksMap.get(student.id);
+                AppCache.selectedMarks = existingRecord;
+                android.util.Log.d("DESCRIPTIVE", "openMarksEntry: student=" + student.id
+                        + " existingRecord=" + (existingRecord != null ? existingRecord.id : "null"));
+                Intent intent = new Intent(itemView.getContext(), EnterDescriptiveActivity.class);
                 itemView.getContext().startActivity(intent);
             }
         }

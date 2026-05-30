@@ -54,12 +54,14 @@
                 android:contentDescription="Options Menu" />
         </RelativeLayout>
 
-        <!-- Subject Cards Section: Horizontal Scrollable List -->
+        <!-- Subject Cards Section: Horizontal Scrollable List (Slide Layout) -->
         <HorizontalScrollView
+            android:id="@+id/layoutSubjectsScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
-            android:overScrollMode="never">
+            android:overScrollMode="never"
+            android:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/layoutSubjectsHorizontal"
@@ -69,6 +71,15 @@
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
         </HorizontalScrollView>
+
+        <!-- Subject Cards Section: Two-Column Vertical Grid Layout Container -->
+        <LinearLayout
+            android:id="@+id/layoutSubjectsGridContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -43,4 +43,15 @@ public class AppCache {
     public static Map<String, MarksRecord> cachedDescriptiveMarksMap;
     public static String cachedDescriptiveClassId;
     public static String cachedDescriptiveSemesterId;
+
+    // ── Cross-screen save signals ─────────────────────────────────────────────
+    // Set by EnterMarksActivity on success; consumed by FormativeSummativeFragment.onResume()
+    public static boolean marksJustSaved           = false;
+    public static String  marksJustSavedStudentId  = null;
+    public static MarksRecord marksJustSavedRecord = null;
+
+    // Set by EnterDescriptiveActivity on success; consumed by DescriptiveEntriesFragment.onResume()
+    public static boolean descriptiveJustSaved           = false;
+    public static String  descriptiveJustSavedStudentId  = null;
+    public static MarksRecord descriptiveJustSavedRecord = null;
 }

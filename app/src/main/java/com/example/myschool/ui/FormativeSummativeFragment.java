@@ -49,10 +49,12 @@ public class FormativeSummativeFragment extends Fragment {
     private String activeSemesterId = "sem_1";
     private int activeSemesterNumber = 1;
     private boolean isGridView = false;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         b = FragmentFormativeSummativeBinding.inflate(inflater, container, false);
         return b.getRoot();
     }
@@ -70,6 +72,19 @@ public class FormativeSummativeFragment extends Fragment {
         setupCustomAppBar();
         setupHeaderStrip();
 
+        swipeRefresh = b.swipeRefreshLayout;
+        swipeRefresh.setColorSchemeColors(0xFF6C4CCF, 0xFF9C27B0, 0xFF00A5CF);
+        swipeRefresh.setProgressBackgroundColorSchemeColor(0xFFFFFFFF);
+        swipeRefresh.setOnRefreshListener(() -> {
+            // Clear all caches to force a true Firebase reload
+            AppCache.cachedStudents = null;
+            AppCache.cachedMarksMap = null;
+            AppCache.cachedClassIdForStudents = null;
+            AppCache.cachedSemesterIdForMarks = null;
+            FirebaseRepository.get().clearMarksCache();
+            loadEvaluationData();
+        });
+
         updateLayoutManager();
         adapter = new EvaluationAdapter();
         b.rvEvaluationStudents.setAdapter(adapter);
@@ -77,7 +92,8 @@ public class FormativeSummativeFragment extends Fragment {
 
     private void updateLayoutManager() {
         if (isGridView) {
-            b.rvEvaluationStudents.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(requireContext(), 2));
+            b.rvEvaluationStudents
+                    .setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(requireContext(), 2));
         } else {
             b.rvEvaluationStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
         }
@@ -101,11 +117,14 @@ public class FormativeSummativeFragment extends Fragment {
         // Subtitle dynamic binding
         String clsLabel = activeClass != null ? activeClass.className : "5";
         String divLabel = activeClass != null ? activeClass.division : "1";
-        b.tvAppSubtitle.setText("• Class: " + clsLabel + " • Div: " + divLabel + " • Semester: " + activeSemesterNumber);
+        b.tvAppSubtitle
+                .setText("• Class: " + clsLabel + " • Div: " + divLabel + " • Semester: " + activeSemesterNumber);
 
         // Outlined button click actions
-        b.btnHelpSquare.setOnClickListener(v -> Toast.makeText(requireContext(), "Evaluation Help Manual opened!", Toast.LENGTH_SHORT).show());
-        b.btnAddSquare.setOnClickListener(v -> Toast.makeText(requireContext(), "Add student clicked", Toast.LENGTH_SHORT).show());
+        b.btnHelpSquare.setOnClickListener(
+                v -> Toast.makeText(requireContext(), "Evaluation Help Manual opened!", Toast.LENGTH_SHORT).show());
+        b.btnAddSquare.setOnClickListener(
+                v -> Toast.makeText(requireContext(), "Add student clicked", Toast.LENGTH_SHORT).show());
         b.btnCalcSquare.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
                 ((HomeActivity) getActivity()).navigateTo(R.id.nav_print_report);
@@ -117,18 +136,19 @@ public class FormativeSummativeFragment extends Fragment {
         String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         String cls = activeClass != null ? activeClass.className : "5";
         String div = activeClass != null ? activeClass.division : "1";
-        b.tvHeaderStripInfo.setText("Year: " + yr + "  Class: " + cls + ", Div: " + div + ", Sem: " + activeSemesterNumber);
+        b.tvHeaderStripInfo
+                .setText("Year: " + yr + "  Class: " + cls + ", Div: " + div + ", Sem: " + activeSemesterNumber);
 
         b.btnGridListToggle.setOnClickListener(v -> {
             isGridView = !isGridView;
-            
+
             // Toggle icon
             if (isGridView) {
                 b.btnGridListToggle.setImageResource(R.drawable.ic_list_bullet);
             } else {
                 b.btnGridListToggle.setImageResource(R.drawable.ic_table_grid);
             }
-            
+
             updateLayoutManager();
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
@@ -150,8 +170,10 @@ public class FormativeSummativeFragment extends Fragment {
             if (b != null) {
                 b.progressLoading.setVisibility(View.GONE);
                 b.tvEmptyState.setVisibility(View.VISIBLE);
-                b.tvEmptyState.setText("No subjects configured.\nGo to Subjects page to activate subjects for this class.");
+                b.tvEmptyState
+                        .setText("No subjects configured.\nGo to Subjects page to activate subjects for this class.");
             }
+            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
             return;
         }
 
@@ -166,10 +188,13 @@ public class FormativeSummativeFragment extends Fragment {
                 && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
                 && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
             List<Student> cachedList = AppCache.cachedStudents;
-            Map<String, MarksRecord> cachedMarks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap : new HashMap<>();
-            
+            Map<String, MarksRecord> cachedMarks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap
+                    : new HashMap<>();
+
             // Render instantly from cache and hide progress
-            if (b != null) b.progressLoading.setVisibility(View.GONE);
+            if (b != null)
+                b.progressLoading.setVisibility(View.GONE);
+            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
             adapter.setData(cachedList, cachedMarks);
         }
 
@@ -177,25 +202,27 @@ public class FormativeSummativeFragment extends Fragment {
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
-                if (students == null) students = new ArrayList<>();
+                if (students == null)
+                    students = new ArrayList<>();
                 List<Student> finalList = students;
-                
+
                 // Fetch marks map
                 FirebaseRepository.get().getMarksForClassAndSemester(activeClass.id, activeSemesterId,
                         new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
                             @Override
                             public void onSuccess(Map<String, MarksRecord> marksMap) {
                                 Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
-                                
+
                                 // Merge network results with the fresh cache based on updatedAt
                                 if (AppCache.cachedMarksMap != null) {
                                     for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
                                         String sId = entry.getKey();
                                         MarksRecord cachedRecord = entry.getValue();
                                         MarksRecord fetchedRecord = finalMarks.get(sId);
-                                        
+
                                         // If cache has a newer or same record, keep the cache!
-                                        if (cachedRecord != null && (fetchedRecord == null || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
+                                        if (cachedRecord != null && (fetchedRecord == null
+                                                || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
                                             finalMarks.put(sId, cachedRecord);
                                         }
                                     }
@@ -209,6 +236,7 @@ public class FormativeSummativeFragment extends Fragment {
 
                                 if (isAdded() && b != null) {
                                     b.progressLoading.setVisibility(View.GONE);
+                                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                                     if (finalList.isEmpty()) {
                                         b.tvEmptyState.setVisibility(View.VISIBLE);
                                     } else {
@@ -217,17 +245,21 @@ public class FormativeSummativeFragment extends Fragment {
                                     adapter.setData(finalList, finalMarks);
                                 }
                             }
+
                             @Override
                             public void onError(Exception e) {
                                 Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + e.getMessage(), e);
                                 if (isAdded() && b != null) {
                                     b.progressLoading.setVisibility(View.GONE);
+                                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                                     // FIX: only fallback to empty marks when there is truly no
                                     // previously-cached data. Never wipe marks just because of a
                                     // transient network error on resume.
                                     boolean hasCachedMarks = AppCache.cachedMarksMap != null
-                                            && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
-                                            && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks);
+                                            && java.util.Objects.equals(activeClass.id,
+                                                    AppCache.cachedClassIdForStudents)
+                                            && java.util.Objects.equals(activeSemesterId,
+                                                    AppCache.cachedSemesterIdForMarks);
                                     if (!hasCachedMarks) {
                                         adapter.setData(finalList, new HashMap<>());
                                     }
@@ -240,9 +272,12 @@ public class FormativeSummativeFragment extends Fragment {
             public void onError(Exception e) {
                 if (isAdded() && b != null) {
                     b.progressLoading.setVisibility(View.GONE);
+                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                     // Only show network error toast if cache is fully empty
-                    if (AppCache.cachedStudents == null || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
-                        Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (AppCache.cachedStudents == null
+                            || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
+                        Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -257,7 +292,8 @@ public class FormativeSummativeFragment extends Fragment {
             activeClass = SessionContext.selectedClass;
         }
 
-        if (SessionContext.selectedSemester == null && activeClass != null && activeClass.semesterId != null && !activeClass.semesterId.isEmpty()) {
+        if (SessionContext.selectedSemester == null && activeClass != null && activeClass.semesterId != null
+                && !activeClass.semesterId.isEmpty()) {
             com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
             fallbackSem.id = activeClass.semesterId;
             fallbackSem.yearId = activeClass.yearId;
@@ -280,19 +316,20 @@ public class FormativeSummativeFragment extends Fragment {
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             View activityAppBar = activity.findViewById(R.id.appBarLayout);
-            if (activityAppBar != null) activityAppBar.setVisibility(View.GONE);
+            if (activityAppBar != null)
+                activityAppBar.setVisibility(View.GONE);
 
             View navHost = activity.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
-                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
+            if (navHost != null && navHost
+                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
+                        .getLayoutParams();
                 params.setBehavior(null);
                 float density = getResources().getDisplayMetrics().density;
                 params.bottomMargin = (int) (64 * density);
                 navHost.setLayoutParams(params);
             }
         }
-
 
         loadEvaluationData();
     }
@@ -309,9 +346,10 @@ public class FormativeSummativeFragment extends Fragment {
 
             // Restore CoordinatorLayout scrolling behavior:
             View navHost = activity.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
-                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
+            if (navHost != null && navHost
+                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
+                        .getLayoutParams();
                 params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
                 float density = getResources().getDisplayMetrics().density;
                 params.bottomMargin = (int) (64 * density);
@@ -327,7 +365,7 @@ public class FormativeSummativeFragment extends Fragment {
     }
 
     // ════════════════════════════════════════════════════════════════════════════
-    //  RECYCLERVIEW ADAPTER
+    // RECYCLERVIEW ADAPTER
     // ════════════════════════════════════════════════════════════════════════════
     private class EvaluationAdapter extends RecyclerView.Adapter<EvaluationAdapter.ViewHolder> {
 
@@ -341,8 +379,6 @@ public class FormativeSummativeFragment extends Fragment {
             marksMap.putAll(map);
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
-
-
 
         @NonNull
         @Override
@@ -373,7 +409,8 @@ public class FormativeSummativeFragment extends Fragment {
 
             public void bind(Student s, int index) {
                 binding.tvStudentName.setText(index + ". " + s.name);
-                binding.btnStudentMore.setOnClickListener(v -> Toast.makeText(itemView.getContext(), "Options for " + s.name, Toast.LENGTH_SHORT).show());
+                binding.btnStudentMore.setOnClickListener(
+                        v -> Toast.makeText(itemView.getContext(), "Options for " + s.name, Toast.LENGTH_SHORT).show());
 
                 MarksRecord marks = marksMap.get(s.id);
 
@@ -381,7 +418,8 @@ public class FormativeSummativeFragment extends Fragment {
                 binding.layoutGradeChips.removeAllViews();
                 if (marks != null && marks.detailedMarks != null && activeClass.subjects != null) {
                     for (Subject sub : activeClass.subjects) {
-                        MarksRecord.SubjectMarksDetail detail = marks.detailedMarks.get(MarksRecord.sanitizeKey(sub.name));
+                        MarksRecord.SubjectMarksDetail detail = marks.detailedMarks
+                                .get(MarksRecord.sanitizeKey(sub.name));
                         if (detail != null && detail.grade != null && !detail.grade.isEmpty()) {
                             binding.layoutGradeChips.addView(createGradeChip(detail.grade));
                         }
@@ -424,7 +462,7 @@ public class FormativeSummativeFragment extends Fragment {
                 tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10);
                 tv.setGravity(android.view.Gravity.CENTER);
                 float density = getResources().getDisplayMetrics().density;
-                tv.setPadding((int)(8 * density), (int)(3 * density), (int)(8 * density), (int)(3 * density));
+                tv.setPadding((int) (8 * density), (int) (3 * density), (int) (8 * density), (int) (3 * density));
                 tv.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
 
                 int textColor = 0xFF6C4CCF;
@@ -458,14 +496,13 @@ public class FormativeSummativeFragment extends Fragment {
                 GradientDrawable gd = new GradientDrawable();
                 gd.setColor(bgColor);
                 gd.setCornerRadius(6 * density);
-                gd.setStroke((int)(1 * density), borderColor);
+                gd.setStroke((int) (1 * density), borderColor);
                 tv.setBackground(gd);
 
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                lp.setMarginEnd((int)(6 * density));
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMarginEnd((int) (6 * density));
                 tv.setLayoutParams(lp);
 
                 return tv;
@@ -482,9 +519,9 @@ public class FormativeSummativeFragment extends Fragment {
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
                 // Default table values
-                String fe1 = "-", fe2 = "-", fe3 = "-", fe4 = "-", fe5 = "-", fe6 = "-", fe7 = "-", fe8 = "-";
-                String se1 = "-", se2 = "-", se3 = "-";
-                String fet = "-", set = "-", tet = "-";
+                String fe1 = "0", fe2 = "0", fe3 = "0", fe4 = "0", fe5 = "0", fe6 = "0", fe7 = "0", fe8 = "0";
+                String se1 = "0", se2 = "0", se3 = "0";
+                String fet = "0", set = "0", tet = "0";
                 String gradeVal = "—";
                 boolean hasMarks = false;
 
@@ -492,25 +529,23 @@ public class FormativeSummativeFragment extends Fragment {
                 if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
                     MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
                     if (d != null) {
-                        hasMarks = hasEnteredMarks(d);
-                        if (hasMarks) {
-                            fe1 = formatVal(d.nirikhshan);
-                            fe2 = formatVal(d.tondiKam);
-                            fe3 = formatVal(d.pratyakshik);
-                            fe4 = formatVal(d.upkram);
-                            fe5 = formatVal(d.prakalp);
-                            fe6 = formatVal(d.chachani);
-                            fe7 = formatVal(d.swadhyay);
-                            fe8 = formatVal(d.itar);
+                        hasMarks = true; // Always treat as entered when a record exists to show 0s
+                        fe1 = formatVal(d.nirikhshan);
+                        fe2 = formatVal(d.tondiKam);
+                        fe3 = formatVal(d.pratyakshik);
+                        fe4 = formatVal(d.upkram);
+                        fe5 = formatVal(d.prakalp);
+                        fe6 = formatVal(d.chachani);
+                        fe7 = formatVal(d.swadhyay);
+                        fe8 = formatVal(d.itar);
 
-                            se1 = formatVal(d.tondi);
-                            se2 = formatVal(d.pratyakshikB);
-                            se3 = formatVal(d.lekhi);
+                        se1 = formatVal(d.tondi);
+                        se2 = formatVal(d.pratyakshikB);
+                        se3 = formatVal(d.lekhi);
 
-                            fet = formatVal(d.akarikTotal);
-                            set = formatVal(d.sanklit);
-                            tet = formatVal(d.grandTotal);
-                        }
+                        fet = formatVal(d.akarikTotal);
+                        set = formatVal(d.sanklit);
+                        tet = formatVal(d.grandTotal);
                         if (d.grade != null && !d.grade.isEmpty()) {
                             gradeVal = d.grade;
                         }
@@ -547,11 +582,16 @@ public class FormativeSummativeFragment extends Fragment {
                 // Style dynamic Grade Chip in header
                 float density = itemView.getResources().getDisplayMetrics().density;
                 int gradeColor = 0xFF90A4AE; // gray
-                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) gradeColor = 0xFF6C4CCF;
-                else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) gradeColor = 0xFF00A5CF;
-                else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1")) gradeColor = 0xFF2E7D32;
-                else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) gradeColor = 0xFF9E9D24;
-                else if (!gradeVal.equals("—")) gradeColor = 0xFFE65100;
+                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1"))
+                    gradeColor = 0xFF6C4CCF;
+                else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2"))
+                    gradeColor = 0xFF00A5CF;
+                else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1"))
+                    gradeColor = 0xFF2E7D32;
+                else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2"))
+                    gradeColor = 0xFF9E9D24;
+                else if (!gradeVal.equals("—"))
+                    gradeColor = 0xFFE65100;
 
                 cardB.tvHeaderGrade.setText(gradeVal);
                 if (gradeVal.equals("—")) {
@@ -566,7 +606,8 @@ public class FormativeSummativeFragment extends Fragment {
 
                 // Setup 3-dot popup menu
                 cardB.btnSubjectMore.setOnClickListener(v -> {
-                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(itemView.getContext(), v);
+                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
+                            itemView.getContext(), v);
                     popup.getMenu().add(0, 1, 0, "Enter Marks");
                     popup.getMenu().add(0, 2, 1, "Quick View Info");
                     popup.setOnMenuItemClickListener(item -> {
@@ -583,11 +624,11 @@ public class FormativeSummativeFragment extends Fragment {
                 // JOIN TO ENTER MARKS PAGE: Click on the entire subject card opens marks entry!
                 cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
 
-                // Set consistent layout width and margins for horizontal scrolling (300dp to fit table)
+                // Set consistent layout width and margins for horizontal scrolling (300dp to
+                // fit table)
                 android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
                         (int) (300 * density),
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                );
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                 int margin = (int) (6 * density);
                 param.setMargins(margin, margin, margin, margin);
                 cardB.getRoot().setLayoutParams(param);
@@ -597,19 +638,24 @@ public class FormativeSummativeFragment extends Fragment {
 
             private void openMarksEntry(Student student) {
                 AppCache.selectedStudent = student;
-                // FIX: Always use SessionContext.selectedClass (reflects latest subject toggles).
+                // FIX: Always use SessionContext.selectedClass (reflects latest subject
+                // toggles).
                 // activeClass may be a stale local copy from when the fragment was created.
                 // SessionContext.selectedClass is always kept up-to-date by SubjectsFragment.
                 ClassModel freshClass = SessionContext.selectedClass != null
-                        ? SessionContext.selectedClass : activeClass;
+                        ? SessionContext.selectedClass
+                        : activeClass;
                 AppCache.selectedClass = freshClass;
                 // Also keep activeClass in sync so the fragment header stays correct
                 activeClass = freshClass;
+                AppCache.selectedMarks = marksMap.get(student.id);
                 Intent intent = new Intent(itemView.getContext(), EnterMarksActivity.class);
                 itemView.getContext().startActivity(intent);
             }
+
             private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
-                if (detail == null) return false;
+                if (detail == null)
+                    return false;
                 return detail.nirikhshan > 0 || detail.tondiKam > 0 || detail.pratyakshik > 0
                         || detail.upkram > 0 || detail.prakalp > 0 || detail.chachani > 0
                         || detail.swadhyay > 0 || detail.itar > 0 || detail.tondi > 0

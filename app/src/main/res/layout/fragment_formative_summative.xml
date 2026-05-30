@@ -186,13 +186,20 @@
         android:textSize="15sp"
         android:visibility="gone" />
 
-    <!-- Scrollable Student List Container -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvEvaluationStudents"
+    <!-- Pull-to-Refresh + Scrollable Student List Container -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        android:scrollbars="vertical" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvEvaluationStudents"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            android:scrollbars="vertical" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

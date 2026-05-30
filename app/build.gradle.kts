@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 android {
     namespace = "com.example.myschool"
     compileSdk = 37
@@ -55,6 +61,7 @@ dependencies {
     implementation(libs.activity)
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(libs.recyclerview)
+    implementation(libs.swiperefreshlayout)
     implementation(libs.coordinatorlayout)
     implementation("androidx.fragment:fragment:1.8.8")
 

@@ -41,6 +41,7 @@
         <activity android:name=".MainActivity"               android:exported="false"/>
         <activity android:name=".ProfileActivity"            android:exported="false"/>
         <activity android:name=".SubjectUpdateActivity"      android:exported="false"/>
+        <activity android:name=".EnterDescriptiveActivity"   android:exported="false"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
