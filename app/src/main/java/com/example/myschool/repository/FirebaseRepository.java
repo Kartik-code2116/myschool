@@ -314,7 +314,18 @@ public class FirebaseRepository {
                 .whereEqualTo("yearId", yearId)
                 .get()
                 .addOnSuccessListener(snap -> {
-                    List<Semester> list = snap != null ? snap.toObjects(Semester.class) : new ArrayList<>();
+                    List<Semester> list = new ArrayList<>();
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            Semester sem = doc.toObject(Semester.class);
+                            if (sem != null) {
+                                if (sem.id == null || sem.id.isEmpty()) {
+                                    sem.id = doc.getId();
+                                }
+                                list.add(sem);
+                            }
+                        }
+                    }
                     Collections.sort(list, (a, b) -> Integer.compare(a.number, b.number));
                     cachedSemestersMap.put(yearId, list);
                     cb.onSuccess(new ArrayList<>(list));

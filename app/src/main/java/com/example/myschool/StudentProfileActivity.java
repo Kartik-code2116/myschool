@@ -1,6 +1,7 @@
 package com.example.myschool;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -13,8 +14,12 @@ import com.example.myschool.model.MarksRecord;
 import com.example.myschool.model.Student;
 import com.example.myschool.repository.FirebaseRepository;
 import com.example.myschool.utils.DetailRowHelper;
+import com.example.myschool.utils.PdfGenerator;
 import com.example.myschool.utils.UiAnimations;
 import com.google.android.material.chip.Chip;
+
+import java.io.File;
+import java.util.List;
 
 public class StudentProfileActivity extends AppCompatActivity {
 
@@ -208,30 +213,180 @@ public class StudentProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void openReport() {
+    private String[] getSemesterIds() {
+        String sem1Id = "sem_1";
+        String sem2Id = "sem_2";
+        if (com.example.myschool.AppCache.cachedSemesters != null) {
+            for (com.example.myschool.model.Semester sem : com.example.myschool.AppCache.cachedSemesters) {
+                if (sem.number == 1 && sem.id != null && !sem.id.isEmpty()) {
+                    sem1Id = sem.id;
+                } else if (sem.number == 2 && sem.id != null && !sem.id.isEmpty()) {
+                    sem2Id = sem.id;
+                }
+            }
+        }
+        if (sem1Id == null || sem1Id.isEmpty()) sem1Id = "sem_1";
+        if (sem2Id == null || sem2Id.isEmpty()) sem2Id = "sem_2";
+        return new String[] { sem1Id, sem2Id };
+    }
+
+    private void openPdfFile(File file) {
+        if (file == null || !file.exists()) return;
+        try {
+            Uri uri = androidx.core.content.FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    file
+            );
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } catch (Exception e) {
+            sharePdfFile(file);
+        }
+    }
+
+    private void sharePdfFile(File file) {
+        if (file == null || !file.exists()) return;
+        try {
+            Uri uri = androidx.core.content.FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    file
+            );
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("application/pdf");
+            share.putExtra(Intent.EXTRA_STREAM, uri);
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, "Share Report PDF"));
+        } catch (Exception e) {
+            Toast.makeText(this, "त्रुटी: PDF फाईल उघडू शकली नाही", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void loadPrerequisitesThen(Runnable next) {
         loadClassThen(() -> {
             if (AppCache.selectedClass == null) {
-                Toast.makeText(this, R.string.select_class_first, Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> Toast.makeText(this, R.string.select_class_first, Toast.LENGTH_SHORT).show());
                 return;
             }
-            String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
-            FirebaseRepository.get().getMarksForStudentAndSemester(student.id, student.classId, semId,
-                    new FirebaseRepository.OnResult<MarksRecord>() {
-                        @Override public void onSuccess(MarksRecord m) {
-                            if (m != null) {
-                                AppCache.selectedMarks = m;
-                                startActivity(new Intent(StudentProfileActivity.this, MarksheetActivity.class));
-                                overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
-                            } else {
-                                Toast.makeText(StudentProfileActivity.this,
-                                        R.string.no_marks_yet, Toast.LENGTH_SHORT).show();
+            SessionContext.selectedClass = AppCache.selectedClass;
+            // 1. Load school if needed
+            if (SessionContext.selectedSchool == null && student.schoolId != null) {
+                FirebaseRepository.get().getSchools(new FirebaseRepository.OnResult<List<com.example.myschool.model.School>>() {
+                    @Override
+                    public void onSuccess(List<com.example.myschool.model.School> schools) {
+                        if (schools != null) {
+                            for (com.example.myschool.model.School school : schools) {
+                                if (school.id != null && school.id.equals(student.schoolId)) {
+                                    SessionContext.selectedSchool = school;
+                                    AppCache.selectedSchool = school;
+                                    break;
+                                }
+                            }
+                            if (SessionContext.selectedSchool == null && !schools.isEmpty()) {
+                                SessionContext.selectedSchool = schools.get(0);
+                                AppCache.selectedSchool = schools.get(0);
                             }
                         }
-                        @Override public void onError(Exception e) {
-                            Toast.makeText(StudentProfileActivity.this,
-                                    e.getMessage(), Toast.LENGTH_SHORT).show();
+                        loadSemestersThen(next);
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        loadSemestersThen(next);
+                    }
+                });
+            } else {
+                if (SessionContext.selectedSchool == null && AppCache.selectedSchool != null) {
+                    SessionContext.selectedSchool = AppCache.selectedSchool;
+                }
+                loadSemestersThen(next);
+            }
+        });
+    }
+
+    private void loadSemestersThen(Runnable next) {
+        boolean cacheValid = false;
+        if (AppCache.cachedSemesters != null && !AppCache.cachedSemesters.isEmpty()) {
+            cacheValid = true;
+            for (com.example.myschool.model.Semester sem : AppCache.cachedSemesters) {
+                if (sem.id == null || sem.id.isEmpty()) {
+                    cacheValid = false;
+                    break;
+                }
+            }
+        }
+        if (cacheValid) {
+            next.run();
+            return;
+        }
+        String yearId = SessionContext.selectedYear != null ? SessionContext.selectedYear.id : 
+                        (AppCache.selectedClass != null ? AppCache.selectedClass.yearId : null);
+        if (yearId == null) {
+            next.run();
+            return;
+        }
+        FirebaseRepository.clearCache(); // Force clear repository cache to map IDs freshly
+        FirebaseRepository.get().getSemestersForYear(yearId, new FirebaseRepository.OnResult<List<com.example.myschool.model.Semester>>() {
+            @Override
+            public void onSuccess(List<com.example.myschool.model.Semester> list) {
+                if (list != null) {
+                    AppCache.cachedSemesters = list;
+                }
+                runOnUiThread(next);
+            }
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(next);
+            }
+        });
+    }
+
+    private void openReport() {
+        loadPrerequisitesThen(() -> {
+            Toast.makeText(this, student.name + " चा रिपोर्ट तयार होत आहे...", Toast.LENGTH_SHORT).show();
+            String classId = (AppCache.selectedClass != null && AppCache.selectedClass.id != null) 
+                             ? AppCache.selectedClass.id : student.classId;
+            String[] sids = getSemesterIds();
+            FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[0], new FirebaseRepository.OnResult<MarksRecord>() {
+                @Override
+                public void onSuccess(MarksRecord s1) {
+                    FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[1], new FirebaseRepository.OnResult<MarksRecord>() {
+                        @Override
+                        public void onSuccess(MarksRecord s2) {
+                            if (s1 == null && s2 == null) {
+                                runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, R.string.no_marks_yet, Toast.LENGTH_SHORT).show());
+                                return;
+                            }
+                            PdfGenerator.generateGunapattrak(StudentProfileActivity.this, SessionContext.selectedSchool, AppCache.selectedClass, student, s1, s2, new PdfGenerator.PdfCallback() {
+                                @Override
+                                public void onSuccess(File pdfFile) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(StudentProfileActivity.this, "रिपोर्ट यशस्वीरीत्या तयार झाला!", Toast.LENGTH_SHORT).show();
+                                        openPdfFile(pdfFile);
+                                    });
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(StudentProfileActivity.this, "त्रुटी आढळली: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    });
+                                }
+                            });
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "द्वितीय सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
                         }
                     });
+                }
+                @Override
+                public void onError(Exception e) {
+                    runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "प्रथम सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            });
         });
     }
 

@@ -717,10 +717,11 @@ public class FormativeSummativeFragment extends Fragment {
             private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
                 if (detail == null)
                     return false;
-                return detail.nirikhshan > 0 || detail.tondiKam > 0 || detail.pratyakshik > 0
+                boolean hasField = detail.nirikhshan > 0 || detail.tondiKam > 0 || detail.pratyakshik > 0
                         || detail.upkram > 0 || detail.prakalp > 0 || detail.chachani > 0
                         || detail.swadhyay > 0 || detail.itar > 0 || detail.tondi > 0
                         || detail.pratyakshikB > 0 || detail.lekhi > 0;
+                return hasField && detail.grandTotal > 0;
             }
         }
     }
