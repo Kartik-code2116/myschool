@@ -980,7 +980,9 @@ public class PdfGenerator {
                     if (cls.subjects != null && i < cls.subjects.size()) {
                         String sn = cls.subjects.get(i).name;
                         MarksRecord.SubjectMarksDetail d = detail(sem1 != null ? sem1 : sem2, sn);
-                        if (d != null) remark = nvl(d.remark);
+                        if (d != null && d.remark != null) {
+                            remark = d.remark.replace("||", ", ");
+                        }
                     }
                     PdfPCell nc = rawCell(String.valueOf(i + 1), fNormal, bg, C_DARK, Element.ALIGN_CENTER); tbl.addCell(nc);
                     PdfPCell lc = rawCell(labels[i], fNormal, bg, C_DARK, Element.ALIGN_LEFT); lc.setMinimumHeight(28f); tbl.addCell(lc);

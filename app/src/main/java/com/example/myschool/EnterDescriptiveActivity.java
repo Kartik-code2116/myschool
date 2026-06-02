@@ -50,15 +50,17 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         b = ActivityEnterDescriptiveBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
-        
+
         setSupportActionBar(b.toolbar);
         b.toolbar.setNavigationOnClickListener(v -> finish());
 
         student = AppCache.selectedStudent;
         classModel = AppCache.selectedClass;
-        if (classModel == null) classModel = callerClass;
+        if (classModel == null)
+            classModel = callerClass;
 
-        if (callerClass != null && callerClass.subjects != null && !callerClass.subjects.isEmpty() && classModel != null) {
+        if (callerClass != null && callerClass.subjects != null && !callerClass.subjects.isEmpty()
+                && classModel != null) {
             classModel.subjects = callerClass.subjects;
         }
 
@@ -72,7 +74,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
             return;
         }
 
-        if (SessionContext.selectedSemester == null && classModel.semesterId != null && !classModel.semesterId.isEmpty()) {
+        if (SessionContext.selectedSemester == null && classModel.semesterId != null
+                && !classModel.semesterId.isEmpty()) {
             com.example.myschool.model.Semester fallbackSem = new com.example.myschool.model.Semester();
             fallbackSem.id = classModel.semesterId;
             fallbackSem.yearId = classModel.yearId;
@@ -84,7 +87,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         b.tvMarksStudentName.setText(student.name);
         b.tvMarksRollClass.setText("Roll: " + student.rollNo + " | " + classModel.getDisplayName());
 
-        if (classModel.subjects == null) classModel.subjects = new ArrayList<>();
+        if (classModel.subjects == null)
+            classModel.subjects = new ArrayList<>();
         for (Subject sub : classModel.subjects) {
             addRemarkRow(sub);
         }
@@ -112,7 +116,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                     (AppCache.selectedMarks == null ? "null" : "wrong student/class or no id"));
         }
 
-        // Layer 2: SharedPreferences doc ID — fastest Firestore path, survives app restart
+        // Layer 2: SharedPreferences doc ID — fastest Firestore path, survives app
+        // restart
         String prefKey = getMarksDocPrefKey();
         String legacyPrefKey = "marks_doc_" + student.id + "_" + classModel.id;
         android.content.SharedPreferences docPrefs = getSharedPreferences("marks_doc_ids", MODE_PRIVATE);
@@ -135,7 +140,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                                     m.id = doc.getId();
                                 }
                                 if (!isRecordForCurrentSelection(m)) {
-                                    Log.d("DESC_LOAD", "Layer2: stored doc belongs to a different student/class/semester");
+                                    Log.d("DESC_LOAD",
+                                            "Layer2: stored doc belongs to a different student/class/semester");
                                     runLayer3();
                                     return;
                                 }
@@ -173,7 +179,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         FirebaseRepository.get().getMarksForStudentAndSemester(
                 student.id, classModel.id, semId,
                 new FirebaseRepository.OnResult<MarksRecord>() {
-                    @Override public void onSuccess(MarksRecord m) {
+                    @Override
+                    public void onSuccess(MarksRecord m) {
                         if (m != null) {
                             if (existingMarks == null || m.updatedAt >= existingMarks.updatedAt) {
                                 Log.d("DESC_LOAD", "Layer3 SUCCESS: docId=" + m.id
@@ -194,7 +201,9 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                             Log.d("DESC_LOAD", "Layer3: no marks found for student=" + student.id);
                         }
                     }
-                    @Override public void onError(Exception e) {
+
+                    @Override
+                    public void onError(Exception e) {
                         Log.e("DESC_LOAD", "Layer3 FAILED: " + e.getMessage());
                     }
                 });
@@ -202,7 +211,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
 
     private String getActiveSemesterId() {
         return SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null
-                ? SessionContext.selectedSemester.id : "sem_1";
+                ? SessionContext.selectedSemester.id
+                : "sem_1";
     }
 
     private String getMarksDocPrefKey() {
@@ -210,15 +220,19 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     }
 
     private boolean isRecordForCurrentSelection(MarksRecord record) {
-        if (record == null || student == null || classModel == null) return false;
-        if (student.id == null || !student.id.equals(record.studentId)) return false;
-        if (classModel.id == null || !classModel.id.equals(record.classId)) return false;
+        if (record == null || student == null || classModel == null)
+            return false;
+        if (student.id == null || !student.id.equals(record.studentId))
+            return false;
+        if (classModel.id == null || !classModel.id.equals(record.classId))
+            return false;
         String semId = getActiveSemesterId();
         return record.semesterId == null || record.semesterId.isEmpty() || semId.equals(record.semesterId);
     }
 
     private void addRemarkRow(Subject sub) {
-        ItemSubjectRemarkRowBinding row = ItemSubjectRemarkRowBinding.inflate(LayoutInflater.from(this), b.llRemarkRows, false);
+        ItemSubjectRemarkRowBinding row = ItemSubjectRemarkRowBinding.inflate(LayoutInflater.from(this), b.llRemarkRows,
+                false);
         row.tvSubjectName.setText(sub.name);
 
         // Hide "Select" button as we are showing the choices directly for fast action!
@@ -232,7 +246,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
             chip.setText(remark);
             chip.setCheckable(true);
             chip.setChecked(false);
-            
+
             styleInteractiveChip(chip, false);
 
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -261,7 +275,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         float density = getResources().getDisplayMetrics().density;
         chip.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f);
         chip.setChipMinHeight((int) (32 * density));
-        
+
         if (checked) {
             // Checked State: Filled purple/primary with white text
             chip.setChipBackgroundColor(android.content.res.ColorStateList.valueOf(0xFF6C4CCF)); // Primary purple
@@ -294,7 +308,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     }
 
     private void fillExistingRemarks(MarksRecord m) {
-        if (classModel.subjects == null) return;
+        if (classModel.subjects == null)
+            return;
         for (int i = 0; i < classModel.subjects.size() && i < remarkRows.size(); i++) {
             String subName = MarksRecord.sanitizeKey(classModel.subjects.get(i).name);
             ItemSubjectRemarkRowBinding row = remarkRows.get(i);
@@ -304,7 +319,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                 MarksRecord.SubjectMarksDetail d = m.detailedMarks.get(subName);
                 if (d != null && d.remark != null && !d.remark.isEmpty()) {
                     List<String> parsedRemarks = Arrays.asList(d.remark.split("\\|\\|"));
-                    
+
                     // Match standard remarks first
                     List<String> remainingRemarks = new ArrayList<>();
                     for (String r : parsedRemarks) {
@@ -362,7 +377,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     }
 
     private void saveRemarks() {
-        com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance()
+                .getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(this, "लॉगिन आवश्यक आहे.", Toast.LENGTH_LONG).show();
             return;
@@ -373,9 +389,12 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         m.classId = classModel.id;
         m.examName = classModel.examName;
 
-        if (m.subjectMarks == null) m.subjectMarks = new java.util.HashMap<>();
-        if (m.subjectMax == null) m.subjectMax = new java.util.HashMap<>();
-        if (m.detailedMarks == null) m.detailedMarks = new java.util.HashMap<>();
+        if (m.subjectMarks == null)
+            m.subjectMarks = new java.util.HashMap<>();
+        if (m.subjectMax == null)
+            m.subjectMax = new java.util.HashMap<>();
+        if (m.detailedMarks == null)
+            m.detailedMarks = new java.util.HashMap<>();
 
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             m.semesterId = SessionContext.selectedSemester.id;
@@ -401,7 +420,8 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
             StringBuilder sb = new StringBuilder();
             for (int j = 0; j < selected.size(); j++) {
                 sb.append(selected.get(j));
-                if (j < selected.size() - 1) sb.append("||");
+                if (j < selected.size() - 1)
+                    sb.append("||");
             }
             d.remark = sb.toString();
 
@@ -426,9 +446,9 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                 Log.d("SAVE_REMARKS", "Saved docId=" + id + " key=" + prefKey);
 
                 // ── Signal DescriptiveEntriesFragment to instant-patch this student's card ──
-                AppCache.descriptiveJustSaved          = true;
+                AppCache.descriptiveJustSaved = true;
                 AppCache.descriptiveJustSavedStudentId = student.id;
-                AppCache.descriptiveJustSavedRecord    = m;
+                AppCache.descriptiveJustSavedRecord = m;
 
                 // Also keep descriptive + formative caches in sync
                 if (AppCache.cachedDescriptiveMarksMap == null
