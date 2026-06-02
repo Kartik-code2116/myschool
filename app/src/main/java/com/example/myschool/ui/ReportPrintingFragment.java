@@ -91,22 +91,14 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         // Class-level (roster) reports — no student selection needed
-        // positions: 0 (मुखपृष्ठ), 1 (अनुक्रमणिका), 4 (श्रेणी तक्का), 5 (सर्वसामावेशक), 6 (श्रेणी तक्का), 7 (गुण-श्रेणी), 10 (उपयुक्त), 12 (वार्षिक तक्के), 14 (वार्षिक निकाल)
-        boolean isClassReport = (position == 0 || position == 1 || position == 4 || position == 5 || position == 6
-                || position == 7 || position == 10 || position == 12 || position == 14);
+        // Positions 1: Index, 4,5,8,9,10,12,14: Class-wide progress and roster charts
+        boolean isClassReport = (position == 1 || position == 4 || position == 5 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
 
         if (isClassReport) {
             generateClassRosterReport(position);
         } else {
-            String[] options = {"१. एक विद्यार्थी निवडा (Select Single Student)",
-                               "२. संपूर्ण वर्गाचे रिपोर्ट्स बनवा (Bulk Class PDFs)"};
-            new android.app.AlertDialog.Builder(getContext())
-                    .setTitle("रिपोर्ट प्रकार निवडा (Choose Report Type)")
-                    .setItems(options, (dialog, which) -> {
-                        if (which == 0) showStudentSelectionDialog(position);
-                        else triggerBulkReportGeneration(position);
-                    })
-                    .show();
+            // Default to generating for all students directly
+            triggerBulkReportGeneration(position);
         }
     }
 
@@ -354,8 +346,10 @@ public class ReportPrintingFragment extends Fragment {
                         };
                         switch (reportPosition) {
                             case 4:
-                            case 5:
+                                PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb); break;
                             case 6:
+                                PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem2Map, true, cb); break;
+                            case 5:
                             case 7:
                             case 10:
                             case 12:
@@ -477,6 +471,10 @@ public class ReportPrintingFragment extends Fragment {
             PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, 0, cb);
         } else if (position == 1) { // Index
             PdfGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
+        } else if (position == 4) {
+            PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb);
+        } else if (position == 6) {
+            PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem2Map, true, cb);
         } else if (isClassReport) {
             PdfGenerator.generateProgressBook(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb);
         } else {
