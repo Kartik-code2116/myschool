@@ -60,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         topLevel.add(R.id.nav_dropdown);
         topLevel.add(R.id.nav_extra);
         topLevel.add(R.id.nav_print_report);
+        topLevel.add(R.id.nav_dashboard);
 
         appBarConfig = new AppBarConfiguration.Builder(topLevel)
                 .setOpenableLayout(b.drawerLayout)
@@ -140,6 +141,11 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_settings) {
                 title = getString(R.string.drawer_settings);
                 subtitle = "App Settings & Configurations";
+            } else if (id == R.id.nav_dashboard) {
+                title = "Stats Dashboard";
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) ? SessionContext.selectedClass.className : "N/A";
+                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division : "N/A";
+                subtitle = "Progress Tracker - Class " + cls + " " + div;
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
@@ -263,7 +269,7 @@ public class HomeActivity extends AppCompatActivity {
         });
         header.findViewById(R.id.btnDrawerStats).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            navigateToAnimated(R.id.nav_info_print);
+            navigateToAnimated(R.id.nav_dashboard);
         });
     }
 
