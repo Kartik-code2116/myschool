@@ -78,7 +78,7 @@ public class SchoolRegisterActivity extends AppCompatActivity {
         FirebaseRepository.get().saveSchool(s, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
                 showLoading(false);
-                Toast.makeText(SchoolRegisterActivity.this, "School saved!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SchoolRegisterActivity.this, R.string.msg_school_saved, Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }

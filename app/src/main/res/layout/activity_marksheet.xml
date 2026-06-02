@@ -39,7 +39,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Save as PDF"
+                        android:text="@string/txt_save_as_pdf"
                         android:textSize="20sp"
                         android:textColor="#212121"
                         android:fontFamily="sans-serif-medium"/>
@@ -64,13 +64,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Copies: 1"
+                    android:text="@string/txt_copies_1"
                     android:textSize="12sp"
                     android:textColor="#9E9E9E"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" • Paper size: ISO A4"
+                    android:text="@string/txt_paper_size_iso_a4"
                     android:textSize="12sp"
                     android:textColor="#9E9E9E"/>
                 <ImageView

@@ -262,7 +262,7 @@ public class StudentProfileActivity extends AppCompatActivity {
             share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(share, "Share Report PDF"));
         } catch (Exception e) {
-            Toast.makeText(this, "त्रुटी: PDF फाईल उघडू शकली नाही", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.msg_pdf, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -364,7 +364,7 @@ public class StudentProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(File pdfFile) {
                                     runOnUiThread(() -> {
-                                        Toast.makeText(StudentProfileActivity.this, "रिपोर्ट यशस्वीरीत्या तयार झाला!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(StudentProfileActivity.this, R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
                                         openPdfFile(pdfFile);
                                     });
                                 }

@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Today, 5:12 PM"
+                android:text="@string/txt_today_5_12_pm"
                 android:textAppearance="@style/TextAppearance.Myschool.LabelLarge"
                 android:textColor="@color/on_surface" />
 
@@ -34,7 +34,7 @@
                 android:id="@+id/chipPdf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PDF"
+                android:text="@string/txt_pdf"
                 android:visibility="gone"
                 app:chipIcon="@drawable/ic_pdf"
                 app:chipIconTint="@color/success"
@@ -50,7 +50,7 @@
             android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="12345\n98765"
+            android:text="@string/txt_12345_n98765"
             android:textAppearance="@style/TextAppearance.Myschool.BodyMedium"
             android:textColor="@color/on_surface_variant" />
     </LinearLayout>

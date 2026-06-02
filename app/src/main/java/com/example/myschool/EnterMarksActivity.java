@@ -61,7 +61,7 @@ public class EnterMarksActivity extends AppCompatActivity {
                         Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                         processOcr(bmp);
                     } catch (IOException e) {
-                        Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.msg_failed_to_load_image, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -521,7 +521,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         if (currentUser == null) {
             Log.e("SAVE_MARKS", "ABORT: User is NOT authenticated. Cannot save to Firestore.");
             Toast.makeText(this,
-                    "लॉगिन आवश्यक आहे. कृपया पुन्हा लॉगिन करा.", Toast.LENGTH_LONG).show();
+                    R.string.msg_empty_1, Toast.LENGTH_LONG).show();
             return;
         }
         Log.d("SAVE_MARKS", "Auth OK — UID: " + currentUser.getUid());
@@ -579,7 +579,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         Log.d("SAVE_MARKS", "subjects   : " + (classModel.subjects != null ? classModel.subjects.size() : 0));
 
         if (classModel.subjects == null) {
-            Toast.makeText(this, "No subjects configured", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_no_subjects_configured, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -707,7 +707,7 @@ public class EnterMarksActivity extends AppCompatActivity {
                     }
                 });
 
-                Toast.makeText(EnterMarksActivity.this, "गुण यशस्वीरित्या जतन केले गेले आहेत!", Toast.LENGTH_SHORT)
+                Toast.makeText(EnterMarksActivity.this, R.string.msg_empty_2, Toast.LENGTH_SHORT)
                         .show();
                 setResult(RESULT_OK);
                 finish();
@@ -726,7 +726,7 @@ public class EnterMarksActivity extends AppCompatActivity {
     // ── OCR ───────────────────────────────────────────────────────────────────
     private void showScanOptions() {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("Scan Marksheet")
+                .setTitle(R.string.msg_scan_marksheet)
                 .setItems(new String[] { "Camera", "Gallery" }, (d, w) -> {
                     if (w == 0) {
                         cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
@@ -742,7 +742,7 @@ public class EnterMarksActivity extends AppCompatActivity {
             return;
         b.cardOcrPreview.setVisibility(View.VISIBLE);
         b.ivOcrPreview.setImageBitmap(bitmap);
-        b.tvOcrRaw.setText("Processing...");
+        b.tvOcrRaw.setText(R.string.msg_processing);
         ocrHelper.processImage(bitmap, new OcrHelper.OcrCallback() {
             @Override
             public void onResult(List<String> numbers, String rawText) {
@@ -773,7 +773,7 @@ public class EnterMarksActivity extends AppCompatActivity {
             }
         }
         recalcAllSubjectsTotals();
-        Toast.makeText(this, "Marks filled into Written (लेखी) — please verify!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.msg_marks_filled_into_written_plea, Toast.LENGTH_LONG).show();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

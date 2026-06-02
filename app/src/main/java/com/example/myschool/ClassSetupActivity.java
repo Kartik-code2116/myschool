@@ -133,7 +133,7 @@ public class ClassSetupActivity extends AppCompatActivity {
         FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
                 showLoading(false);
-                Toast.makeText(ClassSetupActivity.this, "Class saved!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ClassSetupActivity.this, R.string.msg_class_saved, Toast.LENGTH_SHORT).show();
                 c.id = id;
                 SessionContext.selectedClass = c;
                 SessionContext.save(ClassSetupActivity.this);

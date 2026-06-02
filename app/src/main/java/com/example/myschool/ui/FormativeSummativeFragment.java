@@ -122,9 +122,9 @@ public class FormativeSummativeFragment extends Fragment {
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), "Evaluation Help Manual opened!", Toast.LENGTH_SHORT).show());
+                v -> Toast.makeText(requireContext(), R.string.msg_evaluation_help_manual_opened, Toast.LENGTH_SHORT).show());
         b.btnAddSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), "Add student clicked", Toast.LENGTH_SHORT).show());
+                v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
         b.btnCalcSquare.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
                 ((HomeActivity) getActivity()).navigateTo(R.id.nav_print_report);
@@ -171,7 +171,7 @@ public class FormativeSummativeFragment extends Fragment {
                 b.progressLoading.setVisibility(View.GONE);
                 b.tvEmptyState.setVisibility(View.VISIBLE);
                 b.tvEmptyState
-                        .setText("No subjects configured.\nGo to Subjects page to activate subjects for this class.");
+                        .setText(R.string.msg_no_subjects_configured_ngo_to);
             }
             if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
             return;
@@ -676,7 +676,7 @@ public class FormativeSummativeFragment extends Fragment {
                             openMarksEntry(student);
                             return true;
                         }
-                        Toast.makeText(itemView.getContext(), "Info opened", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
                         return true;
                     });
                     popup.show();

@@ -102,7 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_toStartOf="@id/btnOptions"
-                    android:text="kartik"
+                    android:text="@string/txt_kartik"
                     android:textColor="#5A4FCF"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-bold"/>
@@ -146,7 +146,7 @@
                         android:id="@+id/tvRoll1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Roll 1 : 1"
+                        android:text="@string/txt_roll_1_1"
                         android:textSize="11.5sp"
                         android:textColor="@color/on_surface_variant"/>
 
@@ -155,7 +155,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2.5dp"
-                        android:text="Roll 2 : 1"
+                        android:text="@string/txt_roll_2_1"
                         android:textSize="11.5sp"
                         android:textColor="@color/on_surface_variant"/>
                 </LinearLayout>
@@ -172,7 +172,7 @@
                         android:id="@+id/tvDob"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DOB - 25-05-2012"
+                        android:text="@string/txt_dob_25_05_2012"
                         android:textSize="11.5sp"
                         android:textColor="@color/on_surface_variant"
                         android:singleLine="true"/>
@@ -182,7 +182,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2.5dp"
-                        android:text="Reg No: 215454"
+                        android:text="@string/txt_reg_no_215454"
                         android:textSize="11.5sp"
                         android:textColor="@color/on_surface_variant"
                         android:singleLine="true"/>

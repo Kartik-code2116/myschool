@@ -30,7 +30,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:fontFamily="sans-serif-medium"
-                android:text="1. मराठी"
+                android:text="@string/txt_1_2"
                 android:textColor="#6C4CCF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -65,7 +65,7 @@
                 android:id="@+id/tvEmptyLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="नोंद प्रविष्ट करा"
+                android:text="@string/str_empty_15"
                 android:textColor="#B0BEC5"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-medium"

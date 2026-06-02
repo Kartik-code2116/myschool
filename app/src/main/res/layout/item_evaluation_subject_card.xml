@@ -39,7 +39,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="1. मराठी"
+                    android:text="@string/txt_1_2"
                     android:textColor="#37474F"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="A-1"
+                    android:text="@string/txt_a_1"
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:paddingHorizontal="6dp"
@@ -75,7 +75,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Formative Evaluation Weightage"
+            android:text="@string/txt_formative_evaluation_weightage"
             android:textColor="#78909C"
             android:textSize="10sp"
             android:fontFamily="sans-serif-medium"
@@ -97,7 +97,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="निरी."
+                    android:text="@string/str_empty_16"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -124,7 +124,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="तोंडी."
+                    android:text="@string/str_empty_17"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -151,7 +151,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="प्रात्य."
+                    android:text="@string/str_empty_18"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -178,7 +178,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="उप."
+                    android:text="@string/str_empty_19"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -205,7 +205,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="प्रक."
+                    android:text="@string/str_empty_20"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -232,7 +232,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="चाच."
+                    android:text="@string/str_empty_21"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -259,7 +259,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="स्वा."
+                    android:text="@string/str_empty_22"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -286,7 +286,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="इतर"
+                    android:text="@string/str_empty_23"
                     android:gravity="center"
                     android:textColor="#78909C"
                     android:textSize="9sp"
@@ -309,7 +309,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Summative Evaluation Weightage"
+            android:text="@string/txt_summative_evaluation_weightage"
             android:textColor="#78909C"
             android:textSize="10sp"
             android:fontFamily="sans-serif-medium"
@@ -338,7 +338,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="तोंडी."
+                        android:text="@string/str_empty_17"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -365,7 +365,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="प्रात्य."
+                        android:text="@string/str_empty_18"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -392,7 +392,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="लेखी"
+                        android:text="@string/str_empty_24"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -432,7 +432,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="आका."
+                        android:text="@string/str_empty_25"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -459,7 +459,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="संक."
+                        android:text="@string/str_empty_26"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"
@@ -486,7 +486,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="एकूण"
+                        android:text="@string/str_empty_2"
                         android:gravity="center"
                         android:textColor="#78909C"
                         android:textSize="9sp"

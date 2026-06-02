@@ -86,7 +86,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void handleReportSelection(int position) {
         if (SessionContext.selectedClass == null) {
-            Toast.makeText(getContext(), "कृपया मुख्यपृष्ठावरून इयत्ता व तुकडी निवडा!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.msg_empty_10, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -104,7 +104,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void showStudentSelectionDialog(int reportPosition) {
         if (studentsList == null || studentsList.isEmpty()) {
-            Toast.makeText(getContext(), "या वर्गात कोणतेही विद्यार्थी आढळले नाहीत", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_11, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -114,7 +114,7 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         new android.app.AlertDialog.Builder(getContext())
-                .setTitle("विद्यार्थी निवडा (Select Student)")
+                .setTitle(R.string.msg_select_student)
                 .setItems(studentNames, (dialog, which) -> {
                     Student selectedStudent = studentsList.get(which);
                     generateIndividualReport(selectedStudent, reportPosition);
@@ -154,13 +154,13 @@ public class ReportPrintingFragment extends Fragment {
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), "द्वितीय सत्राचे गुण मिळवण्यात अपयश आले", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_empty_12, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), "प्रथम सत्राचे गुण मिळवण्यात अपयश आले", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.msg_empty_13, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -171,7 +171,7 @@ public class ReportPrintingFragment extends Fragment {
             public void onSuccess(File pdfFile) {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "रिपोर्ट यशस्वीरीत्या तयार झाला!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
                         openPdfFile(pdfFile);
                     });
                 }
@@ -208,11 +208,11 @@ public class ReportPrintingFragment extends Fragment {
 
     private void triggerBulkReportGeneration(int reportPosition) {
         if (studentsList == null || studentsList.isEmpty()) {
-            Toast.makeText(getContext(), "कोणताही विद्यार्थी उपलब्ध नाही", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_14, Toast.LENGTH_SHORT).show();
             return;
         }
         
-        Toast.makeText(getContext(), "पार्श्वभूमीत संपूर्ण वर्गाचे रिपोर्ट तयार होत आहेत, कृपया थांबा...", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), R.string.msg_empty_15, Toast.LENGTH_LONG).show();
         
         String classId = SessionContext.selectedClass.id;
         String[] sids = getSemesterIds();
@@ -226,13 +226,13 @@ public class ReportPrintingFragment extends Fragment {
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), "द्वितीय सत्राचे गुण लोड होऊ शकले नाहीत", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_empty_16, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), "प्रथम सत्राचे गुण लोड होऊ शकले नाहीत", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.msg_empty_17, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -241,7 +241,7 @@ public class ReportPrintingFragment extends Fragment {
         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
             @Override public void onSuccess(File pdfFile) {
                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), "संपूर्ण वर्गाचा एकत्रित रिपोर्ट यशस्वीरित्या तयार झाला!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), R.string.msg_empty_18, Toast.LENGTH_LONG).show();
                     openPdfFile(pdfFile);
                 });
             }
@@ -282,16 +282,16 @@ public class ReportPrintingFragment extends Fragment {
 
     private void generateClassRosterReport(int reportPosition) {
         if (studentsList == null || studentsList.isEmpty()) {
-            Toast.makeText(getContext(), "या वर्गात कोणतेही विद्यार्थी आढळले नाहीत", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_11, Toast.LENGTH_SHORT).show();
             return;
         }
         
         if (reportPosition == 0) {
-            Toast.makeText(getContext(), "मुखपृष्ठ तयार होत आहे...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_19, Toast.LENGTH_SHORT).show();
             PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                 @Override public void onSuccess(File pdfFile) {
                     if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "मुखपृष्ठ यशस्वीरित्या तयार झाले!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_empty_20, Toast.LENGTH_SHORT).show();
                         openPdfFile(pdfFile);
                     });
                 }
@@ -305,11 +305,11 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         if (reportPosition == 1) {
-            Toast.makeText(getContext(), "अनुक्रमणिका तयार होत आहे...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_21, Toast.LENGTH_SHORT).show();
             PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                 @Override public void onSuccess(File pdfFile) {
                     if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "अनुक्रमणिका यशस्वीरित्या तयार झाली!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_empty_22, Toast.LENGTH_SHORT).show();
                         openPdfFile(pdfFile);
                     });
                 }
@@ -322,7 +322,7 @@ public class ReportPrintingFragment extends Fragment {
             return;
         }
 
-        Toast.makeText(getContext(), "वर्गवार एकूण निकाल तक्ता तयार होत आहे...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.msg_empty_23, Toast.LENGTH_SHORT).show();
         
         String classId = SessionContext.selectedClass.id;
         String[] sids = getSemesterIds();
@@ -335,7 +335,7 @@ public class ReportPrintingFragment extends Fragment {
                         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                             @Override public void onSuccess(File pdfFile) {
                                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                                    Toast.makeText(getContext(), "निकाल तक्ता यशस्वीरित्या तयार झाला!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), R.string.msg_empty_24, Toast.LENGTH_SHORT).show();
                                     openPdfFile(pdfFile);
                                 });
                             }
@@ -360,13 +360,13 @@ public class ReportPrintingFragment extends Fragment {
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), "द्वितीय सत्राचे गुण लोड होऊ शकले नाहीत", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.msg_empty_16, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), "प्रथम सत्राचे गुण लोड होऊ शकले नाहीत", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.msg_empty_17, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -406,7 +406,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void generateMasterReportPdf() {
         if (studentsList == null || studentsList.isEmpty()) {
-            Toast.makeText(getContext(), "या वर्गात कोणतेही विद्यार्थी आढळले नाहीत", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_11, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -437,7 +437,7 @@ public class ReportPrintingFragment extends Fragment {
                                 
                                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
                                     pd.dismiss();
-                                    Toast.makeText(getContext(), "मास्टर रिपोर्ट तयार झाला!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), R.string.msg_empty_25, Toast.LENGTH_LONG).show();
                                     openPdfFile(masterOut);
                                 });
                             } catch (Exception e) {
@@ -619,7 +619,7 @@ public class ReportPrintingFragment extends Fragment {
             share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(share, "Share Report PDF"));
         } catch (Exception e) {
-            Toast.makeText(getContext(), "त्रुटी: PDF फाईल उघडू शकली नाही", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.msg_pdf, Toast.LENGTH_LONG).show();
         }
     }
 

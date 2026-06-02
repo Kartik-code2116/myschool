@@ -6,7 +6,7 @@
     android:background="?attr/selectableItemBackground">
     <TextView android:id="@+id/tvRowSubject"
         android:layout_width="0dp" android:layout_height="wrap_content"
-        android:layout_weight="3" android:text="Mathematics"
+        android:layout_weight="3" android:text="@string/txt_mathematics"
         android:textSize="12sp" android:textColor="#FF212121"/>
     <TextView android:id="@+id/tvRowMax"
         android:layout_width="0dp" android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         android:textColor="#FF212121" android:gravity="center"/>
     <TextView android:id="@+id/tvRowGrade"
         android:layout_width="0dp" android:layout_height="wrap_content"
-        android:layout_weight="1" android:text="A"
+        android:layout_weight="1" android:text="@string/txt_a"
         android:textSize="12sp" android:fontFamily="sans-serif-medium"
         android:textColor="#FF1565C0" android:gravity="center"/>
 </LinearLayout>

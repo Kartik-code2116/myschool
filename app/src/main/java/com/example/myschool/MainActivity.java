@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 if (allGranted) {
                     startCamera();
                 } else {
-                    Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.msg_camera_permission_is_required, Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                     .build();
         } catch (Exception e) {
             Log.e(TAG, "DB initialization failed: " + e.getMessage());
-            Toast.makeText(this, "Database initialization failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.msg_database_initialization_failed, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(ImageCaptureException exc) {
                         Log.e(TAG, "Photo capture failed: " + exc.getMessage());
                         hideStatus();
-                        Toast.makeText(MainActivity.this, "Capture failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.msg_capture_failed, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
             if (bitmap == null) {
                 hideStatus();
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.msg_failed_to_load_image, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "OCR failed: " + e.getMessage());
                         hideStatus();
-                        Toast.makeText(this, "OCR processing failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.msg_ocr_processing_failed, Toast.LENGTH_SHORT).show();
                     });
 
         } catch (Exception e) {
@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void generatePDF() {
         if (extractedNumbers.isEmpty()) {
-            Toast.makeText(this, "No data to generate PDF", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_no_data_to_generate_pdf, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -450,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "PDF generation failed: " + e.getMessage());
                 runOnUiThread(() -> {
                     hideStatus();
-                    Toast.makeText(this, "PDF generation failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.msg_pdf_generation_failed, Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();

@@ -251,7 +251,7 @@ public class ClassDivListFragment extends Fragment {
                     FirebaseRepository.get().deleteClass(c.id, new FirebaseRepository.OnResult<Void>() {
                         @Override
                         public void onSuccess(Void result) {
-                            Toast.makeText(requireContext(), "Class deleted successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.msg_class_deleted_successfully, Toast.LENGTH_SHORT).show();
                             loadClasses();
                         }
                         @Override

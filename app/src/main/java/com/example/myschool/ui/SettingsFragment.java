@@ -104,7 +104,7 @@ public class SettingsFragment extends Fragment {
         settingsPrefs.edit().putInt("theme_mode", mode).apply();
         updateThemeUi(mode);
         MySchoolApplication.applyTheme(mode);
-        Toast.makeText(requireContext(), "Theme updated successfully", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), R.string.msg_theme_updated_successfully, Toast.LENGTH_SHORT).show();
     }
 
     // ── Language UI ──────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ public class SettingsFragment extends Fragment {
         config.setLocale(locale);
         requireContext().getResources().updateConfiguration(config, requireContext().getResources().getDisplayMetrics());
 
-        Toast.makeText(requireContext(), "Language updated / भाषा बदलली", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), R.string.msg_language_updated, Toast.LENGTH_SHORT).show();
 
         // Recreate activity to force reinflating components with new resource locale bundle
         requireActivity().recreate();
@@ -151,7 +151,7 @@ public class SettingsFragment extends Fragment {
             public void onSuccess(List<Student> list) {
                 if (list == null || list.isEmpty()) {
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "No students to backup in the active class", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), R.string.msg_no_students_to_backup_in_the_a, Toast.LENGTH_SHORT).show()
                     );
                     return;
                 }
@@ -248,12 +248,12 @@ public class SettingsFragment extends Fragment {
             JSONArray array = new JSONArray(sb.toString());
             int count = array.length();
             if (count == 0) {
-                Toast.makeText(requireContext(), "Backup file is empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.msg_backup_file_is_empty, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             android.app.ProgressDialog pd = new android.app.ProgressDialog(requireContext());
-            pd.setTitle("Restoring Students");
+            pd.setTitle(R.string.msg_restoring_students);
             pd.setMessage("Saving student records to Firestore...");
             pd.setCancelable(false);
             pd.show();
@@ -343,12 +343,12 @@ public class SettingsFragment extends Fragment {
     // ── Reset & Cache utilities ──────────────────────────────────────────────
     private void resetSession() {
         SessionContext.clear(requireContext());
-        Toast.makeText(requireContext(), "Active session reset successfully.", Toast.LENGTH_LONG).show();
+        Toast.makeText(requireContext(), R.string.msg_active_session_reset_successfu, Toast.LENGTH_LONG).show();
     }
 
     private void clearCache() {
         SessionContext.clear(requireContext());
-        Toast.makeText(requireContext(), "Cache cleared successfully.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), R.string.msg_cache_cleared_successfully, Toast.LENGTH_SHORT).show();
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────

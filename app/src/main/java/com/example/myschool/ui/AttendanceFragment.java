@@ -83,7 +83,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         // Add Icon click (Friendly instructions dialog)
         b.ivActionAdd.setOnClickListener(v -> {
             new AlertDialog.Builder(getContext())
-                    .setTitle("नवीन हजेरी (New Attendance)")
+                    .setTitle(R.string.msg_new_attendance)
                     .setMessage("नवीन हजेरी जोडण्यासाठी संबंधित विद्यार्थ्याच्या कार्डवरील उजव्या ३-बिंदू चिन्हावर क्लिक करा आणि 'बदल करा' (Edit) पर्याय निवडा.")
                     .setPositiveButton("ठीक आहे", null)
                     .show();
@@ -94,13 +94,13 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
 
         // More Vertical click
         b.ivActionMore.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "सेटिंग्ज लवकरच येत आहेत", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_4, Toast.LENGTH_SHORT).show();
         });
     }
 
     private void loadData() {
         if (SessionContext.selectedClass == null) {
-            Toast.makeText(getContext(), "Please select class first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_please_select_class_first, Toast.LENGTH_SHORT).show();
             return;
         }
         String classId = SessionContext.selectedClass.id;
@@ -117,7 +117,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), "Failed to load students", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.msg_failed_to_load_students, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -143,7 +143,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
 
     private void showHelpDialog() {
         new AlertDialog.Builder(getContext())
-                .setTitle("उपस्थिती मदत (Help Guidelines)")
+                .setTitle(R.string.msg_help_guidelines)
                 .setMessage("१. मासिक उपस्थिती बदल करण्यासाठी प्रत्येक कार्डच्या उजव्या बाजूला असलेल्या तीन-बिंदू मेनूवर क्लिक करा आणि 'बदल करा' निवडा.\n\n"
                         + "२. एका विद्यार्थ्याची मासिक हजेरी दुसऱ्या विद्यार्थ्यावर जशीच्या तशी कॉपी करण्यासाठी 'डुप्लिकेट' निवडा.\n\n"
                         + "३. रेकॉर्ड डिलीट करण्यासाठी 'डिलीट करा' वर क्लिक करा.")
@@ -178,7 +178,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         }
 
         new AlertDialog.Builder(getContext())
-                .setTitle("वर्गवार उपस्थिती अहवाल (Attendance Analytics)")
+                .setTitle(R.string.msg_attendance_analytics)
                 .setMessage("• एकूण विद्यार्थी (Total Students): " + studentsCount + " विद्यार्थी\n\n"
                         + "• एकूण हजेरी बेरीज (Total Present): " + totalPresent + " दिवस\n\n"
                         + "• एकूण कामकाजाचे दिवस (Total Working): " + totalWorking + " दिवस\n\n"
@@ -276,7 +276,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         }
 
         if (targets.isEmpty()) {
-            Toast.makeText(getContext(), "हजेरी डुप्लिकेट करण्यासाठी वर्गात इतर विद्यार्थी नाहीत", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.msg_empty_5, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -286,7 +286,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         }
 
         new AlertDialog.Builder(getContext())
-                .setTitle("उपस्थिती डुप्लिकेट करा (Copy To)")
+                .setTitle(R.string.msg_copy_to)
                 .setItems(targetNames, (dialog, which) -> {
                     Student targetStudent = targets.get(which);
                     
@@ -313,7 +313,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
 
     private void showDeleteConfirmation(Student student, AttendanceRecord record) {
         new AlertDialog.Builder(getContext())
-                .setTitle("डिलीट करा?")
+                .setTitle(R.string.msg_empty_7)
                 .setMessage("तुम्हाला खात्री आहे की तुम्ही " + student.name + " ची उपस्थिती नष्ट (डिलीट) करू इच्छिता?")
                 .setNegativeButton("रद्द करा", null)
                 .setPositiveButton("डिलीट", (dialog, which) -> {
@@ -323,7 +323,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
                     FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
                         @Override
                         public void onSuccess(String id) {
-                            Toast.makeText(getContext(), "उपस्थिती डिलीट झाली!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.msg_empty_6, Toast.LENGTH_SHORT).show();
                             loadData();
                         }
                         @Override

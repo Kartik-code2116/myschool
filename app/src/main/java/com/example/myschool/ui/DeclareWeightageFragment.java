@@ -69,7 +69,7 @@ public class DeclareWeightageFragment extends Fragment {
             b.layoutEmptyState.setVisibility(View.VISIBLE);
             b.rvWeightageSubjects.setVisibility(View.GONE);
             b.btnSaveWeightage.setEnabled(false);
-            Toast.makeText(getContext(), "कृपया आधी इयत्ता आणि तुकडी निवडा", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.msg_empty_8, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -118,7 +118,7 @@ public class DeclareWeightageFragment extends Fragment {
             public void onSuccess(String id) {
                 if (getContext() != null) {
                     SessionContext.syncToAppCache();
-                    Toast.makeText(getContext(), "गुण भारमान यशस्वीरित्या जतन झाले!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.msg_empty_9, Toast.LENGTH_SHORT).show();
                     b.btnSaveWeightage.setEnabled(true);
                     loadActiveSubjects();
                 }

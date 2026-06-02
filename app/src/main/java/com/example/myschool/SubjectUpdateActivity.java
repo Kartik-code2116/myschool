@@ -31,7 +31,7 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             b.etSubjectCode.setText("1");
         }
 
-        b.etTeacherId.setText("null");
+        b.etTeacherId.setText(R.string.msg_null);
 
         if (name != null) {
             b.etSubjectNameRegular.setText(name);
@@ -48,7 +48,7 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             b.etSummativeEval.setText("30");
         }
 
-        b.etDropdownNotes.setText("I_1");
+        b.etDropdownNotes.setText(R.string.msg_i_1);
         b.etDropdownNoteMedium.setText("1");
 
         // Action Buttons Setup
@@ -65,7 +65,7 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             b.etSubjectNameLong.setText("");
             b.etDropdownNotes.setText("");
             b.etDropdownNoteMedium.setText("");
-            Toast.makeText(this, "Form cleared", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_form_cleared, Toast.LENGTH_SHORT).show();
         });
 
         b.btnUpdate.setOnClickListener(v -> {

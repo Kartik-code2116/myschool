@@ -80,7 +80,7 @@ public class StatsDashboardFragment extends Fragment {
             String semNum = SessionContext.selectedSemester != null ? String.valueOf(SessionContext.selectedSemester.number) : "1";
             tvHeaderStripInfo.setText("Class " + activeClass.className + " Div " + activeClass.division + " • Semester " + semNum);
         } else {
-            tvHeaderStripInfo.setText("Dashboard - No Class Selected");
+            tvHeaderStripInfo.setText(R.string.msg_dashboard_no_class_selected);
         }
     }
 

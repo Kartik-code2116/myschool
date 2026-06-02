@@ -40,7 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Evaluation"
+                android:text="@string/txt_evaluation"
                 android:textColor="#263238"
                 android:textSize="18sp"
                 android:fontFamily="sans-serif-black"
@@ -50,7 +50,7 @@
                 android:id="@+id/tvAppSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="• Class: 5 • Div: 1 • Semester: 2"
+                android:text="@string/txt_class_5_div_1_semester_2"
                 android:textColor="#78909C"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-medium"
@@ -147,7 +147,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@+id/btnGridListToggle"
                 android:fontFamily="sans-serif-medium"
-                android:text="Year: 2025-26  Class: 5, Div: 1, Sem: 2"
+                android:text="@string/txt_year_2025_26_class_5_div_1_sem"
                 android:textColor="#37474F"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -181,7 +181,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:gravity="center"
-        android:text="कोणतेही विद्यार्थी आढळले नाही"
+        android:text="@string/str_empty_13"
         android:textColor="#9E9E9E"
         android:textSize="15sp"
         android:visibility="gone" />

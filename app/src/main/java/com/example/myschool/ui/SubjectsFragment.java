@@ -52,7 +52,7 @@ public class SubjectsFragment extends Fragment {
 
         adapter.setOnToggleListener((item, isActive) -> {
             if (SessionContext.selectedClass == null) {
-                Toast.makeText(getContext(), "No active class selected. Please select a class.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.msg_no_active_class_selected_pleas, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -125,7 +125,7 @@ public class SubjectsFragment extends Fragment {
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).showCustomToolbarActions(
                     true,
-                    v -> Toast.makeText(getContext(), "Subjects Help & Guidelines", Toast.LENGTH_SHORT).show(),
+                    v -> Toast.makeText(getContext(), R.string.msg_subjects_help_guidelines, Toast.LENGTH_SHORT).show(),
                     v -> {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
                         popup.getMenu().add("Refresh Subjects");

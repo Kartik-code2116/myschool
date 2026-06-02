@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Smart OCR Scanner"
+                    android:text="@string/txt_smart_ocr_scanner"
                     android:textAppearance="@style/TextAppearance.Myschool.BodyMedium"
                     android:textColor="@color/white"
                     android:alpha="0.9" />
@@ -88,7 +88,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="How It Works"
+                        android:text="@string/txt_how_it_works"
                         android:textAppearance="@style/TextAppearance.Myschool.TitleMedium"
                         android:textColor="@color/primary" />
 
@@ -126,7 +126,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="Capture"
+                                android:text="@string/txt_capture"
                                 android:textAppearance="@style/TextAppearance.Myschool.LabelSmall"
                                 android:textColor="@color/on_surface_variant" />
                         </LinearLayout>
@@ -166,7 +166,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="OCR"
+                                android:text="@string/txt_ocr"
                                 android:textAppearance="@style/TextAppearance.Myschool.LabelSmall"
                                 android:textColor="@color/on_surface_variant" />
                         </LinearLayout>
@@ -206,7 +206,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="PDF"
+                                android:text="@string/txt_pdf"
                                 android:textAppearance="@style/TextAppearance.Myschool.LabelSmall"
                                 android:textColor="@color/on_surface_variant" />
                         </LinearLayout>
@@ -247,7 +247,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|bottom"
                         android:layout_marginBottom="40dp"
-                        android:text="Align text within the frame"
+                        android:text="@string/txt_align_text_within_the_frame"
                         android:textAppearance="@style/TextAppearance.Myschool.BodySmall"
                         android:textColor="@color/white"
                         android:shadowColor="@color/black"
@@ -288,7 +288,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Processing..."
+                        android:text="@string/txt_processing"
                         android:textAppearance="@style/TextAppearance.Myschool.BodyMedium"
                         android:textColor="@color/on_primary_container" />
                 </LinearLayout>
@@ -313,7 +313,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Extracted Numbers"
+                        android:text="@string/txt_extracted_numbers"
                         android:textAppearance="@style/TextAppearance.Myschool.TitleSmall"
                         android:textColor="@color/primary" />
 
@@ -342,7 +342,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            android:text="Copy"
+                            android:text="@string/txt_copy"
                             app:icon="@drawable/ic_copy" />
 
                         <com.google.android.material.button.MaterialButton
@@ -352,7 +352,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:text="PDF"
+                            android:text="@string/txt_pdf"
                             app:icon="@drawable/ic_pdf" />
                     </LinearLayout>
                 </LinearLayout>
@@ -376,7 +376,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Recent Scans"
+                        android:text="@string/txt_recent_scans"
                         android:textAppearance="@style/TextAppearance.Myschool.TitleSmall"
                         android:textColor="@color/on_surface" />
 
@@ -399,7 +399,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_margin="24dp"
-        android:text="Capture"
+        android:text="@string/txt_capture"
         app:backgroundTint="@color/primary"
         app:icon="@drawable/ic_camera"
         app:iconTint="@color/white"

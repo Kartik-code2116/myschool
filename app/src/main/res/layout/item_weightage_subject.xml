@@ -41,7 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="M"
+                    android:text="@string/txt_m"
                     android:textColor="#5E35B1"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -59,7 +59,7 @@
                     android:id="@+id/tvSubjectName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Marathi"
+                    android:text="@string/txt_marathi"
                     android:textColor="#333333"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -70,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="आकारिक: 50 | संकलित: 50"
+                    android:text="@string/txt_50_50"
                     android:textColor="#666666"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -81,7 +81,7 @@
                 style="@style/Widget.Myschool.TextInputLayout"
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
-                android:hint="पैकी"
+                android:hint="@string/str_empty_43"
                 android:layout_marginStart="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -131,7 +131,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="आकारिक मूल्यमापन (Formative - Part A)"
+                android:text="@string/txt_formative_part_a"
                 android:textColor="#5E35B1"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -149,7 +149,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="१. निरीक्षण"
+                    android:hint="@string/str_empty_44"
                     android:layout_marginEnd="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etNirikhshanMax"
@@ -164,7 +164,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="२. तोंडीकाम"
+                    android:hint="@string/str_empty_45"
                     android:layout_marginStart="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etTondiKamMax"
@@ -187,7 +187,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="३. प्रात्यक्षिक"
+                    android:hint="@string/str_empty_46"
                     android:layout_marginEnd="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPratyakshikMax"
@@ -202,7 +202,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="४. उपक्रम"
+                    android:hint="@string/str_empty_47"
                     android:layout_marginStart="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etUpkramMax"
@@ -225,7 +225,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="५. प्रकल्प"
+                    android:hint="@string/str_empty_48"
                     android:layout_marginEnd="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPrakalpMax"
@@ -240,7 +240,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="६. चाचणी"
+                    android:hint="@string/str_empty_49"
                     android:layout_marginStart="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etChachaniMax"
@@ -263,7 +263,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="७. स्वाध्याय"
+                    android:hint="@string/str_empty_50"
                     android:layout_marginEnd="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etSwadhyayMax"
@@ -278,7 +278,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="८. इतर"
+                    android:hint="@string/str_empty_51"
                     android:layout_marginStart="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etItarMax"
@@ -293,7 +293,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="संकलित मूल्यमापन (Summative - Part B)"
+                android:text="@string/txt_summative_part_b"
                 android:textColor="#E65100"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -311,7 +311,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="१. तोंडी"
+                    android:hint="@string/str_empty_52"
                     android:layout_marginEnd="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etTondiMax"
@@ -326,7 +326,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="२. प्रात्यक्षिक"
+                    android:hint="@string/str_empty_53"
                     android:layout_marginStart="6dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPratyakshikBMax"
@@ -347,7 +347,7 @@
                     style="@style/Widget.Myschool.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="३. लेखी">
+                    android:hint="@string/str_empty_54">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etLekhiMax"
                         android:layout_width="match_parent"

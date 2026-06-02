@@ -77,7 +77,7 @@ public class StudentListFragment extends Fragment {
         if (b.btnHelp != null) {
             b.btnHelp.setOnClickListener(v -> {
                 new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle("विद्यार्थी यादी मदत (Student List Help)")
+                        .setTitle(R.string.msg_student_list_help)
                         .setMessage("१. विद्यार्थ्याचे गुण भरण्यासाठी किंवा उपस्थिती बदलण्यासाठी प्रत्येक विद्यार्थ्याच्या कार्डवरील ३-बिंदू मेनूवर क्लिक करा.\n\n"
                                 + "२. नवीन विद्यार्थी जोडण्यासाठी खाली उजव्या कोपऱ्यातील '+' बटणावर क्लिक करा.\n\n"
                                 + "३. शोध घेण्यासाठी वरील सर्च बारचा वापर करा.")
@@ -88,13 +88,13 @@ public class StudentListFragment extends Fragment {
 
         if (b.btnCalc != null) {
             b.btnCalc.setOnClickListener(v -> {
-                android.widget.Toast.makeText(requireContext(), "गुण/निकाल मोजणी विभाग लवकरच येत आहे", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(requireContext(), R.string.msg_empty_26, android.widget.Toast.LENGTH_SHORT).show();
             });
         }
 
         if (b.btnIdCard != null) {
             b.btnIdCard.setOnClickListener(v -> {
-                android.widget.Toast.makeText(requireContext(), "आयडी कार्ड प्रिंटिंग लवकरच सुरू होईल", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(requireContext(), R.string.msg_empty_27, android.widget.Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -171,7 +171,7 @@ public class StudentListFragment extends Fragment {
             @Override
             public void onDeleteClick(Student student, int position) {
                 new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Delete Student")
+                        .setTitle(R.string.msg_delete_student)
                         .setMessage("Are you sure you want to delete " + student.name + "?")
                         .setPositiveButton("Delete", (d, w) -> {
                             FirebaseRepository.get().deleteStudent(student.id, new FirebaseRepository.OnResult<Void>() {
@@ -183,7 +183,7 @@ public class StudentListFragment extends Fragment {
                                             filteredStudents.remove(student);
                                             studentAdapter.setData(filteredStudents);
                                             b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
-                                            android.widget.Toast.makeText(requireContext(), "Student deleted successfully", android.widget.Toast.LENGTH_SHORT).show();
+                                            android.widget.Toast.makeText(requireContext(), R.string.msg_student_deleted_successfully, android.widget.Toast.LENGTH_SHORT).show();
                                         });
                                     }
                                 }

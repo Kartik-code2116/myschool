@@ -38,7 +38,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/on_surface"
                     android:textSize="16sp"
-                    android:text="Subject Name"/>
+                    android:text="@string/txt_subject_name"/>
 
                 <TextView
                     android:id="@+id/tvSummary"
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
                     android:textColor="@color/primary"
-                    android:text="0 remarks selected"
+                    android:text="@string/txt_0_remarks_selected"
                     android:visibility="gone"
                     android:layout_marginTop="2dp"/>
             </LinearLayout>
@@ -56,7 +56,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select"
+                android:text="@string/txt_select"
                 android:textColor="@color/primary"
                 app:icon="@drawable/ic_add_circle"
                 app:iconTint="@color/primary"
@@ -80,7 +80,7 @@
             android:id="@+id/tvNoRemarks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No remarks added."
+            android:text="@string/txt_no_remarks_added"
             android:textSize="13sp"
             android:textColor="@color/on_surface_variant"
             android:fontStyle="italic"

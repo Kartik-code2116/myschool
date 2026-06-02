@@ -82,7 +82,7 @@ public class StudentRegisterActivity extends AppCompatActivity {
                     b.actvSelectSchool.setEnabled(false);
                     b.tilSelectClass.setEnabled(false);
                     Toast.makeText(StudentRegisterActivity.this,
-                            "Please add a school first", Toast.LENGTH_LONG).show();
+                            R.string.msg_please_add_a_school_first, Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -131,7 +131,7 @@ public class StudentRegisterActivity extends AppCompatActivity {
                     b.tilSelectClass.setHint("No classes in this school");
                     b.actvSelectClass.setEnabled(false);
                     Toast.makeText(StudentRegisterActivity.this,
-                            "Please add a class to this school first", Toast.LENGTH_LONG).show();
+                            R.string.msg_please_add_a_class_to_this_sch, Toast.LENGTH_LONG).show();
                     return;
                 }
 

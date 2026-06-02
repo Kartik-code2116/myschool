@@ -35,7 +35,7 @@
                 android:layout_toStartOf="@+id/btnStudentMore"
                 android:layout_centerVertical="true"
                 android:fontFamily="sans-serif-bold"
-                android:text="1. भारती आयुष महादेव"
+                android:text="@string/txt_1"
                 android:textColor="#263238"
                 android:textSize="15sp"
                 android:textStyle="bold" />

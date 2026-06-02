@@ -28,7 +28,7 @@
                 android:id="@+id/tvPdfMockSchool1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="School Name"
+                android:text="@string/txt_school_name"
                 android:textSize="6sp"
                 android:gravity="center"
                 android:fontFamily="sans-serif-medium"
@@ -37,7 +37,7 @@
                 android:id="@+id/tvPdfMockSub1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Student Info | Academic Year | UID"
+                android:text="@string/txt_student_info_academic_year_uid"
                 android:textSize="4sp"
                 android:gravity="center"
                 android:textColor="@color/black"/>
@@ -52,13 +52,13 @@
             android:orientation="horizontal"
             android:background="#E3F2FD">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="3"
-                android:text="विषय" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+                android:text="@string/str_empty_55" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
             <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="श्रेणी" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:gravity="center" android:fontFamily="sans-serif-medium"/>
+                android:text="@string/str_empty_56" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:gravity="center" android:fontFamily="sans-serif-medium"/>
             <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"
-                android:text="वर्णनात्मक नोंद" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+                android:text="@string/str_empty_57" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
         </LinearLayout>
 
         <!-- Rows container -->
@@ -89,7 +89,7 @@
                 android:id="@+id/tvPdfMockSchool2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="School Name"
+                android:text="@string/txt_school_name"
                 android:textSize="6sp"
                 android:gravity="center"
                 android:fontFamily="sans-serif-medium"
@@ -98,7 +98,7 @@
                 android:id="@+id/tvPdfMockSub2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Student Info | Academic Year | UID"
+                android:text="@string/txt_student_info_academic_year_uid"
                 android:textSize="4sp"
                 android:gravity="center"
                 android:textColor="@color/black"/>
@@ -113,13 +113,13 @@
             android:orientation="horizontal"
             android:background="#E3F2FD">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="3"
-                android:text="विषय" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+                android:text="@string/str_empty_55" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
             <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="श्रेणी" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:gravity="center" android:fontFamily="sans-serif-medium"/>
+                android:text="@string/str_empty_56" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:gravity="center" android:fontFamily="sans-serif-medium"/>
             <View android:layout_width="0.5dp" android:layout_height="match_parent" android:background="#2962FF"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"
-                android:text="वर्णनात्मक नोंद" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
+                android:text="@string/str_empty_57" android:textSize="5sp" android:padding="2dp" android:textColor="@color/black" android:fontFamily="sans-serif-medium"/>
         </LinearLayout>
 
         <!-- Rows container -->

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.myschool.HomeActivity;
+import com.example.myschool.R;
 import com.example.myschool.SessionContext;
 import com.example.myschool.databinding.FragmentExtraMenusBinding;
 import com.example.myschool.model.ClassModel;
@@ -109,7 +110,7 @@ public class ExtraMenusFragment extends Fragment {
             if (activeClass.assistantTeacherName != null) {
                 b.tvTeacherInfoAsst.setText("Assistant Teacher: " + activeClass.assistantTeacherName);
             } else {
-                b.tvTeacherInfoAsst.setText("Assistant Teacher: Not Assigned");
+                b.tvTeacherInfoAsst.setText(R.string.msg_assistant_teacher_not_assigned);
             }
 
             // Real-time student statistics for active class (Gender & Cast categories)
@@ -161,7 +162,7 @@ public class ExtraMenusFragment extends Fragment {
                                 double girlsPercent = (finalGirls * 100.0) / finalTotal;
                                 b.tvGenderRatio.setText(String.format("Active Class Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent));
                             } else {
-                                b.tvGenderRatio.setText("No students in active class.");
+                                b.tvGenderRatio.setText(R.string.msg_no_students_in_active_class);
                             }
 
                             // Update Cast distribution
@@ -180,6 +181,6 @@ public class ExtraMenusFragment extends Fragment {
         }
 
         // Save Default admission baseline click listener
-        b.btnSaveDefaults.setOnClickListener(v -> Toast.makeText(getContext(), "Admission defaults baseline settings saved!", Toast.LENGTH_SHORT).show());
+        b.btnSaveDefaults.setOnClickListener(v -> Toast.makeText(getContext(), R.string.msg_admission_defaults_baseline_se, Toast.LENGTH_SHORT).show());
     }
 }

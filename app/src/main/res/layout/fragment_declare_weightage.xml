@@ -29,7 +29,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="गुण भारमान निश्चित करा"
+                    android:text="@string/str_empty_8"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -40,7 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="सन : 2025-26 | इयत्ता: 5 | तुकडी: 1"
+                    android:text="@string/txt_2025_26_5_1_1"
                     android:textColor="#E2D9F3"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="कोणतेही सक्रिय विषय आढळले नाहीत"
+                    android:text="@string/str_empty_9"
                     android:textColor="#333333"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -82,7 +82,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="या वर्गासाठी कोणतेही विषय निवडलेले नाहीत. कृपया प्रथम 'विषय' मेनूवर जाऊन या वर्गासाठी आवश्यक असलेले विषय निवडा."
+                    android:text="@string/str_empty_10"
                     android:textColor="#666666"
                     android:textSize="13sp" />
 
@@ -92,7 +92,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="विषय निवडा"
+                    android:text="@string/str_empty_11"
                     app:icon="@drawable/ic_add_circle" />
             </LinearLayout>
 
@@ -125,7 +125,7 @@
                     style="@style/Widget.Myschool.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="गुण भारमान जतन करा"
+                    android:text="@string/str_empty_12"
                     app:icon="@drawable/ic_check_circle" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

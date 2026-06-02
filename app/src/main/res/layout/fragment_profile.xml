@@ -136,7 +136,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Phone Number"
+                                        android:text="@string/txt_phone_number"
                                         android:textColor="#757575"
                                         android:textSize="11sp"
                                         android:fontFamily="sans-serif-medium"/>
@@ -161,7 +161,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="School UDISE Code"
+                                        android:text="@string/txt_school_udise_code"
                                         android:textColor="#757575"
                                         android:textSize="11sp"
                                         android:fontFamily="sans-serif-medium"/>
@@ -190,7 +190,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
-                                android:text="Edit Profile Details"
+                                android:text="@string/txt_edit_profile_details"
                                 android:textColor="#5A4FCF"
                                 android:textSize="16sp"
                                 android:layout_marginBottom="12dp"/>
@@ -378,7 +378,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
-        android:text="Add Class"
+        android:text="@string/txt_add_class"
         app:icon="@drawable/ic_add_circle"
         app:backgroundTint="@color/primary"
         android:textColor="@color/white"

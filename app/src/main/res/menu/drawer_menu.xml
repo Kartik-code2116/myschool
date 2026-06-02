@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="About Student">
+    <item android:title="@string/txt_about_student">
         <menu>
             <item
                 android:id="@+id/nav_formative"
                 android:icon="@drawable/ic_book"
-                android:title="Formative Summative" />
+                android:title="@string/txt_formative_summative" />
             <item
                 android:id="@+id/nav_descriptive"
                 android:icon="@drawable/ic_document"
-                android:title="Descriptive Entries" />
+                android:title="@string/txt_descriptive_entries" />
             <item
                 android:id="@+id/nav_attendance"
                 android:icon="@drawable/ic_calendar"
-                android:title="Attendance" />
+                android:title="@string/txt_attendance" />
         </menu>
     </item>
 
-    <item android:title="Class Level">
+    <item android:title="@string/txt_class_level">
         <menu>
             <item
                 android:id="@+id/nav_students"
                 android:icon="@drawable/ic_students"
-                android:title="List of Students" />
+                android:title="@string/txt_list_of_students" />
             <item
                 android:id="@+id/nav_subjects"
                 android:icon="@drawable/ic_school"
-                android:title="Subjects" />
+                android:title="@string/txt_subjects" />
             <item
                 android:id="@+id/nav_weightage"
                 android:icon="@drawable/ic_chart"
-                android:title="Declare Weightage" />
+                android:title="@string/txt_declare_weightage" />
             <item
                 android:id="@+id/nav_dropdown"
                 android:icon="@drawable/ic_list_bullet"
-                android:title="Dropdown List" />
+                android:title="@string/txt_dropdown_list" />
         </menu>
     </item>
 
-    <item android:title="School Level">
+    <item android:title="@string/txt_school_level">
         <menu>
             <item
                 android:id="@+id/nav_extra"
                 android:icon="@drawable/ic_settings"
-                android:title="See Extra Menus" />
+                android:title="@string/txt_see_extra_menus" />
         </menu>
     </item>
 
-    <item android:title="Bottom Action">
+    <item android:title="@string/txt_bottom_action">
         <menu>
             <item
                 android:id="@+id/nav_print_report"
                 android:icon="@drawable/ic_print"
-                android:title="Print Report" />
+                android:title="@string/txt_print_report" />
         </menu>
     </item>
 

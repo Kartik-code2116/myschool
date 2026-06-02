@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
 
         b.btnGoogle.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnGoogle);
-            Toast.makeText(this, "Google Sign-In coming soon", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_google_sign_in_coming_soon, Toast.LENGTH_SHORT).show();
         });
     }
 

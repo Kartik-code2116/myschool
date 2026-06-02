@@ -160,8 +160,8 @@ public class MarksheetActivity extends AppCompatActivity {
     }
 
     private void generateAndPrint() {
-        if (school == null) { Toast.makeText(this, "School data not loaded", Toast.LENGTH_SHORT).show(); return; }
-        Toast.makeText(this, "Generating PDF…", Toast.LENGTH_SHORT).show();
+        if (school == null) { Toast.makeText(this, R.string.msg_school_data_not_loaded, Toast.LENGTH_SHORT).show(); return; }
+        Toast.makeText(this, R.string.msg_generating_pdf, Toast.LENGTH_SHORT).show();
         PdfGenerator.generate(this, school, classModel, student, marks, new PdfGenerator.PdfCallback() {
             @Override public void onSuccess(File f) {
                 runOnUiThread(() -> {

@@ -12,7 +12,7 @@
             android:layout_width="match_parent" android:layout_height="72dp"
             android:background="#FFFFFF"
             app:navigationIcon="@drawable/ic_close" app:navigationIconTint="#5A4FCF"
-            app:title="Descriptive Entries" app:titleTextColor="#2E2E2E"
+            app:title="@string/txt_descriptive_entries" app:titleTextColor="#2E2E2E"
             app:titleCentered="false"/>
         <!-- Student info strip -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -30,11 +30,11 @@
                 android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="12dp">
                 <TextView android:id="@+id/tvMarksStudentName"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Student Name" android:textColor="#2E2E2E"
+                    android:text="@string/txt_student_name" android:textColor="#2E2E2E"
                     android:textSize="16sp" android:fontFamily="sans-serif-medium"/>
                 <TextView android:id="@+id/tvMarksRollClass"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Roll: 01 | Class 7-A" android:textColor="#757575"
+                    android:text="@string/txt_roll_01_class_7_a" android:textColor="#757575"
                     android:textSize="12sp" android:alpha="0.85"/>
             </LinearLayout>
         </LinearLayout>
@@ -61,7 +61,7 @@
                         android:src="@drawable/ic_edit_pencil" app:tint="@color/primary"
                         android:layout_marginEnd="12dp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="Select standard remarks from the predefined list or add your own custom remarks for each subject."
+                        android:text="@string/txt_select_standard_remarks_from_t"
                         android:textSize="13sp" android:textColor="@color/on_surface_variant"
                         android:fontFamily="sans-serif"/>
                 </LinearLayout>
@@ -86,7 +86,7 @@
         <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveRemarks"
             style="@style/Widget.Myschool.Button"
             android:layout_width="match_parent" android:layout_height="54dp"
-            android:text="Save Remarks"
+            android:text="@string/txt_save_remarks"
             app:backgroundTint="@color/primary"
             app:cornerRadius="12dp" />
     </LinearLayout>

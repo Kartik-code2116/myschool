@@ -52,7 +52,7 @@
                     android:gravity="center"
                     android:letterSpacing="0.12"
                     android:paddingHorizontal="12dp"
-                    android:text="Myschool 1.0"
+                    android:text="@string/txt_myschool_1_0"
                     android:textAllCaps="true"
                     android:textColor="#BBDEFB"
                     android:textSize="10sp" />
@@ -67,7 +67,7 @@
                     android:shadowDx="0"
                     android:shadowDy="2"
                     android:shadowRadius="4"
-                    android:text="Kartik Thorat"
+                    android:text="@string/txt_kartik_thorat"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -78,7 +78,7 @@
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-medium"
                     android:letterSpacing="0.06"
-                    android:text="MySchool"
+                    android:text="@string/txt_myschool"
                     android:textColor="#90CAF9"
                     android:textSize="13sp" />
 
@@ -88,7 +88,7 @@
                     android:layout_marginTop="2dp"
                     android:alpha="0.7"
                     android:fontFamily="sans-serif"
-                    android:text="Smart School Management"
+                    android:text="@string/txt_smart_school_management"
                     android:textColor="#BBDEFB"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -269,7 +269,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Academic Year"
+                    android:text="@string/txt_academic_year"
                     android:textColor="#1A237E"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"
@@ -364,7 +364,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Semester"
+                    android:text="@string/txt_semester"
                     android:textColor="#1A237E"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"
@@ -407,7 +407,7 @@
                         android:layout_height="match_parent"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
-                        android:text="First Semester"
+                        android:text="@string/txt_first_semester"
                         android:textColor="#333333"
                         android:textSize="16sp"/>
                 </com.google.android.material.card.MaterialCardView>
@@ -447,7 +447,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Class Activation"
+                    android:text="@string/txt_class_activation"
                     android:textColor="#1A237E"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"
@@ -463,7 +463,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="← swipe →"
+                    android:text="@string/txt_swipe"
                     android:textColor="#90A4AE"
                     android:textSize="10sp"
                     android:fontFamily="sans-serif"
@@ -543,7 +543,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
-                                android:text="Class: 1, Div: A"
+                                android:text="@string/txt_class_1_div_a"
                                 android:textColor="#1A237E"
                                 android:textSize="15sp"/>
 
@@ -552,7 +552,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="1dp"
                                 android:fontFamily="sans-serif"
-                                android:text="Tap to manage students"
+                                android:text="@string/txt_tap_to_manage_students"
                                 android:textColor="#90A4AE"
                                 android:textSize="11sp"/>
 
@@ -567,7 +567,7 @@
                                 android:paddingEnd="12dp"
                                 android:paddingTop="4dp"
                                 android:paddingBottom="4dp"
-                                android:text="Activate it"
+                                android:text="@string/txt_activate_it"
                                 android:textColor="#E65100"
                                 android:textSize="12sp"
                                 android:fontFamily="sans-serif-medium"/>
@@ -630,7 +630,7 @@
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:text="GO TO CLASS"
+                    android:text="@string/txt_go_to_class"
                     android:textColor="#2E7D32"
                     app:strokeColor="#66BB6A"
                     app:strokeWidth="2dp"
@@ -649,7 +649,7 @@
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:text="ALL CLASSES"
+                    android:text="@string/txt_all_classes"
                     android:textColor="#4527A0"
                     app:strokeColor="#7E57C2"
                     app:strokeWidth="2dp"
@@ -675,7 +675,7 @@
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:text="HOW TO USE"
+                    android:text="@string/txt_how_to_use"
                     android:textColor="#546E7A"
                     app:strokeColor="#B0BEC5"
                     app:strokeWidth="1.5dp"
@@ -694,7 +694,7 @@
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:text="ONLINE HELP"
+                    android:text="@string/txt_online_help"
                     android:textColor="#546E7A"
                     app:strokeColor="#B0BEC5"
                     app:strokeWidth="1.5dp"

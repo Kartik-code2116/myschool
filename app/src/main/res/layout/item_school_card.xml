@@ -17,15 +17,15 @@
             android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="14dp">
             <TextView android:id="@+id/tvSchoolCardName"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="School Name" android:textSize="15sp"
+                android:text="@string/txt_school_name" android:textSize="15sp"
                 android:fontFamily="sans-serif-medium" android:textColor="@color/on_surface"/>
             <TextView android:id="@+id/tvSchoolCardBoard"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="2dp" android:text="CBSE"
+                android:layout_marginTop="2dp" android:text="@string/txt_cbse"
                 android:textSize="12sp" android:textColor="@color/on_surface_variant"/>
             <TextView android:id="@+id/tvSchoolCardStudentCount"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="2dp" android:text="0 students"
+                android:layout_marginTop="2dp" android:text="@string/txt_0_students_1"
                 android:textSize="11sp" android:textColor="@color/on_surface_variant"/>
         </LinearLayout>
         <ImageView android:layout_width="20dp" android:layout_height="20dp"

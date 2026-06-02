@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="एकूण उपस्थिती"
+                android:text="@string/str_empty_29"
                 android:textSize="9sp"
                 android:textColor="#555555"
                 android:layout_marginTop="8dp"/>
@@ -82,7 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toStartOf="@id/ivOptions"
-                    android:text="1. भारती आयुष महादेव"
+                    android:text="@string/txt_1"
                     android:textColor="#5E35B1"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -115,17 +115,17 @@
                     android:orientation="horizontal"
                     android:background="#EDE7F6">
 
-                    <TextView style="@style/AttendanceHeaderCell" android:text="जून"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_30"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="जुलै"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_31"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="ऑगस्ट"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_32"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="सप्टें"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_33"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="ऑक्टो"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_34"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="नोव्हे"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_35"/>
                 </LinearLayout>
 
                 <View
@@ -175,17 +175,17 @@
                     android:orientation="horizontal"
                     android:background="#EDE7F6">
 
-                    <TextView style="@style/AttendanceHeaderCell" android:text="डिसें"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_36"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="जाने"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_37"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="फेब्रु"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_38"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="मार्च"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_39"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="एप्रिल"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_40"/>
                     <View style="@style/AttendanceDivider"/>
-                    <TextView style="@style/AttendanceHeaderCell" android:text="मे"/>
+                    <TextView style="@style/AttendanceHeaderCell" android:text="@string/str_empty_41"/>
                 </LinearLayout>
 
                 <View

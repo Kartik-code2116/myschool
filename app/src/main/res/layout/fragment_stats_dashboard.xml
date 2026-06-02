@@ -32,7 +32,7 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
-            android:text="Class 5 Div 1 - Progress Dashboard" />
+            android:text="@string/txt_class_5_div_1_progress_dashboa" />
             
         <TextView
             android:id="@+id/tvTotalStudents"
@@ -41,7 +41,7 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:fontFamily="sans-serif-bold"
-            android:text="0 Students" />
+            android:text="@string/txt_0_students" />
     </LinearLayout>
 
     <FrameLayout
@@ -78,7 +78,7 @@
                 android:id="@+id/tvEmptyMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No data found.\nPlease select a class and semester."
+                android:text="@string/txt_no_data_found_nplease_select_a"
                 android:gravity="center"
                 android:textSize="16sp"
                 android:textColor="#78909C"/>

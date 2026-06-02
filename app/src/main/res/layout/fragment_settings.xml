@@ -33,7 +33,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="App Theme / अ‍ॅप थीम"
+                    android:text="@string/txt_app_theme"
                     android:textColor="@color/primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium"/>
@@ -42,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Choose how MySchool appears on your device"
+                    android:text="@string/txt_choose_how_myschool_appears_on"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="12sp"/>
 
@@ -71,7 +71,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:paddingVertical="12dp"
-                            android:text="System"
+                            android:text="@string/txt_system"
                             android:textSize="13sp"
                             android:fontFamily="sans-serif-medium"/>
                     </com.google.android.material.card.MaterialCardView>
@@ -95,7 +95,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:paddingVertical="12dp"
-                            android:text="Light"
+                            android:text="@string/txt_light"
                             android:textSize="13sp"
                             android:fontFamily="sans-serif-medium"/>
                     </com.google.android.material.card.MaterialCardView>
@@ -118,7 +118,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:paddingVertical="12dp"
-                            android:text="Dark"
+                            android:text="@string/txt_dark"
                             android:textSize="13sp"
                             android:fontFamily="sans-serif-medium"/>
                     </com.google.android.material.card.MaterialCardView>
@@ -145,7 +145,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="App Language / भाषा"
+                    android:text="@string/txt_app_language"
                     android:textColor="@color/primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium"/>
@@ -154,7 +154,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Choose your preferred language for MySchool"
+                    android:text="@string/txt_choose_your_preferred_language"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="12sp"/>
 
@@ -183,7 +183,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:paddingVertical="12dp"
-                            android:text="English"
+                            android:text="@string/txt_english"
                             android:textSize="14sp"
                             android:fontFamily="sans-serif-medium"/>
                     </com.google.android.material.card.MaterialCardView>
@@ -206,7 +206,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:paddingVertical="12dp"
-                            android:text="मराठी"
+                            android:text="@string/str_empty_14"
                             android:textSize="14sp"
                             android:fontFamily="sans-serif-medium"/>
                     </com.google.android.material.card.MaterialCardView>
@@ -233,7 +233,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Student Backup &amp; Restore / डेटा व्यवस्थापन"
+                    android:text="@string/txt_student_backup_amp_restore"
                     android:textColor="@color/primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium"/>
@@ -242,7 +242,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Export class students data or restore from a JSON backup file"
+                    android:text="@string/txt_export_class_students_data_or"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="12sp"/>
 
@@ -260,7 +260,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:text="Backup / निर्यात"
+                        android:text="@string/txt_backup"
                         android:textSize="12sp"
                         app:strokeColor="@color/primary"
                         app:icon="@drawable/ic_copy"/>
@@ -272,7 +272,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Restore / आयात"
+                        android:text="@string/txt_restore"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_add_box"/>
                 </LinearLayout>
@@ -298,7 +298,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="App Utilities &amp; Cache / उपयुक्त सुविधा"
+                    android:text="@string/txt_app_utilities_amp_cache"
                     android:textColor="@color/primary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium"/>
@@ -307,7 +307,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Troubleshoot or reset app settings"
+                    android:text="@string/txt_troubleshoot_or_reset_app_sett"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="12sp"/>
 
@@ -325,7 +325,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:text="Reset Session"
+                        android:text="@string/txt_reset_session"
                         android:textColor="@color/accent_purple"
                         android:textSize="12sp"/>
 
@@ -336,7 +336,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Clear Cache"
+                        android:text="@string/txt_clear_cache"
                         android:textColor="@color/accent_purple"
                         android:textSize="12sp"/>
                 </LinearLayout>
@@ -368,7 +368,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="MySchool Pro"
+                    android:text="@string/txt_myschool_pro"
                     android:textColor="@color/on_surface"
                     android:textSize="18sp"
                     android:fontFamily="sans-serif-medium"/>
@@ -377,7 +377,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Smart ERP for School Results &amp; Reports"
+                    android:text="@string/txt_smart_erp_for_school_results_a"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="12sp"/>
 
@@ -385,7 +385,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:text="Version 1.0.0 (Build 2026.05)"
+                    android:text="@string/txt_version_1_0_0_build_2026_05"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="11sp"
                     android:alpha="0.7"/>
@@ -394,7 +394,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="© 2026 Advanced Agentic Coding. All Rights Reserved."
+                    android:text="@string/txt_2026_advanced_agentic_coding_a"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="10sp"
                     android:alpha="0.6"/>

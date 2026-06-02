@@ -228,7 +228,7 @@ public class HomeActivity extends AppCompatActivity {
             if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.name != null && !SessionContext.selectedSchool.name.isEmpty()) {
                 tvName.setText(SessionContext.selectedSchool.name);
             } else {
-                tvName.setText("CCE110");
+                tvName.setText(R.string.msg_cce110);
             }
         }
 
@@ -422,7 +422,7 @@ public class HomeActivity extends AppCompatActivity {
                     int checkedItem = "mr".equals(currentLang) ? 1 : 0;
 
                     new androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("Select Language / भाषा निवडा")
+                            .setTitle(R.string.msg_select_language)
                             .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
                                 String selectedLang = (which == 1) ? "mr" : "en";
                                 changeLanguage(selectedLang);
@@ -432,14 +432,14 @@ public class HomeActivity extends AppCompatActivity {
                             .show();
                     return true;
                 } else if (id == 902) {
-                    Toast.makeText(this, "Thank you for rating us 5 stars!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.msg_thank_you_for_rating_us_5_star, Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == 903) {
-                    Toast.makeText(this, "Opening More Apps on Play Store...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.msg_opening_more_apps_on_play_stor, Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == 904) {
                     new androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("About Developer")
+                            .setTitle(R.string.msg_about_developer)
                             .setMessage("Developed with ❤️ by Sanjay Gore\nVersion 24.04.14")
                             .setPositiveButton(android.R.string.ok, null).show();
                     return true;
@@ -486,7 +486,7 @@ public class HomeActivity extends AppCompatActivity {
         config.setLocale(locale);
         res.updateConfiguration(config, res.getDisplayMetrics());
 
-        Toast.makeText(this, "Language updated / भाषा बदलली", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.msg_language_updated, Toast.LENGTH_SHORT).show();
 
         // Recreate activity to force reinflating components with new resource locale bundle
         recreate();

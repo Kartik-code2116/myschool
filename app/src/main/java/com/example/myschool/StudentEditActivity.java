@@ -33,7 +33,7 @@ public class StudentEditActivity extends AppCompatActivity {
         isNew = getIntent().getBooleanExtra("new_student", false);
         student = AppCache.selectedStudent;
         if (!isNew && student == null) {
-            Toast.makeText(this, "No student to edit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_no_student_to_edit, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -98,7 +98,7 @@ public class StudentEditActivity extends AppCompatActivity {
     private void save() {
         String name = str(b.etName);
         if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this, "Name is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_name_is_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -143,7 +143,7 @@ public class StudentEditActivity extends AppCompatActivity {
             @Override public void onSuccess(String id) {
                 s.id = id;
                 AppCache.selectedStudent = s;
-                Toast.makeText(StudentEditActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(StudentEditActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }

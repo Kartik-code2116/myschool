@@ -77,13 +77,13 @@ public class InfoPrintSettingFragment extends Fragment {
         b.btnHowToUse.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnHowToUse);
             new android.app.AlertDialog.Builder(requireContext())
-                    .setTitle("How to Use")
+                    .setTitle(R.string.msg_how_to_use)
                     .setMessage(getString(R.string.hint_question_mark))
                     .setPositiveButton(android.R.string.ok, null).show();
         });
         b.btnOnlineHelp.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnOnlineHelp);
-            Toast.makeText(requireContext(), "Opening online help portal...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.msg_opening_online_help_portal, Toast.LENGTH_SHORT).show();
         });
 
         setupSwipeListener(b.panelSemester,
@@ -512,7 +512,7 @@ public class InfoPrintSettingFragment extends Fragment {
             b.frameClassNumCircle.setBackground(
                     requireContext().getDrawable(R.drawable.bg_class_num_normal));
             b.panelClass.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#E8EAF6")));
-            b.tvClassStatusBadge.setText("Activate it");
+            b.tvClassStatusBadge.setText(R.string.msg_activate_it);
             b.tvClassStatusBadge.setTextColor(Color.parseColor("#E65100"));
             b.tvClassStatusBadge.setBackground(
                     requireContext().getDrawable(R.drawable.bg_pill_activate));
@@ -543,7 +543,7 @@ public class InfoPrintSettingFragment extends Fragment {
         b.tvClassNumberBig.setTextColor(Color.parseColor("#2E7D32"));
         b.panelClass.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#A5D6A7")));
         b.panelClass.setCardBackgroundColor(Color.parseColor("#F9FFF9"));
-        b.tvClassStatusBadge.setText("✓  Activated");
+        b.tvClassStatusBadge.setText(R.string.msg_activated);
         b.tvClassStatusBadge.setTextColor(Color.parseColor("#2E7D32"));
         b.tvClassStatusBadge.setBackground(
                 requireContext().getDrawable(R.drawable.bg_pill_activated));
@@ -679,7 +679,7 @@ public class InfoPrintSettingFragment extends Fragment {
         String[] names = new String[semesters.size()];
         for (int i = 0; i < semesters.size(); i++) names[i] = semesters.get(i).name;
         new android.app.AlertDialog.Builder(requireContext())
-                .setTitle("Select Semester").setItems(names, (d, w) -> { semesterIndex = w; applySemester(0); }).show();
+                .setTitle(R.string.msg_select_semester).setItems(names, (d, w) -> { semesterIndex = w; applySemester(0); }).show();
     }
 
     private void showClassPickerDialog() {
@@ -691,7 +691,7 @@ public class InfoPrintSettingFragment extends Fragment {
             names[i] = getString(R.string.class_div_format, n, d);
         }
         new android.app.AlertDialog.Builder(requireContext())
-                .setTitle("Select Class").setItems(names, (d, w) -> { classIndex = w; applyClass(0); }).show();
+                .setTitle(R.string.msg_select_class).setItems(names, (d, w) -> { classIndex = w; applyClass(0); }).show();
     }
 
     // ── Swipe gesture helper ──────────────────────────────────────────────────

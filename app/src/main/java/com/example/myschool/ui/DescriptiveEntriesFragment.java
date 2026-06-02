@@ -109,9 +109,9 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), "Descriptive Entries Manual opened!", Toast.LENGTH_SHORT).show());
+                v -> Toast.makeText(requireContext(), R.string.msg_descriptive_entries_manual_ope, Toast.LENGTH_SHORT).show());
         b.btnAddSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), "Add student clicked", Toast.LENGTH_SHORT).show());
+                v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
         b.btnExcelSquare.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
                 ((HomeActivity) getActivity()).navigateTo(R.id.nav_print_report);
@@ -566,7 +566,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
             private void confirmDeleteRemarks(Student student) {
                 new androidx.appcompat.app.AlertDialog.Builder(itemView.getContext())
-                        .setTitle("Delete remarks?")
+                        .setTitle(R.string.msg_delete_remarks)
                         .setMessage("This will remove saved descriptive remarks for this student only.")
                         .setNegativeButton("Cancel", null)
                         .setPositiveButton("Delete", (dialog, which) -> deleteRemarks(student))
@@ -576,7 +576,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             private void deleteRemarks(Student student) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    Toast.makeText(itemView.getContext(), "No saved remarks found.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -589,7 +589,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                 }
 
                 if (!changed) {
-                    Toast.makeText(itemView.getContext(), "No saved remarks found.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 saveStudentRemarkRecord(student, record, "Remarks deleted.");
@@ -598,7 +598,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             private void applyGenderRemarkChange(Student student) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    Toast.makeText(itemView.getContext(), "No saved remarks found.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -616,7 +616,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                 }
 
                 if (!changed) {
-                    Toast.makeText(itemView.getContext(), "No gender words found to change.", Toast.LENGTH_SHORT)
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_gender_words_found_to_chang, Toast.LENGTH_SHORT)
                             .show();
                     return;
                 }

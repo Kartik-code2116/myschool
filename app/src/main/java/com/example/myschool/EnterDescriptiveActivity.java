@@ -380,7 +380,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance()
                 .getCurrentUser();
         if (currentUser == null) {
-            Toast.makeText(this, "लॉगिन आवश्यक आहे.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.msg_empty, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -472,7 +472,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
 
                 showLoading(false);
                 Toast.makeText(EnterDescriptiveActivity.this,
-                        "Remarks saved successfully!", Toast.LENGTH_SHORT).show();
+                        R.string.msg_remarks_saved_successfully, Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }
