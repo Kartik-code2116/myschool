@@ -45,7 +45,7 @@ public class DescriptiveEntriesFragment extends Fragment {
     private String activeSemesterId = "sem_1";
     private int activeSemesterNumber = 1;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
-    private boolean isGridViewMode = false;
+    private boolean isGridViewMode = true;
 
     @Nullable
     @Override
@@ -60,7 +60,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         activeClass = SessionContext.selectedClass;
-        if (SessionContext.selectedSemester != null) {
+        if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             activeSemesterId = SessionContext.selectedSemester.id;
             activeSemesterNumber = SessionContext.selectedSemester.number;
         }
@@ -308,7 +308,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             SessionContext.selectedSemester = fallbackSem;
         }
 
-        if (SessionContext.selectedSemester != null) {
+        if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             activeSemesterId = SessionContext.selectedSemester.id;
             activeSemesterNumber = SessionContext.selectedSemester.number;
         }
@@ -473,7 +473,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                 binding.btnStudentMore.setOnClickListener(v -> showStudentRemarkMenu(v, s));
 
                 MarksRecord marks = getDisplayMarksForStudent(s);
-                // Removed renderSavedRemarkSummary to avoid showing remarks twice
+                // User requested to not show remarks twice, only in the subject boxes
+                // renderSavedRemarkSummary(marks);
 
                 if (isGridViewMode) {
                     // Show 2-Column Grid, Hide Horizontal Scroll
