@@ -229,10 +229,41 @@ public class StudentListFragment extends Fragment {
 
     private void setupFab() {
         b.fabAddStudent.setOnClickListener(v -> {
-            AppCache.selectedStudent = new Student();
-            startActivity(new Intent(requireContext(), StudentEditActivity.class)
-                    .putExtra("new_student", true));
+            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.example.myschool.model.Teacher>() {
+                @Override
+                public void onSuccess(com.example.myschool.model.Teacher teacher) {
+                    if (teacher != null && !"active".equals(teacher.subscriptionStatus)) {
+                        FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
+                            @Override
+                            public void onSuccess(List<Student> students) {
+                                if (students != null && students.size() >= 3) {
+                                    SubscriptionBottomSheet bottomSheet = new SubscriptionBottomSheet();
+                                    bottomSheet.show(getParentFragmentManager(), "SubscriptionBottomSheet");
+                                } else {
+                                    openAddStudent();
+                                }
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                openAddStudent();
+                            }
+                        });
+                    } else {
+                        openAddStudent();
+                    }
+                }
+                @Override
+                public void onError(Exception e) {
+                    openAddStudent();
+                }
+            });
         });
+    }
+
+    private void openAddStudent() {
+        AppCache.selectedStudent = new Student();
+        startActivity(new Intent(requireContext(), StudentEditActivity.class)
+                .putExtra("new_student", true));
     }
 
     private void loadAllStudents() {

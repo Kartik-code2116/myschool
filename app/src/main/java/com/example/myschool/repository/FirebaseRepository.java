@@ -84,6 +84,7 @@ public class FirebaseRepository {
     public static final String COL_STUDENTS = "students";
     public static final String COL_MARKS = "marks";
     public static final String COL_ATTENDANCE_RECORDS = "attendance_records";
+    public static final String COL_SUBSCRIPTIONS = "subscriptions";
 
     private FirebaseRepository() {
         db = FirebaseFirestore.getInstance();
@@ -1097,6 +1098,36 @@ public class FirebaseRepository {
         if (source.percentage > 0) target.percentage = source.percentage;
         if (source.grade != null && !source.grade.isEmpty()) target.grade = source.grade;
         if (source.result != null && !source.result.isEmpty()) target.result = source.result;
+    }
+
+    // ---------- Subscriptions ----------
+    public void getSubscriptionHistory(String teacherId, OnResult<List<com.example.myschool.model.SubscriptionRequest>> cb) {
+        if (teacherId == null) {
+            cb.onError(new IllegalArgumentException("Teacher ID cannot be null"));
+            return;
+        }
+        db.collection(COL_SUBSCRIPTIONS)
+                .where(com.google.firebase.firestore.Filter.or(
+                        com.google.firebase.firestore.Filter.equalTo("teacherId", teacherId),
+                        com.google.firebase.firestore.Filter.equalTo("userId", teacherId)
+                ))
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<com.example.myschool.model.SubscriptionRequest> list = new ArrayList<>();
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            com.example.myschool.model.SubscriptionRequest req = doc.toObject(com.example.myschool.model.SubscriptionRequest.class);
+                            if (req != null) {
+                                req.id = doc.getId();
+                                list.add(req);
+                            }
+                        }
+                    }
+                    // Sort descending by timestamp
+                    Collections.sort(list, (a, b) -> Long.compare(b.timestamp, a.timestamp));
+                    cb.onSuccess(list);
+                })
+                .addOnFailureListener(cb::onError);
     }
 
     // ---------- Callback interface ----------

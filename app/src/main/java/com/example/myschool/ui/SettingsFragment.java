@@ -62,6 +62,26 @@ public class SettingsFragment extends Fragment {
 
         settingsPrefs = requireContext().getSharedPreferences("myschool_settings_prefs", android.content.Context.MODE_PRIVATE);
 
+        // Fetch Subscription info
+        FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.example.myschool.model.Teacher>() {
+            @Override
+            public void onSuccess(com.example.myschool.model.Teacher teacher) {
+                if (teacher != null && b != null) {
+                    b.tvSubscriptionStatus.setText("Status: " + teacher.subscriptionStatus.toUpperCase());
+                    if (teacher.subscriptionExpiry > 0) {
+                        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault());
+                        b.tvSubscriptionExpiry.setText("Valid till: " + sdf.format(new java.util.Date(teacher.subscriptionExpiry)));
+                    } else {
+                        b.tvSubscriptionExpiry.setText("Valid till: N/A");
+                    }
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                if (b != null) b.tvSubscriptionStatus.setText("Status: Error fetching");
+            }
+        });
+
         // 1. Initial State UI Restoration
         int themeMode = settingsPrefs.getInt("theme_mode", 0);
         String lang = settingsPrefs.getString("language", "en");
@@ -69,6 +89,13 @@ public class SettingsFragment extends Fragment {
         updateLanguageUi(lang);
 
         // 2. Click Listeners
+        if (b.btnViewHistory != null) {
+            b.btnViewHistory.setOnClickListener(v -> {
+                UiAnimations.pulse(b.btnViewHistory);
+                startActivity(new Intent(requireContext(), SubscriptionHistoryActivity.class));
+            });
+        }
+
         b.btnThemeSystem.setOnClickListener(v -> { UiAnimations.pulse(b.btnThemeSystem); selectTheme(0); });
         b.btnThemeLight.setOnClickListener(v -> { UiAnimations.pulse(b.btnThemeLight); selectTheme(1); });
         b.btnThemeDark.setOnClickListener(v -> { UiAnimations.pulse(b.btnThemeDark); selectTheme(2); });

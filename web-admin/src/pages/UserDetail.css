@@ -1,0 +1,142 @@
+.user-detail-page {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.back-nav {
+  margin-bottom: 24px;
+}
+
+.profile-header {
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.profile-info h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+}
+
+.profile-info .email {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin: 0 0 4px 0;
+}
+
+.profile-info .school {
+  color: #94a3b8;
+  margin: 0;
+}
+
+.profile-status {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.profile-status .expiry {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  padding: 24px;
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin: 0 0 12px 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.data-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.data-section {
+  padding: 24px;
+}
+
+.data-section h2 {
+  font-size: 18px;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.data-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.data-list li:last-child {
+  border-bottom: none;
+}
+
+.data-list strong {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.data-list .subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.empty-text {
+  color: var(--text-secondary);
+  font-style: italic;
+}

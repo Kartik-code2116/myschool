@@ -14,6 +14,9 @@ public class Teacher {
     public String academicYearLabel;
     public String pasteLinkResult;
     public List<String> schoolIds = new ArrayList<>();
+    public String subscriptionStatus = "inactive"; // inactive, active, pending
+    public long subscriptionExpiry = 0; // timestamp
+    public int studentsCount = 0;
 
     public Teacher() {}
 }

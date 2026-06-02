@@ -42,6 +42,7 @@
         <activity android:name=".ProfileActivity"            android:exported="false"/>
         <activity android:name=".SubjectUpdateActivity"      android:exported="false"/>
         <activity android:name=".EnterDescriptiveActivity"   android:exported="false"/>
+        <activity android:name=".ui.SubscriptionHistoryActivity" android:exported="false" android:theme="@style/Theme.Myschool"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

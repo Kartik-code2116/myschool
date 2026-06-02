@@ -1,0 +1,10 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: 250px; /* Offset for fixed sidebar */
+  min-height: 100vh;
+}
