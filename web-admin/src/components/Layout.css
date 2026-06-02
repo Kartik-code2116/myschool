@@ -5,6 +5,16 @@
 
 .main-content {
   flex-grow: 1;
-  margin-left: 250px; /* Offset for fixed sidebar */
   min-height: 100vh;
+  margin-left: 264px;
+}
+
+@media (max-width: 860px) {
+  .app-layout {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
 }

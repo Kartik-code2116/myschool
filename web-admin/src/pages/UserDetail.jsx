@@ -1,119 +1,357 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { collection, getDocs, doc, getDoc, query, updateDoc, where } from 'firebase/firestore';
+import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../firebase';
 import './UserDetail.css';
+
+const editableFields = [
+  ['name', 'Teacher name'],
+  ['email', 'Email'],
+  ['phone', 'Phone'],
+  ['schoolName', 'School name'],
+  ['udiseCode', 'UDISE code'],
+  ['district', 'District'],
+  ['taluka', 'Taluka'],
+  ['address', 'Address'],
+  ['studentsCount', 'Students count'],
+];
+
+const formatDate = (timestamp) => {
+  if (!timestamp) return 'N/A';
+  return new Date(timestamp).toLocaleDateString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const formatDateTime = (timestamp) => {
+  if (!timestamp) return 'No date';
+  return new Date(timestamp).toLocaleString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const toDateInput = (timestamp) => {
+  if (!timestamp) return '';
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 10);
+};
+
+const buildForm = (user) => ({
+  name: user.name || '',
+  email: user.email || '',
+  phone: user.phone || '',
+  schoolName: user.schoolName || '',
+  udiseCode: user.udiseCode || '',
+  district: user.district || '',
+  taluka: user.taluka || '',
+  address: user.address || '',
+  studentsCount: user.studentsCount || '',
+  subscriptionStatus: user.subscriptionStatus || 'inactive',
+  subscriptionExpiry: toDateInput(user.subscriptionExpiry),
+  accountStatus: user.accountStatus || 'active',
+  adminNote: user.adminNote || '',
+});
 
 export default function UserDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [form, setForm] = useState(null);
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [error, setError] = useState(null);
   const [selectedScreenshot, setSelectedScreenshot] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // 1. Fetch User Profile
-        const userDoc = await getDoc(doc(db, "teachers", id));
-        if (userDoc.exists()) {
-          setUser({ id: userDoc.id, ...userDoc.data() });
-        } else {
-          console.error("User not found");
-          setLoading(false);
+        const userDoc = await getDoc(doc(db, 'teachers', id));
+        if (!userDoc.exists()) {
+          setUser(null);
           return;
         }
 
-        // 2. Fetch Classes
-        const classesQuery = query(collection(db, "classes"), where("teacherId", "==", id));
-        const classesSnap = await getDocs(classesQuery);
+        const userData = { id: userDoc.id, ...userDoc.data() };
+        setUser(userData);
+        setForm(buildForm(userData));
+
+        const classesQuery = query(collection(db, 'classes'), where('teacherId', '==', id));
+        const studentsQuery = query(collection(db, 'students'), where('teacherId', '==', id));
+        const subsQuery1 = query(collection(db, 'subscriptions'), where('teacherId', '==', id));
+        const subsQuery2 = query(collection(db, 'subscriptions'), where('userId', '==', id));
+
+        const [classesSnap, studentsSnap, subsSnap1, subsSnap2] = await Promise.all([
+          getDocs(classesQuery),
+          getDocs(studentsQuery),
+          getDocs(subsQuery1),
+          getDocs(subsQuery2),
+        ]);
+
         const classesData = [];
-        classesSnap.forEach(doc => classesData.push({ id: doc.id, ...doc.data() }));
+        classesSnap.forEach((classDoc) => classesData.push({ id: classDoc.id, ...classDoc.data() }));
         setClasses(classesData);
 
-        // 3. Fetch Students
-        const studentsQuery = query(collection(db, "students"), where("teacherId", "==", id));
-        const studentsSnap = await getDocs(studentsQuery);
         const studentsData = [];
-        studentsSnap.forEach(doc => studentsData.push({ id: doc.id, ...doc.data() }));
+        studentsSnap.forEach((studentDoc) => studentsData.push({ id: studentDoc.id, ...studentDoc.data() }));
         setStudents(studentsData);
 
-        // 4. Fetch Subscriptions (Check both new 'teacherId' and old 'userId' fields for backward compatibility)
-        const subsQuery1 = query(collection(db, "subscriptions"), where("teacherId", "==", id));
-        const subsQuery2 = query(collection(db, "subscriptions"), where("userId", "==", id));
-        const [subsSnap1, subsSnap2] = await Promise.all([getDocs(subsQuery1), getDocs(subsQuery2)]);
-        
         const subsMap = new Map();
-        subsSnap1.forEach(doc => subsMap.set(doc.id, { id: doc.id, ...doc.data() }));
-        subsSnap2.forEach(doc => subsMap.set(doc.id, { id: doc.id, ...doc.data() }));
-        
-        const subsData = Array.from(subsMap.values());
-        // Sort descending
-        subsData.sort((a, b) => b.timestamp - a.timestamp);
-        setSubscriptions(subsData);
+        subsSnap1.forEach((subscriptionDoc) => subsMap.set(subscriptionDoc.id, { id: subscriptionDoc.id, ...subscriptionDoc.data() }));
+        subsSnap2.forEach((subscriptionDoc) => subsMap.set(subscriptionDoc.id, { id: subscriptionDoc.id, ...subscriptionDoc.data() }));
 
+        const subsData = Array.from(subsMap.values());
+        subsData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        setSubscriptions(subsData);
+        setError(null);
       } catch (err) {
-        console.error("Error fetching user data:", err);
+        console.error('Error fetching user data:', err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUserData();
   }, [id]);
 
+  const updateForm = (field, value) => {
+    setForm((currentForm) => ({ ...currentForm, [field]: value }));
+    setSaveMessage('');
+  };
+
+  const saveUser = async (override = {}) => {
+    if (!form) return;
+    setSaving(true);
+    setSaveMessage('');
+
+    const nextForm = { ...form, ...override };
+    const payload = {
+      name: nextForm.name.trim(),
+      email: nextForm.email.trim(),
+      phone: nextForm.phone.trim(),
+      schoolName: nextForm.schoolName.trim(),
+      udiseCode: String(nextForm.udiseCode || '').trim(),
+      district: nextForm.district.trim(),
+      taluka: nextForm.taluka.trim(),
+      address: nextForm.address.trim(),
+      studentsCount: Number(nextForm.studentsCount) || 0,
+      subscriptionStatus: nextForm.subscriptionStatus,
+      subscriptionExpiry: nextForm.subscriptionExpiry ? new Date(nextForm.subscriptionExpiry).getTime() : null,
+      accountStatus: nextForm.accountStatus,
+      adminNote: nextForm.adminNote.trim(),
+      updatedByAdminAt: Date.now(),
+    };
+
+    try {
+      await updateDoc(doc(db, 'teachers', id), payload);
+      const updatedUser = { ...user, ...payload };
+      setUser(updatedUser);
+      setForm(buildForm(updatedUser));
+      setSaveMessage('Changes saved.');
+    } catch (err) {
+      setSaveMessage(`Failed to save: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const quickSetAccount = (accountStatus) => {
+    saveUser({ accountStatus });
+  };
+
+  const quickActivateYear = () => {
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    saveUser({
+      accountStatus: 'active',
+      subscriptionStatus: 'active',
+      subscriptionExpiry: expiry.toISOString().slice(0, 10),
+    });
+  };
+
   if (loading) return <div className="loading">Loading user details...</div>;
-  if (!user) return <div className="loading">User not found</div>;
+
+  if (error) {
+    return (
+      <main className="user-detail-page">
+        <button className="btn" onClick={() => navigate('/users')} type="button">Back to Users</button>
+        <div className="glass-panel empty-state error-state">
+          <h3>Firebase Error</h3>
+          <p>{error}</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!user || !form) {
+    return (
+      <main className="user-detail-page">
+        <button className="btn" onClick={() => navigate('/users')} type="button">Back to Users</button>
+        <div className="glass-panel empty-state">
+          <h3>User not found</h3>
+          <p>This teacher profile is no longer available.</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <div className="user-detail-page">
+    <main className="user-detail-page">
       <div className="back-nav">
-        <button className="btn" onClick={() => navigate('/users')}>&larr; Back to Users</button>
+        <button className="btn" onClick={() => navigate('/users')} type="button">Back to Users</button>
       </div>
 
-      <div className="glass-panel profile-header">
+      <section className="glass-panel profile-header">
         <div className="profile-avatar">
           {user.name ? user.name.charAt(0).toUpperCase() : '?'}
         </div>
         <div className="profile-info">
+          <span className="label">App user account</span>
           <h1>{user.name || 'Unnamed Teacher'}</h1>
           <p className="email">{user.email || 'No email'}</p>
-          <p className="school">School: {user.schoolName || 'Not specified'} (UDISE: {user.udiseCode || 'N/A'})</p>
+          <p className="school">{user.schoolName || 'School not specified'}</p>
         </div>
         <div className="profile-status">
-          <span className={`status-badge status-${user.subscriptionStatus || 'inactive'}`}>
-            {(user.subscriptionStatus || 'inactive').toUpperCase()}
+          <span className={`status-badge status-${user.accountStatus || 'active'}`}>
+            {user.accountStatus || 'active'}
           </span>
-          <p className="expiry">
-            Expires: {user.subscriptionExpiry ? new Date(user.subscriptionExpiry).toLocaleDateString() : 'N/A'}
-          </p>
+          <span className={`status-badge status-${user.subscriptionStatus || 'inactive'}`}>
+            {user.subscriptionStatus || 'inactive'}
+          </span>
+          <p className="expiry">Expires {formatDate(user.subscriptionExpiry)}</p>
+        </div>
+      </section>
+
+      <section className="control-grid">
+        <div className="glass-panel admin-panel">
+          <div className="section-title">
+            <h2>Edit User Information</h2>
+            <span>Admin</span>
+          </div>
+          <div className="edit-grid">
+            {editableFields.map(([field, label]) => (
+              <label key={field} className={field === 'address' ? 'field-wide' : ''}>
+                <span>{label}</span>
+                {field === 'address' ? (
+                  <textarea
+                    rows="3"
+                    value={form[field]}
+                    onChange={(event) => updateForm(field, event.target.value)}
+                  />
+                ) : (
+                  <input
+                    type={field === 'studentsCount' ? 'number' : 'text'}
+                    value={form[field]}
+                    onChange={(event) => updateForm(field, event.target.value)}
+                  />
+                )}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass-panel admin-panel">
+          <div className="section-title">
+            <h2>Account Control</h2>
+            <span>Access</span>
+          </div>
+          <div className="edit-grid single">
+            <label>
+              <span>App account status</span>
+              <select value={form.accountStatus} onChange={(event) => updateForm('accountStatus', event.target.value)}>
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+                <option value="blocked">Blocked</option>
+              </select>
+            </label>
+            <label>
+              <span>Subscription status</span>
+              <select value={form.subscriptionStatus} onChange={(event) => updateForm('subscriptionStatus', event.target.value)}>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </label>
+            <label>
+              <span>Subscription expiry</span>
+              <input
+                type="date"
+                value={form.subscriptionExpiry}
+                onChange={(event) => updateForm('subscriptionExpiry', event.target.value)}
+              />
+            </label>
+            <label>
+              <span>Admin note</span>
+              <textarea
+                rows="4"
+                value={form.adminNote}
+                onChange={(event) => updateForm('adminNote', event.target.value)}
+                placeholder="Internal note for this account"
+              />
+            </label>
+          </div>
+          <div className="quick-actions">
+            <button className="btn btn-success" onClick={quickActivateYear} disabled={saving} type="button">Activate 1 Year</button>
+            <button className="btn" onClick={() => quickSetAccount('active')} disabled={saving} type="button">Allow Access</button>
+            <button className="btn btn-danger" onClick={() => quickSetAccount('suspended')} disabled={saving} type="button">Suspend</button>
+          </div>
+        </div>
+      </section>
+
+      <div className="save-bar glass-panel">
+        <div>
+          <strong>Admin controls</strong>
+          <p>Save changes to update what the mobile app can read for this account.</p>
+        </div>
+        <div className="save-actions">
+          {saveMessage && <span className={saveMessage.startsWith('Failed') ? 'save-error' : 'save-success'}>{saveMessage}</span>}
+          <button className="btn btn-primary" onClick={() => saveUser()} disabled={saving} type="button">
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
         </div>
       </div>
 
-      <div className="stats-row">
+      <section className="stats-row">
         <div className="glass-panel stat-card">
-          <h3>Total Classes</h3>
-          <div className="stat-value">{classes.length}</div>
+          <span>Total Classes</span>
+          <strong>{classes.length}</strong>
         </div>
         <div className="glass-panel stat-card">
-          <h3>Total Students</h3>
-          <div className="stat-value">{students.length}</div>
+          <span>Total Students</span>
+          <strong>{students.length}</strong>
         </div>
-      </div>
+        <div className="glass-panel stat-card">
+          <span>UDISE Code</span>
+          <strong className="code-value">{user.udiseCode || 'N/A'}</strong>
+        </div>
+      </section>
 
-      <div className="data-sections">
+      <section className="data-sections">
         <div className="glass-panel data-section">
-          <h2>Classes Created</h2>
+          <div className="section-title">
+            <h2>Classes Created</h2>
+            <span>{classes.length}</span>
+          </div>
           {classes.length === 0 ? (
             <p className="empty-text">No classes found.</p>
           ) : (
             <ul className="data-list">
-              {classes.map(c => (
-                <li key={c.id}>
-                  <strong>Class {c.className} {c.division}</strong>
-                  <span className="subtitle">Year: {c.academicYearLabel}</span>
+              {classes.map((classItem) => (
+                <li key={classItem.id}>
+                  <strong>Class {classItem.className} {classItem.division}</strong>
+                  <span className="subtitle">Year: {classItem.academicYearLabel || 'N/A'}</span>
                 </li>
               ))}
             </ul>
@@ -121,63 +359,78 @@ export default function UserDetail() {
         </div>
 
         <div className="glass-panel data-section">
-          <h2>Students</h2>
+          <div className="section-title">
+            <h2>Students</h2>
+            <span>{students.length}</span>
+          </div>
           {students.length === 0 ? (
             <p className="empty-text">No students found.</p>
           ) : (
             <ul className="data-list">
-              {students.map(s => (
-                <li key={s.id}>
-                  <strong>{s.name}</strong>
-                  <span className="subtitle">Class: {s.className} {s.division} | Roll: {s.rollNo}</span>
+              {students.map((student) => (
+                <li key={student.id}>
+                  <strong>{student.name || 'Unnamed Student'}</strong>
+                  <span className="subtitle">Class: {student.className || '-'} {student.division || ''} | Roll: {student.rollNo || 'N/A'}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
 
-        <div className="glass-panel data-section" style={{ gridColumn: "1 / -1" }}>
-          <h2>Subscription History</h2>
+        <div className="glass-panel data-section subscriptions-section">
+          <div className="section-title">
+            <h2>Subscription History</h2>
+            <span>{subscriptions.length}</span>
+          </div>
           {subscriptions.length === 0 ? (
             <p className="empty-text">No subscription requests found.</p>
           ) : (
-            <div className="requests-grid" style={{ marginTop: '16px' }}>
-              {subscriptions.map(sub => (
-                <div key={sub.id} className="glass-panel request-card">
-                  <div className="request-header">
-                    <span className="user-id">{new Date(sub.timestamp).toLocaleString()}</span>
-                    <span className={`status-badge status-${sub.status}`}>
-                      {sub.status.toUpperCase()}
-                    </span>
+            <div className="detail-subscriptions">
+              {subscriptions.map((sub) => (
+                <article key={sub.id} className="subscription-item">
+                  <div>
+                    <strong>{formatDateTime(sub.timestamp)}</strong>
+                    <span className={`status-badge status-${sub.status || 'pending'}`}>{sub.status || 'pending'}</span>
                   </div>
-                  <div className="screenshot-container" onClick={() => setSelectedScreenshot(sub.screenshotUrl)} style={{ cursor: 'pointer' }}>
-                    <img src={sub.screenshotUrl} alt="Payment Screenshot" />
-                  </div>
-                </div>
+                  <button
+                    className="thumb-button"
+                    onClick={() => setSelectedScreenshot(sub.screenshotUrl)}
+                    type="button"
+                  >
+                    {sub.screenshotUrl ? (
+                      <img src={sub.screenshotUrl} alt="Payment screenshot" />
+                    ) : (
+                      <span>No screenshot</span>
+                    )}
+                  </button>
+                </article>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {selectedScreenshot && (
         <div className="modal-overlay animate-fade-in" onClick={() => setSelectedScreenshot(null)}>
-          <div className="glass-panel modal-content" onClick={e => e.stopPropagation()}>
+          <div className="glass-panel modal-content" onClick={(event) => event.stopPropagation()}>
             <div className="modal-header">
-              <h2>Payment Screenshot</h2>
-              <button className="close-btn" onClick={() => setSelectedScreenshot(null)}>×</button>
+              <div>
+                <span className="label">Payment proof</span>
+                <h2>Payment Screenshot</h2>
+              </div>
+              <button className="close-btn" onClick={() => setSelectedScreenshot(null)} type="button">x</button>
             </div>
             <div className="modal-body">
               <div className="full-screenshot">
-                <img src={selectedScreenshot} alt="Screenshot Full" />
+                <img src={selectedScreenshot} alt="Payment screenshot full view" />
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn" onClick={() => setSelectedScreenshot(null)}>Close</button>
+              <button className="btn" onClick={() => setSelectedScreenshot(null)} type="button">Close</button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }
