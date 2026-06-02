@@ -97,8 +97,8 @@ public class StatsDashboardFragment extends Fragment {
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
-                if (students == null) students = new ArrayList<>();
-                final int totalStudents = students.size();
+                final List<Student> finalStudents = (students == null) ? new ArrayList<>() : students;
+                final int totalStudents = finalStudents.size();
                 tvTotalStudents.setText(totalStudents + " Students");
 
                 if (totalStudents == 0) {
@@ -129,7 +129,7 @@ public class StatsDashboardFragment extends Fragment {
                             }
                         }
 
-                        calculateAndDisplayStats(totalStudents, marksMap);
+                        calculateAndDisplayStats(totalStudents, finalStudents, marksMap);
                     }
 
                     @Override
@@ -150,7 +150,7 @@ public class StatsDashboardFragment extends Fragment {
         });
     }
 
-    private void calculateAndDisplayStats(int totalStudents, Map<String, MarksRecord> marksMap) {
+    private void calculateAndDisplayStats(int totalStudents, List<Student> students, Map<String, MarksRecord> marksMap) {
         if (activeClass == null || activeClass.subjects == null || activeClass.subjects.isEmpty()) {
             showEmptyState();
             return;
@@ -165,8 +165,9 @@ public class StatsDashboardFragment extends Fragment {
 
             String safeKey = MarksRecord.sanitizeKey(subject.name);
 
-            // Calculate progress
-            for (MarksRecord record : marksMap.values()) {
+            // Calculate progress for students belonging to this class only
+            for (Student student : students) {
+                MarksRecord record = marksMap.get(student.id);
                 if (record != null && record.detailedMarks != null) {
                     MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
                     if (detail != null) {
@@ -176,8 +177,11 @@ public class StatsDashboardFragment extends Fragment {
                         if (detail.sanklit > 0) {
                             stat.summativeFilled++;
                         }
-                        if (detail.remark != null && !detail.remark.trim().isEmpty()) {
-                            stat.descriptiveFilled++;
+                        if (detail.remark != null) {
+                            String cleanRemark = detail.remark.replace("||", "").replace("null", "").trim();
+                            if (!cleanRemark.isEmpty()) {
+                                stat.descriptiveFilled++;
+                            }
                         }
                     }
                 }
