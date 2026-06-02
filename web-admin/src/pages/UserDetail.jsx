@@ -347,14 +347,17 @@ export default function UserDetail() {
           {classes.length === 0 ? (
             <p className="empty-text">No classes found.</p>
           ) : (
-            <ul className="data-list">
-              {classes.map((classItem) => (
-                <li key={classItem.id}>
-                  <strong>Class {classItem.className} {classItem.division}</strong>
-                  <span className="subtitle">Year: {classItem.academicYearLabel || 'N/A'}</span>
-                </li>
-              ))}
-            </ul>
+            <details className="dropdown-details">
+              <summary className="dropdown-summary">View all {classes.length} classes...</summary>
+              <ul className="data-list">
+                {classes.map((classItem) => (
+                  <li key={classItem.id}>
+                    <strong>Class {classItem.className} {classItem.division}</strong>
+                    <span className="subtitle">Year: {classItem.academicYearLabel || 'N/A'}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
         </div>
 
@@ -366,14 +369,17 @@ export default function UserDetail() {
           {students.length === 0 ? (
             <p className="empty-text">No students found.</p>
           ) : (
-            <ul className="data-list">
-              {students.map((student) => (
-                <li key={student.id}>
-                  <strong>{student.name || 'Unnamed Student'}</strong>
-                  <span className="subtitle">Class: {student.className || '-'} {student.division || ''} | Roll: {student.rollNo || 'N/A'}</span>
-                </li>
-              ))}
-            </ul>
+            <details className="dropdown-details">
+              <summary className="dropdown-summary">View all {students.length} students...</summary>
+              <ul className="data-list">
+                {students.map((student) => (
+                  <li key={student.id}>
+                    <strong>{student.name || 'Unnamed Student'}</strong>
+                    <span className="subtitle">Class: {student.className || '-'} {student.division || ''} | Roll: {student.rollNo || 'N/A'}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
         </div>
 
