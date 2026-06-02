@@ -427,128 +427,62 @@ public class ReportPrintingFragment extends Fragment {
             
             android.app.Dialog dialog = new android.app.Dialog(getContext(), android.R.style.Theme_Light_NoTitleBar_Fullscreen);
             
-            android.widget.LinearLayout root = new android.widget.LinearLayout(getContext());
-            root.setOrientation(android.widget.LinearLayout.VERTICAL);
-            root.setBackgroundColor(android.graphics.Color.parseColor("#F5F5F7"));
-            root.setPadding(24, 24, 24, 24);
+            android.view.View root = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_pdf_viewer, null);
             
-            // Header
-            android.widget.RelativeLayout header = new android.widget.RelativeLayout(getContext());
-            header.setPadding(0, 16, 0, 16);
+            android.widget.ImageButton btnBack = root.findViewById(R.id.btnBack);
+            android.widget.ImageButton btnToggleView = root.findViewById(R.id.btnToggleView);
+            com.example.myschool.utils.ZoomImageView ivPdfPage = root.findViewById(R.id.ivPdfPage);
+            androidx.recyclerview.widget.RecyclerView rvPdfPages = root.findViewById(R.id.rvPdfPages);
+            android.widget.TextView tvPageIndicator = root.findViewById(R.id.tvPageIndicator);
+            com.google.android.material.button.MaterialButton btnPrev = root.findViewById(R.id.btnPrev);
+            com.google.android.material.button.MaterialButton btnNext = root.findViewById(R.id.btnNext);
+            com.google.android.material.button.MaterialButton btnDownload = root.findViewById(R.id.btnDownload);
             
-            android.widget.ImageButton btnBack = new android.widget.ImageButton(getContext());
-            btnBack.setImageResource(R.drawable.ic_chevron_left);
-            btnBack.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-            btnBack.setPadding(12, 12, 12, 12);
-            btnBack.setColorFilter(android.graphics.Color.parseColor("#5A4FCF"));
+            rvPdfPages.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+            PdfPageAdapter adapter = new PdfPageAdapter(renderer, totalPages);
+            rvPdfPages.setAdapter(adapter);
+
+            final boolean[] isScrollMode = {false};
+
+            btnToggleView.setOnClickListener(v -> {
+                isScrollMode[0] = !isScrollMode[0];
+                if (isScrollMode[0]) {
+                    ivPdfPage.setVisibility(android.view.View.GONE);
+                    tvPageIndicator.setVisibility(android.view.View.GONE);
+                    btnPrev.setVisibility(android.view.View.GONE);
+                    btnNext.setVisibility(android.view.View.GONE);
+                    rvPdfPages.setVisibility(android.view.View.VISIBLE);
+                } else {
+                    rvPdfPages.setVisibility(android.view.View.GONE);
+                    ivPdfPage.setVisibility(android.view.View.VISIBLE);
+                    tvPageIndicator.setVisibility(android.view.View.VISIBLE);
+                    btnPrev.setVisibility(android.view.View.VISIBLE);
+                    btnNext.setVisibility(android.view.View.VISIBLE);
+                }
+            });
+            
             btnBack.setOnClickListener(v -> {
                 renderer.close();
                 dialog.dismiss();
             });
             
-            android.widget.TextView tvTitle = new android.widget.TextView(getContext());
-            tvTitle.setText("निकालपत्रक पहा (Preview Report)");
-            tvTitle.setTextSize(18);
-            tvTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-            tvTitle.setTextColor(android.graphics.Color.parseColor("#1C1C1E"));
-            
-            android.widget.RelativeLayout.LayoutParams lpBack = new android.widget.RelativeLayout.LayoutParams(
-                    android.widget.RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    android.widget.RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-            lpBack.addRule(android.widget.RelativeLayout.ALIGN_PARENT_START);
-            lpBack.addRule(android.widget.RelativeLayout.CENTER_VERTICAL);
-            header.addView(btnBack, lpBack);
-            
-            android.widget.RelativeLayout.LayoutParams lpTitle = new android.widget.RelativeLayout.LayoutParams(
-                    android.widget.RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    android.widget.RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-            lpTitle.addRule(android.widget.RelativeLayout.CENTER_IN_PARENT);
-            header.addView(tvTitle, lpTitle);
-            
-            root.addView(header);
-            
-            // Main image card view
-            android.widget.ImageView ivPdfPage = new android.widget.ImageView(getContext());
-            ivPdfPage.setAdjustViewBounds(true);
-            ivPdfPage.setBackgroundResource(R.drawable.bg_pdf_mock_border);
-            
-            android.widget.ScrollView scrollView = new android.widget.ScrollView(getContext());
-            android.widget.LinearLayout.LayoutParams lpScroll = new android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                    0, 1.0f
-            );
-            lpScroll.setMargins(0, 16, 0, 16);
-            scrollView.addView(ivPdfPage);
-            root.addView(scrollView, lpScroll);
-            
-            // Page counter
-            android.widget.TextView tvPageIndicator = new android.widget.TextView(getContext());
-            tvPageIndicator.setText("पृष्ठ: 1 / " + totalPages);
-            tvPageIndicator.setGravity(android.view.Gravity.CENTER);
-            tvPageIndicator.setTextColor(android.graphics.Color.parseColor("#8E8E93"));
-            tvPageIndicator.setTextSize(14);
-            root.addView(tvPageIndicator);
-            
-            // Controls panel
-            android.widget.LinearLayout controls = new android.widget.LinearLayout(getContext());
-            controls.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-            controls.setGravity(android.view.Gravity.CENTER_VERTICAL);
-            controls.setPadding(0, 16, 0, 16);
-            
-            com.google.android.material.button.MaterialButton btnPrev = new com.google.android.material.button.MaterialButton(getContext(), null, com.google.android.material.R.style.Widget_MaterialComponents_Button_TextButton);
-            btnPrev.setText("मागील");
-            btnPrev.setTextColor(android.graphics.Color.parseColor("#5A4FCF"));
-            
-            com.google.android.material.button.MaterialButton btnNext = new com.google.android.material.button.MaterialButton(getContext(), null, com.google.android.material.R.style.Widget_MaterialComponents_Button_TextButton);
-            btnNext.setText("पुढील");
-            btnNext.setTextColor(android.graphics.Color.parseColor("#5A4FCF"));
-            
-            com.google.android.material.button.MaterialButton btnDownload = new com.google.android.material.button.MaterialButton(getContext());
-            btnDownload.setText("डाउनलोड करा");
-            btnDownload.setIcon(androidx.core.content.ContextCompat.getDrawable(getContext(), R.drawable.ic_print));
-            btnDownload.setBackgroundColor(android.graphics.Color.parseColor("#8BC34A"));
-            btnDownload.setTextColor(android.graphics.Color.WHITE);
-            btnDownload.setCornerRadius(24);
-            btnDownload.setPadding(16, 16, 16, 16);
             btnDownload.setOnClickListener(v -> downloadOrSharePdfFile(pdfFile));
-            
-            android.widget.LinearLayout.LayoutParams lpBtn = new android.widget.LinearLayout.LayoutParams(
-                    0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f
-            );
-            controls.addView(btnPrev, lpBtn);
-            
-            android.widget.LinearLayout.LayoutParams lpDl = new android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            lpDl.setMargins(16, 0, 16, 0);
-            controls.addView(btnDownload, lpDl);
-            
-            controls.addView(btnNext, lpBtn);
-            
-            android.widget.LinearLayout.LayoutParams lpControls = new android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            float density = getResources().getDisplayMetrics().density;
-            lpControls.setMargins(0, (int) (16 * density), 0, (int) (48 * density));
-            root.addView(controls, lpControls);
             
             Runnable renderPage = () -> {
                 try {
-                    android.graphics.pdf.PdfRenderer.Page page = renderer.openPage(currentPage[0]);
-                    int w = page.getWidth() * 2;
-                    int h = page.getHeight() * 2;
-                    android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
-                    page.render(bmp, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                    
-                    ivPdfPage.setImageBitmap(bmp);
-                    tvPageIndicator.setText("पृष्ठ: " + (currentPage[0] + 1) + " / " + totalPages);
-                    btnPrev.setEnabled(currentPage[0] > 0);
-                    btnNext.setEnabled(currentPage[0] < totalPages - 1);
-                    page.close();
+                    synchronized (renderer) {
+                        android.graphics.pdf.PdfRenderer.Page page = renderer.openPage(currentPage[0]);
+                        int w = page.getWidth() * 3; // Render at 3x scale for zooming clarity
+                        int h = page.getHeight() * 3;
+                        android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                        page.render(bmp, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                        
+                        ivPdfPage.setImageBitmap(bmp);
+                        tvPageIndicator.setText("पृष्ठ: " + (currentPage[0] + 1) + " / " + totalPages);
+                        btnPrev.setEnabled(currentPage[0] > 0);
+                        btnNext.setEnabled(currentPage[0] < totalPages - 1);
+                        page.close();
+                    }
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Render page failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -570,7 +504,9 @@ public class ReportPrintingFragment extends Fragment {
             renderPage.run();
             
             dialog.setContentView(root);
-            dialog.setOnDismissListener(d -> renderer.close());
+            dialog.setOnDismissListener(d -> {
+                try { renderer.close(); } catch (Exception ignored) {}
+            });
             dialog.show();
         } catch (Exception e) {
             Toast.makeText(getContext(), "PDF उघडण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -646,6 +582,53 @@ public class ReportPrintingFragment extends Fragment {
         super.onPause();
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).showCustomToolbarActions(false, null, null);
+        }
+    }
+
+    private static class PdfPageAdapter extends androidx.recyclerview.widget.RecyclerView.Adapter<PdfPageAdapter.PdfViewHolder> {
+        private final android.graphics.pdf.PdfRenderer renderer;
+        private final int totalPages;
+
+        public PdfPageAdapter(android.graphics.pdf.PdfRenderer renderer, int totalPages) {
+            this.renderer = renderer;
+            this.totalPages = totalPages;
+        }
+
+        @androidx.annotation.NonNull
+        @Override
+        public PdfViewHolder onCreateViewHolder(@androidx.annotation.NonNull android.view.ViewGroup parent, int viewType) {
+            android.view.View view = android.view.LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pdf_page, parent, false);
+            return new PdfViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@androidx.annotation.NonNull PdfViewHolder holder, int position) {
+            try {
+                synchronized (renderer) {
+                    android.graphics.pdf.PdfRenderer.Page page = renderer.openPage(position);
+                    int w = page.getWidth() * 2; // Render at 2x scale for scroll mode efficiency
+                    int h = page.getHeight() * 2;
+                    android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                    page.render(bmp, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                    holder.ivPage.setImageBitmap(bmp);
+                    page.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return totalPages;
+        }
+
+        static class PdfViewHolder extends androidx.recyclerview.widget.RecyclerView.ViewHolder {
+            android.widget.ImageView ivPage;
+            public PdfViewHolder(@androidx.annotation.NonNull android.view.View itemView) {
+                super(itemView);
+                ivPage = itemView.findViewById(R.id.ivPage);
+            }
         }
     }
 }
