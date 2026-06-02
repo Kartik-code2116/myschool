@@ -407,7 +407,83 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private void generateAndShowCollectivePdf() {
-        generateClassRosterReport(14); // Default: वार्षिक निकालपत्रक
+        generateMasterReportPdf();
+    }
+
+    private void generateMasterReportPdf() {
+        if (studentsList == null || studentsList.isEmpty()) {
+            Toast.makeText(getContext(), "या वर्गात कोणतेही विद्यार्थी आढळले नाहीत", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
+        pd.setMessage("सर्व 15 रिपोर्ट तयार होत आहेत. कृपया प्रतीक्षा करा (यास काही मिनिटे लागू शकतात)...");
+        pd.setCancelable(false);
+        pd.show();
+
+        String classId = SessionContext.selectedClass.id;
+        String[] sids = getSemesterIds();
+        FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[0], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+            @Override
+            public void onSuccess(Map<String, MarksRecord> sem1Map) {
+                FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[1], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+                    @Override
+                    public void onSuccess(Map<String, MarksRecord> sem2Map) {
+                        new Thread(() -> {
+                            try {
+                                List<File> allFiles = new ArrayList<>();
+                                // Generate all 15 reports
+                                for (int i = 0; i <= 14; i++) {
+                                    File f = generateReportPositionSync(i, sem1Map, sem2Map);
+                                    if (f != null && f.exists()) allFiles.add(f);
+                                }
+                                
+                                File masterOut = new File(getContext().getCacheDir(), "Master_Report_Class_" + System.currentTimeMillis() + ".pdf");
+                                com.example.myschool.utils.PdfMerger.mergePdfFiles(allFiles, masterOut);
+                                
+                                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                                    pd.dismiss();
+                                    Toast.makeText(getContext(), "मास्टर रिपोर्ट तयार झाला!", Toast.LENGTH_LONG).show();
+                                    openPdfFile(masterOut);
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                                    pd.dismiss();
+                                    Toast.makeText(getContext(), "मास्टर रिपोर्ट तयार करण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                });
+                            }
+                        }).start();
+                    }
+                    @Override public void onError(Exception e) { pd.dismiss(); }
+                });
+            }
+            @Override public void onError(Exception e) { pd.dismiss(); }
+        });
+    }
+
+    private File generateReportPositionSync(int position, Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map) throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        final File[] result = new File[1];
+        PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
+            @Override public void onSuccess(File pdfFile) { result[0] = pdfFile; latch.countDown(); }
+            @Override public void onError(Exception e) { latch.countDown(); }
+        };
+
+        boolean isClassReport = (position == 0 || position == 1 || position == 4 || position == 5 || position == 6
+                || position == 7 || position == 10 || position == 12 || position == 14);
+
+        if (position == 0) { // Cover page
+            PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, 0, cb);
+        } else if (position == 1) { // Index
+            PdfGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
+        } else if (isClassReport) {
+            PdfGenerator.generateProgressBook(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb);
+        } else {
+            PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, position, cb);
+        }
+        latch.await();
+        return result[0];
     }
 
     private void openPdfFile(File file) {

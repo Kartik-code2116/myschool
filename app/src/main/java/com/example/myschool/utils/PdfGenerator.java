@@ -227,7 +227,7 @@ public class PdfGenerator {
         new Thread(() -> {
             try {
                 ensureFonts(ctx);
-                String rName = reportPosition == 2 ? "Gunapattrak" : (reportPosition == 3 ? "Descriptive" : "Personality");
+                String rName = reportPosition == 2 ? "Gunapattrak" : (reportPosition == 3 ? "Descriptive" : (reportPosition == 0 ? "CoverPage" : "Personality"));
                 File out = new File(outDir(ctx), "Bulk_" + rName + "_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
@@ -245,6 +245,8 @@ public class PdfGenerator {
                         addGunapattrakContent(doc, ctx, school, cls, student, s1, s2);
                     } else if (reportPosition == 3) {
                         addDescriptiveContent(doc, ctx, school, cls, student, s1, s2);
+                    } else if (reportPosition == 0) {
+                        addCoverPageContent(doc, ctx, school, cls, student);
                     } else {
                         addPersonalityContent(doc, ctx, school, cls, student, s1, s2);
                     }
