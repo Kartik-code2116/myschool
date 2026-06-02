@@ -657,4 +657,11 @@
     <string name="msg_delete_student">विद्यार्थी हटवा</string>
     <string name="msg_no_active_class_selected_pleas">कोणताही सक्रिय वर्ग निवडलेला नाही. कृपया वर्ग निवडा.</string>
     <string name="msg_subjects_help_guidelines">विषय मदत आणि मार्गदर्शक तत्त्वे</string>
+
+    <string name="fmt_school_name" formatted="false">नाव: %s</string>
+    <string name="fmt_school_udise" formatted="false">UDISE कोड: %s</string>
+    <string name="fmt_school_board" formatted="false">बोर्ड: %s</string>
+    <string name="fmt_school_address" formatted="false">पत्ता: %s</string>
+    <string name="btn_edit_school">तपशील संपादित करा</string>
+    <string name="title_edit_school">शाळेचा तपशील संपादित करा</string>
 </resources>

@@ -657,4 +657,11 @@
     <string name="msg_delete_student">Delete Student</string>
     <string name="msg_no_active_class_selected_pleas">No active class selected. Please select a class.</string>
     <string name="msg_subjects_help_guidelines">Subjects Help &amp; Guidelines</string>
+
+    <string name="fmt_school_name" formatted="false">Name: %s</string>
+    <string name="fmt_school_udise" formatted="false">UDISE Code: %s</string>
+    <string name="fmt_school_board" formatted="false">Board: %s</string>
+    <string name="fmt_school_address" formatted="false">Address: %s</string>
+    <string name="btn_edit_school">Edit Details</string>
+    <string name="title_edit_school">Edit School Details</string>
 </resources>

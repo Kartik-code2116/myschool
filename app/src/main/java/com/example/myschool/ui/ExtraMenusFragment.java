@@ -95,11 +95,20 @@ public class ExtraMenusFragment extends Fragment {
         // Load School details
         School school = SessionContext.selectedSchool;
         if (school != null) {
-            if (school.name != null) b.tvSchoolInfoName.setText("Name: " + school.name);
-            if (school.udiseCode != null) b.tvSchoolInfoUdise.setText("UDISE Code: " + school.udiseCode);
-            if (school.board != null) b.tvSchoolInfoBoard.setText("Board: " + school.board);
-            if (school.address != null && !school.address.isEmpty()) b.tvSchoolInfoAddress.setText("Address: " + school.address);
+            if (school.name != null) b.tvSchoolInfoName.setText(getString(R.string.fmt_school_name, school.name));
+            if (school.udiseCode != null) b.tvSchoolInfoUdise.setText(getString(R.string.fmt_school_udise, school.udiseCode));
+            if (school.board != null) b.tvSchoolInfoBoard.setText(getString(R.string.fmt_school_board, school.board));
+            if (school.address != null && !school.address.isEmpty()) b.tvSchoolInfoAddress.setText(getString(R.string.fmt_school_address, school.address));
         }
+
+        b.btnEditSchoolInfo.setOnClickListener(v -> {
+            if (school != null) {
+                com.example.myschool.AppCache.selectedSchool = school;
+                android.content.Intent intent = new android.content.Intent(getContext(), com.example.myschool.SchoolRegisterActivity.class);
+                intent.putExtra("school_id", school.id);
+                startActivity(intent);
+            }
+        });
 
         // Load Class details
         ClassModel activeClass = SessionContext.selectedClass;
