@@ -16,16 +16,15 @@
 
         <!-- Large School Logo Frame on Left -->
         <FrameLayout
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:background="@drawable/shape_circle_white"
             android:padding="8dp">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_school"
-                app:tint="@color/drawer_header_dark"
+                android:src="@drawable/app_logo"
                 android:contentDescription="School Logo"/>
         </FrameLayout>
 
@@ -43,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
-                android:text="@string/txt_cce110"
+                android:text="@string/txt_myschool"
                 android:textColor="@color/drawer_header_dark"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -54,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="27251208204"
+                android:text="2116"
                 android:textColor="#2E7D32"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
@@ -80,8 +79,7 @@
             android:contentDescription="@string/drawer_stats"
             android:padding="12dp"
             android:src="@drawable/ic_chart"
-            android:scaleType="fitCenter"
-            app:tint="@color/drawer_header_dark"/>
+            android:scaleType="fitCenter"/>
 
         <ImageButton
             android:id="@+id/btnDrawerSettings"
@@ -93,8 +91,7 @@
             android:contentDescription="@string/drawer_settings"
             android:padding="12dp"
             android:src="@drawable/ic_settings"
-            android:scaleType="fitCenter"
-            app:tint="@color/drawer_header_dark"/>
+            android:scaleType="fitCenter"/>
 
         <ImageButton
             android:id="@+id/btnDrawerPrint"
@@ -106,8 +103,7 @@
             android:contentDescription="@string/drawer_print"
             android:padding="12dp"
             android:src="@drawable/ic_print"
-            android:scaleType="fitCenter"
-            app:tint="@color/drawer_header_dark"/>
+            android:scaleType="fitCenter"/>
 
         <ImageButton
             android:id="@+id/btnDrawerProfile"
@@ -118,7 +114,6 @@
             android:contentDescription="@string/profile_title"
             android:padding="12dp"
             android:src="@drawable/ic_person"
-            android:scaleType="fitCenter"
-            app:tint="@color/drawer_header_dark"/>
+            android:scaleType="fitCenter"/>
     </LinearLayout>
 </LinearLayout>

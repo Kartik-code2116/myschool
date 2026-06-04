@@ -26,8 +26,8 @@
             <!-- Circular Logo Badge Container -->
             <FrameLayout
                 android:id="@+id/logoContainer"
-                android:layout_width="88dp"
-                android:layout_height="88dp"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
                 android:background="@drawable/shape_circle_white"
                 android:elevation="6dp"
                 android:padding="16dp">
@@ -36,8 +36,7 @@
                     android:id="@+id/ivSchoolLogo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_school"
-                    app:tint="@color/primary"
+                    android:src="@drawable/app_logo"
                     android:contentDescription="@string/app_name"/>
             </FrameLayout>
 

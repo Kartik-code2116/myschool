@@ -19,11 +19,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_school"
-            app:tint="@color/primary" />
+            android:src="@drawable/app_logo" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
