@@ -360,7 +360,7 @@ public class StudentProfileActivity extends AppCompatActivity {
                                 runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, R.string.no_marks_yet, Toast.LENGTH_SHORT).show());
                                 return;
                             }
-                            PdfGenerator.generateGunapattrak(StudentProfileActivity.this, SessionContext.selectedSchool, AppCache.selectedClass, student, s1, s2, new PdfGenerator.PdfCallback() {
+                            com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(StudentProfileActivity.this, SessionContext.selectedSchool, AppCache.selectedClass, student, s1, s2, new PdfGenerator.PdfCallback() {
                                 @Override
                                 public void onSuccess(File pdfFile) {
                                     runOnUiThread(() -> {

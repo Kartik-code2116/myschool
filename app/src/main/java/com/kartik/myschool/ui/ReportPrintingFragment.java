@@ -56,7 +56,7 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        b.rvReportCards.setLayoutManager(new LinearLayoutManager(getContext()));
+        b.rvReportCards.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
         adapter = new ReportPrintingAdapter();
         adapter.setOnItemClickListener((template, position) -> handleReportSelection(position));
         b.rvReportCards.setAdapter(adapter);
@@ -91,8 +91,8 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         // Class-level (roster) reports — no student selection needed
-        // Positions 1: Index, 4,5,8,9,10,12,14: Class-wide progress and roster charts
-        boolean isClassReport = (position == 1 || position == 4 || position == 5 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
+        // Positions 1: Index, 3: Descriptive Remarks, 4,5,7,8,9,10,12,14: Class-wide progress and roster charts
+        boolean isClassReport = (position == 1 || position == 3 || position == 4 || position == 5 || position == 7 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
 
         if (isClassReport) {
             generateClassRosterReport(position);
@@ -187,18 +187,21 @@ public class ReportPrintingFragment extends Fragment {
 
         switch (reportPosition) {
             case 0:  // 1. मुखपृष्ठ (Cover Page)
-                PdfGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
                 break;
-            case 3:  // 4. वर्णनात्मक नोंदी (Descriptive)
-                PdfGenerator.generateDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+            case 3:  // 4. वर्णनात्मक नोंदी (Descriptive Remarks)
+            case 7:  // 8. वर्णनात्मक नोंदी
+                java.util.Map<String, com.kartik.myschool.model.MarksRecord> map1 = s1 != null ? java.util.Collections.singletonMap(student.id, s1) : new java.util.HashMap<>();
+                java.util.Map<String, com.kartik.myschool.model.MarksRecord> map2 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
+                com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), map1, map2, cb);
                 break;
             case 1:  // 2. अनुक्रमणिका (Index)
-            case 2:  // 3. गुणनोंदी (Marks Register)
+            case 2:  // 3. गुणनोंदी (Marks Register - now Individual)
             case 8:  // 9. प्रगतीपत्रक मुखपृष्ठ (Progress Card Cover)
             case 9:  // 10. प्रगतीपत्रक पृष्ठ (Progress Card Inner)
             case 11: // 12. पाचवी आठवी गुणपत्रक
             case 13: // 14. प्रगतीपत्रक मुखपृष्ठ (duplicate)
-                PdfGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
                 break;
             default: // Fallback to personality record for any other individual report
                 PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
@@ -264,14 +267,13 @@ public class ReportPrintingFragment extends Fragment {
         };
         
         switch (reportPosition) {
-            case 0:  PdfGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
-            case 3:  PdfGenerator.generateDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
+            case 0:  com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
             case 1:
             case 2:
             case 8:
             case 9:
             case 11:
-            case 13: PdfGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
+            case 13: com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
             default: PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
         }
         
@@ -300,7 +302,7 @@ public class ReportPrintingFragment extends Fragment {
                         Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 }
             };
-            PdfGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, null, null, null, cb);
+            com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, null, null, null, cb);
             return;
         }
 
@@ -318,7 +320,7 @@ public class ReportPrintingFragment extends Fragment {
                         Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 }
             };
-            PdfGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
+            com.kartik.myschool.utils.pdf.IndexPageGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
             return;
         }
 
@@ -345,12 +347,14 @@ public class ReportPrintingFragment extends Fragment {
                             }
                         };
                         switch (reportPosition) {
+                            case 3:
+                            case 7:
+                                com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb); break;
                             case 4:
                                 PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb); break;
                             case 6:
                                 PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem2Map, true, cb); break;
                             case 5:
-                            case 7:
                             case 10:
                             case 12:
                             case 14:
@@ -470,7 +474,7 @@ public class ReportPrintingFragment extends Fragment {
         if (position == 0) { // Cover page
             PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, 0, cb);
         } else if (position == 1) { // Index
-            PdfGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
+            com.kartik.myschool.utils.pdf.IndexPageGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
         } else if (position == 4) {
             PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb);
         } else if (position == 6) {
