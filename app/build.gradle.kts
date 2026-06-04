@@ -10,11 +10,11 @@ java {
 }
 
 android {
-    namespace = "com.example.myschool"
+    namespace = "com.kartik.myschool"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.myschool"
+        applicationId = "com.kartik.myschool"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

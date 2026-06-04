@@ -6,154 +6,154 @@
 
     <fragment
         android:id="@+id/nav_info_print"
-        android:name="com.example.myschool.ui.InfoPrintSettingFragment"
+        android:name="com.kartik.myschool.ui.InfoPrintSettingFragment"
         android:label="@string/title_info_print"/>
 
     <fragment
         android:id="@+id/nav_dashboard"
-        android:name="com.example.myschool.ui.StatsDashboardFragment"
+        android:name="com.kartik.myschool.ui.StatsDashboardFragment"
         android:label="Stats Dashboard"/>
 
     <fragment
         android:id="@+id/nav_class_div"
-        android:name="com.example.myschool.ui.ClassDivListFragment"
+        android:name="com.kartik.myschool.ui.ClassDivListFragment"
         android:label="@string/title_class_div"/>
 
     <fragment
         android:id="@+id/nav_students"
-        android:name="com.example.myschool.ui.StudentListFragment"
+        android:name="com.kartik.myschool.ui.StudentListFragment"
         android:label="@string/menu_student_list"/>
 
     <fragment
         android:id="@+id/nav_reports"
-        android:name="com.example.myschool.ui.ReportsFragment"
+        android:name="com.kartik.myschool.ui.ReportsFragment"
         android:label="@string/nav_reports"/>
 
     <fragment
         android:id="@+id/nav_profile"
-        android:name="com.example.myschool.ui.ProfileFragment"
+        android:name="com.kartik.myschool.ui.ProfileFragment"
         android:label="@string/nav_profile"/>
 
     <fragment
         android:id="@+id/nav_formative"
-        android:name="com.example.myschool.ui.FormativeSummativeFragment"
+        android:name="com.kartik.myschool.ui.FormativeSummativeFragment"
         android:label="@string/menu_formative_summative">
         <argument android:name="title" app:argType="string" android:defaultValue="Formative Summative"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_descriptive"
-        android:name="com.example.myschool.ui.DescriptiveEntriesFragment"
+        android:name="com.kartik.myschool.ui.DescriptiveEntriesFragment"
         android:label="@string/menu_descriptive_entries">
         <argument android:name="title" app:argType="string" android:defaultValue="Descriptive Entries"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_attendance"
-        android:name="com.example.myschool.ui.AttendanceFragment"
+        android:name="com.kartik.myschool.ui.AttendanceFragment"
         android:label="@string/menu_attendance">
         <argument android:name="title" app:argType="string" android:defaultValue="Attendance"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_subjects"
-        android:name="com.example.myschool.ui.SubjectsFragment"
+        android:name="com.kartik.myschool.ui.SubjectsFragment"
         android:label="@string/menu_subjects">
         <argument android:name="title" app:argType="string" android:defaultValue="Subjects"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_weightage"
-        android:name="com.example.myschool.ui.DeclareWeightageFragment"
+        android:name="com.kartik.myschool.ui.DeclareWeightageFragment"
         android:label="@string/menu_declare_weightage">
         <argument android:name="title" app:argType="string" android:defaultValue="Declare Weightage"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_dropdown"
-        android:name="com.example.myschool.ui.PlaceholderFragment"
+        android:name="com.kartik.myschool.ui.PlaceholderFragment"
         android:label="@string/menu_dropdown_list">
         <argument android:name="title" app:argType="string" android:defaultValue="Dropdown List"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_extra"
-        android:name="com.example.myschool.ui.ExtraDashboardFragment"
+        android:name="com.kartik.myschool.ui.ExtraDashboardFragment"
         android:label="@string/menu_extra_menus">
         <argument android:name="title" app:argType="string" android:defaultValue="Extra Menus"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_school_info"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="School Information">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="school_info"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_gender"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Gender">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="gender"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_cast_category"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Cast Category">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="cast_category"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_class_teacher"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Class Teacher">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="class_teacher"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_classes"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Classes">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="classes"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_subject"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Subject">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="subject"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_default_values"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Default Values">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="default_values"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_working_days"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="Working Days">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="working_days"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_he_she_items"
-        android:name="com.example.myschool.ui.ExtraMenusFragment"
+        android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="He/She Items">
         <argument android:name="menu_type" app:argType="string" android:defaultValue="he_she_items"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_print_report"
-        android:name="com.example.myschool.ui.ReportPrintingFragment"
+        android:name="com.kartik.myschool.ui.ReportPrintingFragment"
         android:label="Report Printing"/>
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.myschool.ui.SettingsFragment"
+        android:name="com.kartik.myschool.ui.SettingsFragment"
         android:label="Settings"/>
 
 </navigation>

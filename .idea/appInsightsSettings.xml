@@ -8,7 +8,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.myschool" />
+                  <option name="appId" value="com.kartik.myschool" />
                   <option name="mobileSdkAppId" value="1:323006914636:android:e598ecf7eb0332bc8114e9" />
                   <option name="projectId" value="kartik-28deb" />
                   <option name="projectNumber" value="323006914636" />

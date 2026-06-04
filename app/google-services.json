@@ -9,7 +9,36 @@
       "client_info": {
         "mobilesdk_app_id": "1:323006914636:android:e598ecf7eb0332bc8114e9",
         "android_client_info": {
-          "package_name": "com.example.myschool"
+          "package_name": "com.kartik.myschool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "323006914636-t0v6uav8qrhjvf5du7re90gpae1j8qe5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQGltN_97tRW0-dhqJFvxL_c3IvJvR6xM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "323006914636-t0v6uav8qrhjvf5du7re90gpae1j8qe5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323006914636:android:18ae59af49b40b178114e9",
+        "android_client_info": {
+          "package_name": "com.kartik.myschool"
         }
       },
       "oauth_client": [
