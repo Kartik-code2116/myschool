@@ -16,16 +16,16 @@
 
         <!-- Large School Logo Frame on Left -->
         <FrameLayout
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
             android:background="@drawable/shape_circle_white"
             android:padding="8dp">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/app_logo"
-                android:contentDescription="School Logo"/>
+                android:layout_width="75dp"
+                android:layout_height="77dp"
+                android:contentDescription="School Logo"
+                android:src="@drawable/app_logo" />
         </FrameLayout>
 
         <!-- Vertically Centered School Name and ID -->

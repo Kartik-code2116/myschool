@@ -8,8 +8,8 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/logoCard"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
+        android:layout_width="106dp"
+        android:layout_height="106dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="55dp"
         app:cardElevation="0dp"
@@ -19,8 +19,8 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="110dp"
-            android:layout_height="110dp"
+            android:layout_width="84dp"
+            android:layout_height="92dp"
             android:layout_gravity="center"
             android:src="@drawable/app_logo" />
     </com.google.android.material.card.MaterialCardView>
