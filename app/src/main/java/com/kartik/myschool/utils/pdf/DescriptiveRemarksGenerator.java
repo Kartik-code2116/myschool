@@ -49,7 +49,8 @@ public class DescriptiveRemarksGenerator {
                         Subject sub = cls.subjects.get(si);
 
                         // Title
-                        Paragraph title = new Paragraph("Descriptive Remarks Register", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_DARK));
+                        Font titleFont = PdfGenerator.sMarathiBase != null ? new Font(PdfGenerator.sMarathiBase, 16, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_DARK);
+                        Paragraph title = new Paragraph("वर्णनात्मक नोंदी (Descriptive Remarks)", titleFont);
                         title.setAlignment(Element.ALIGN_CENTER);
                         title.setSpacingAfter(15);
                         doc.add(title);
@@ -70,38 +71,40 @@ public class DescriptiveRemarksGenerator {
                         PdfPTable tbl = new PdfPTable(new float[]{0.6f, 2.5f, 1.0f, 6.0f});
                         tbl.setWidthPercentage(100); tbl.setSpacingBefore(6);
 
-                        cell(tbl, "Sr.No.",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "Student Name",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "Roll No.",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "Descriptive Remarks",   fBold, C_HEADER_BG, C_DARK,  1, Element.ALIGN_CENTER);
+                        cell(tbl, "अ.क्र.",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
+                        cell(tbl, "विद्यार्थ्याचे नाव",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
+                        cell(tbl, "हजेरी क्र.",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
+                        cell(tbl, "वर्णनात्मक नोंदी",   fBold, C_HEADER_BG, C_DARK,  1, Element.ALIGN_CENTER);
 
                         boolean alt = false;
-                        for (int i = 0; i < students.size(); i++) {
-                            Student s = students.get(i);
-                            BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+                        if (students != null) {
+                            for (int i = 0; i < students.size(); i++) {
+                                Student s = students.get(i);
+                                BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
 
-                            String remark = "";
-                            MarksRecord rec1 = sem1Marks != null ? sem1Marks.get(s.id) : null;
-                            MarksRecord rec2 = sem2Marks != null ? sem2Marks.get(s.id) : null;
-                            
-                            MarksRecord.SubjectMarksDetail d1 = rec1 != null ? detail(rec1, sub.name) : null;
-                            MarksRecord.SubjectMarksDetail d2 = rec2 != null ? detail(rec2, sub.name) : null;
-                            
-                            String r1 = (d1 != null && d1.remark != null) ? d1.remark.replace("||", ", ").trim() : "";
-                            String r2 = (d2 != null && d2.remark != null) ? d2.remark.replace("||", ", ").trim() : "";
-                            
-                            int activeSem = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
-                            
-                            if (activeSem == 2) {
-                                remark = !r2.isEmpty() ? r2 : r1;
-                            } else {
-                                remark = !r1.isEmpty() ? r1 : r2;
+                                String remark = "";
+                                MarksRecord rec1 = sem1Marks != null ? sem1Marks.get(s.id) : null;
+                                MarksRecord rec2 = sem2Marks != null ? sem2Marks.get(s.id) : null;
+                                
+                                MarksRecord.SubjectMarksDetail d1 = rec1 != null ? detail(rec1, sub.name) : null;
+                                MarksRecord.SubjectMarksDetail d2 = rec2 != null ? detail(rec2, sub.name) : null;
+                                
+                                String r1 = (d1 != null && d1.remark != null) ? d1.remark.replace("||", ", ").trim() : "";
+                                String r2 = (d2 != null && d2.remark != null) ? d2.remark.replace("||", ", ").trim() : "";
+                                
+                                int activeSem = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
+                                
+                                if (activeSem == 2) {
+                                    remark = !r2.isEmpty() ? r2 : r1;
+                                } else {
+                                    remark = !r1.isEmpty() ? r1 : r2;
+                                }
+
+                                PdfPCell nc = rawCell(String.valueOf(i + 1), fNormal, bg, C_DARK, Element.ALIGN_CENTER); tbl.addCell(nc);
+                                PdfPCell lc = rawCell(nvl(s.name), fNormal, bg, C_DARK, Element.ALIGN_LEFT); lc.setMinimumHeight(28f); tbl.addCell(lc);
+                                PdfPCell rc = rawCell(nvl(s.rollNo), fNormal, bg, C_DARK, Element.ALIGN_CENTER); rc.setMinimumHeight(28f); tbl.addCell(rc);
+                                PdfPCell remCell = rawCell(remark, fNormal, bg, C_DARK, Element.ALIGN_LEFT); remCell.setMinimumHeight(28f); tbl.addCell(remCell);
                             }
-
-                            PdfPCell nc = rawCell(String.valueOf(i + 1), fNormal, bg, C_DARK, Element.ALIGN_CENTER); tbl.addCell(nc);
-                            PdfPCell lc = rawCell(nvl(s.name), fNormal, bg, C_DARK, Element.ALIGN_LEFT); lc.setMinimumHeight(28f); tbl.addCell(lc);
-                            PdfPCell rc = rawCell(nvl(s.rollNo), fNormal, bg, C_DARK, Element.ALIGN_CENTER); rc.setMinimumHeight(28f); tbl.addCell(rc);
-                            PdfPCell remCell = rawCell(remark, fNormal, bg, C_DARK, Element.ALIGN_LEFT); remCell.setMinimumHeight(28f); tbl.addCell(remCell);
                         }
                         doc.add(tbl);
                     }
