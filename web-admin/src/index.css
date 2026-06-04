@@ -295,3 +295,13 @@ textarea:focus {
     padding: 9px 12px;
   }
 }
+
+@media (max-width: 860px) {
+  .theme-toggle {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+  }
+}
+

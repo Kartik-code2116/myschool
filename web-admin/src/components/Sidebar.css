@@ -127,6 +127,13 @@
     flex-direction: row;
     padding: 0;
     overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    -webkit-overflow-scrolling: touch; /* Safari momentum scroll */
+  }
+
+  .sidebar-nav::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
   }
 
   .sidebar-footer {
@@ -143,10 +150,14 @@
 @media (max-width: 560px) {
   .sidebar {
     flex-wrap: wrap;
+    gap: 12px 8px; /* Tweak wrapping gap */
   }
 
   .sidebar-nav {
     order: 3;
     width: 100%;
+    gap: 6px;
+    padding: 4px 0 0;
   }
 }
+

@@ -275,11 +275,20 @@
 
 @media (max-width: 520px) {
   .login-container {
-    padding-top: 88px;
+    padding: 64px 16px 32px;
   }
 
   .login-preview,
   .login-orbit {
     display: none;
   }
+
+  .login-hero h1 {
+    font-size: 32px;
+  }
+
+  .login-box {
+    padding: 22px;
+  }
 }
+

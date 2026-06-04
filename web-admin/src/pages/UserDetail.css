@@ -312,7 +312,7 @@
 
 .detail-subscriptions {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
   gap: 14px;
 }
 
@@ -368,9 +368,13 @@
 
   .profile-header,
   .control-grid,
-  .stats-row,
   .data-sections {
     grid-template-columns: 1fr;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .edit-grid {
@@ -383,8 +387,14 @@
   }
 
   .save-actions {
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     margin-top: 14px;
+  }
+
+  .save-actions button {
+    width: 100%;
   }
 
   .profile-status {
@@ -398,3 +408,10 @@
     white-space: normal;
   }
 }
+
+@media (max-width: 480px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
