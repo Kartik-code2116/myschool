@@ -161,6 +161,35 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void getTeacherFresh(OnResult<Teacher> cb) {
+        String uid = currentUid();
+        if (uid == null) {
+            cb.onError(new IllegalStateException("User not authenticated"));
+            return;
+        }
+        db.collection(COL_TEACHERS).document(uid).get()
+                .addOnSuccessListener(snap -> {
+                    Teacher t = snap != null ? snap.toObject(Teacher.class) : null;
+                    cachedTeacher = t;
+                    cb.onSuccess(t);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getAppConfig(OnResult<com.kartik.myschool.model.AppConfig> cb) {
+        db.collection("admin_settings").document("app_config").get()
+                .addOnSuccessListener(snap -> {
+                    com.kartik.myschool.model.AppConfig config = snap != null ? snap.toObject(com.kartik.myschool.model.AppConfig.class) : null;
+                    if (config == null) {
+                        config = new com.kartik.myschool.model.AppConfig();
+                    }
+                    cb.onSuccess(config);
+                })
+                .addOnFailureListener(e -> {
+                    cb.onSuccess(new com.kartik.myschool.model.AppConfig());
+                });
+    }
+
     // ---------- School ----------
     public void saveSchool(School s, OnResult<String> cb) {
         String uid = currentUid();

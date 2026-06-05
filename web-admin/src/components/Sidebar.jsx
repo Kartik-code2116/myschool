@@ -29,6 +29,10 @@ export default function Sidebar() {
           <span className="nav-icon">U</span>
           <span>Users</span>
         </NavLink>
+        <NavLink to="/profile" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+          <span className="nav-icon">P</span>
+          <span>Admin Profile</span>
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

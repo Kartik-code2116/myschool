@@ -72,6 +72,7 @@ export default function UserDetail() {
   const [saveMessage, setSaveMessage] = useState('');
   const [error, setError] = useState(null);
   const [selectedScreenshot, setSelectedScreenshot] = useState(null);
+  const [selectedClassId, setSelectedClassId] = useState('all');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -179,6 +180,10 @@ export default function UserDetail() {
       subscriptionExpiry: expiry.toISOString().slice(0, 10),
     });
   };
+
+  const filteredStudents = selectedClassId === 'all'
+    ? students
+    : students.filter((student) => student.classId === selectedClassId);
 
   if (loading) return <div className="loading">Loading user details...</div>;
 
@@ -347,11 +352,15 @@ export default function UserDetail() {
           {classes.length === 0 ? (
             <p className="empty-text">No classes found.</p>
           ) : (
-            <details className="dropdown-details">
+            <details className="dropdown-details" open={classes.length > 0 || undefined}>
               <summary className="dropdown-summary">View all {classes.length} classes...</summary>
               <ul className="data-list">
                 {classes.map((classItem) => (
-                  <li key={classItem.id}>
+                  <li 
+                    key={classItem.id} 
+                    className={`clickable-class-item ${selectedClassId === classItem.id ? 'active' : ''}`}
+                    onClick={() => setSelectedClassId(selectedClassId === classItem.id ? 'all' : classItem.id)}
+                  >
                     <strong>Class {classItem.className} {classItem.division}</strong>
                     <span className="subtitle">Year: {classItem.academicYearLabel || 'N/A'}</span>
                   </li>
@@ -364,15 +373,39 @@ export default function UserDetail() {
         <div className="glass-panel data-section">
           <div className="section-title">
             <h2>Students</h2>
-            <span>{students.length}</span>
+            <span>{filteredStudents.length} / {students.length}</span>
           </div>
-          {students.length === 0 ? (
-            <p className="empty-text">No students found.</p>
+
+          {classes.length > 0 && (
+            <div className="class-filter-container">
+              <select
+                id="class-filter"
+                value={selectedClassId}
+                onChange={(e) => setSelectedClassId(e.target.value)}
+                className="class-filter-select"
+              >
+                <option value="all">All Classes ({students.length})</option>
+                {classes.map((cls) => {
+                  const classStudentCount = students.filter(s => s.classId === cls.id).length;
+                  return (
+                    <option key={cls.id} value={cls.id}>
+                      Class {cls.className} {cls.division} ({classStudentCount})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
+
+          {filteredStudents.length === 0 ? (
+            <p className="empty-text">No students found for this class.</p>
           ) : (
-            <details className="dropdown-details">
-              <summary className="dropdown-summary">View all {students.length} students...</summary>
+            <details className="dropdown-details" open={selectedClassId !== 'all' || undefined}>
+              <summary className="dropdown-summary">
+                View {selectedClassId === 'all' ? 'all' : ''} {filteredStudents.length} students...
+              </summary>
               <ul className="data-list">
-                {students.map((student) => (
+                {filteredStudents.map((student) => (
                   <li key={student.id}>
                     <strong>{student.name || 'Unnamed Student'}</strong>
                     <span className="subtitle">Class: {student.className || '-'} {student.division || ''} | Roll: {student.rollNo || 'N/A'}</span>
@@ -404,7 +437,11 @@ export default function UserDetail() {
                     type="button"
                   >
                     {sub.screenshotUrl ? (
-                      <img src={sub.screenshotUrl} alt="Payment screenshot" />
+                      <img 
+                        src={sub.screenshotUrl} 
+                        alt="Payment screenshot" 
+                        onError={(e) => console.error("UserDetail list screenshot failed to load. URL: " + sub.screenshotUrl, e)}
+                      />
                     ) : (
                       <span>No screenshot</span>
                     )}
@@ -428,7 +465,11 @@ export default function UserDetail() {
             </div>
             <div className="modal-body">
               <div className="full-screenshot">
-                <img src={selectedScreenshot} alt="Payment screenshot full view" />
+                <img 
+                  src={selectedScreenshot} 
+                  alt="Payment screenshot full view" 
+                  onError={(e) => console.error("UserDetail modal screenshot failed to load. URL: " + selectedScreenshot, e)}
+                />
               </div>
             </div>
             <div className="modal-footer">

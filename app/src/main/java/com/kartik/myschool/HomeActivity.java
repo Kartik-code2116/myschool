@@ -404,17 +404,21 @@ public class HomeActivity extends AppCompatActivity {
             popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 " + getString(R.string.menu_3dot_home));
             popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 " + getString(R.string.menu_3dot_classes));
             popup.getMenu().add(0, R.id.nav_students, 3, "👥 " + getString(R.string.menu_3dot_students));
+            popup.getMenu().add(0, 801, 4, "💬 " + getString(R.string.menu_3dot_message));
             
             // Utility options
-            popup.getMenu().add(0, 901, 4, "🌐 " + getString(R.string.menu_3dot_language));
-            popup.getMenu().add(0, 902, 5, "⭐ " + getString(R.string.menu_3dot_rate));
-            popup.getMenu().add(0, 903, 6, "📱 " + getString(R.string.menu_3dot_more_apps));
-            popup.getMenu().add(0, 904, 7, "ℹ️ " + getString(R.string.menu_3dot_about));
-            popup.getMenu().add(0, 999, 8, "🚪 " + getString(R.string.logout));
+            popup.getMenu().add(0, 901, 5, "🌐 " + getString(R.string.menu_3dot_language));
+            popup.getMenu().add(0, 902, 6, "⭐ " + getString(R.string.menu_3dot_rate));
+            popup.getMenu().add(0, 903, 7, "📱 " + getString(R.string.menu_3dot_more_apps));
+            popup.getMenu().add(0, 904, 8, "ℹ️ " + getString(R.string.menu_3dot_about));
+            popup.getMenu().add(0, 999, 9, "🚪 " + getString(R.string.logout));
 
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
-                if (id == 901) {
+                if (id == 801) {
+                    showAdminMessageDialog();
+                    return true;
+                } else if (id == 901) {
                     // Fully functional bilingual language selector dialog
                     String[] languages = {"English", "मराठी (Marathi)"};
                     android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
@@ -438,10 +442,7 @@ public class HomeActivity extends AppCompatActivity {
                     Toast.makeText(this, R.string.msg_opening_more_apps_on_play_stor, Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == 904) {
-                    new androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle(R.string.msg_about_developer)
-                            .setMessage("Developed with ❤️ by Sanjay Gore\nVersion 24.04.14")
-                            .setPositiveButton(android.R.string.ok, null).show();
+                    showAboutDeveloperDialog();
                     return true;
                 } else if (id == 999) {
                     confirmLogout();
@@ -452,6 +453,83 @@ public class HomeActivity extends AppCompatActivity {
             });
             popup.show();
         }
+    }
+
+    private void showAboutDeveloperDialog() {
+        android.app.ProgressDialog pd = new android.app.ProgressDialog(this);
+        pd.setMessage(getString(R.string.msg_checking_messages));
+        pd.setCancelable(false);
+        pd.show();
+
+        FirebaseRepository.get().getAppConfig(new FirebaseRepository.OnResult<com.kartik.myschool.model.AppConfig>() {
+            @Override
+            public void onSuccess(com.kartik.myschool.model.AppConfig config) {
+                pd.dismiss();
+                
+                StringBuilder sb = new StringBuilder();
+                sb.append("<h3><b>🧑‍💻 " + config.devName + "</b></h3>");
+                sb.append("<p><b>🤖 Version:</b> " + config.appVersion + "</p>");
+                if (config.devEmail != null && !config.devEmail.trim().isEmpty()) {
+                    sb.append("<p><b>📧 Email:</b> <a href=\"mailto:" + config.devEmail.trim() + "\">" + config.devEmail.trim() + "</a></p>");
+                }
+                if (config.devWebsite != null && !config.devWebsite.trim().isEmpty()) {
+                    sb.append("<p><b>🌐 Website:</b> <a href=\"" + config.devWebsite.trim() + "\">" + config.devWebsite.trim() + "</a></p>");
+                }
+                if (config.devPhone != null && !config.devPhone.trim().isEmpty()) {
+                    sb.append("<p><b>📞 Contact:</b> " + config.devPhone.trim() + "</p>");
+                }
+                sb.append("<br/>");
+                sb.append("<p><i>" + config.aboutText + "</i></p>");
+
+                android.widget.TextView tv = new android.widget.TextView(HomeActivity.this);
+                int padding = (int) (18 * getResources().getDisplayMetrics().density);
+                tv.setPadding(padding, padding, padding, padding);
+                tv.setText(android.text.Html.fromHtml(sb.toString()));
+                tv.setTextSize(16);
+                tv.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+
+                new androidx.appcompat.app.AlertDialog.Builder(HomeActivity.this)
+                        .setTitle(R.string.msg_about_developer)
+                        .setView(tv)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                pd.dismiss();
+                Toast.makeText(HomeActivity.this, "Error fetching developer details", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showAdminMessageDialog() {
+        android.app.ProgressDialog pd = new android.app.ProgressDialog(this);
+        pd.setMessage(getString(R.string.msg_checking_messages));
+        pd.setCancelable(false);
+        pd.show();
+
+        FirebaseRepository.get().getTeacherFresh(new FirebaseRepository.OnResult<Teacher>() {
+            @Override
+            public void onSuccess(Teacher teacher) {
+                pd.dismiss();
+                String message = (teacher != null && teacher.adminNote != null && !teacher.adminNote.trim().isEmpty())
+                        ? teacher.adminNote.trim()
+                        : getString(R.string.msg_no_admin_message);
+
+                new androidx.appcompat.app.AlertDialog.Builder(HomeActivity.this)
+                        .setTitle("✉️ " + getString(R.string.menu_3dot_message))
+                        .setMessage(message)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                pd.dismiss();
+                Toast.makeText(HomeActivity.this, "Failed to load message: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void handleHomeMoreClick(View v) {

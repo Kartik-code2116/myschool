@@ -12,23 +12,42 @@ export default function UsersList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsersAndStudents = async () => {
       try {
-        const snap = await getDocs(collection(db, 'teachers'));
-        const data = [];
-        snap.forEach((teacherDoc) => {
-          data.push({ id: teacherDoc.id, ...teacherDoc.data() });
+        // Fetch all teachers
+        const teachersSnap = await getDocs(collection(db, 'teachers'));
+        const teachersList = [];
+        teachersSnap.forEach((doc) => {
+          teachersList.push({ id: doc.id, ...doc.data() });
         });
-        setUsers(data);
+
+        // Fetch all students to compute true counts per teacher
+        const studentsSnap = await getDocs(collection(db, 'students'));
+        const studentCounts = {};
+        studentsSnap.forEach((doc) => {
+          const studentData = doc.data();
+          const teacherId = studentData.teacherId;
+          if (teacherId) {
+            studentCounts[teacherId] = (studentCounts[teacherId] || 0) + 1;
+          }
+        });
+
+        // Assign correct counts to teachers
+        const updatedUsers = teachersList.map(user => ({
+          ...user,
+          studentsCount: studentCounts[user.id] || 0
+        }));
+
+        setUsers(updatedUsers);
         setError(null);
       } catch (err) {
-        console.error('Error fetching users:', err);
+        console.error('Error fetching users and students:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchUsers();
+    fetchUsersAndStudents();
   }, []);
 
   const filteredUsers = useMemo(() => {
@@ -123,6 +142,9 @@ export default function UsersList() {
                 </span>
                 <span className="student-count">
                   {user.studentsCount || 0} Students
+                </span>
+                <span className="expiry-text">
+                  Expires: {user.subscriptionExpiry ? new Date(user.subscriptionExpiry).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
                 </span>
               </div>
             </button>

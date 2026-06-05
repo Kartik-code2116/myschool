@@ -179,3 +179,12 @@
   }
 }
 
+.expiry-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+

@@ -241,6 +241,9 @@
     <string name="menu_3dot_rate">ॲपला रेट करा</string>
     <string name="menu_3dot_more_apps">अधिक ॲप्स</string>
     <string name="menu_3dot_about">विकसकांबद्दल</string>
+    <string name="menu_3dot_message">प्रशासक संदेश</string>
+    <string name="msg_no_admin_message">प्रशासकांकडून कोणताही नवीन संदेश नाही.</string>
+    <string name="msg_checking_messages">संदेश तपासत आहे…</string>
     <string name="section_bottom_action">तळ क्रिया</string>
 
     

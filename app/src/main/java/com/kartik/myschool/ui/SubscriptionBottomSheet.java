@@ -8,7 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,6 +27,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 public class SubscriptionBottomSheet extends BottomSheetDialogFragment {
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private String upiQrUrl = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +58,40 @@ public class SubscriptionBottomSheet extends BottomSheetDialogFragment {
         
         Button btnUpload = view.findViewById(R.id.btnUploadScreenshot);
         btnUpload.setOnClickListener(v -> pickImage());
+
+        ImageView ivUpiQr = view.findViewById(R.id.ivUpiQr);
+        TextView tvUpiId = view.findViewById(R.id.tvUpiId);
+
+        ivUpiQr.setOnClickListener(v -> {
+            if (upiQrUrl != null && !upiQrUrl.isEmpty()) {
+                showQrPreviewDialog(upiQrUrl);
+            }
+        });
+
+        FirebaseFirestore.getInstance().collection("admin_settings").document("payment_info")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String upiId = documentSnapshot.getString("upi_id");
+                        upiQrUrl = documentSnapshot.getString("upi_qr_url");
+
+                        if (upiId != null && !upiId.isEmpty()) {
+                            tvUpiId.setText("UPI: " + upiId);
+                        }
+
+                        if (upiQrUrl != null && !upiQrUrl.isEmpty()) {
+                            if (isAdded() && getContext() != null) {
+                                Glide.with(requireContext())
+                                        .load(upiQrUrl)
+                                        .placeholder(R.drawable.ic_qr_placeholder)
+                                        .into(ivUpiQr);
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Keep placeholder
+                });
     }
 
     private void pickImage() {
@@ -85,5 +125,26 @@ public class SubscriptionBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
+    }
+
+    private void showQrPreviewDialog(String qrUrl) {
+        if (getContext() == null) return;
+
+        android.app.Dialog dialog = new android.app.Dialog(requireContext(), R.style.QrPreviewDialogTheme);
+        dialog.setContentView(R.layout.dialog_qr_preview);
+
+        ImageView ivLargeQr = dialog.findViewById(R.id.ivLargeQr);
+        View rootLayout = dialog.findViewById(R.id.rootLayout);
+
+        Glide.with(requireContext())
+                .load(qrUrl)
+                .placeholder(R.drawable.ic_qr_placeholder)
+                .into(ivLargeQr);
+
+        // Dismiss on clicking background or the image itself
+        rootLayout.setOnClickListener(v -> dialog.dismiss());
+        ivLargeQr.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 }

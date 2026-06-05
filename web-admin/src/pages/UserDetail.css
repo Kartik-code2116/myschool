@@ -415,3 +415,49 @@
   }
 }
 
+.class-filter-container {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.class-filter-select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.class-filter-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.clickable-class-item {
+  cursor: pointer;
+  padding: 10px 12px !important;
+  margin: 2px 0;
+  border-radius: 6px;
+  transition: background-color 0.2s, border-left-color 0.2s, transform 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.clickable-class-item:hover {
+  background-color: var(--surface-muted);
+  transform: translateX(4px);
+}
+
+.clickable-class-item.active {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left-color: var(--primary-color);
+}
+
+
+

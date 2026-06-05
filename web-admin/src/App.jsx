@@ -7,6 +7,7 @@ import Dashboard from './Dashboard';
 import Layout from './components/Layout';
 import UsersList from './pages/UsersList';
 import UserDetail from './pages/UserDetail';
+import AdminProfile from './pages/AdminProfile';
 
 const getInitialTheme = () => {
   const savedTheme = localStorage.getItem('myschool-theme');
@@ -62,6 +63,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="users" element={<UsersList />} />
           <Route path="users/:id" element={<UserDetail />} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>

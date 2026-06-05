@@ -350,3 +350,135 @@
   }
 }
 
+.dashboard-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+  padding: 2px;
+}
+
+.search-input {
+  border: none !important;
+  background: transparent !important;
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  width: 100%;
+}
+
+.search-input:focus {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.date-filters {
+  display: flex;
+  padding: 4px;
+  gap: 4px;
+}
+
+.date-filter-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-filter-btn:hover {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.date-filter-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.load-more-btn {
+  min-width: 200px;
+}
+
+@media (max-width: 680px) {
+  .dashboard-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-box {
+    max-width: 100%;
+  }
+}
+
+.calendar-filter-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--border-color);
+  margin-left: 8px;
+  padding-left: 8px;
+}
+
+.calendar-input {
+  border: none !important;
+  background: transparent !important;
+  padding: 6px 28px 6px 8px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--text-secondary) !important;
+  outline: none !important;
+  cursor: pointer;
+  width: 155px;
+}
+
+.calendar-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(40%) sepia(10%) saturate(1000%) hue-rotate(180deg) brightness(90%) contrast(90%);
+}
+
+[data-theme='dark'] .calendar-input::-webkit-calendar-picker-indicator {
+  filter: invert(100%) !important;
+}
+
+.calendar-clear-btn {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+
+
