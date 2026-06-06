@@ -5,10 +5,13 @@ import android.util.Log;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -26,24 +29,43 @@ import java.util.Map;
 
 import static com.kartik.myschool.utils.PdfGenerator.*;
 
+/**
+ * Generates the Descriptive Remarks PDF (Option 4).
+ *
+ * Layout: ONE PAGE PER STUDENT.
+ * Each page contains:
+ *  - Page title: "सातत्यपूर्ण सर्वंकष मूल्यमापन"
+ *  - Student header: Name | Year | Class, Div | Roll No | Semester
+ *  - 3-column table: Sr. No. | Subject | Descriptive Remark
+ *    -> Rows for every class subject
+ *    -> Extra fixed rows for विशेष प्रगती, आवड/छंद, सुधारणा आवश्यक, व्यक्तिमत्व गुण
+ */
 public class DescriptiveRemarksGenerator {
 
     private static final String TAG = "DESC_PDF";
 
-    /**
-     * Finds the remark for a given subject from a MarksRecord.
-     * Tries EVERY possible way to match the subject key.
-     */
+    // ── Extra fixed subject rows appended after class subjects ─────────────────
+    private static final String[] EXTRA_LABELS = {
+            "विशेष प्रगती",
+            "आवड, छंद कला, क्रीडा, साहित्य इ.",
+            "सुधारणा आवश्यक",
+            "व्यक्तिमत्व गुण विशेष\n(अभिवृत्ती, कल, मूल्ये, स्वभाव गुणविशेष)"
+    };
+    private static final String[] EXTRA_KEYS = { "विशेष", "आवड", "सुधारणा", "व्यक्तिमत्व" };
+
+    // ── Remark lookup helpers ──────────────────────────────────────────────────
+
+    /** Finds the remark for a given subject from a MarksRecord, using multi-strategy matching. */
     private static String findRemark(MarksRecord rec, String subjectName) {
         if (rec == null || rec.detailedMarks == null || subjectName == null) return "";
 
-        // Strategy 1: PdfGenerator.detail() with multi-strategy matching
+        // Strategy 1: exact/normalised via PdfGenerator.detail()
         MarksRecord.SubjectMarksDetail d = detail(rec, subjectName);
         if (d != null && d.remark != null && !d.remark.trim().isEmpty()) {
-            return d.remark.replace("||", ", ").trim();
+            return cleanRemark(d.remark);
         }
 
-        // Strategy 2: Case-insensitive + loose matching
+        // Strategy 2: case-insensitive loose matching
         String safeName = MarksRecord.sanitizeKey(subjectName).toLowerCase();
         for (Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : rec.detailedMarks.entrySet()) {
             String key = entry.getKey();
@@ -51,21 +73,33 @@ public class DescriptiveRemarksGenerator {
             if (val != null && val.remark != null && !val.remark.trim().isEmpty()) {
                 String safeKey = key != null ? MarksRecord.sanitizeKey(key).toLowerCase() : "";
                 if (safeKey.equals(safeName) || safeKey.contains(safeName) || safeName.contains(safeKey)) {
-                    return val.remark.replace("||", ", ").trim();
+                    return cleanRemark(val.remark);
                 }
             }
         }
-
         return "";
     }
 
+    /** Finds a remark from a record whose key contains `keyword` (used for extra rows). */
+    private static String remarkContaining(MarksRecord rec, String keyword) {
+        if (rec == null || rec.detailedMarks == null) return "";
+        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : rec.detailedMarks.entrySet()) {
+            if (e.getKey() != null && e.getKey().contains(keyword) && e.getValue() != null
+                    && e.getValue().remark != null && !e.getValue().remark.trim().isEmpty()) {
+                return cleanRemark(e.getValue().remark);
+            }
+        }
+        return "";
+    }
+
+    private static String cleanRemark(String raw) {
+        return raw == null ? "" : raw.replace("||", ", ").trim();
+    }
+
     /**
-     * Builds the BEST possible remarks map for each student by combining:
-     * 1. The provided sem1/sem2 maps from getMarksForClassAndSemester
-     * 2. AppCache.cachedDescriptiveMarksMap (written by DescriptiveEntriesFragment)
-     * 3. AppCache.cachedMarksMap (general marks cache)
-     *
-     * For each student, picks the MarksRecord that has the most descriptive remarks.
+     * Builds the best possible marks map for each student across all data sources:
+     * sem1Marks, sem2Marks, AppCache.cachedDescriptiveMarksMap, AppCache.cachedMarksMap.
+     * Picks the record with the most populated remarks.
      */
     private static Map<String, MarksRecord> buildBestRemarksMap(
             Map<String, MarksRecord> sem1Marks,
@@ -74,66 +108,51 @@ public class DescriptiveRemarksGenerator {
             String classId) {
 
         java.util.Map<String, MarksRecord> best = new java.util.HashMap<>();
+        if (students == null) return best;
 
-        // Collect ALL candidate records per student
-        if (students != null) {
-            for (Student s : students) {
-                MarksRecord bestRec = null;
-                int bestRemarkCount = 0;
+        for (Student s : students) {
+            MarksRecord bestRec = null;
+            int bestCount = 0;
 
-                // Candidate 1: sem1 map
-                MarksRecord r1 = sem1Marks != null ? sem1Marks.get(s.id) : null;
-                int c1 = countRemarks(r1);
-                if (c1 > bestRemarkCount) { bestRec = r1; bestRemarkCount = c1; }
+            MarksRecord r1 = sem1Marks != null ? sem1Marks.get(s.id) : null;
+            int c1 = countRemarks(r1);
+            if (c1 > bestCount) { bestRec = r1; bestCount = c1; }
 
-                // Candidate 2: sem2 map
-                MarksRecord r2 = sem2Marks != null ? sem2Marks.get(s.id) : null;
-                int c2 = countRemarks(r2);
-                if (c2 > bestRemarkCount) { bestRec = r2; bestRemarkCount = c2; }
+            MarksRecord r2 = sem2Marks != null ? sem2Marks.get(s.id) : null;
+            int c2 = countRemarks(r2);
+            if (c2 > bestCount) { bestRec = r2; bestCount = c2; }
 
-                // Candidate 3: AppCache.cachedDescriptiveMarksMap
-                if (com.kartik.myschool.AppCache.cachedDescriptiveMarksMap != null
-                        && java.util.Objects.equals(classId, com.kartik.myschool.AppCache.cachedDescriptiveClassId)) {
-                    MarksRecord r3 = com.kartik.myschool.AppCache.cachedDescriptiveMarksMap.get(s.id);
-                    int c3 = countRemarks(r3);
-                    if (c3 > bestRemarkCount) { bestRec = r3; bestRemarkCount = c3; }
-                }
-
-                // Candidate 4: AppCache.cachedMarksMap
-                if (com.kartik.myschool.AppCache.cachedMarksMap != null
-                        && java.util.Objects.equals(classId, com.kartik.myschool.AppCache.cachedClassIdForStudents)) {
-                    MarksRecord r4 = com.kartik.myschool.AppCache.cachedMarksMap.get(s.id);
-                    int c4 = countRemarks(r4);
-                    if (c4 > bestRemarkCount) { bestRec = r4; bestRemarkCount = c4; }
-                }
-
-                if (bestRec != null) {
-                    best.put(s.id, bestRec);
-                }
-
-                Log.d(TAG, "Student " + s.name + " (id=" + s.id + "): "
-                        + "sem1=" + c1 + " sem2=" + c2
-                        + " descCache=" + countRemarks(com.kartik.myschool.AppCache.cachedDescriptiveMarksMap != null ? com.kartik.myschool.AppCache.cachedDescriptiveMarksMap.get(s.id) : null)
-                        + " marksCache=" + countRemarks(com.kartik.myschool.AppCache.cachedMarksMap != null ? com.kartik.myschool.AppCache.cachedMarksMap.get(s.id) : null)
-                        + " → bestRemarkCount=" + bestRemarkCount);
+            if (com.kartik.myschool.AppCache.cachedDescriptiveMarksMap != null
+                    && java.util.Objects.equals(classId, com.kartik.myschool.AppCache.cachedDescriptiveClassId)) {
+                MarksRecord r3 = com.kartik.myschool.AppCache.cachedDescriptiveMarksMap.get(s.id);
+                int c3 = countRemarks(r3);
+                if (c3 > bestCount) { bestRec = r3; bestCount = c3; }
             }
+
+            if (com.kartik.myschool.AppCache.cachedMarksMap != null
+                    && java.util.Objects.equals(classId, com.kartik.myschool.AppCache.cachedClassIdForStudents)) {
+                MarksRecord r4 = com.kartik.myschool.AppCache.cachedMarksMap.get(s.id);
+                int c4 = countRemarks(r4);
+                if (c4 > bestCount) { bestRec = r4; bestCount = c4; }
+            }
+
+            if (bestRec != null) best.put(s.id, bestRec);
+
+            Log.d(TAG, "Student " + s.name + " bestRemarkCount=" + bestCount);
         }
         return best;
     }
 
-    /**
-     * Counts how many subjects have non-empty remarks in a MarksRecord.
-     */
     private static int countRemarks(MarksRecord rec) {
         if (rec == null || rec.detailedMarks == null) return 0;
         int count = 0;
         for (MarksRecord.SubjectMarksDetail d : rec.detailedMarks.values()) {
-            if (d != null && d.remark != null && !d.remark.trim().isEmpty()) {
-                count++;
-            }
+            if (d != null && d.remark != null && !d.remark.trim().isEmpty()) count++;
         }
         return count;
     }
+
+    // ── Public entry point ─────────────────────────────────────────────────────
 
     public static void generateDescriptive(Context ctx,
                                            School school,
@@ -145,121 +164,37 @@ public class DescriptiveRemarksGenerator {
         new Thread(() -> {
             try {
                 PdfGenerator.ensureFonts(ctx);
-                File out = new File(PdfGenerator.outDir(ctx), "DescriptiveRemarksRegister_" + PdfGenerator.ts() + ".pdf");
+
+                File out = new File(PdfGenerator.outDir(ctx),
+                        "DescriptiveRemarksRegister_" + PdfGenerator.ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
-                doc.setMargins(30, 30, 30, 30);
+                doc.setMargins(28, 28, 32, 28);
 
                 String classId = cls != null ? cls.id : null;
 
-                Log.d(TAG, "=== GENERATING DESCRIPTIVE PDF ===");
-                Log.d(TAG, "sem1Marks=" + (sem1Marks != null ? sem1Marks.size() : "null")
-                        + " sem2Marks=" + (sem2Marks != null ? sem2Marks.size() : "null")
+                // Detect active semester label
+                int semNum = com.kartik.myschool.SessionContext.selectedSemester != null
+                        ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
+                String semLabel = semNum == 2 ? "द्वितीय सत्र" : "प्रथम सत्र";
+
+                // Choose the semester marks map to use as primary
+                Map<String, MarksRecord> activeSemMarks = semNum == 2 ? sem2Marks : sem1Marks;
+
+                Log.d(TAG, "=== GENERATING DESCRIPTIVE PDF === sem=" + semNum
                         + " students=" + (students != null ? students.size() : "null"));
 
-                // Dump ALL keys from sem1 for the first student to debug
-                if (sem1Marks != null && students != null && !students.isEmpty()) {
-                    MarksRecord firstRec = sem1Marks.get(students.get(0).id);
-                    if (firstRec != null && firstRec.detailedMarks != null) {
-                        Log.d(TAG, "sem1 first student detailedMarks keys: " + firstRec.detailedMarks.keySet());
-                        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : firstRec.detailedMarks.entrySet()) {
-                            MarksRecord.SubjectMarksDetail v = e.getValue();
-                            Log.d(TAG, "  key=" + e.getKey()
-                                    + " remark=" + (v != null && v.remark != null ? "'" + v.remark + "'" : "null")
-                                    + " akarik=" + (v != null ? v.akarikTotal : 0));
-                        }
-                    } else {
-                        Log.d(TAG, "sem1 first student: " + (firstRec == null ? "NO RECORD" : "detailedMarks=null"));
-                    }
-                }
-                if (sem2Marks != null && students != null && !students.isEmpty()) {
-                    MarksRecord firstRec = sem2Marks.get(students.get(0).id);
-                    if (firstRec != null && firstRec.detailedMarks != null) {
-                        Log.d(TAG, "sem2 first student detailedMarks keys: " + firstRec.detailedMarks.keySet());
-                        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : firstRec.detailedMarks.entrySet()) {
-                            MarksRecord.SubjectMarksDetail v = e.getValue();
-                            Log.d(TAG, "  key=" + e.getKey()
-                                    + " remark=" + (v != null && v.remark != null ? "'" + v.remark + "'" : "null")
-                                    + " akarik=" + (v != null ? v.akarikTotal : 0));
-                        }
-                    } else {
-                        Log.d(TAG, "sem2 first student: " + (firstRec == null ? "NO RECORD" : "detailedMarks=null"));
-                    }
-                }
-
-                // Build the best possible map by checking all sources
                 Map<String, MarksRecord> bestMap = buildBestRemarksMap(sem1Marks, sem2Marks, students, classId);
-                Log.d(TAG, "bestMap size=" + bestMap.size());
 
-                if (cls.subjects != null) {
-                    for (int si = 0; si < cls.subjects.size(); si++) {
+                if (students != null && !students.isEmpty()) {
+                    for (int si = 0; si < students.size(); si++) {
                         if (si > 0) doc.newPage();
-                        Subject sub = cls.subjects.get(si);
+                        Student student = students.get(si);
+                        MarksRecord rec = bestMap.get(student.id);
+                        if (rec == null && activeSemMarks != null) rec = activeSemMarks.get(student.id);
 
-                        // Title
-                        Font titleFont = PdfGenerator.sMarathiBase != null ? new Font(PdfGenerator.sMarathiBase, 16, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_DARK);
-                        Paragraph title = new Paragraph("वर्णनात्मक नोंदी (Descriptive Remarks)", titleFont);
-                        title.setAlignment(Element.ALIGN_CENTER);
-                        title.setSpacingAfter(15);
-                        doc.add(title);
-
-                        // Header Info table
-                        PdfPTable top = new PdfPTable(3);
-                        top.setWidthPercentage(100); top.setSpacingAfter(10);
-                        String schoolStr = "School: " + (school != null ? nvl(school.name) : "");
-                        String classStr = "Class: " + (cls != null ? nvl(cls.className) : "") + " " + (cls != null ? nvl(cls.division) : "");
-                        String yearStr = "Year: " + (cls != null ? nvl(cls.academicYearLabel) : "");
-
-                        cellSpan(top, schoolStr + "\n" + classStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
-                        cellSpan(top, "Subject: " + sub.name, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(top, yearStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
-                        doc.add(top);
-
-                        // Table: Sr No | Student Name | Roll No | Descriptive Remarks
-                        PdfPTable tbl = new PdfPTable(new float[]{0.6f, 2.5f, 1.0f, 6.0f});
-                        tbl.setWidthPercentage(100); tbl.setSpacingBefore(6);
-
-                        cell(tbl, "अ.क्र.",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "विद्यार्थ्याचे नाव",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "हजेरी क्र.",  fBold, C_HEADER_BG, C_DARK, 1, Element.ALIGN_CENTER);
-                        cell(tbl, "वर्णनात्मक नोंदी",   fBold, C_HEADER_BG, C_DARK,  1, Element.ALIGN_CENTER);
-
-                        boolean alt = false;
-                        if (students != null) {
-                            for (int i = 0; i < students.size(); i++) {
-                                Student s = students.get(i);
-                                BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-
-                                // Get the best record for this student from combined sources
-                                MarksRecord bestRec = bestMap.get(s.id);
-                                String remark = findRemark(bestRec, sub.name);
-
-                                // If still empty, try a brute-force: iterate ALL subject details
-                                // and try index-based matching (subject at position si)
-                                if (remark.isEmpty() && bestRec != null && bestRec.detailedMarks != null) {
-                                    int idx = 0;
-                                    for (MarksRecord.SubjectMarksDetail val : bestRec.detailedMarks.values()) {
-                                        if (idx == si && val != null && val.remark != null && !val.remark.trim().isEmpty()) {
-                                            remark = val.remark.replace("||", ", ").trim();
-                                            Log.d(TAG, "  FALLBACK index match for " + s.name + " sub=" + sub.name + " at idx=" + si);
-                                            break;
-                                        }
-                                        idx++;
-                                    }
-                                }
-
-                                if (si == 0) { // Log only for first subject to avoid spam
-                                    Log.d(TAG, "Row " + i + " " + s.name + ": remark='" + remark + "'");
-                                }
-
-                                PdfPCell nc = rawCell(String.valueOf(i + 1), fNormal, bg, C_DARK, Element.ALIGN_CENTER); tbl.addCell(nc);
-                                PdfPCell lc = rawCell(nvl(s.name), fNormal, bg, C_DARK, Element.ALIGN_LEFT); lc.setMinimumHeight(28f); tbl.addCell(lc);
-                                PdfPCell rc = rawCell(nvl(s.rollNo), fNormal, bg, C_DARK, Element.ALIGN_CENTER); rc.setMinimumHeight(28f); tbl.addCell(rc);
-                                PdfPCell remCell = rawCell(remark.isEmpty() ? "" : remark, fNormal, bg, C_DARK, Element.ALIGN_LEFT); remCell.setMinimumHeight(28f); tbl.addCell(remCell);
-                            }
-                        }
-                        doc.add(tbl);
+                        addStudentPage(doc, school, cls, student, rec, semLabel, si + 1);
                     }
                 }
 
@@ -271,5 +206,123 @@ public class DescriptiveRemarksGenerator {
                 cb.onError(e);
             }
         }).start();
+    }
+
+    // ── Per-student page renderer ──────────────────────────────────────────────
+
+    private static void addStudentPage(Document doc, School school, ClassModel cls,
+                                       Student student, MarksRecord rec,
+                                       String semLabel, int pageIndex)
+            throws DocumentException {
+
+        Font fTitle  = sMarathiBase != null ? new Font(sMarathiBase, 15, Font.BOLD,  C_DARK)
+                                            : new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD, C_DARK);
+        Font fMeta   = sMarathiBase != null ? new Font(sMarathiBase, 10, Font.NORMAL, C_DARK)
+                                            : new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, C_DARK);
+        Font fMetaB  = sMarathiBase != null ? new Font(sMarathiBase, 10, Font.BOLD,   C_DARK)
+                                            : new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, C_DARK);
+        Font fHdr    = sMarathiBase != null ? new Font(sMarathiBase, 10, Font.BOLD,   C_WHITE)
+                                            : new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, C_WHITE);
+        Font fRow    = sMarathiBase != null ? new Font(sMarathiBase,  9, Font.NORMAL, C_DARK)
+                                            : new Font(Font.FontFamily.HELVETICA,  9, Font.NORMAL, C_DARK);
+        Font fRowB   = sMarathiBase != null ? new Font(sMarathiBase,  9, Font.BOLD,   C_DARK)
+                                            : new Font(Font.FontFamily.HELVETICA,  9, Font.BOLD, C_DARK);
+
+        // ── 1. Page Title ──────────────────────────────────────────────────────
+        Paragraph titlePara = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", fTitle);
+        titlePara.setAlignment(Element.ALIGN_CENTER);
+        titlePara.setSpacingAfter(8);
+        doc.add(titlePara);
+
+        // ── 2. Student Info Header ─────────────────────────────────────────────
+        PdfPTable hdr = new PdfPTable(new float[]{2.5f, 0.2f, 1.5f});
+        hdr.setWidthPercentage(100);
+        hdr.setSpacingAfter(6);
+
+        // Row 1: Name  |  |  Year
+        addNoBorderCell(hdr, "नाव: " + nvl(student != null ? student.name : null), fMetaB, Element.ALIGN_LEFT);
+        addNoBorderCell(hdr, "", fMeta, Element.ALIGN_CENTER);
+        addNoBorderCell(hdr, "सन : " + (cls != null ? nvl(cls.academicYearLabel) : "-"), fMetaB, Element.ALIGN_RIGHT);
+
+        // Row 2: Class, Div  |  Roll No  |  Semester
+        String classDiv = "इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-");
+        String rollStr  = "रोल नं.: " + nvl(student != null ? student.rollNo : null);
+        addNoBorderCell(hdr, classDiv, fMeta, Element.ALIGN_LEFT);
+        addNoBorderCell(hdr, rollStr,  fMeta, Element.ALIGN_CENTER);
+        addNoBorderCell(hdr, semLabel, fMetaB, Element.ALIGN_RIGHT);
+
+        doc.add(hdr);
+
+        // ── 3. Table: Sr.No | Subject | Remark ──────────────────────────────
+        PdfPTable tbl = new PdfPTable(new float[]{0.5f, 2.5f, 5.0f});
+        tbl.setWidthPercentage(100);
+        tbl.setSpacingBefore(4);
+
+        // Header row
+        addHeaderCell(tbl, "अ.नं", fHdr, C_PRIMARY);
+        addHeaderCell(tbl, "विषय", fHdr, C_PRIMARY);
+        addHeaderCell(tbl, "विषयवार वर्णनात्मक नोंद", fHdr, C_PRIMARY);
+
+        int rowIdx = 1;
+        boolean alt = false;
+
+        // Class subjects
+        if (cls != null && cls.subjects != null) {
+            for (Subject sub : cls.subjects) {
+                BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+                String remark = findRemark(rec, sub.name);
+
+                addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 32f);
+                addDataCell(tbl, sub.name,                 fRow,  bg, Element.ALIGN_LEFT,   32f);
+                addDataCell(tbl, remark,                   fRow,  bg, Element.ALIGN_LEFT,   32f);
+            }
+        }
+
+        // Extra fixed rows
+        for (int i = 0; i < EXTRA_LABELS.length; i++) {
+            BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+            String remark = remarkContaining(rec, EXTRA_KEYS[i]);
+
+            addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 40f);
+            addDataCell(tbl, EXTRA_LABELS[i],          fRow,  bg, Element.ALIGN_LEFT,   40f);
+            addDataCell(tbl, remark,                   fRow,  bg, Element.ALIGN_LEFT,   40f);
+        }
+
+        doc.add(tbl);
+
+        // ── 4. Signature row ──────────────────────────────────────────────────
+        try {
+            doc.add(PdfGenerator.buildSignatureRow(school, cls));
+        } catch (Exception ignored) {}
+    }
+
+    // ── Cell helpers ──────────────────────────────────────────────────────────
+
+    private static void addNoBorderCell(PdfPTable tbl, String text, Font font, int align) {
+        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setHorizontalAlignment(align);
+        c.setPadding(2f);
+        tbl.addCell(c);
+    }
+
+    private static void addHeaderCell(PdfPTable tbl, String text, Font font, BaseColor bg) {
+        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        c.setBackgroundColor(bg);
+        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setPadding(5f);
+        tbl.addCell(c);
+    }
+
+    private static void addDataCell(PdfPTable tbl, String text, Font font,
+                                    BaseColor bg, int align, float minH) {
+        PdfPCell c = new PdfPCell(new Phrase(text != null ? text : "", font));
+        c.setBackgroundColor(bg);
+        c.setHorizontalAlignment(align);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setPadding(5f);
+        c.setMinimumHeight(minH);
+        tbl.addCell(c);
     }
 }
