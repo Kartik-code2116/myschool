@@ -10,6 +10,7 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -26,6 +27,17 @@ import static com.kartik.myschool.utils.PdfGenerator.*;
 
 public class CoverPageGenerator {
 
+    // ── Design colours ────────────────────────────────────────────────────────
+    private static final BaseColor C_INDIGO        = new BaseColor(63,  81, 181);   // #3F51B5
+    private static final BaseColor C_INDIGO_DARK   = new BaseColor(40,  53, 147);   // #283593
+    private static final BaseColor C_INDIGO_LIGHT  = new BaseColor(197, 202, 233);  // #C5CAE9
+    private static final BaseColor C_AMBER         = new BaseColor(255, 193,   7);  // #FFC107
+    private static final BaseColor C_AMBER_DARK    = new BaseColor(255, 143,   0);  // #FF8F00
+    private static final BaseColor C_WHITE         = BaseColor.WHITE;
+    private static final BaseColor C_PALE          = new BaseColor(232, 234, 246);  // very light indigo
+    private static final BaseColor C_DARK_TEXT     = new BaseColor(28,  27,  31);
+    private static final BaseColor C_GREY_TEXT     = new BaseColor(90,  90, 100);
+
     public static void generateCoverPage(Context ctx,
                                          School school,
                                          ClassModel cls,
@@ -36,134 +48,345 @@ public class CoverPageGenerator {
         new Thread(() -> {
             try {
                 PdfGenerator.ensureFonts(ctx);
-                File out = new File(PdfGenerator.outDir(ctx), "CoverPage_" + PdfGenerator.safeRoll(student) + "_" + PdfGenerator.ts() + ".pdf");
+                File out = new File(PdfGenerator.outDir(ctx),
+                        "CoverPage_" + PdfGenerator.safeRoll(student) + "_" + PdfGenerator.ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
-                doc.setMargins(30, 30, 30, 30);
-                addCoverPageContent(doc, ctx, school, cls, student);
+                doc.setMargins(0, 0, 0, 0);
+                addCoverPageContent(doc, ctx, school, cls, student, writer);
                 doc.close();
                 cb.onSuccess(out);
             } catch (Exception e) { cb.onError(e); }
         }).start();
     }
 
-    public static void addCoverPageContent(Document doc, Context ctx, School school, ClassModel cls, Student student) throws Exception {
-        // 1. Logo and Header
-        PdfPTable t = new PdfPTable(1);
-        t.setWidthPercentage(100);
-        PdfPCell c = new PdfPCell();
-        c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+    // ── Public overload (called from bulk / combined generators) ──────────────
+    public static void addCoverPageContent(Document doc, Context ctx, School school,
+                                           ClassModel cls, Student student) throws Exception {
+        addCoverPageContent(doc, ctx, school, cls, student, null);
+    }
 
-        try {
-            android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat.getDrawable(ctx, com.kartik.myschool.R.drawable.ic_school);
-            if (d != null) {
-                int w = d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : 100;
-                int h = d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : 100;
-                android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
-                android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
-                d.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                d.draw(canvas);
+    // ── Main layout ──────────────────────────────────────────────────────────
+    public static void addCoverPageContent(Document doc, Context ctx, School school,
+                                           ClassModel cls, Student student,
+                                           PdfWriter writer) throws Exception {
 
-                java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
-                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream);
-                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(stream.toByteArray());
-                img.setAlignment(Element.ALIGN_CENTER);
-                img.scaleToFit(60, 60);
-                c.addElement(img);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
+        float pageW = PageSize.A4.getWidth();   // 595 pt
+        float pageH = PageSize.A4.getHeight();  // 842 pt
 
-        Paragraph p1 = new Paragraph("जिल्हा परिषद", colored(fHeader, C_DARK));
-        p1.setAlignment(Element.ALIGN_CENTER);
-        p1.setSpacingBefore(10);
-        c.addElement(p1);
-        t.addCell(c);
-        doc.add(t);
-        
-        // 2. Year (सन)
-        String yearLabel = cls != null && cls.academicYearLabel != null ? cls.academicYearLabel : "2025-26";
-        Paragraph yearPara = new Paragraph("सन : " + yearLabel, colored(fHeader, C_DARK));
-        yearPara.setAlignment(Element.ALIGN_CENTER);
-        yearPara.setSpacingBefore(5);
-        yearPara.setSpacingAfter(40);
-        doc.add(yearPara);
-
-        // 3. Large Red Title
-        Font titleFont;
-        if (sMarathiBase != null) {
-            titleFont = new Font(sMarathiBase, 38, Font.BOLD, new BaseColor(244, 131, 145));
-        } else {
-            titleFont = new Font(Font.FontFamily.HELVETICA, 38, Font.BOLD, new BaseColor(244, 131, 145));
+        // ══════════════════════════════════════════════════════════════════════
+        // BACKGROUND ARTWORK  (drawn on the PdfContentByte underlay)
+        // ══════════════════════════════════════════════════════════════════════
+        if (writer != null) {
+            PdfContentByte cb = writer.getDirectContentUnder();
+            drawBackground(cb, pageW, pageH);
         }
-        Paragraph title1 = new Paragraph("सातत्यपूर्ण सर्वंकष", titleFont);
-        title1.setAlignment(Element.ALIGN_CENTER);
-        doc.add(title1);
-        
-        Paragraph title2 = new Paragraph("मूल्यमापन", titleFont);
-        title2.setAlignment(Element.ALIGN_CENTER);
-        title2.setSpacingAfter(20);
-        doc.add(title2);
 
-        // Decorative light-blue divider
-        com.itextpdf.text.pdf.draw.LineSeparator ls = new com.itextpdf.text.pdf.draw.LineSeparator();
-        ls.setLineColor(new BaseColor(173, 216, 230)); // Light blue
-        ls.setLineWidth(1.5f);
-        ls.setPercentage(40);
-        ls.setAlignment(Element.ALIGN_CENTER);
-        doc.add(ls);
-        
-        // Additional spacing
-        Paragraph space = new Paragraph(" ");
-        space.setSpacingAfter(40);
-        doc.add(space);
+        // ══════════════════════════════════════════════════════════════════════
+        // CONTENT — We use a 0-margin page and simulate margin via table padding
+        // ══════════════════════════════════════════════════════════════════════
 
-        // 4. White Information Box (clean left-aligned list)
-        PdfPTable box = new PdfPTable(1);
-        box.setWidthPercentage(85);
-        box.setSpacingBefore(30);
-        
-        PdfPCell boxCell = new PdfPCell();
-        boxCell.setBorder(Rectangle.NO_BORDER);
-        boxCell.setCellEvent(new com.itextpdf.text.pdf.PdfPCellEvent() {
-            @Override
-            public void cellLayout(PdfPCell cell, Rectangle position, com.itextpdf.text.pdf.PdfContentByte[] canvases) {
-                com.itextpdf.text.pdf.PdfContentByte canvas = canvases[PdfPTable.BACKGROUNDCANVAS];
-                canvas.saveState();
-                canvas.setColorFill(new BaseColor(242, 245, 249)); // Light shaded background
-                canvas.roundRectangle(position.getLeft(), position.getBottom(), position.getWidth(), position.getHeight(), 12f);
-                canvas.fill();
-                canvas.restoreState();
+        // ── 1. TOP HEADER BAND spacer (the band is drawn in background) ──────
+        addSpacer(doc, 148);   // height of the top band
+
+        // ── 2. LOGO ───────────────────────────────────────────────────────────
+        PdfPTable logoRow = new PdfPTable(1);
+        logoRow.setWidthPercentage(100);
+        PdfPCell logoCell = new PdfPCell();
+        logoCell.setBorder(Rectangle.NO_BORDER);
+        logoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        logoCell.setPaddingBottom(4);
+        try {
+            android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat
+                    .getDrawable(ctx, com.kartik.myschool.R.drawable.ic_school);
+            if (d != null) {
+                int w = Math.max(d.getIntrinsicWidth(),  1);
+                int h = Math.max(d.getIntrinsicHeight(), 1);
+                android.graphics.Bitmap bmp = android.graphics.Bitmap
+                        .createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+                d.setBounds(0, 0, w, h);
+                d.draw(canvas);
+                java.io.ByteArrayOutputStream bs = new java.io.ByteArrayOutputStream();
+                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bs);
+                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(bs.toByteArray());
+                img.scaleToFit(72, 72);
+                logoCell.addElement(img);
             }
+        } catch (Exception ignored) {}
+        logoRow.addCell(logoCell);
+        doc.add(logoRow);
+
+        // ── 3. GOVT. LABEL ────────────────────────────────────────────────────
+        addCentred(doc, "जिल्हा परिषद प्राथमिक शाळा",
+                mkFont(11, Font.BOLD, C_GREY_TEXT), 2, 0);
+
+        // ── 4. SCHOOL NAME ────────────────────────────────────────────────────
+        String schoolName = (school != null && school.name != null && !school.name.isEmpty())
+                ? school.name : "शाळेचे नाव";
+        addCentred(doc, schoolName.toUpperCase(),
+                mkFont(14, Font.BOLD, C_INDIGO_DARK), 4, 2);
+
+        // ── 5. UDISE ──────────────────────────────────────────────────────────
+        String udise = (school != null && school.udiseCode != null) ? school.udiseCode : "—";
+        addCentred(doc, "युडायस : " + udise,
+                mkFont(9, Font.NORMAL, C_GREY_TEXT), 0, 16);
+
+        // ── 6. DECORATIVE AMBER DIVIDER ───────────────────────────────────────
+        PdfPTable divider = new PdfPTable(new float[]{1f, 3f, 1f});
+        divider.setWidthPercentage(60);
+        divider.setSpacingAfter(20);
+        addFilledCell(divider, C_AMBER_DARK, 4);
+        addFilledCell(divider, C_AMBER, 4);
+        addFilledCell(divider, C_AMBER_DARK, 4);
+        doc.add(divider);
+
+        // ── 7. BIG MARATHI TITLE ──────────────────────────────────────────────
+        addCentred(doc, "सातत्यपूर्ण सर्वंकष",
+                mkFont(34, Font.BOLD, C_INDIGO), 0, 0);
+        addCentred(doc, "मूल्यमापन",
+                mkFont(34, Font.BOLD, C_INDIGO), 0, 6);
+        addCentred(doc, "( CCE )",
+                mkFont(13, Font.NORMAL, C_GREY_TEXT), 2, 22);
+
+        // ── 8. INFO CARD ──────────────────────────────────────────────────────
+        String yearLabel  = (cls != null && cls.academicYearLabel != null) ? cls.academicYearLabel : "2025-26";
+        String className  = (cls != null && cls.className  != null) ? cls.className  : "—";
+        String division   = (cls != null && cls.division   != null && !cls.division.isEmpty()) ? cls.division : "—";
+        String teacher    = (cls != null && cls.teacherName != null && !cls.teacherName.isEmpty()) ? cls.teacherName : "—";
+        String principal  = (school != null && school.principalName != null && !school.principalName.isEmpty()) ? school.principalName : "—";
+
+        doc.add(buildInfoCard(yearLabel, className, division, teacher, principal));
+
+        // ── 9. BOTTOM SPACER (footer band is bg artwork) ─────────────────────
+        addSpacer(doc, 10);
+
+        // ── 10. Powered-by footer text ────────────────────────────────────────
+        addCentred(doc, "MySchool App — CCE Report",
+                mkFont(8, Font.ITALIC, new BaseColor(160, 160, 180)), 0, 0);
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // BACKGROUND ARTWORK
+    // ══════════════════════════════════════════════════════════════════════════
+    private static void drawBackground(PdfContentByte cb, float W, float H) {
+        // ── Full-page pale fill ───────────────────────────────────────────────
+        cb.saveState();
+        cb.setColorFill(new BaseColor(245, 245, 255));
+        cb.rectangle(0, 0, W, H);
+        cb.fill();
+        cb.restoreState();
+
+        // ── Top indigo header band ────────────────────────────────────────────
+        cb.saveState();
+        cb.setColorFill(C_INDIGO_DARK);
+        cb.rectangle(0, H - 130, W, 130);
+        cb.fill();
+        cb.restoreState();
+
+        // ── Overlapping lighter stripe across top band ────────────────────────
+        cb.saveState();
+        cb.setColorFill(C_INDIGO);
+        cb.rectangle(0, H - 130, W, 90);
+        cb.fill();
+        cb.restoreState();
+
+        // ── Amber accent bar at very top ──────────────────────────────────────
+        cb.saveState();
+        cb.setColorFill(C_AMBER);
+        cb.rectangle(0, H - 8, W, 8);
+        cb.fill();
+        cb.restoreState();
+
+        // ── Top-right decorative circles ─────────────────────────────────────
+        drawCircle(cb, W - 40, H - 40, 60, new BaseColor(255, 255, 255, 18));
+        drawCircle(cb, W - 20, H - 80, 40, new BaseColor(255, 255, 255, 12));
+        drawCircle(cb, W - 70, H - 20, 30, new BaseColor(255, 255, 255, 15));
+
+        // ── Top-left decorative circles ───────────────────────────────────────
+        drawCircle(cb, 30, H - 30, 55, new BaseColor(255, 255, 255, 14));
+        drawCircle(cb, 60, H - 15, 30, new BaseColor(255, 255, 255, 10));
+
+        // ── White logo circle background (centred at x=W/2, y=H-130) ─────────
+        cb.saveState();
+        cb.setColorFill(C_WHITE);
+        float cx = W / 2f;
+        float cy = H - 130;
+        cb.circle(cx, cy, 46);
+        cb.fill();
+        cb.restoreState();
+
+        // ── Amber ring around logo circle ─────────────────────────────────────
+        cb.saveState();
+        cb.setColorStroke(C_AMBER);
+        cb.setLineWidth(3f);
+        cb.circle(cx, cy, 48);
+        cb.stroke();
+        cb.restoreState();
+
+        // ── Bottom footer band ────────────────────────────────────────────────
+        cb.saveState();
+        cb.setColorFill(C_INDIGO_DARK);
+        cb.rectangle(0, 0, W, 38);
+        cb.fill();
+        cb.restoreState();
+
+        cb.saveState();
+        cb.setColorFill(C_AMBER);
+        cb.rectangle(0, 38, W, 5);
+        cb.fill();
+        cb.restoreState();
+
+        // ── Diagonal stripes in bottom-right corner ───────────────────────────
+        cb.saveState();
+        cb.setColorFill(new BaseColor(255, 193, 7, 30));
+        for (int i = 0; i < 5; i++) {
+            float x = W - 60 + i * 14;
+            drawDiagStripe(cb, x, 0, 12, 60);
+        }
+        cb.restoreState();
+
+        // ── Subtle dot grid in centre-right margin ────────────────────────────
+        cb.saveState();
+        cb.setColorFill(C_INDIGO_LIGHT);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 3; col++) {
+                cb.circle(W - 30 - col * 14, H / 2f - 80 + row * 18, 1.5f);
+                cb.fill();
+            }
+        }
+        cb.restoreState();
+
+        // ── Subtle dot grid in centre-left margin ────────────────────────────
+        cb.saveState();
+        cb.setColorFill(C_INDIGO_LIGHT);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 3; col++) {
+                cb.circle(18 + col * 14, H / 2f - 80 + row * 18, 1.5f);
+                cb.fill();
+            }
+        }
+        cb.restoreState();
+    }
+
+    private static void drawCircle(PdfContentByte cb, float x, float y, float r, BaseColor c) {
+        cb.saveState();
+        cb.setColorFill(c);
+        cb.circle(x, y, r);
+        cb.fill();
+        cb.restoreState();
+    }
+
+    private static void drawDiagStripe(PdfContentByte cb, float x, float y, float w, float h) {
+        cb.moveTo(x, y);
+        cb.lineTo(x + w, y);
+        cb.lineTo(x + w + h * 0.4f, y + h);
+        cb.lineTo(x + h * 0.4f, y + h);
+        cb.closePath();
+        cb.fill();
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // INFO CARD (rounded box with left accent bar per row)
+    // ══════════════════════════════════════════════════════════════════════════
+    private static PdfPTable buildInfoCard(String year, String cls, String div,
+                                           String teacher, String principal) throws Exception {
+        // Outer wrapper — provides left/right padding
+        PdfPTable outer = new PdfPTable(1);
+        outer.setWidthPercentage(78);
+        outer.setSpacingBefore(4);
+        outer.setSpacingAfter(12);
+        outer.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+        PdfPCell outerCell = new PdfPCell();
+        outerCell.setBorder(Rectangle.NO_BORDER);
+        outerCell.setCellEvent((cell, pos, canvases) -> {
+            // Rounded light-indigo background
+            PdfContentByte bgCb = canvases[PdfPTable.BACKGROUNDCANVAS];
+            bgCb.saveState();
+            bgCb.setColorFill(C_PALE);
+            bgCb.roundRectangle(pos.getLeft(), pos.getBottom(),
+                    pos.getWidth(), pos.getHeight(), 10f);
+            bgCb.fill();
+            // Left accent bar
+            bgCb.setColorFill(C_INDIGO);
+            bgCb.roundRectangle(pos.getLeft(), pos.getBottom() + 4,
+                    5f, pos.getHeight() - 8, 2f);
+            bgCb.fill();
+            bgCb.restoreState();
         });
-        boxCell.setPaddingTop(20);
-        boxCell.setPaddingBottom(20);
-        boxCell.setPaddingLeft(50);
-        boxCell.setPaddingRight(20);
+        outerCell.setPaddingTop(16);
+        outerCell.setPaddingBottom(16);
+        outerCell.setPaddingLeft(22);
+        outerCell.setPaddingRight(16);
 
-        PdfPTable tbl = new PdfPTable(new float[]{0.15f, 1.2f, 0.1f, 3.5f});
-        tbl.setWidthPercentage(100);
+        // Inner 2-column table: label | value
+        PdfPTable inner = new PdfPTable(new float[]{0.9f, 2.4f});
+        inner.setWidthPercentage(100);
 
-        String[] keys = {"युडायस", "शाळा", "वर्गशिक्षक", "इयत्ता", "तुकडी"};
-        String[] vals = {
-            school != null ? nvl(school.udiseCode) : "",
-            school != null ? nvl(school.name) : "",
-            cls != null ? nvl(cls.teacherName) : "",
-            cls != null ? nvl(cls.className) : "",
-            cls != null ? nvl(cls.division) : "-"
+        String[][] rows = {
+            { "शैक्षणिक वर्ष", year   },
+            { "इयत्ता",        cls    },
+            { "तुकडी",         div    },
+            { "वर्गशिक्षक",    teacher },
+            { "मुख्याध्यापक",  principal },
         };
 
-        for (int i = 0; i < keys.length; i++) {
-            PdfPCell c1 = new PdfPCell(new Phrase("●", colored(fHeader, C_DARK))); c1.setBorder(Rectangle.NO_BORDER); c1.setPaddingBottom(18);
-            PdfPCell c2 = new PdfPCell(new Phrase(keys[i], colored(fHeader, C_DARK))); c2.setBorder(Rectangle.NO_BORDER); c2.setPaddingBottom(18);
-            PdfPCell c3 = new PdfPCell(new Phrase(":", colored(fHeader, C_DARK))); c3.setBorder(Rectangle.NO_BORDER); c3.setPaddingBottom(18);
-            PdfPCell c4 = new PdfPCell(new Phrase(vals[i], colored(fHeader, C_DARK))); c4.setBorder(Rectangle.NO_BORDER); c4.setPaddingBottom(18);
-            tbl.addCell(c1); tbl.addCell(c2); tbl.addCell(c3); tbl.addCell(c4);
+        for (String[] row : rows) {
+            PdfPCell labelCell = new PdfPCell(
+                    new Phrase(row[0], mkFont(10, Font.BOLD, C_INDIGO_DARK)));
+            labelCell.setBorder(Rectangle.BOTTOM);
+            labelCell.setBorderColor(C_INDIGO_LIGHT);
+            labelCell.setPaddingBottom(8);
+            labelCell.setPaddingTop(6);
+            labelCell.setBackgroundColor(new BaseColor(0,0,0,0));
+
+            PdfPCell valueCell = new PdfPCell(
+                    new Phrase(row[1], mkFont(10, Font.NORMAL, C_DARK_TEXT)));
+            valueCell.setBorder(Rectangle.BOTTOM);
+            valueCell.setBorderColor(C_INDIGO_LIGHT);
+            valueCell.setPaddingBottom(8);
+            valueCell.setPaddingTop(6);
+
+            inner.addCell(labelCell);
+            inner.addCell(valueCell);
         }
 
-        boxCell.addElement(tbl);
-        box.addCell(boxCell);
-        doc.add(box);
+        outerCell.addElement(inner);
+        outer.addCell(outerCell);
+        return outer;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ══════════════════════════════════════════════════════════════════════════
+    private static Font mkFont(int size, int style, BaseColor color) {
+        if (sMarathiBase != null)
+            return new Font(sMarathiBase, size, style, color);
+        return new Font(Font.FontFamily.HELVETICA, size, style, color);
+    }
+
+    private static void addCentred(Document doc, String text, Font font,
+                                   float spaceBefore, float spaceAfter) throws Exception {
+        Paragraph p = new Paragraph(text, font);
+        p.setAlignment(Element.ALIGN_CENTER);
+        p.setSpacingBefore(spaceBefore);
+        p.setSpacingAfter(spaceAfter);
+        doc.add(p);
+    }
+
+    private static void addSpacer(Document doc, float height) throws Exception {
+        Paragraph sp = new Paragraph(" ");
+        sp.setSpacingBefore(height);
+        doc.add(sp);
+    }
+
+    private static void addFilledCell(PdfPTable t, BaseColor color, float height) {
+        PdfPCell c = new PdfPCell(new Phrase(" "));
+        c.setBackgroundColor(color);
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setMinimumHeight(height);
+        t.addCell(c);
     }
 }
