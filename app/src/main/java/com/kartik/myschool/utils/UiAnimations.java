@@ -30,6 +30,26 @@ public final class UiAnimations {
                 .build();
     }
 
+    /** Used for bottom navigation tab switches — content slides up smoothly. */
+    public static NavOptions navBottomTab() {
+        return new NavOptions.Builder()
+                .setEnterAnim(R.anim.slide_up_in)
+                .setExitAnim(R.anim.slide_down_out)
+                .setPopEnterAnim(R.anim.slide_up_in)
+                .setPopExitAnim(R.anim.slide_down_out)
+                .build();
+    }
+
+    /** Used for sidebar drawer navigation — scale + fade for a premium feel. */
+    public static NavOptions navDrawerOpen() {
+        return new NavOptions.Builder()
+                .setEnterAnim(R.anim.scale_fade_in)
+                .setExitAnim(R.anim.scale_fade_out)
+                .setPopEnterAnim(R.anim.scale_fade_in)
+                .setPopExitAnim(R.anim.scale_fade_out)
+                .build();
+    }
+
     public static void fadeIn(View view) {
         if (view == null) return;
         view.setAlpha(0f);
@@ -115,5 +135,88 @@ public final class UiAnimations {
         android.view.animation.Animation anim = AnimationUtils.loadAnimation(
                 root.getContext(), R.anim.slide_up_fade_in);
         root.startAnimation(anim);
+    }
+
+    /**
+     * Scroll-reveal animation: each item slides up and fades in as it appears
+     * while the user scrolls down. Call this from onBindViewHolder().
+     *
+     * @param view         The item root view to animate
+     * @param position     The adapter position (used to stagger delays)
+     * @param lastPosition Mutable int[] of size 1: holds the last animated position.
+     *                     Pass the same array instance across all bind calls.
+     */
+    public static void animateScrollReveal(View view, int position, int[] lastPosition) {
+        if (view == null) return;
+        if (position > lastPosition[0]) {
+            lastPosition[0] = position;
+
+            float density = view.getResources().getDisplayMetrics().density;
+            float translateY = 48 * density;
+
+            view.setAlpha(0f);
+            view.setTranslationY(translateY);
+            view.setScaleX(0.97f);
+            view.setScaleY(0.97f);
+
+            // Stagger each item slightly so they cascade in as you scroll
+            long delay = Math.min(position * 40L, 200L); // cap stagger at 200ms
+
+            view.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setStartDelay(delay)
+                    .setDuration(320)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator(1.4f))
+                    .withEndAction(() -> {
+                        view.setAlpha(1f);
+                        view.setTranslationY(0f);
+                        view.setScaleX(1f);
+                        view.setScaleY(1f);
+                    })
+                    .start();
+        }
+    }
+
+    /**
+     * Card pop animation: a subtle scale-bounce that makes a card feel alive
+     * when it first appears. Use for report/card-style list items.
+     *
+     * @param view         The card root view
+     * @param position     The adapter position
+     * @param lastPosition Mutable int[] of size 1
+     */
+    public static void animateCardPop(View view, int position, int[] lastPosition) {
+        if (view == null) return;
+        if (position > lastPosition[0]) {
+            lastPosition[0] = position;
+
+            float density = view.getResources().getDisplayMetrics().density;
+
+            view.setAlpha(0f);
+            view.setTranslationY(32 * density);
+            view.setScaleX(0.92f);
+            view.setScaleY(0.92f);
+
+            long delay = Math.min(position * 50L, 250L);
+
+            view.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .scaleX(1.03f)
+                    .scaleY(1.03f)
+                    .setStartDelay(delay)
+                    .setDuration(260)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .withEndAction(() -> view.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(120)
+                            .setInterpolator(new android.view.animation.OvershootInterpolator(1.5f))
+                            .start())
+                    .start();
+        }
     }
 }

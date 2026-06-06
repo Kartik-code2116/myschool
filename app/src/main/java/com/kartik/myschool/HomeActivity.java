@@ -186,14 +186,23 @@ public class HomeActivity extends AppCompatActivity {
                 && navController.getCurrentDestination().getId() == destId) {
             return true;
         }
-        navigateTo(destId);
+        // Drawer navigation uses scale+fade for a premium feel
+        navigateFromDrawer(destId);
         return true;
     }
 
     private boolean navigateBottomItem(android.view.MenuItem item) {
         int id = item.getItemId();
-        boolean handled = navigateToAnimated(id);
-        return handled;
+        if (navController == null) return false;
+        if (navController.getCurrentDestination() != null
+                && navController.getCurrentDestination().getId() == id) {
+            return true;
+        }
+        // Bottom nav uses slide-up animation for tab switching
+        if (navController != null) {
+            navController.navigate(id, null, UiAnimations.navBottomTab());
+        }
+        return true;
     }
 
     private void syncBottomNavSelection(int destinationId) {
@@ -373,13 +382,16 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /** Navigate programmatically (e.g., from intent or internal button) — horizontal slide. */
     public void navigateTo(int destId) {
         if (navController == null) return;
-        if (destId == R.id.nav_info_print || destId == R.id.nav_profile || destId == R.id.nav_students || destId == R.id.nav_extra) {
-            navController.navigate(destId, null, UiAnimations.navCrossFade());
-        } else {
-            navController.navigate(destId, null, UiAnimations.navSlideForward());
-        }
+        navController.navigate(destId, null, UiAnimations.navSlideForward());
+    }
+
+    /** Navigate from drawer sidebar — scale + fade for premium feel. */
+    private void navigateFromDrawer(int destId) {
+        if (navController == null) return;
+        navController.navigate(destId, null, UiAnimations.navDrawerOpen());
     }
 
     @Override

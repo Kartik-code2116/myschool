@@ -2,12 +2,16 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:interpolator/fast_out_slow_in"
     android:shareInterpolator="true">
-    <translate
+    <scale
         android:duration="@integer/anim_duration_nav"
-        android:fromXDelta="0"
-        android:toXDelta="16%" />
+        android:fromXScale="0.96"
+        android:fromYScale="0.96"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toXScale="1.0"
+        android:toYScale="1.0" />
     <alpha
         android:duration="@integer/anim_duration_nav"
-        android:fromAlpha="1"
-        android:toAlpha="0.0" />
+        android:fromAlpha="0.0"
+        android:toAlpha="1" />
 </set>

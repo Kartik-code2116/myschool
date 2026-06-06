@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="anim_duration_short">180</integer>
-    <integer name="anim_duration_medium">280</integer>
-    <integer name="anim_duration_nav">300</integer>
+    <integer name="anim_duration_short">140</integer>
+    <integer name="anim_duration_medium">220</integer>
+    <integer name="anim_duration_nav">220</integer>
 </resources>

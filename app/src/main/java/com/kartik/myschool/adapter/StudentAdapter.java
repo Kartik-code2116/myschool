@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.kartik.myschool.utils.UiAnimations;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,10 +30,13 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
 
     private final List<Student> items = new ArrayList<>();
     private OnStudentClick listener;
+    // Tracks last animated position so each item animates only once per load
+    private final int[] lastAnimatedPos = {-1};
 
     public void setData(List<Student> data) {
         items.clear();
         if (data != null) items.addAll(data);
+        lastAnimatedPos[0] = -1; // Reset so new data animates fresh
         notifyDataSetChanged();
     }
 
@@ -118,6 +123,8 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             });
             popup.show();
         });
+        // Scroll-reveal animation: slides up + fades in as new items appear
+        UiAnimations.animateScrollReveal(h.itemView, pos, lastAnimatedPos);
     }
 
     @Override

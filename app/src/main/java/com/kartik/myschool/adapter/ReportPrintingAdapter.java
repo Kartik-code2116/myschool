@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kartik.myschool.databinding.ItemReportCardBinding;
 import com.kartik.myschool.R;
+import com.kartik.myschool.utils.UiAnimations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
 
     private final List<ReportTemplate> items = new ArrayList<>();
     private OnItemClickListener listener;
+    // Tracks last animated position so each card pops in only once
+    private final int[] lastAnimatedPos = {-1};
 
     public ReportPrintingAdapter(android.content.Context ctx) {
         items.add(new ReportTemplate(R.string.report_cat_register, R.string.report_title_1, R.string.report_desc_1));
@@ -106,6 +109,9 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         b.btnReportSettings.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item, position);
         });
+
+        // Card-pop animation: scales from 92% with a bounce overshoot as items scroll into view
+        UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);
     }
 
     @Override
