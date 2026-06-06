@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Temporary logs and developer artifacts
+/jdk17.zip
+/*.txt
+/*.py

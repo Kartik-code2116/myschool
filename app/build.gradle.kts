@@ -16,21 +16,15 @@ android {
     defaultConfig {
         applicationId = "com.kartik.myschool"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val atlasApiUrl = ""
-        val atlasApiKey = ""
-        val atlasDataSource = ""
-        val atlasDb = ""
-        val atlasCollection = ""
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

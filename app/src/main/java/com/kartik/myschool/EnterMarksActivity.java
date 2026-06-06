@@ -1,8 +1,11 @@
 package com.kartik.myschool;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.kartik.myschool.databinding.ActivityEnterMarksBinding;
 import com.kartik.myschool.databinding.ItemSubjectMarksRowBinding;
@@ -52,6 +56,33 @@ public class EnterMarksActivity extends AppCompatActivity {
                     }
                 }
             });
+
+    private final ActivityResultLauncher<String> cameraPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    launchCameraIntent();
+                } else {
+                    Toast.makeText(this, R.string.msg_camera_permission_is_required, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private final ActivityResultLauncher<String> galleryPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    launchGalleryIntent();
+                } else {
+                    Toast.makeText(this, "Storage permission is required to read image", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private void launchCameraIntent() {
+        cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
+    }
+
+    private void launchGalleryIntent() {
+        galleryLauncher.launch(new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+    }
 
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -729,12 +760,34 @@ public class EnterMarksActivity extends AppCompatActivity {
                 .setTitle(R.string.msg_scan_marksheet)
                 .setItems(new String[] { "Camera", "Gallery" }, (d, w) -> {
                     if (w == 0) {
-                        cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            launchCameraIntent();
+                        } else {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+                        }
                     } else {
-                        galleryLauncher.launch(new Intent(Intent.ACTION_PICK,
-                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+                        checkGalleryPermissionAndLaunch();
                     }
                 }).show();
+    }
+
+    private void checkGalleryPermissionAndLaunch() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    == PackageManager.PERMISSION_GRANTED) {
+                launchGalleryIntent();
+            } else {
+                galleryPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                launchGalleryIntent();
+            } else {
+                galleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
     }
 
     private void processOcr(Bitmap bitmap) {

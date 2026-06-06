@@ -51,6 +51,8 @@ public class FormativeSummativeFragment extends Fragment {
     private int activeSemesterNumber = 1;
     private boolean isGridView = false;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
+    private String lastLoadedClassId = null;
+    private String lastLoadedSemesterId = null;
 
     @Nullable
     @Override
@@ -114,7 +116,7 @@ public class FormativeSummativeFragment extends Fragment {
         String clsLabel = activeClass != null ? activeClass.className : "5";
         String divLabel = activeClass != null ? activeClass.division : "1";
         b.tvAppSubtitle
-                .setText("• Class: " + clsLabel + " • Div: " + divLabel + " • Semester: " + activeSemesterNumber);
+                .setText("Cls: " + clsLabel + "-" + divLabel + " • Sem: " + activeSemesterNumber);
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
@@ -133,7 +135,7 @@ public class FormativeSummativeFragment extends Fragment {
         String cls = activeClass != null ? activeClass.className : "5";
         String div = activeClass != null ? activeClass.division : "1";
         b.tvHeaderStripInfo
-                .setText("Year: " + yr + "  Class: " + cls + ", Div: " + div + ", Sem: " + activeSemesterNumber);
+                .setText("Year: " + yr + " | Cls: " + cls + "-" + div + " | Sem: " + activeSemesterNumber);
 
         b.btnGridListToggle.setOnClickListener(v -> {
             isGridView = !isGridView;
@@ -157,6 +159,9 @@ public class FormativeSummativeFragment extends Fragment {
             Toast.makeText(requireContext(), R.string.select_class_first, Toast.LENGTH_LONG).show();
             return;
         }
+
+        lastLoadedClassId = activeClass.id;
+        lastLoadedSemesterId = activeSemesterId;
 
         // Subjects must be activated via the Subjects page — no hardcoded defaults.
         if (activeClass.subjects == null) {
@@ -244,7 +249,8 @@ public class FormativeSummativeFragment extends Fragment {
 
                             @Override
                             public void onError(Exception e) {
-                                Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + e.getMessage(), e);
+                                String errMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error";
+                                Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + errMsg, e);
                                 if (isAdded() && b != null) {
                                     b.progressLoading.setVisibility(View.GONE);
                                     if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
@@ -252,6 +258,7 @@ public class FormativeSummativeFragment extends Fragment {
                                     // previously-cached data. Never wipe marks just because of a
                                     // transient network error on resume.
                                     boolean hasCachedMarks = AppCache.cachedMarksMap != null
+                                            && activeClass != null
                                             && java.util.Objects.equals(activeClass.id,
                                                     AppCache.cachedClassIdForStudents)
                                             && java.util.Objects.equals(activeSemesterId,
@@ -271,8 +278,10 @@ public class FormativeSummativeFragment extends Fragment {
                     if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                     // Only show network error toast if cache is fully empty
                     if (AppCache.cachedStudents == null
+                            || activeClass == null
                             || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
-                        Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(),
+                        String errMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error";
+                        Toast.makeText(requireContext(), "Failed to load students: " + errMsg,
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -351,7 +360,13 @@ public class FormativeSummativeFragment extends Fragment {
             AppCache.selectedMarks = null;
         }
 
-        loadEvaluationData();
+        boolean isFirstLoad = lastLoadedClassId == null || lastLoadedSemesterId == null;
+        boolean classChanged = activeClass != null && !java.util.Objects.equals(activeClass.id, lastLoadedClassId);
+        boolean semesterChanged = !java.util.Objects.equals(activeSemesterId, lastLoadedSemesterId);
+
+        if (isFirstLoad || classChanged || semesterChanged) {
+            loadEvaluationData();
+        }
     }
 
     @Override

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="14dp"
     android:layout_marginEnd="14dp"
-    android:layout_marginBottom="16dp"
+    android:layout_marginBottom="10dp"
     app:cardCornerRadius="14dp"
     app:cardElevation="3dp"
     app:strokeWidth="0.8dp"
@@ -17,14 +17,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="8dp">
 
         <!-- Student Header Row -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="6dp">
 
             <!-- Student Name in Bold Charcoal -->
             <TextView

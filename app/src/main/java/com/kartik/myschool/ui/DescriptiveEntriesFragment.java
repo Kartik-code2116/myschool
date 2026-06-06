@@ -45,7 +45,7 @@ public class DescriptiveEntriesFragment extends Fragment {
     private String activeSemesterId = "sem_1";
     private int activeSemesterNumber = 1;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
-    private boolean isGridViewMode = true;
+    private boolean isGridViewMode = false;
 
     @Nullable
     @Override
@@ -105,18 +105,14 @@ public class DescriptiveEntriesFragment extends Fragment {
         String clsLabel = activeClass != null ? activeClass.className : "5";
         String divLabel = activeClass != null ? activeClass.division : "1";
         b.tvAppSubtitle
-                .setText("• Class: " + clsLabel + " • Div: " + divLabel + " • Semester: " + activeSemesterNumber);
+                .setText("Cls: " + clsLabel + "-" + divLabel + " • Sem: " + activeSemesterNumber);
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), R.string.msg_descriptive_entries_manual_ope, Toast.LENGTH_SHORT).show());
+                v -> Toast.makeText(requireContext(), R.string.msg_descriptive_entries_manual_ope, Toast.LENGTH_SHORT)
+                        .show());
         b.btnAddSquare.setOnClickListener(
                 v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
-        b.btnExcelSquare.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_print_report);
-            }
-        });
     }
 
     private void setupHeaderStrip() {
@@ -124,7 +120,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         String cls = activeClass != null ? activeClass.className : "5";
         String div = activeClass != null ? activeClass.division : "1";
         b.tvHeaderStripInfo
-                .setText("Year: " + yr + "  Class: " + cls + ", Div: " + div + ", Sem: " + activeSemesterNumber);
+                .setText("Year: " + yr + " | Cls: " + cls + "-" + div + " | Sem: " + activeSemesterNumber);
 
         // Set initial icon (show grid icon when in slide mode, show list/bullet icon
         // when in grid mode)
@@ -506,7 +502,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                                     1f);
 
                             float density = itemView.getResources().getDisplayMetrics().density;
-                            int margin = (int) (4 * density);
+                            int margin = (int) (3 * density);
                             param.setMargins(margin, margin, margin, margin);
                             cardView.setLayoutParams(param);
 
@@ -576,7 +572,8 @@ public class DescriptiveEntriesFragment extends Fragment {
             private void deleteRemarks(Student student) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
+                            .show();
                     return;
                 }
 
@@ -589,7 +586,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                 }
 
                 if (!changed) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
+                            .show();
                     return;
                 }
                 saveStudentRemarkRecord(student, record, "Remarks deleted.");
@@ -598,7 +596,8 @@ public class DescriptiveEntriesFragment extends Fragment {
             private void applyGenderRemarkChange(Student student) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
+                            .show();
                     return;
                 }
 
@@ -616,7 +615,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                 }
 
                 if (!changed) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_gender_words_found_to_chang, Toast.LENGTH_SHORT)
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_gender_words_found_to_chang,
+                            Toast.LENGTH_SHORT)
                             .show();
                     return;
                 }
@@ -707,20 +707,20 @@ public class DescriptiveEntriesFragment extends Fragment {
                     cardB.layoutEmptyRemark.setVisibility(View.GONE);
                     cardB.cgRemarkChips.removeAllViews();
 
-                    float density = itemView.getResources().getDisplayMetrics().density;
-                    // Show ALL remarks permanently (no cap, no "+N more")
+                    StringBuilder sb = new StringBuilder();
                     for (int r = 0; r < remarks.size(); r++) {
-                        String full = remarks.get(r);
-
-                        TextView tv = new TextView(itemView.getContext());
-                        tv.setText("• " + full);
-                        tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f);
-                        tv.setTextColor(0xFF455A64); // Dark greyish blue
-                        tv.setPadding(0, 0, 0, (int) (4 * density));
-                        tv.setLineSpacing(0, 1.2f);
-
-                        cardB.cgRemarkChips.addView(tv);
+                        if (r > 0)
+                            sb.append("\n");
+                        sb.append("• ").append(remarks.get(r));
                     }
+
+                    TextView tv = new TextView(itemView.getContext());
+                    tv.setText(sb.toString());
+                    tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10f);
+                    tv.setTextColor(0xFF455A64); // Dark greyish blue
+                    tv.setLineSpacing(0f, 1.15f);
+
+                    cardB.cgRemarkChips.addView(tv);
 
                     // Green border = filled
                     cardRoot.setStrokeColor(0xFF81C784);
@@ -743,13 +743,13 @@ public class DescriptiveEntriesFragment extends Fragment {
                     param = new android.widget.LinearLayout.LayoutParams(
                             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
                             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-                    int margin = (int) (4 * density);
+                    int margin = (int) (3 * density);
                     param.setMargins(margin, margin, margin, margin);
                 } else {
                     param = new android.widget.LinearLayout.LayoutParams(
-                            (int) (300 * density),
+                            (int) (240 * density),
                             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-                    int margin = (int) (6 * density);
+                    int margin = (int) (4 * density);
                     param.setMargins(margin, margin, margin, margin);
                 }
                 cardB.getRoot().setLayoutParams(param);
