@@ -123,7 +123,7 @@
     <string name="section_class_level">वर्ग स्तर</string>
     <string name="section_school_level">शालेय स्तर</string>
     <string name="menu_info_print">माहिती आणि मुद्रण सेटिंग</string>
-    <string name="menu_formative_summative">Formative Summative</string>
+    <string name="menu_formative_summative">आकारिक संकलित</string>
     <string name="menu_descriptive_entries">वर्णनात्मक नोंदी</string>
     <string name="menu_attendance">हजेरी</string>
     <string name="menu_list_students">वर्ग आणि विभाग</string>
@@ -249,8 +249,8 @@
     
     <string name="label_marks_total">एकूण:</string>
     <string name="label_marks_grade">ग्रेड:</string>
-    <string name="label_formative_evaluation">(अ) रचनात्मक मूल्यमापन</string>
-    <string name="label_summative_evaluation">(ब) सममितीय मूल्यमापन</string>
+    <string name="label_formative_evaluation">(अ) आकारिक मूल्यमापन</string>
+    <string name="label_summative_evaluation">(ब) संकलित मूल्यमापन</string>
     <string name="label_out_of">च्या बाहेर</string>
     <string name="label_observation">निरीक्षण</string>
     <string name="label_project">प्रकल्प</string>
@@ -261,8 +261,8 @@
     <string name="label_assignment">असाइनमेंट</string>
     <string name="label_activity">क्रियाकलाप</string>
     <string name="label_other">इतर</string>
-    <string name="label_formative_total">फॉर्मेटिव्ह टोटल (A)</string>
-    <string name="label_summative_total">बेरीज एकूण (B)</string>
+    <string name="label_formative_total">आकारिक एकूण (A)</string>
+    <string name="label_summative_total">संकलित एकूण (B)</string>
     <string name="label_grand_total_ab">एकूण (A + B)</string>
     <string name="label_written">लिहिले</string>
     <string name="label_subject_remark_title">विषय गुणात्मक टिप्पणी</string>
@@ -306,8 +306,8 @@
     <string name="txt_subject_code">विषय कोड</string>
     <string name="txt_teacher_id">शिक्षक आयडी</string>
     <string name="txt_null">शून्य</string>
-    <string name="txt_formative_evaluation">रचनात्मक मूल्यमापन</string>
-    <string name="txt_summative_evaluation">सममितीय मूल्यमापन</string>
+    <string name="txt_formative_evaluation">आकारिक मूल्यमापन</string>
+    <string name="txt_summative_evaluation">संकलित मूल्यमापन</string>
     <string name="txt_name_of_subject_regular">विषयाचे नाव (नियमित)</string>
     <string name="txt_marathi">मराठी</string>
     <string name="txt_name_of_subject_short">विषयाचे नाव (लहान)</string>
@@ -467,14 +467,14 @@
     <string name="txt_class_1_div_1">• वर्ग: 1 • Div: 1 •</string>
     <string name="txt_year_2026_27_class_1_div_1">वर्ष: 2026-27 वर्ग: 1, विभाग: 1</string>
     <string name="txt_1_marathi">1. मराठी</string>
-    <string name="txt_formative_progress">रचनात्मक प्रगती</string>
-    <string name="txt_summative_progress">सममितीय प्रगती</string>
+    <string name="txt_formative_progress">आकारिक प्रगती</string>
+    <string name="txt_summative_progress">संकलित प्रगती</string>
     <string name="txt_descriptive_progress">वर्णनात्मक प्रगती</string>
     <string name="txt_1">1. भारती आयुष महादेव</string>
     <string name="txt_1_2">1. मराठी</string>
     <string name="str_empty_15">नोंद प्रविष्ट करा</string>
     <string name="txt_a_1">A-1</string>
-    <string name="txt_formative_evaluation_weightage">फॉर्मेटिव्ह इव्हॅल्युएशन वेटेज</string>
+    <string name="txt_formative_evaluation_weightage">आकारिक मूल्यमापन भारमान</string>
     <string name="str_empty_16">निरी.</string>
     <string name="str_empty_17">तोंडी.</string>
     <string name="str_empty_18">प्रात्य.</string>
@@ -483,7 +483,7 @@
     <string name="str_empty_21">चाच.</string>
     <string name="str_empty_22">स्वा.</string>
     <string name="str_empty_23">इतर</string>
-    <string name="txt_summative_evaluation_weightage">सममितीय मूल्यमापन वजन</string>
+    <string name="txt_summative_evaluation_weightage">संकलित मूल्यमापन भारमान</string>
     <string name="str_empty_24">लेखी</string>
     <string name="str_empty_25">आका.</string>
     <string name="str_empty_26">संक.</string>
@@ -550,7 +550,7 @@
     <string name="str_empty_57">वर्णनात्मक नोंद</string>
     <string name="txt_cce110">CCE110</string>
     <string name="txt_about_student">विद्यार्थ्याबद्दल</string>
-    <string name="txt_formative_summative">Formative Summative</string>
+    <string name="txt_formative_summative">आकारिक संकलित</string>
     <string name="txt_attendance">हजेरी</string>
     <string name="txt_class_level">वर्ग स्तर</string>
     <string name="txt_list_of_students">विद्यार्थ्यांची यादी</string>
@@ -667,4 +667,41 @@
     <string name="fmt_school_address" formatted="false">पत्ता: %s</string>
     <string name="btn_edit_school">तपशील संपादित करा</string>
     <string name="title_edit_school">शाळेचा तपशील संपादित करा</string>
+
+    <string name="report_cat_register">नोंदवही</string>
+    <string name="report_cat_result">निकालपत्रक</string>
+    <string name="report_cat_marksheet">गुणपत्रक</string>
+    <string name="report_cat_tables">तक्के</string>
+    <string name="report_cat_progressbook">प्रगतीपुस्तक</string>
+
+    <string name="report_title_1">1. मुखपृष्ठ</string>
+    <string name="report_desc_1">नोंदवहीचे आकर्षक मुखपृष्ठ</string>
+    <string name="report_title_2">2. अनुक्रमणिका</string>
+    <string name="report_desc_2">सत्र एक वा दोन अनुसार अनुक्रमणिका</string>
+    <string name="report_title_3">3. गुणनोंदी</string>
+    <string name="report_desc_3">तंत्रे व श्रेणीसहित आकारिक-संकलित गुणनोंदी</string>
+    <string name="report_title_4">4. वर्णनात्मक नोंदी (Descriptive Entries)</string>
+    <string name="report_desc_4">सत्रानुसार विद्यार्थ्यांच्या वर्णनात्मक नोंदी</string>
+    <string name="report_title_5">5. श्रेणी तक्का</string>
+    <string name="report_desc_5">सत्र व विषयनुसार गुण व श्रेणी तक्का</string>
+    <string name="report_title_6">6. सर्वसामावेशक निकाल</string>
+    <string name="report_desc_6">आकारिक-संकलित गण श्रेणीयुक्त</string>
+    <string name="report_title_7">7. श्रेणी तक्का</string>
+    <string name="report_desc_7">सत्र, वर्गवार मुले-मुली श्रेणी तक्का</string>
+    <string name="report_title_8">8. गुण-श्रेणीयुक्त निकालपत्रक</string>
+    <string name="report_desc_8">विषयवार एकूण गुण व श्रेणीयुक्त</string>
+    <string name="report_title_9">9. प्रगतीपत्रक मुखपृष्ठ</string>
+    <string name="report_desc_9">A4 साईज कलरफुल प्रगतीपत्रक</string>
+    <string name="report_title_10">10. प्रगतीपत्रक पृष्ठ</string>
+    <string name="report_desc_10">A4 साईज प्रगतीपत्रक आतील पृष्ठ</string>
+    <string name="report_title_11">11. उपयुक्त रिपोर्ट</string>
+    <string name="report_desc_11">विषयवार गुणतक्के</string>
+    <string name="report_title_12">12. पाचवी आठवी गुणपत्रक</string>
+    <string name="report_desc_12">इयत्ता पाचवी / आठवी गुणपत्रक</string>
+    <string name="report_title_13">13. पाचवी आठवी वार्षिक तक्के</string>
+    <string name="report_desc_13">इयत्ता पाचवी / आठवी गुणतक्का</string>
+    <string name="report_title_14">14. प्रगतीपत्रक मुखपृष्ठ</string>
+    <string name="report_desc_14">A4 साईज कलरफुल प्रगतीपत्रक</string>
+    <string name="report_title_15">15. वार्षिक निकालपत्रक</string>
+    <string name="report_desc_15">सत्र व विषयनुसार गुण व श्रेणी तक्का</string>
 </resources>

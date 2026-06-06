@@ -57,7 +57,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void setupRecyclerView() {
         b.rvReportCards.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
-        adapter = new ReportPrintingAdapter();
+        adapter = new ReportPrintingAdapter(getContext());
         adapter.setOnItemClickListener((template, position) -> handleReportSelection(position));
         b.rvReportCards.setAdapter(adapter);
     }

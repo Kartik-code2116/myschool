@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kartik.myschool.databinding.ItemReportCardBinding;
+import com.kartik.myschool.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,14 @@ import java.util.List;
 public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAdapter.VH> {
 
     public static class ReportTemplate {
-        public String category;
-        public String title;
-        public String description;
+        public int categoryResId;
+        public int titleResId;
+        public int descriptionResId;
 
-        public ReportTemplate(String category, String title, String description) {
-            this.category = category;
-            this.title = title;
-            this.description = description;
+        public ReportTemplate(int categoryResId, int titleResId, int descriptionResId) {
+            this.categoryResId = categoryResId;
+            this.titleResId = titleResId;
+            this.descriptionResId = descriptionResId;
         }
     }
 
@@ -31,30 +32,29 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
     private final List<ReportTemplate> items = new ArrayList<>();
     private OnItemClickListener listener;
 
-    public ReportPrintingAdapter() {
-        // नोंदवही (Register/Book) reports
-        items.add(new ReportTemplate("नोंदवही",  "1. मुखपृष्ठ",                  "नोंदवहीचे आकर्षक मुखपृष्ठ"));
-        items.add(new ReportTemplate("नोंदवही",  "2. अनुक्रमणिका",               "सत्र एक वा दोन अनुसार अनुक्रमणिका"));
-        items.add(new ReportTemplate("नोंदवही",  "3. गुणनोंदी",                  "तंत्रे व श्रेणीसहित आकारिक-संकलित गुणनोंदी"));
-        items.add(new ReportTemplate("नोंदवही",  "4. वर्णनात्मक नोंदी",          "सत्रानुसार विद्यार्थ्यांच्या वर्णनात्मक नोंदी"));
-        items.add(new ReportTemplate("नोंदवही",  "5. श्रेणी तक्का",              "सत्र व विषयनुसार गुण व श्रेणी तक्का"));
-        // निकालपत्रक (Result Sheet) reports
-        items.add(new ReportTemplate("निकालपत्रक", "6. सर्वसामावेशक निकाल",     "आकारिक-संकलित गण श्रेणीयुक्त"));
-        items.add(new ReportTemplate("निकालपत्रक", "7. श्रेणी तक्का",            "सत्र, वर्गवार मुले-मुली श्रेणी तक्का"));
-        items.add(new ReportTemplate("निकालपत्रक", "8. गुण-श्रेणीयुक्त निकालपत्रक", "विषयवार एकूण गुण व श्रेणीयुक्त"));
-        // गुणपत्रक (Marksheet) reports
-        items.add(new ReportTemplate("गुणपत्रक",  "9. प्रगतीपत्रक मुखपृष्ठ",    "A4 साईज कलरफुल प्रगतीपत्रक"));
-        items.add(new ReportTemplate("गुणपत्रक",  "10. प्रगतीपत्रक पृष्ठ",       "A4 साईज प्रगतीपत्रक आतील पृष्ठ"));
-        // तक्के (Tables) reports
-        items.add(new ReportTemplate("तक्के",     "11. उपयुक्त रिपोर्ट",         "विषयवार गुणतक्के"));
-        // प्रगतीपुस्तक (Progress Book) reports
-        items.add(new ReportTemplate("प्रगतीपुस्तक", "12. पाचवी आठवी गुणपत्रक", "इयत्ता पाचवी / आठवी गुणपत्रक"));
-        // तक्के (Tables) reports continued
-        items.add(new ReportTemplate("तक्के",     "13. पाचवी आठवी वार्षिक तक्के", "इयत्ता पाचवी / आठवी गुणतक्का"));
-        // गुणपत्रक (Marksheet) reports continued
-        items.add(new ReportTemplate("गुणपत्रक",  "14. प्रगतीपत्रक मुखपृष्ठ",   "A4 साईज कलरफुल प्रगतीपत्रक"));
-        // निकालपत्रक (Result Sheet) continued
-        items.add(new ReportTemplate("निकालपत्रक", "15. वार्षिक निकालपत्रक",     "सत्र व विषयनुसार गुण व श्रेणी तक्का"));
+    public ReportPrintingAdapter(android.content.Context ctx) {
+        items.add(new ReportTemplate(R.string.report_cat_register, R.string.report_title_1, R.string.report_desc_1));
+        items.add(new ReportTemplate(R.string.report_cat_register, R.string.report_title_2, R.string.report_desc_2));
+        items.add(new ReportTemplate(R.string.report_cat_register, R.string.report_title_3, R.string.report_desc_3));
+        items.add(new ReportTemplate(R.string.report_cat_register, R.string.report_title_4, R.string.report_desc_4));
+        items.add(new ReportTemplate(R.string.report_cat_register, R.string.report_title_5, R.string.report_desc_5));
+        
+        items.add(new ReportTemplate(R.string.report_cat_result, R.string.report_title_6, R.string.report_desc_6));
+        items.add(new ReportTemplate(R.string.report_cat_result, R.string.report_title_7, R.string.report_desc_7));
+        items.add(new ReportTemplate(R.string.report_cat_result, R.string.report_title_8, R.string.report_desc_8));
+        
+        items.add(new ReportTemplate(R.string.report_cat_marksheet, R.string.report_title_9, R.string.report_desc_9));
+        items.add(new ReportTemplate(R.string.report_cat_marksheet, R.string.report_title_10, R.string.report_desc_10));
+        
+        items.add(new ReportTemplate(R.string.report_cat_tables, R.string.report_title_11, R.string.report_desc_11));
+        
+        items.add(new ReportTemplate(R.string.report_cat_progressbook, R.string.report_title_12, R.string.report_desc_12));
+        
+        items.add(new ReportTemplate(R.string.report_cat_tables, R.string.report_title_13, R.string.report_desc_13));
+        
+        items.add(new ReportTemplate(R.string.report_cat_marksheet, R.string.report_title_14, R.string.report_desc_14));
+        
+        items.add(new ReportTemplate(R.string.report_cat_result, R.string.report_title_15, R.string.report_desc_15));
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -74,19 +74,24 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         ReportTemplate item = items.get(position);
         ItemReportCardBinding b = holder.b;
 
-        b.tvReportCategory.setText(item.category);
-        b.tvReportTitle.setText(item.title);
-        b.tvReportDescription.setText(item.description);
+        b.tvReportCategory.setText(item.categoryResId);
+        b.tvReportTitle.setText(item.titleResId);
+        b.tvReportDescription.setText(item.descriptionResId);
 
         // Category colour-coding matches the screenshots
         int categoryColor;
-        switch (item.category) {
-            case "नोंदवही":       categoryColor = 0xFF5A4FCF; break; // indigo
-            case "निकालपत्रक":  categoryColor = 0xFFD32F2F; break; // red
-            case "गुणपत्रक":   categoryColor = 0xFF6A5ACD; break; // purple
-            case "तक्के":      categoryColor = 0xFF757575; break; // grey
-            case "प्रगतीपुस्तक": categoryColor = 0xFF388E3C; break; // green
-            default:              categoryColor = 0xFF888888; break;
+        if (item.categoryResId == R.string.report_cat_register) {
+            categoryColor = 0xFF5A4FCF; // indigo
+        } else if (item.categoryResId == R.string.report_cat_result) {
+            categoryColor = 0xFFD32F2F; // red
+        } else if (item.categoryResId == R.string.report_cat_marksheet) {
+            categoryColor = 0xFF6A5ACD; // purple
+        } else if (item.categoryResId == R.string.report_cat_tables) {
+            categoryColor = 0xFF757575; // grey
+        } else if (item.categoryResId == R.string.report_cat_progressbook) {
+            categoryColor = 0xFF388E3C; // green
+        } else {
+            categoryColor = 0xFF888888;
         }
         b.tvReportCategory.setTextColor(categoryColor);
 

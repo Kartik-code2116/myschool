@@ -667,4 +667,41 @@
     <string name="fmt_school_address" formatted="false">Address: %s</string>
     <string name="btn_edit_school">Edit Details</string>
     <string name="title_edit_school">Edit School Details</string>
+
+    <string name="report_cat_register">Register</string>
+    <string name="report_cat_result">Result Sheet</string>
+    <string name="report_cat_marksheet">Marksheet</string>
+    <string name="report_cat_tables">Tables</string>
+    <string name="report_cat_progressbook">Progress Book</string>
+
+    <string name="report_title_1">1. Cover Page</string>
+    <string name="report_desc_1">Attractive cover page of register</string>
+    <string name="report_title_2">2. Index</string>
+    <string name="report_desc_2">Index according to semester 1 or 2</string>
+    <string name="report_title_3">3. Marks Register</string>
+    <string name="report_desc_3">Formative-Summative marks register with tools &amp; grades</string>
+    <string name="report_title_4">4. Descriptive Entries</string>
+    <string name="report_desc_4">Semester-wise descriptive remarks of students</string>
+    <string name="report_title_5">5. Grade Table</string>
+    <string name="report_desc_5">Marks &amp; grade table according to semester and subject</string>
+    <string name="report_title_6">6. Comprehensive Result</string>
+    <string name="report_desc_6">Formative-Summative total grade sheet</string>
+    <string name="report_title_7">7. Roster Grade Table</string>
+    <string name="report_desc_7">Semester and class-wide boys-girls grade table</string>
+    <string name="report_title_8">8. Marks-Grade Ledger</string>
+    <string name="report_desc_8">Subject-wise total marks &amp; grades sheet</string>
+    <string name="report_title_9">9. Progress Card Cover</string>
+    <string name="report_desc_9">A4 size colorful progress card cover</string>
+    <string name="report_title_10">10. Progress Card Inner</string>
+    <string name="report_desc_10">A4 size progress card inner page</string>
+    <string name="report_title_11">11. Useful Reports</string>
+    <string name="report_desc_11">Subject-wise marks tables</string>
+    <string name="report_title_12">12. 5th &amp; 8th Marksheet</string>
+    <string name="report_desc_12">5th / 8th standard marksheet</string>
+    <string name="report_title_13">13. 5th &amp; 8th Annual Tables</string>
+    <string name="report_desc_13">5th / 8th standard annual tables</string>
+    <string name="report_title_14">14. Progress Card Cover</string>
+    <string name="report_desc_14">A4 size colorful progress card cover</string>
+    <string name="report_title_15">15. Annual Result Ledger</string>
+    <string name="report_desc_15">Marks &amp; grade table according to semester and subject</string>
 </resources>
