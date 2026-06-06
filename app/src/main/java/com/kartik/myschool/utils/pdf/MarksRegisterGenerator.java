@@ -65,13 +65,13 @@ public class MarksRegisterGenerator {
                         cellSpan(top, yearStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
                         doc.add(top);
 
-                        float[] widths = {0.6f, 2.5f, 1.2f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
+                        float[] widths = {0.6f, 1.2f, 1.2f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
                         PdfPTable tbl = new PdfPTable(widths);
                         tbl.setWidthPercentage(100); tbl.setSpacingAfter(10);
 
                         // Row 1
                         cellSpan(tbl, "Sr.No.", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                        cellSpan(tbl, "Student Name", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
                         cellSpan(tbl, "Roll No.", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
                         cellSpan(tbl, "Formative (A)", fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, "Summative (B)", fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);

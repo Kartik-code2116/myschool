@@ -28,6 +28,7 @@ import com.kartik.myschool.SessionContext;
 import com.kartik.myschool.databinding.FragmentFormativeSummativeBinding;
 import com.kartik.myschool.databinding.ItemEvaluationStudentBlockBinding;
 import com.kartik.myschool.databinding.ItemEvaluationSubjectCardBinding;
+import com.kartik.myschool.databinding.ItemEvaluationSubjectCardCompactBinding;
 import com.kartik.myschool.databinding.ItemSubjectMarksRowBinding;
 import com.kartik.myschool.model.ClassModel;
 import com.kartik.myschool.model.MarksRecord;
@@ -91,12 +92,7 @@ public class FormativeSummativeFragment extends Fragment {
     }
 
     private void updateLayoutManager() {
-        if (isGridView) {
-            b.rvEvaluationStudents
-                    .setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(requireContext(), 2));
-        } else {
-            b.rvEvaluationStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
-        }
+        b.rvEvaluationStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
     }
 
     private void setupCustomAppBar() {
@@ -491,9 +487,9 @@ public class FormativeSummativeFragment extends Fragment {
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) binding.getRoot().getLayoutParams();
                 float density = itemView.getResources().getDisplayMetrics().density;
                 if (isGridView) {
-                    lp.setMarginStart((int) (6 * density));
-                    lp.setMarginEnd((int) (6 * density));
-                    lp.bottomMargin = (int) (10 * density);
+                    lp.setMarginStart((int) (10 * density));
+                    lp.setMarginEnd((int) (10 * density));
+                    lp.bottomMargin = (int) (12 * density);
                 } else {
                     lp.setMarginStart((int) (14 * density));
                     lp.setMarginEnd((int) (14 * density));
@@ -501,18 +497,24 @@ public class FormativeSummativeFragment extends Fragment {
                 }
                 binding.getRoot().setLayoutParams(lp);
 
+                // Show/hide grade chips under student name
+                binding.layoutGradeChips.setVisibility(isGridView ? View.GONE : View.VISIBLE);
+
                 // Build Subject Cards depending on layout mode
-                if (isGridView) {
-                    binding.scrollSubjects.setVisibility(View.GONE);
-                } else {
-                    binding.scrollSubjects.setVisibility(View.VISIBLE);
-                    binding.layoutSubjectsHorizontal.removeAllViews();
-                    if (activeClass.subjects != null) {
-                        for (int i = 0; i < activeClass.subjects.size(); i++) {
-                            Subject sub = activeClass.subjects.get(i);
-                            View cardView = createSubjectCard(s, sub, i + 1, marks);
-                            binding.layoutSubjectsHorizontal.addView(cardView);
+                binding.scrollSubjects.setVisibility(View.VISIBLE);
+                binding.layoutSummaryGrid.setVisibility(View.GONE);
+                binding.layoutSubjectsHorizontal.removeAllViews();
+
+                if (activeClass.subjects != null) {
+                    for (int i = 0; i < activeClass.subjects.size(); i++) {
+                        Subject sub = activeClass.subjects.get(i);
+                        View cardView;
+                        if (isGridView) {
+                            cardView = createSubjectCardCompact(s, sub, i + 1, marks);
+                        } else {
+                            cardView = createSubjectCard(s, sub, i + 1, marks);
                         }
+                        binding.layoutSubjectsHorizontal.addView(cardView);
                     }
                 }
             }
@@ -689,6 +691,112 @@ public class FormativeSummativeFragment extends Fragment {
                 // fit table)
                 android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
                         (int) (300 * density),
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                int margin = (int) (6 * density);
+                param.setMargins(margin, margin, margin, margin);
+                cardB.getRoot().setLayoutParams(param);
+
+                return cardB.getRoot();
+            }
+
+            private View createSubjectCardCompact(Student student, Subject sub, int number, MarksRecord record) {
+                ItemEvaluationSubjectCardCompactBinding cardB = ItemEvaluationSubjectCardCompactBinding.inflate(
+                        LayoutInflater.from(itemView.getContext()), binding.layoutSubjectsHorizontal, false);
+
+                cardB.tvSubjectName.setText(number + ". " + sub.name);
+
+                // Default table values
+                String fet = "0", set = "0", tet = "0";
+                int formativeMax = 0, summativeMax = 0, totalMax = 0;
+                String gradeVal = "—";
+                boolean hasMarks = false;
+
+                // Max values calculations
+                formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik + sub.maxUpkram
+                        + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
+                if (formativeMax == 0) {
+                    formativeMax = sub.maxMarks / 2;
+                }
+                summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+                if (summativeMax == 0) {
+                    summativeMax = sub.maxMarks - (sub.maxMarks / 2);
+                }
+                totalMax = sub.maxMarks;
+
+                String safeKey = MarksRecord.sanitizeKey(sub.name);
+                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
+                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
+                    if (d != null && hasEnteredMarks(d)) {
+                        hasMarks = true;
+                        fet = formatVal(d.akarikTotal);
+                        set = formatVal(d.sanklit);
+                        tet = formatVal(d.grandTotal);
+                        if (d.grade != null && !d.grade.isEmpty()) {
+                            gradeVal = d.grade;
+                        }
+                    }
+                }
+
+                // Set table values (Obtained)
+                cardB.tvFETObtained.setText(fet);
+                cardB.tvSETObtained.setText(set);
+                cardB.tvTETObtained.setText(tet);
+
+                // Set table values (Max)
+                cardB.tvFETMax.setText(String.valueOf(formativeMax));
+                cardB.tvSETMax.setText(String.valueOf(summativeMax));
+                cardB.tvTETMax.setText(String.valueOf(totalMax));
+
+                // Style grade cell
+                cardB.tvGrade.setText(gradeVal);
+
+                int gradeColor = 0xFF90A4AE; // gray
+                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) {
+                    gradeColor = 0xFF6C4CCF;
+                } else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) {
+                    gradeColor = 0xFF00A5CF;
+                } else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1")) {
+                    gradeColor = 0xFF2E7D32;
+                } else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) {
+                    gradeColor = 0xFF9E9D24;
+                } else if (!gradeVal.equals("—")) {
+                    gradeColor = 0xFFE53935; // Crimson/Red for E-2 or lower
+                }
+                cardB.tvGrade.setBackgroundColor(gradeColor);
+
+                // Tint card border orange to signal "needs entry" if no marks are entered yet
+                if (hasMarks) {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
+                            .setStrokeColor(0xFFE0E0E0);
+                } else {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
+                            .setStrokeColor(0xFFFFB74D);
+                }
+
+                // Setup 3-dot popup menu
+                cardB.btnSubjectMore.setOnClickListener(v -> {
+                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
+                            itemView.getContext(), v);
+                    popup.getMenu().add(0, 1, 0, "Enter Marks");
+                    popup.getMenu().add(0, 2, 1, "Quick View Info");
+                    popup.setOnMenuItemClickListener(item -> {
+                        if (item.getItemId() == 1) {
+                            openMarksEntry(student);
+                            return true;
+                        }
+                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        return true;
+                    });
+                    popup.show();
+                });
+
+                // Click on entire subject card opens marks entry!
+                cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
+
+                // Set compact card layout width
+                float density = itemView.getResources().getDisplayMetrics().density;
+                android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
+                        (int) (186 * density),
                         android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                 int margin = (int) (6 * density);
                 param.setMargins(margin, margin, margin, margin);

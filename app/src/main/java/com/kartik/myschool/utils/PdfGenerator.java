@@ -1,6 +1,7 @@
 package com.kartik.myschool.utils;
 
 import static com.kartik.myschool.utils.pdf.GunapattrakGenerator.cellVerticalSpan;
+import static com.kartik.myschool.utils.pdf.GunapattrakGenerator.cellHorizontalImageSpan;
 
 import android.content.Context;
 
@@ -63,6 +64,7 @@ public class PdfGenerator {
 
     // ── Fonts ─────────────────────────────────────────────────────────────────
     public static BaseFont sMarathiBase;
+    public static android.graphics.Typeface sMarathiTypeface;
     public static boolean sFontsInitDone = false;
 
     public static Font fTitle, fTitleSub, fHeader, fNormal, fSmall, fMicro, fBold, fSmallBold;
@@ -79,6 +81,7 @@ public class PdfGenerator {
             is.close(); os.close();
 
             sMarathiBase = BaseFont.createFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            sMarathiTypeface = android.graphics.Typeface.createFromFile(fontFile);
             android.util.Log.d("PDF_FONT", "Successfully loaded Marathi font from assets!");
         } catch (Exception e) {
             android.util.Log.e("PDF_FONT", "Failed to load Marathi font from assets", e);
@@ -93,6 +96,7 @@ public class PdfGenerator {
                 try {
                     if (new File(sysFont).exists()) {
                         sMarathiBase = BaseFont.createFont(sysFont, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        sMarathiTypeface = android.graphics.Typeface.createFromFile(sysFont);
                         android.util.Log.d("PDF_FONT", "Successfully loaded system font: " + sysFont);
                         break;
                     }
@@ -233,7 +237,7 @@ public class PdfGenerator {
                 int numCols = 2 + (numSubjects * 2);
                 float[] widths = new float[numCols];
                 widths[0] = 0.5f; // SrNo
-                widths[1] = 1.6f; // Name
+                widths[1] = 1.0f; // Name (reduced from 1.6f for vertical header)
                 for (int i = 0; i < numSubjects; i++) {
                     widths[2 + (i*2)] = 0.4f; // Marks
                     widths[2 + (i*2) + 1] = 0.4f; // Grade
@@ -244,7 +248,7 @@ public class PdfGenerator {
                 
                 // Row 1
                 cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-                cellSpan(tbl, "विद्यार्थ्याचे नाव", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
                 for (int i = 0; i < numSubjects; i++) {
                     cellSpan(tbl, subjects.get(i).name, fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
                 }
@@ -324,11 +328,11 @@ public class PdfGenerator {
 
                 PdfPTable indexTbl = new PdfPTable(new float[]{0.6f, 3.0f, 1.0f, 1.2f, 0.8f});
                 indexTbl.setWidthPercentage(100);
-                cellSpan(indexTbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                cellSpan(indexTbl, "विद्यार्थ्याचे नाव", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                cellSpan(indexTbl, "रजि.नं.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                cellSpan(indexTbl, "जन्मतारीख", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                cellSpan(indexTbl, "पृष्ठ क्र.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellHorizontalImageSpan(indexTbl, ctx, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellHorizontalImageSpan(indexTbl, ctx, "विद्यार्थ्याचे नाव", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellHorizontalImageSpan(indexTbl, ctx, "रजि.नं.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellHorizontalImageSpan(indexTbl, ctx, "जन्मतारीख", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellHorizontalImageSpan(indexTbl, ctx, "पृष्ठ क्र.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
 
                 boolean alt = false;
                 for (int i=0; i<students.size(); i++) {
@@ -360,14 +364,14 @@ public class PdfGenerator {
                         cellSpan(top, yearStr + "\n" + "प्रथम सत्र", fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
                         doc.add(top);
 
-                        float[] widths = {0.6f, 2.5f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
+                        float[] widths = {0.6f, 1.2f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
                         PdfPTable tbl = new PdfPTable(widths);
                         tbl.setWidthPercentage(100); tbl.setSpacingAfter(10);
 
                         cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                        cellSpan(tbl, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                        cellSpan(tbl, "आकारिक (अ)", fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, "संकलित (ब)", fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+                        cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+                        cellHorizontalImageSpan(tbl, ctx, "आकारिक (अ)", fSmallBold, C_HEADER_BG, C_DARK, 9, 1);
+                        cellHorizontalImageSpan(tbl, ctx, "संकलित (ब)", fSmallBold, C_HEADER_BG, C_DARK, 4, 1);
                         cellVerticalSpan(tbl, ctx, "अ+ब", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
                         cellVerticalSpan(tbl, ctx, "शे.गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
                         cellVerticalSpan(tbl, ctx, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);

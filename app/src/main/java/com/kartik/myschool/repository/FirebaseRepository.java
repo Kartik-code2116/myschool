@@ -474,7 +474,7 @@ public class FirebaseRepository {
         s1.schoolId = schoolId;
         s1.teacherId = uid;
         s1.name = "Kartik Thorat";
-        s1.rollNo = "101";
+        s1.rollNo = "1";
         s1.registrationNo = "101" + className + "01";
         s1.dob = "25/05/2012";
         s1.gender = "Male";
@@ -501,7 +501,7 @@ public class FirebaseRepository {
         s2.schoolId = schoolId;
         s2.teacherId = uid;
         s2.name = "Priya Patil";
-        s2.rollNo = "102";
+        s2.rollNo = "2";
         s2.registrationNo = "101" + className + "02";
         s2.dob = "12/08/2012";
         s2.gender = "Female";

@@ -26,6 +26,7 @@
 
             <!-- Gradient overlay layer -->
             <View
+                android:id="@+id/headerGradient"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_header_anim_gradient"/>
@@ -45,22 +46,31 @@
                 <!-- Version pill -->
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="#33FFFFFF"
+                    android:layout_height="22dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_badge_pill"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
-                    android:letterSpacing="0.12"
-                    android:paddingHorizontal="12dp"
+                    android:letterSpacing="0.1"
+                    android:paddingHorizontal="10dp"
                     android:text="@string/txt_myschool_1_0"
                     android:textAllCaps="true"
                     android:textColor="#BBDEFB"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="Welcome back,"
+                    android:textColor="#BBDEFB"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/tvTeacherNameHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="sans-serif-black"
                     android:letterSpacing="0.01"
                     android:shadowColor="#33000000"
@@ -69,28 +79,18 @@
                     android:shadowRadius="4"
                     android:text="@string/txt_kartik_thorat"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="4dp"
                     android:fontFamily="sans-serif-medium"
                     android:letterSpacing="0.06"
                     android:text="@string/txt_myschool"
                     android:textColor="#90CAF9"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:alpha="0.7"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/txt_smart_school_management"
-                    android:textColor="#BBDEFB"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <FrameLayout
@@ -295,14 +295,16 @@
                     android:padding="10dp"/>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardYear"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="6dp"
-                    app:cardBackgroundColor="#EDE7F6"
-                    app:cardCornerRadius="18dp"
-                    app:strokeWidth="0dp"
-                    app:cardElevation="0dp">
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0"
+                    app:cardElevation="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -314,7 +316,7 @@
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:src="@drawable/ic_calendar"
-                            app:tint="#5E35B1"
+                            app:tint="#6366F1"
                             android:layout_marginEnd="8dp"/>
 
                         <TextView
@@ -324,8 +326,8 @@
                             android:fontFamily="sans-serif-black"
                             android:gravity="center"
                             android:text="2026-27"
-                            android:textColor="#5E35B1"
-                            android:textSize="19sp"/>
+                            android:textColor="#1E293B"
+                            android:textSize="17sp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -391,25 +393,40 @@
                     android:padding="10dp"/>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSemester"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="6dp"
                     app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="18dp"
-                    app:strokeWidth="1.5dp"
-                    app:strokeColor="#D1C4E9"
-                    app:cardElevation="1dp">
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0"
+                    app:cardElevation="2dp">
 
-                    <TextView
-                        android:id="@+id/tvSemesterName"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:fontFamily="sans-serif-medium"
                         android:gravity="center"
-                        android:text="@string/txt_first_semester"
-                        android:textColor="#333333"
-                        android:textSize="16sp"/>
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_book"
+                            app:tint="#6366F1"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvSemesterName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:text="@string/txt_first_semester"
+                            android:textColor="#1E293B"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <ImageButton
@@ -495,10 +512,10 @@
                     android:layout_weight="1"
                     android:layout_marginHorizontal="6dp"
                     app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    app:strokeWidth="1.5dp"
-                    app:strokeColor="#E8EAF6"
-                    app:cardElevation="4dp">
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E2E8F0"
+                    app:cardElevation="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -625,39 +642,39 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGoToClass"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     android:text="@string/txt_go_to_class"
-                    android:textColor="#2E7D32"
-                    app:strokeColor="#66BB6A"
-                    app:strokeWidth="2dp"
-                    app:cornerRadius="14dp"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#2E7D32"
+                    app:cornerRadius="16dp"
+                    app:elevation="2dp"
+                    app:strokeWidth="0dp"
                     android:fontFamily="sans-serif-black"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_students"
-                    app:iconTint="#66BB6A"
+                    app:iconTint="#FFFFFF"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAllClasses"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
                     android:text="@string/txt_all_classes"
-                    android:textColor="#4527A0"
-                    app:strokeColor="#7E57C2"
-                    app:strokeWidth="2dp"
-                    app:cornerRadius="14dp"
+                    android:textColor="#5E35B1"
+                    android:backgroundTint="#EDE7F6"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp"
+                    app:strokeWidth="0dp"
                     android:fontFamily="sans-serif-black"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_table_grid"
-                    app:iconTint="#7E57C2"
+                    app:iconTint="#5E35B1"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>
             </LinearLayout>
@@ -670,39 +687,39 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnHowToUse"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     android:text="@string/txt_how_to_use"
-                    android:textColor="#546E7A"
-                    app:strokeColor="#B0BEC5"
-                    app:strokeWidth="1.5dp"
-                    app:cornerRadius="14dp"
+                    android:textColor="#475569"
+                    android:backgroundTint="#F1F5F9"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp"
+                    app:strokeWidth="0dp"
                     android:fontFamily="sans-serif-medium"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_chat"
-                    app:iconTint="#78909C"
+                    app:iconTint="#475569"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnOnlineHelp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
                     android:text="@string/txt_online_help"
-                    android:textColor="#546E7A"
-                    app:strokeColor="#B0BEC5"
-                    app:strokeWidth="1.5dp"
-                    app:cornerRadius="14dp"
+                    android:textColor="#475569"
+                    android:backgroundTint="#F1F5F9"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp"
+                    app:strokeWidth="0dp"
                     android:fontFamily="sans-serif-medium"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_book"
-                    app:iconTint="#78909C"
+                    app:iconTint="#475569"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>
             </LinearLayout>

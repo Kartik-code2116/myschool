@@ -64,7 +64,11 @@ public class GunapattrakGenerator {
             android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
             paint.setTextSize(40); // High resolution for clear PDF printing
             paint.setColor(android.graphics.Color.BLACK);
-            paint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            if (PdfGenerator.sMarathiTypeface != null) {
+                paint.setTypeface(android.graphics.Typeface.create(PdfGenerator.sMarathiTypeface, android.graphics.Typeface.BOLD));
+            } else {
+                paint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            }
             
             float width = paint.measureText(text);
             float height = paint.descent() - paint.ascent();
@@ -106,7 +110,12 @@ public class GunapattrakGenerator {
             paint.setColor(android.graphics.Color.rgb(fg.getRed(), fg.getGreen(), fg.getBlue()));
             paint.setTextSize(36); // Good resolution
             
-            paint.setTypeface(font.getStyle() == Font.BOLD ? android.graphics.Typeface.DEFAULT_BOLD : android.graphics.Typeface.DEFAULT);
+            if (PdfGenerator.sMarathiTypeface != null) {
+                int style = font.getStyle() == Font.BOLD ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL;
+                paint.setTypeface(android.graphics.Typeface.create(PdfGenerator.sMarathiTypeface, style));
+            } else {
+                paint.setTypeface(font.getStyle() == Font.BOLD ? android.graphics.Typeface.DEFAULT_BOLD : android.graphics.Typeface.DEFAULT);
+            }
             
             float textWidth = paint.measureText(text);
             android.graphics.Paint.FontMetrics fm = paint.getFontMetrics();

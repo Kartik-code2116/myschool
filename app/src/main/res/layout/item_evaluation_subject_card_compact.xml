@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0.8dp"
+    app:strokeColor="#E0E0E0"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Subject Header -->
+        <RelativeLayout
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:id="@+id/tvSubjectName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnSubjectMore"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="1. Marathi"
+                android:textColor="#37474F"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnSubjectMore"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                app:tint="#6C4CCF"
+                android:contentDescription="Subject Action" />
+        </RelativeLayout>
+
+        <!-- Compact Table (4 Columns) -->
+        <LinearLayout
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+
+            <!-- FET Column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FET"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFETObtained"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="10sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvFETMax"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- SET Column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SET"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvSETObtained"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:gravity="center"
+                    android:textColor="#37474F"
+                    android:textSize="10sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvSETMax"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- TET Column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TET"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvTETObtained"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:gravity="center"
+                    android:textColor="#6C4CCF"
+                    android:textStyle="bold"
+                    android:textSize="10sp"
+                    android:padding="3dp"
+                    android:background="@drawable/bg_table_cell" />
+                <TextView
+                    android:id="@+id/tvTETMax"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:gravity="center"
+                    android:textColor="#78909C"
+                    android:textSize="9sp"
+                    android:padding="2dp"
+                    android:background="@drawable/bg_table_cell" />
+            </LinearLayout>
+
+            <!-- GRD Column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GRD"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:padding="2dp"
+                    android:background="#212121" />
+                <TextView
+                    android:id="@+id/tvGrade"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="—"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="#90A4AE" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

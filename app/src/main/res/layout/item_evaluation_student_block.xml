@@ -87,6 +87,172 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp" />
 
+        <!-- Grid summary section (visible in grid/compressed view) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layoutSummaryGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0.8dp"
+            app:strokeColor="#E0E0E0"
+            app:cardBackgroundColor="@color/white"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <!-- FET Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="FET"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSummaryFETObtained"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSummaryFETMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="10sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                </LinearLayout>
+
+                <!-- SET Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SET"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSummarySETObtained"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#37474F"
+                        android:textSize="11sp"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSummarySETMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="10sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                </LinearLayout>
+
+                <!-- TET Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TET"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSummaryTETObtained"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#6C4CCF"
+                        android:textStyle="bold"
+                        android:textSize="11sp"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_table_cell" />
+                    <TextView
+                        android:id="@+id/tvSummaryTETMax"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#78909C"
+                        android:textSize="10sp"
+                        android:padding="3dp"
+                        android:background="@drawable/bg_table_cell" />
+                </LinearLayout>
+
+                <!-- GRD Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="GRD"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:padding="3dp"
+                        android:background="#212121" />
+                    <TextView
+                        android:id="@+id/tvSummaryGrade"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:text="—"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:background="#90A4AE" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Subject Cards Section: Horizontal Scrollable List -->
         <HorizontalScrollView
             android:id="@+id/scrollSubjects"

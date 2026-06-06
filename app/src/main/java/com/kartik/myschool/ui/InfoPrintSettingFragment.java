@@ -48,6 +48,7 @@ public class InfoPrintSettingFragment extends Fragment {
     private int yearIndex = 0, semesterIndex = 0, classIndex = 0;
     private boolean entrancePlayed;
     private boolean isFirstLoad = true;
+    private boolean isSwipeOngoing = false;
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -86,68 +87,26 @@ public class InfoPrintSettingFragment extends Fragment {
             Toast.makeText(requireContext(), R.string.msg_opening_online_help_portal, Toast.LENGTH_SHORT).show();
         });
 
-        setupSwipeListener(b.panelSemester,
+        setupInteractiveSwipeListener(b.cardYear, b.cardYear,
+                () -> cycleYear(1), () -> cycleYear(-1), () -> {
+                    UiAnimations.pulse(b.cardYear);
+                });
+        setupInteractiveSwipeListener(b.cardSemester, b.cardSemester,
                 () -> cycleSemester(1), () -> cycleSemester(-1), this::showSemesterPickerDialog);
-        setupSwipeListener(b.panelClass,
+        setupInteractiveSwipeListener(b.panelClass, b.panelClass,
                 () -> cycleClass(1), () -> cycleClass(-1), () -> {
                     if (!classes.isEmpty()) { UiAnimations.pulse(b.panelClass); goToClassStudents(); }
                 });
         b.panelClass.setOnLongClickListener(v -> { showClassPickerDialog(); return true; });
 
-        b.scrollHome.setOnScrollChangeListener(new androidx.core.widget.NestedScrollView.OnScrollChangeListener() {
-            private boolean headerVanished = false;
-            private int initialHeaderHeight = -1;
 
-            @Override
-            public void onScrollChange(androidx.core.widget.NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (initialHeaderHeight == -1 && b != null && b.headerBand != null) {
-                    initialHeaderHeight = b.headerBand.getHeight();
-                    if (initialHeaderHeight <= 0) {
-                        initialHeaderHeight = (int) (200 * v.getContext().getResources().getDisplayMetrics().density);
-                    }
-                }
-
-                if (scrollY > 40 && !headerVanished) {
-                    headerVanished = true;
-                    animateHeader(initialHeaderHeight, 0, 1f, 0f);
-                } else if (scrollY <= 10 && headerVanished) {
-                    headerVanished = false;
-                    animateHeader(0, initialHeaderHeight, 0f, 1f);
-                }
-            }
-        });
 
         playEntranceIfNeeded();
         loadTeacherName();   // instant from cache, then background refresh
         initSessionData();   // instant from AppCache, then background network sync
     }
 
-    private void animateHeader(int startHeight, int endHeight, float startAlpha, float endAlpha) {
-        if (b == null || b.headerBand == null) return;
-        b.headerBand.animate().cancel();
-        
-        // 1. Height animation
-        ValueAnimator heightAnim = ValueAnimator.ofInt(startHeight, endHeight);
-        heightAnim.addUpdateListener(animation -> {
-            if (b != null && b.headerBand != null) {
-                int val = (int) animation.getAnimatedValue();
-                ViewGroup.LayoutParams lp = b.headerBand.getLayoutParams();
-                lp.height = val;
-                b.headerBand.setLayoutParams(lp);
-            }
-        });
-        heightAnim.setDuration(350);
-        heightAnim.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
-        heightAnim.start();
 
-        // 2. Alpha & TranslationY animation
-        b.headerBand.animate()
-                .alpha(endAlpha)
-                .translationY(endAlpha == 0f ? -60f : 0f)
-                .setDuration(300)
-                .setInterpolator(new android.view.animation.DecelerateInterpolator())
-                .start();
-    }
 
     // ── Teacher name ──────────────────────────────────────────────────────────
     /**
@@ -484,7 +443,7 @@ public class InfoPrintSettingFragment extends Fragment {
         SessionContext.save(getContext());
         if (!isViewActive()) return;
         b.tvYearLabel.setText(y.label != null ? y.label : getString(R.string.year_label, "—"));
-        if (dir != 0) UiAnimations.animateSelectorChange(b.tvYearLabel, dir);
+        if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.tvYearLabel, dir);
     }
 
     private void applySemester(int dir) {
@@ -495,7 +454,7 @@ public class InfoPrintSettingFragment extends Fragment {
         SessionContext.save(getContext());
         if (!isViewActive()) return;
         b.tvSemesterName.setText(s.name != null ? s.name : "");
-        if (dir != 0) UiAnimations.animateSelectorChange(b.panelSemester, dir);
+        if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.panelSemester, dir);
     }
 
     private void applyClass(int dir) {
@@ -549,7 +508,7 @@ public class InfoPrintSettingFragment extends Fragment {
                 requireContext().getDrawable(R.drawable.bg_pill_activated));
         b.ivClassArrow.setImageTintList(ColorStateList.valueOf(Color.parseColor("#66BB6A")));
 
-        if (dir != 0) UiAnimations.animateSelectorChange(b.panelClass, dir);
+        if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.panelClass, dir);
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
@@ -695,18 +654,100 @@ public class InfoPrintSettingFragment extends Fragment {
     }
 
     // ── Swipe gesture helper ──────────────────────────────────────────────────
-    private void setupSwipeListener(View v, Runnable onLeft, Runnable onRight, Runnable onTap) {
-        v.setOnTouchListener(new View.OnTouchListener() {
-            private float sx, sy;
-            @Override public boolean onTouch(View vv, android.view.MotionEvent e) {
-                switch (e.getAction()) {
-                    case android.view.MotionEvent.ACTION_DOWN: sx = e.getX(); sy = e.getY(); return true;
+    private void setupInteractiveSwipeListener(View swipeTarget, View animationTarget, Runnable onLeftSwipe, Runnable onRightSwipe, Runnable onTap) {
+        swipeTarget.setOnTouchListener(new View.OnTouchListener() {
+            private float startX = 0f;
+            private float startY = 0f;
+            private boolean isDragging = false;
+            private static final int SWIPE_THRESHOLD_DP = 70;
+
+            @Override
+            public boolean onTouch(View v, android.view.MotionEvent event) {
+                float density = v.getResources().getDisplayMetrics().density;
+                float threshold = SWIPE_THRESHOLD_DP * density;
+
+                switch (event.getAction()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        startX = event.getRawX();
+                        startY = event.getRawY();
+                        isDragging = false;
+                        animationTarget.animate().cancel();
+                        return true;
+
+                    case android.view.MotionEvent.ACTION_MOVE:
+                        float deltaX = event.getRawX() - startX;
+                        float deltaY = event.getRawY() - startY;
+
+                        // Detect drag start if horizontal movement is prominent
+                        if (!isDragging && Math.abs(deltaX) > 10 * density && Math.abs(deltaX) > Math.abs(deltaY)) {
+                            isDragging = true;
+                            // Disallow parent scroll interception so drag is smooth
+                            if (v.getParent() != null) {
+                                v.getParent().requestDisallowInterceptTouchEvent(true);
+                            }
+                        }
+
+                        if (isDragging) {
+                            // Move the card under the finger with a slight resistance
+                            float translation = deltaX * 0.75f;
+                            animationTarget.setTranslationX(translation);
+                            
+                            // Fade slightly as we drag it away
+                            float alpha = 1.0f - (Math.abs(translation) / (v.getWidth() * 1.5f));
+                            animationTarget.setAlpha(Math.max(0.5f, alpha));
+                        }
+                        return true;
+
                     case android.view.MotionEvent.ACTION_UP:
-                        float dx = e.getX() - sx, dy = e.getY() - sy;
-                        if (Math.abs(dx) > 100 && Math.abs(dx) > Math.abs(dy)) {
-                            if (dx < 0) onLeft.run(); else onRight.run();
-                        } else if (Math.abs(dx) < 15 && Math.abs(dy) < 15) {
-                            onTap.run();
+                    case android.view.MotionEvent.ACTION_CANCEL:
+                        float finalDeltaX = event.getRawX() - startX;
+                        float finalDeltaY = event.getRawY() - startY;
+
+                        if (isDragging) {
+                            if (Math.abs(finalDeltaX) > threshold) {
+                                // Swipe confirmed!
+                                boolean isLeft = finalDeltaX < 0;
+                                // 1. Animate off-screen
+                                float exitX = isLeft ? -v.getWidth() : v.getWidth();
+                                animationTarget.animate()
+                                        .translationX(exitX)
+                                        .alpha(0f)
+                                        .setDuration(220)
+                                        .withEndAction(() -> {
+                                            // 2. Trigger value change
+                                            isSwipeOngoing = true;
+                                            if (isLeft) {
+                                                onLeftSwipe.run();
+                                            } else {
+                                                onRightSwipe.run();
+                                            }
+                                            isSwipeOngoing = false;
+                                            // 3. Reset to opposite side off-screen, then slide in
+                                            animationTarget.setTranslationX(isLeft ? v.getWidth() : -v.getWidth());
+                                            animationTarget.animate()
+                                                    .translationX(0f)
+                                                    .alpha(1f)
+                                                    .setDuration(350)
+                                                    .setInterpolator(new android.view.animation.OvershootInterpolator(1.1f))
+                                                    .start();
+                                        })
+                                        .start();
+                            } else {
+                                // Snap back to center
+                                animationTarget.animate()
+                                        .translationX(0f)
+                                        .alpha(1f)
+                                        .setDuration(280)
+                                        .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                                        .start();
+                            }
+                        } else {
+                            // It's a tap
+                            float clickThreshold = 8 * density;
+                            if (Math.abs(finalDeltaX) < clickThreshold && Math.abs(finalDeltaY) < clickThreshold) {
+                                v.performClick();
+                                onTap.run();
+                            }
                         }
                         return true;
                 }
