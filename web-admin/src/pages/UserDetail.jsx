@@ -190,7 +190,7 @@ export default function UserDetail() {
   if (error) {
     return (
       <main className="user-detail-page">
-        <button className="btn" onClick={() => navigate('/users')} type="button">Back to Users</button>
+        <button className="btn" onClick={() => navigate('/admin/users')} type="button">Back to Users</button>
         <div className="glass-panel empty-state error-state">
           <h3>Firebase Error</h3>
           <p>{error}</p>
@@ -202,7 +202,7 @@ export default function UserDetail() {
   if (!user || !form) {
     return (
       <main className="user-detail-page">
-        <button className="btn" onClick={() => navigate('/users')} type="button">Back to Users</button>
+        <button className="btn" onClick={() => navigate('/admin/users')} type="button">Back to Users</button>
         <div className="glass-panel empty-state">
           <h3>User not found</h3>
           <p>This teacher profile is no longer available.</p>
@@ -214,7 +214,7 @@ export default function UserDetail() {
   return (
     <main className="user-detail-page">
       <div className="back-nav">
-        <button className="btn" onClick={() => navigate('/users')} type="button">Back to Users</button>
+        <button className="btn" onClick={() => navigate('/admin/users')} type="button">Back to Users</button>
       </div>
 
       <section className="glass-panel profile-header">

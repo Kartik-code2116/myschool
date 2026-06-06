@@ -15,7 +15,9 @@ import com.kartik.myschool.R;
 import com.kartik.myschool.SessionContext;
 import com.kartik.myschool.databinding.FragmentExtraMenusBinding;
 import com.kartik.myschool.model.ClassModel;
+import com.kartik.myschool.AppCache;
 import com.kartik.myschool.model.School;
+import com.kartik.myschool.model.Semester;
 import com.kartik.myschool.model.Student;
 import com.kartik.myschool.model.Subject;
 import com.kartik.myschool.repository.FirebaseRepository;
@@ -113,13 +115,8 @@ public class ExtraMenusFragment extends Fragment {
         // Load Class details
         ClassModel activeClass = SessionContext.selectedClass;
         if (activeClass != null) {
-            if (activeClass.teacherName != null) {
-                b.tvTeacherInfoPrimary.setText("Class Teacher: " + activeClass.teacherName);
-            }
-            if (activeClass.assistantTeacherName != null) {
-                b.tvTeacherInfoAsst.setText("Assistant Teacher: " + activeClass.assistantTeacherName);
-            } else {
-                b.tvTeacherInfoAsst.setText(R.string.msg_assistant_teacher_not_assigned);
+            if (menuType.equals("class_teacher")) {
+                setupClassTeacherEditor(activeClass);
             }
 
             // Real-time student statistics for active class (Gender & Cast categories)
@@ -191,5 +188,252 @@ public class ExtraMenusFragment extends Fragment {
 
         // Save Default admission baseline click listener
         b.btnSaveDefaults.setOnClickListener(v -> Toast.makeText(getContext(), R.string.msg_admission_defaults_baseline_se, Toast.LENGTH_SHORT).show());
+    }
+
+    private List<Semester> semestersList = new java.util.ArrayList<>();
+    private ClassModel editingClass = null;
+
+    private void setupClassTeacherEditor(ClassModel activeClass) {
+        if (activeClass == null) return;
+
+        b.btnSaveTeacherInfo.setEnabled(false);
+
+        String yearId = SessionContext.selectedYear != null ? SessionContext.selectedYear.id : activeClass.yearId;
+        if (yearId == null) {
+            b.btnSaveTeacherInfo.setEnabled(true);
+            return;
+        }
+
+        // 1. Get semesters list (cached or query)
+        if (AppCache.cachedSemesters != null && !AppCache.cachedSemesters.isEmpty()) {
+            semestersList = new java.util.ArrayList<>(AppCache.cachedSemesters);
+            fetchClassesAndSetup(activeClass, yearId);
+        } else {
+            FirebaseRepository.get().getSemestersForYear(yearId, new FirebaseRepository.OnResult<List<Semester>>() {
+                @Override
+                public void onSuccess(List<Semester> list) {
+                    if (list != null) {
+                        AppCache.cachedSemesters = list;
+                        semestersList = new java.util.ArrayList<>(list);
+                    }
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> fetchClassesAndSetup(activeClass, yearId));
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            b.btnSaveTeacherInfo.setEnabled(true);
+                            Toast.makeText(getContext(), "Failed to load semesters: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        }
+
+        // 2. Set save click listener
+        b.btnSaveTeacherInfo.setOnClickListener(v -> saveTeacherInfo());
+    }
+
+    private void fetchClassesAndSetup(ClassModel activeClass, String yearId) {
+        if (AppCache.cachedClasses != null) {
+            b.btnSaveTeacherInfo.setEnabled(true);
+            populateSemesterSpinner(activeClass);
+        } else {
+            FirebaseRepository.get().getClassesForYear(yearId, new FirebaseRepository.OnResult<List<ClassModel>>() {
+                @Override
+                public void onSuccess(List<ClassModel> list) {
+                    if (list != null) {
+                        AppCache.cachedClasses = list;
+                    } else {
+                        AppCache.cachedClasses = new java.util.ArrayList<>();
+                    }
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            b.btnSaveTeacherInfo.setEnabled(true);
+                            populateSemesterSpinner(activeClass);
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            b.btnSaveTeacherInfo.setEnabled(true);
+                            Toast.makeText(getContext(), "Failed to load classes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    private void populateSemesterSpinner(ClassModel activeClass) {
+        if (!isAdded() || getContext() == null) return;
+
+        List<String> semNames = new java.util.ArrayList<>();
+        int selectedIndex = 0;
+        String currentSemesterId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : activeClass.semesterId;
+
+        for (int i = 0; i < semestersList.size(); i++) {
+            Semester s = semestersList.get(i);
+            semNames.add(s.name != null ? s.name : "Semester " + s.number);
+            if (s.id != null && s.id.equals(currentSemesterId)) {
+                selectedIndex = i;
+            }
+        }
+
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
+                getContext(),
+                android.R.layout.simple_spinner_item,
+                semNames
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        b.spTeacherSemester.setAdapter(adapter);
+        b.spTeacherSemester.setSelection(selectedIndex);
+
+        // Load details for the current selection immediately
+        onSemesterSelected(semestersList.get(selectedIndex), activeClass);
+
+        // Post spinner item selection listener to avoid auto-trigger during layout pass
+        b.spTeacherSemester.post(() -> {
+            if (!isAdded()) return;
+            b.spTeacherSemester.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    Semester selectedSem = semestersList.get(position);
+                    onSemesterSelected(selectedSem, activeClass);
+                }
+
+                @Override
+                public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            });
+        });
+    }
+
+    private void onSemesterSelected(Semester selectedSem, ClassModel activeClass) {
+        if (selectedSem == null || activeClass == null) return;
+
+        // If we are already displaying this semester, do not reload/override
+        if (editingClass != null && selectedSem.id != null && selectedSem.id.equals(editingClass.semesterId)) {
+            return;
+        }
+
+        // Look for existing class document for this semester in AppCache.cachedClasses
+        ClassModel matchedClass = null;
+        if (AppCache.cachedClasses != null) {
+            for (ClassModel c : AppCache.cachedClasses) {
+                if (c.className != null && c.className.equals(activeClass.className)
+                        && c.division != null && c.division.equals(activeClass.division)
+                        && c.semesterId != null && c.semesterId.equals(selectedSem.id)) {
+                    matchedClass = c;
+                    break;
+                }
+            }
+        }
+
+        if (matchedClass != null) {
+            editingClass = matchedClass;
+        } else {
+            // Instantiate a new ClassModel cloning metadata from activeClass
+            editingClass = new ClassModel();
+            editingClass.schoolId = activeClass.schoolId;
+            editingClass.yearId = activeClass.yearId;
+            editingClass.academicYearLabel = activeClass.academicYearLabel;
+            editingClass.semesterId = selectedSem.id;
+            editingClass.className = activeClass.className;
+            editingClass.division = activeClass.division;
+            editingClass.examName = selectedSem.name;
+            editingClass.year = activeClass.year;
+            editingClass.subjects = activeClass.subjects != null ? new java.util.ArrayList<>(activeClass.subjects) : new java.util.ArrayList<>();
+            editingClass.studentCount = activeClass.studentCount;
+            // Leave teacher fields blank for new creation
+            editingClass.teacherName = "";
+            editingClass.assistantTeacherName = "";
+            editingClass.teacherEmail = "";
+            editingClass.teacherPhone = "";
+        }
+
+        // Bind editingClass fields to the text fields
+        b.etTeacherName.setText(editingClass.teacherName != null ? editingClass.teacherName : "");
+        b.etAsstTeacherName.setText(editingClass.assistantTeacherName != null ? editingClass.assistantTeacherName : "");
+        b.etTeacherEmail.setText(editingClass.teacherEmail != null ? editingClass.teacherEmail : "");
+        b.etTeacherPhone.setText(editingClass.teacherPhone != null ? editingClass.teacherPhone : "");
+    }
+
+    private void saveTeacherInfo() {
+        if (editingClass == null) return;
+
+        String teacherName = b.etTeacherName.getText() != null ? b.etTeacherName.getText().toString().trim() : "";
+        String asstTeacherName = b.etAsstTeacherName.getText() != null ? b.etAsstTeacherName.getText().toString().trim() : "";
+        String teacherEmail = b.etTeacherEmail.getText() != null ? b.etTeacherEmail.getText().toString().trim() : "";
+        String teacherPhone = b.etTeacherPhone.getText() != null ? b.etTeacherPhone.getText().toString().trim() : "";
+
+        if (teacherName.isEmpty()) {
+            b.tilTeacherName.setError("Teacher name is required");
+            return;
+        }
+        b.tilTeacherName.setError(null);
+
+        editingClass.teacherName = teacherName;
+        editingClass.assistantTeacherName = asstTeacherName;
+        editingClass.teacherEmail = teacherEmail;
+        editingClass.teacherPhone = teacherPhone;
+
+        b.btnSaveTeacherInfo.setEnabled(false);
+        FirebaseRepository.get().saveClass(editingClass, new FirebaseRepository.OnResult<String>() {
+            @Override
+            public void onSuccess(String classId) {
+                if (!isAdded()) return;
+                editingClass.id = classId;
+
+                // Update AppCache.cachedClasses
+                if (AppCache.cachedClasses == null) {
+                    AppCache.cachedClasses = new java.util.ArrayList<>();
+                }
+                boolean found = false;
+                for (int i = 0; i < AppCache.cachedClasses.size(); i++) {
+                    if (AppCache.cachedClasses.get(i).id != null && AppCache.cachedClasses.get(i).id.equals(classId)) {
+                        AppCache.cachedClasses.set(i, editingClass);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    AppCache.cachedClasses.add(editingClass);
+                }
+
+                // If this is the active semester and active class, update SessionContext
+                ClassModel activeClass = SessionContext.selectedClass;
+                String activeSemId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : (activeClass != null ? activeClass.semesterId : null);
+                if (activeClass != null && activeSemId != null
+                        && activeClass.className != null && activeClass.className.equals(editingClass.className)
+                        && activeClass.division != null && activeClass.division.equals(editingClass.division)
+                        && activeSemId.equals(editingClass.semesterId)) {
+                    SessionContext.selectedClass = editingClass;
+                    SessionContext.save(getContext());
+                }
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        b.btnSaveTeacherInfo.setEnabled(true);
+                        Toast.makeText(getContext(), "Teacher details saved successfully", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        b.btnSaveTeacherInfo.setEnabled(true);
+                        Toast.makeText(getContext(), "Error saving details: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+                }
+            }
+        });
     }
 }

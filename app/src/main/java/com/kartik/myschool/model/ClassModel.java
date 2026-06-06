@@ -16,6 +16,8 @@ public class ClassModel {
     public int year;
     public String teacherName;
     public String assistantTeacherName;
+    public String teacherEmail;
+    public String teacherPhone;
     public int studentCount;
     public List<Subject> subjects = new ArrayList<>();
 

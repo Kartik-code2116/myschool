@@ -16,7 +16,7 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
+      navigate('/admin');
     } catch (err) {
       setError(err.message);
     }

@@ -190,18 +190,112 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/txt_assigned_teachers"
+                            android:text="Assign Teachers per Semester"
                             android:textSize="18sp"
                             android:textColor="@color/on_surface"
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="16dp"/>
 
-                        <TextView android:id="@+id/tvTeacherInfoPrimary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_class_teacher_mrs_sharma" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp" android:fontFamily="sans-serif-medium"/>
-                        <TextView android:id="@+id/tvTeacherInfoAsst" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_assistant_teacher_mr_patil" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+                        <!-- Semester Selection Dropdown -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Select Semester"
+                            android:textSize="12sp"
+                            android:textColor="@color/primary"
+                            android:layout_marginBottom="4dp"/>
+                        
+                        <Spinner
+                            android:id="@+id/spTeacherSemester"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/bg_spinner_border"/>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_contact_information" android:textSize="14sp" android:textColor="@color/primary" android:fontFamily="sans-serif-medium" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Primary Email: teacher@school.edu\nPhone: +91 9876543210" android:textSize="13sp" android:textColor="#666666"/>
+                        <!-- Class Teacher Name -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilTeacherName"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Class Teacher Name"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etTeacherName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Assistant Teacher Name -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilAsstTeacherName"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Assistant Teacher Name"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etAsstTeacherName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Teacher Email -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilTeacherEmail"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:hint="Teacher Email Address"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etTeacherEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textEmailAddress" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Teacher Phone -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilTeacherPhone"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="20dp"
+                            android:hint="Teacher Phone Number"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusTopStart="8dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etTeacherPhone"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="phone" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Save Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSaveTeacherInfo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Save Teacher Details"
+                            app:backgroundTint="@color/primary"
+                            app:cornerRadius="8dp" />
                     </LinearLayout>
 
                     <!-- 5. CLASSES -->

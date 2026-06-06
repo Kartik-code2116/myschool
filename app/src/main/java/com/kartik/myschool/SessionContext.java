@@ -100,6 +100,8 @@ public final class SessionContext {
             editor.putInt("class_year", selectedClass.year);
             editor.putString("class_teacher", selectedClass.teacherName);
             editor.putString("class_asst_teacher", selectedClass.assistantTeacherName);
+            editor.putString("class_teacher_email", selectedClass.teacherEmail);
+            editor.putString("class_teacher_phone", selectedClass.teacherPhone);
             editor.putInt("class_student_count", selectedClass.studentCount);
             
             // Serialize subjects
@@ -193,6 +195,8 @@ public final class SessionContext {
             selectedClass.year = prefs.getInt("class_year", 0);
             selectedClass.teacherName = prefs.getString("class_teacher", "");
             selectedClass.assistantTeacherName = prefs.getString("class_asst_teacher", "");
+            selectedClass.teacherEmail = prefs.getString("class_teacher_email", "");
+            selectedClass.teacherPhone = prefs.getString("class_teacher_phone", "");
             selectedClass.studentCount = prefs.getInt("class_student_count", 0);
 
             // Deserialize subjects

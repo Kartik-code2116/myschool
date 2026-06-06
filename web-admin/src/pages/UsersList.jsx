@@ -9,6 +9,7 @@ export default function UsersList() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [viewMode, setViewMode] = useState('table'); // 'grid' or 'table'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,17 +75,26 @@ export default function UsersList() {
           <h1>App Users</h1>
           <p>View every teacher account using the MySchool app and control their access.</p>
         </div>
-        <div className="users-search">
-          <input
-            type="search"
-            placeholder="Search name, email, school, UDISE"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+        <div className="users-header-actions">
+          <div className="users-search">
+            <input
+              type="search"
+              placeholder="Search name, email, school, UDISE"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+          <button 
+            type="button" 
+            className="btn view-toggle-btn"
+            onClick={() => setViewMode(prev => prev === 'grid' ? 'table' : 'grid')}
+          >
+            {viewMode === 'grid' ? '📋 Table View' : '🗂️ Grid View'}
+          </button>
         </div>
       </div>
 
-      <section className="users-summary">
+      <section className="users-summary animate-fade-in">
         <div className="glass-panel users-stat">
           <span>Total teachers</span>
           <strong>{users.length}</strong>
@@ -116,13 +126,13 @@ export default function UsersList() {
           <h3>No users found</h3>
           <p>Try a different search term.</p>
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="users-grid">
           {filteredUsers.map((user) => (
             <button
               key={user.id}
               className="glass-panel user-card animate-fade-in"
-              onClick={() => navigate(`/users/${user.id}`)}
+              onClick={() => navigate(`/admin/users/${user.id}`)}
               type="button"
             >
               <div className="user-avatar">
@@ -149,6 +159,62 @@ export default function UsersList() {
               </div>
             </button>
           ))}
+        </div>
+      ) : (
+        <div className="glass-panel users-table-wrapper animate-fade-in">
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th>Avatar</th>
+                <th>Full Name</th>
+                <th>Email / Contact</th>
+                <th>School / UDISE</th>
+                <th>Students</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user) => (
+                <tr key={user.id} onClick={() => navigate(`/admin/users/${user.id}`)} className="table-row-clickable">
+                  <td>
+                    <div className="user-avatar-small">
+                      {user.name ? user.name.charAt(0).toUpperCase() : '?'}
+                    </div>
+                  </td>
+                  <td className="table-user-name"><strong>{user.name || 'Unnamed Teacher'}</strong></td>
+                  <td>
+                    <div className="table-contact-info">
+                      <span>{user.email || 'No Email'}</span>
+                      <span className="subtext">{user.phone || 'No Phone'}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="table-school-info">
+                      <span>{user.schoolName || 'No School'}</span>
+                      <span className="subtext">{user.udiseCode || 'No UDISE'}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="status-badge status-active">{user.studentsCount || 0}</span>
+                  </td>
+                  <td>
+                    <div className="table-status-group">
+                      <span className={`status-badge status-${user.accountStatus || 'active'}`}>
+                        {user.accountStatus || 'active'}
+                      </span>
+                      <span className={`status-badge status-${user.subscriptionStatus || 'inactive'}`}>
+                        {user.subscriptionStatus || 'inactive'}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <button className="btn btn-primary btn-sm" type="button">Edit</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </main>
