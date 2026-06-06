@@ -84,22 +84,61 @@ public class ReportPrintingFragment extends Fragment {
         });
     }
 
+    private void ensureSemestersThen(Runnable action) {
+        if (com.kartik.myschool.AppCache.cachedSemesters != null && !com.kartik.myschool.AppCache.cachedSemesters.isEmpty()) {
+            action.run();
+            return;
+        }
+        
+        String yearId = SessionContext.selectedYear != null ? SessionContext.selectedYear.id : 
+                        (SessionContext.selectedClass != null ? SessionContext.selectedClass.yearId : null);
+        if (yearId == null) {
+            Toast.makeText(getContext(), "Academic year not selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
+        pd.setMessage("सत्र माहिती लोड होत आहे...");
+        pd.setCancelable(false);
+        pd.show();
+        
+        FirebaseRepository.get().getSemestersForYear(yearId, new FirebaseRepository.OnResult<List<com.kartik.myschool.model.Semester>>() {
+            @Override
+            public void onSuccess(List<com.kartik.myschool.model.Semester> list) {
+                pd.dismiss();
+                if (list != null && !list.isEmpty()) {
+                    com.kartik.myschool.AppCache.cachedSemesters = list;
+                    action.run();
+                } else {
+                    Toast.makeText(getContext(), "सत्र माहिती सापडली नाही", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                pd.dismiss();
+                Toast.makeText(getContext(), "लोडिंग त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void handleReportSelection(int position) {
         if (SessionContext.selectedClass == null) {
             Toast.makeText(getContext(), R.string.msg_empty_10, Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Class-level (roster) reports — no student selection needed
-        // Positions 1: Index, 3: Descriptive Remarks, 4,5,7,8,9,10,12,14: Class-wide progress and roster charts
-        boolean isClassReport = (position == 1 || position == 3 || position == 4 || position == 5 || position == 7 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
+        ensureSemestersThen(() -> {
+            // Class-level (roster) reports — no student selection needed
+            // Positions 0: Cover page, 1: Index, 3: Descriptive Remarks, 4,5,7,8,9,10,12,14: Class-wide progress and roster charts
+            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 7 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
 
-        if (isClassReport) {
-            generateClassRosterReport(position);
-        } else {
-            // Default to generating for all students directly
-            triggerBulkReportGeneration(position);
-        }
+            if (isClassReport) {
+                generateClassRosterReport(position);
+            } else {
+                // Default to generating for all students directly
+                triggerBulkReportGeneration(position);
+            }
+        });
     }
 
     private void showStudentSelectionDialog(int reportPosition) {
@@ -326,6 +365,12 @@ public class ReportPrintingFragment extends Fragment {
 
         Toast.makeText(getContext(), R.string.msg_empty_23, Toast.LENGTH_SHORT).show();
         
+        // For descriptive remarks (position 3/7), clear internal marks cache
+        // to force a fresh Firestore fetch so the PDF has the latest remarks
+        if (reportPosition == 3 || reportPosition == 7) {
+            FirebaseRepository.get().clearMarksCache();
+        }
+
         String classId = SessionContext.selectedClass.id;
         String[] sids = getSemesterIds();
         FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[0], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
@@ -405,7 +450,7 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private void generateAndShowCollectivePdf() {
-        generateMasterReportPdf();
+        ensureSemestersThen(() -> generateMasterReportPdf());
     }
 
     private void generateMasterReportPdf() {
@@ -472,7 +517,7 @@ public class ReportPrintingFragment extends Fragment {
                 || position == 7 || position == 10 || position == 12 || position == 14);
 
         if (position == 0) { // Cover page
-            PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, 0, cb);
+            com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, null, null, null, cb);
         } else if (position == 1) { // Index
             com.kartik.myschool.utils.pdf.IndexPageGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
         } else if (position == 4) {

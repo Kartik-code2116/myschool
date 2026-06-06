@@ -152,7 +152,9 @@ public class GunapattrakGenerator {
         headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
 
         // Row 2
-        String termLabel = sem1 != null ? "प्रथम सत्र" : "द्वितीय सत्र";
+        int activeSem = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
+        MarksRecord rec = (activeSem == 2) ? (sem2 != null ? sem2 : sem1) : (sem1 != null ? sem1 : sem2);
+        String termLabel = (rec == sem2) ? "द्वितीय सत्र" : "प्रथम सत्र";
         PdfPCell c4 = new PdfPCell(new Phrase("इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-"), fBold)); c4.setBorder(Rectangle.NO_BORDER);
         PdfPCell c5 = new PdfPCell(new Phrase("रोल नं.: " + (student != null ? nvl(student.rollNo) : ""), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_CENTER);
         PdfPCell c6 = new PdfPCell(new Phrase(termLabel, fBold)); c6.setBorder(Rectangle.NO_BORDER); c6.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -193,7 +195,7 @@ public class GunapattrakGenerator {
         cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Formative total empty
         for (int i=0; i<4; i++) cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Summative empty
 
-        MarksRecord rec = sem1 != null ? sem1 : sem2;
+
         List<Subject> subjects = cls.subjects;
         boolean alt = false;
         for (int i = 0; i < (subjects != null ? subjects.size() : 0); i++) {

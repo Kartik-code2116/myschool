@@ -798,15 +798,29 @@ public class FirebaseRepository {
                 .addOnSuccessListener(snap -> {
                     if (snap != null && !snap.isEmpty()) {
                         int targetSemNum = 1;
-                        if (com.kartik.myschool.SessionContext.selectedSemester != null 
-                                && java.util.Objects.equals(semesterId, com.kartik.myschool.SessionContext.selectedSemester.id)) {
-                            targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
-                        } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
-                            targetSemNum = 2;
-                        } else if (semesterId.equals("sem_1") || semesterId.toLowerCase().contains("first") || (semesterId.length() < 10 && semesterId.contains("1"))) {
-                            targetSemNum = 1;
-                        } else if (com.kartik.myschool.SessionContext.selectedSemester != null) {
-                            targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                        boolean foundSem = false;
+                        if (com.kartik.myschool.AppCache.cachedSemesters != null) {
+                            for (com.kartik.myschool.model.Semester sem : com.kartik.myschool.AppCache.cachedSemesters) {
+                                if (java.util.Objects.equals(semesterId, sem.id)) {
+                                    targetSemNum = sem.number;
+                                    foundSem = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!foundSem) {
+                            if (com.kartik.myschool.SessionContext.selectedSemester != null 
+                                    && java.util.Objects.equals(semesterId, com.kartik.myschool.SessionContext.selectedSemester.id)) {
+                                targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                            } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
+                                targetSemNum = 2;
+                            } else if (semesterId.equals("sem_1") || semesterId.toLowerCase().contains("first") || (semesterId.length() < 10 && semesterId.contains("1"))) {
+                                targetSemNum = 1;
+                            } else if (com.kartik.myschool.SessionContext.selectedSemester != null) {
+                                if (java.util.Objects.equals(semesterId, com.kartik.myschool.SessionContext.selectedSemester.id)) {
+                                    targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                                }
+                            }
                         }
                         final int finalTargetSemNum = targetSemNum;
 
@@ -821,13 +835,25 @@ public class FirebaseRepository {
                             }
                             
                             int recordSemNum = 1;
-                            if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
-                                try {
-                                    recordSemNum = Integer.parseInt(m.semesterNumber);
-                                } catch (NumberFormatException ignored) {}
-                            } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
-                                if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
-                                    recordSemNum = 2;
+                            boolean foundRecordSem = false;
+                            if (com.kartik.myschool.AppCache.cachedSemesters != null && m.semesterId != null) {
+                                for (com.kartik.myschool.model.Semester sem : com.kartik.myschool.AppCache.cachedSemesters) {
+                                    if (sem.id != null && sem.id.equals(m.semesterId)) {
+                                        recordSemNum = sem.number;
+                                        foundRecordSem = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!foundRecordSem) {
+                                if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
+                                    try {
+                                        recordSemNum = Integer.parseInt(m.semesterNumber);
+                                    } catch (NumberFormatException ignored) {}
+                                } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
+                                    if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
+                                        recordSemNum = 2;
+                                    }
                                 }
                             }
                             
@@ -903,15 +929,29 @@ public class FirebaseRepository {
                     Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: got " + totalDocs + " docs for classId=" + classId);
                     
                     int targetSemNum = 1;
-                    if (com.kartik.myschool.SessionContext.selectedSemester != null 
-                            && java.util.Objects.equals(semesterId, com.kartik.myschool.SessionContext.selectedSemester.id)) {
-                        targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
-                    } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
-                        targetSemNum = 2;
-                    } else if (semesterId.equals("sem_1") || semesterId.toLowerCase().contains("first") || (semesterId.length() < 10 && semesterId.contains("1"))) {
-                        targetSemNum = 1;
-                    } else if (com.kartik.myschool.SessionContext.selectedSemester != null) {
-                        targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                    boolean foundSem = false;
+                    if (com.kartik.myschool.AppCache.cachedSemesters != null) {
+                        for (com.kartik.myschool.model.Semester sem : com.kartik.myschool.AppCache.cachedSemesters) {
+                            if (java.util.Objects.equals(semesterId, sem.id)) {
+                                targetSemNum = sem.number;
+                                foundSem = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!foundSem) {
+                        if (com.kartik.myschool.SessionContext.selectedSemester != null 
+                                && java.util.Objects.equals(semesterId, com.kartik.myschool.SessionContext.selectedSemester.id)) {
+                            targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                        } else if (semesterId.equals("sem_2") || semesterId.toLowerCase().contains("second") || (semesterId.length() < 10 && semesterId.contains("2"))) {
+                            targetSemNum = 2;
+                        } else if (semesterId.equals("sem_1") || semesterId.toLowerCase().contains("first") || (semesterId.length() < 10 && semesterId.contains("1"))) {
+                            targetSemNum = 1;
+                        } else if (com.kartik.myschool.SessionContext.selectedSemester != null) {
+                            if (java.util.Objects.equals(semesterId, com.kartik.myschool.SessionContext.selectedSemester.id)) {
+                                targetSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                            }
+                        }
                     }
                     final int finalTargetSemNum = targetSemNum;
                     Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: active target semester number is " + finalTargetSemNum);
@@ -929,13 +969,25 @@ public class FirebaseRepository {
                                         + " total=" + m.totalObtained);
                                         
                                 int recordSemNum = 1;
-                                if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
-                                    try {
-                                        recordSemNum = Integer.parseInt(m.semesterNumber);
-                                    } catch (NumberFormatException ignored) {}
-                                } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
-                                    if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
-                                        recordSemNum = 2;
+                                boolean foundRecordSem = false;
+                                if (com.kartik.myschool.AppCache.cachedSemesters != null && m.semesterId != null) {
+                                    for (com.kartik.myschool.model.Semester sem : com.kartik.myschool.AppCache.cachedSemesters) {
+                                        if (sem.id != null && sem.id.equals(m.semesterId)) {
+                                            recordSemNum = sem.number;
+                                            foundRecordSem = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!foundRecordSem) {
+                                    if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
+                                        try {
+                                            recordSemNum = Integer.parseInt(m.semesterNumber);
+                                        } catch (NumberFormatException ignored) {}
+                                    } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
+                                        if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
+                                            recordSemNum = 2;
+                                        }
                                     }
                                 }
                                 

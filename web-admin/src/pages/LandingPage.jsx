@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db, checkIsAdmin } from '../firebase';
 import './LandingPage.css';
 
 const translations = {
@@ -156,7 +156,7 @@ export default function LandingPage({ user, loading, lang }) {
 
   useEffect(() => {
     if (!loading && user) {
-      if (user.email === 'admin@myschool.com') {
+      if (checkIsAdmin(user.email)) {
         navigate('/admin');
       } else {
         navigate('/app-redirect');

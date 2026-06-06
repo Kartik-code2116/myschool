@@ -68,21 +68,38 @@ public class PdfGenerator {
     public static Font fTitle, fTitleSub, fHeader, fNormal, fSmall, fMicro, fBold, fSmallBold;
 
     public static synchronized void ensureFonts(Context ctx) {
-        if (sFontsInitDone) return;
-        sFontsInitDone = true;
+        if (sMarathiBase != null) return;
         try {
-            File fontFile = new File(ctx.getFilesDir(), "noto_dev.ttf");
-            if (!fontFile.exists()) {
-                InputStream is = ctx.getAssets().open("fonts/NotoSansDevanagari-Regular.ttf");
-                FileOutputStream os = new FileOutputStream(fontFile);
-                byte[] buf = new byte[4096]; int len;
-                while ((len = is.read(buf)) > 0) os.write(buf, 0, len);
-                is.close(); os.close();
+            File fontFile = new File(ctx.getFilesDir(), "tiro_dev.ttf");
+            // Force copy every time in case it was corrupted
+            InputStream is = ctx.getAssets().open("fonts/TiroDevanagariHindi-Regular.ttf");
+            FileOutputStream os = new FileOutputStream(fontFile);
+            byte[] buf = new byte[4096]; int len;
+            while ((len = is.read(buf)) > 0) os.write(buf, 0, len);
+            is.close(); os.close();
+
+            sMarathiBase = BaseFont.createFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            android.util.Log.d("PDF_FONT", "Successfully loaded Marathi font from assets!");
+        } catch (Exception e) {
+            android.util.Log.e("PDF_FONT", "Failed to load Marathi font from assets", e);
+            // Fallback 1: Try system font
+            String[] systemFonts = {
+                "/system/fonts/NotoSansDevanagari-Regular.ttf",
+                "/system/fonts/NotoSansDevanagari-UI-Regular.ttf",
+                "/system/fonts/DroidSansDevanagari-Regular.ttf",
+                "/system/fonts/DroidSansFallback.ttf"
+            };
+            for (String sysFont : systemFonts) {
+                try {
+                    if (new File(sysFont).exists()) {
+                        sMarathiBase = BaseFont.createFont(sysFont, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        android.util.Log.d("PDF_FONT", "Successfully loaded system font: " + sysFont);
+                        break;
+                    }
+                } catch (Exception ignored) {
+                    android.util.Log.e("PDF_FONT", "Failed system font: " + sysFont);
+                }
             }
-            sMarathiBase = BaseFont.createFont(fontFile.getAbsolutePath(),
-                    BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        } catch (Exception ignored) {
-            sMarathiBase = null;
         }
         buildFonts();
     }
@@ -765,8 +782,26 @@ public class PdfGenerator {
     // ═════════════════════════════════════════════════════════════════════════
 
     public static MarksRecord.SubjectMarksDetail detail(MarksRecord rec, String subName) {
-        if (rec == null || rec.detailedMarks == null) return null;
-        return rec.detailedMarks.get(MarksRecord.sanitizeKey(subName));
+        if (rec == null || rec.detailedMarks == null || subName == null) return null;
+
+        // Strategy 1: sanitized key (most common)
+        String safeKey = MarksRecord.sanitizeKey(subName);
+        MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(safeKey);
+        if (d != null) return d;
+
+        // Strategy 2: raw subject name (in case it was stored unsanitized)
+        d = rec.detailedMarks.get(subName);
+        if (d != null) return d;
+
+        // Strategy 3: iterate all keys and compare sanitized forms
+        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : rec.detailedMarks.entrySet()) {
+            String key = entry.getKey();
+            if (key != null && MarksRecord.sanitizeKey(key).equals(safeKey)) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
     }
 
     private static String akarikMax(Subject sub) { return str(sub.maxMarks / 2); }
@@ -775,13 +810,13 @@ public class PdfGenerator {
     private static int sumAkarik(MarksRecord rec, List<Subject> subs) {
         int s = 0;
         if (rec == null || rec.detailedMarks == null) return s;
-        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)); if (d!=null) s += d.akarikTotal; }
+        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = detail(rec, sub.name); if (d!=null) s += d.akarikTotal; }
         return s;
     }
     private static int sumSanklit(MarksRecord rec, List<Subject> subs) {
         int s = 0;
         if (rec == null || rec.detailedMarks == null) return s;
-        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)); if (d!=null) s += d.sanklit; }
+        for (Subject sub : subs) { MarksRecord.SubjectMarksDetail d = detail(rec, sub.name); if (d!=null) s += d.sanklit; }
         return s;
     }
 

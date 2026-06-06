@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, checkIsAdmin } from './firebase';
 import Login from './Login';
 import Dashboard from './Dashboard';
 import Layout from './components/Layout';
@@ -23,7 +23,7 @@ function ProtectedRoute({ children, user, loading, requireAdmin }) {
   if (!user) {
     return <Navigate to={requireAdmin ? "/admin-login" : "/"} replace />;
   }
-  const isAdmin = user.email === 'admin@myschool.com';
+  const isAdmin = checkIsAdmin(user.email);
   if (requireAdmin && !isAdmin) {
     return <Navigate to="/app-redirect" replace />;
   }
@@ -86,7 +86,7 @@ export default function App() {
         
         <Route path="/admin-login" element={
           loading ? <div className="loading">Loading...</div> :
-          user ? (user.email === 'admin@myschool.com' ? <Navigate to="/admin" replace /> : <Navigate to="/app-redirect" replace />) :
+          user ? (checkIsAdmin(user.email) ? <Navigate to="/admin" replace /> : <Navigate to="/app-redirect" replace />) :
           <Login />
         } />
 

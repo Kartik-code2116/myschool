@@ -20,3 +20,7 @@ const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Administrative accounts configuration
+export const ADMIN_EMAILS = ['admin@myschool.com', 'kartikthorat2431@gmail.com'];
+export const checkIsAdmin = (email) => email ? ADMIN_EMAILS.includes(email.trim().toLowerCase()) : false;
