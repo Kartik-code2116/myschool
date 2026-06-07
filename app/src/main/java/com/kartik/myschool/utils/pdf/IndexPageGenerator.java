@@ -5,9 +5,7 @@ import android.content.Context;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -16,6 +14,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.kartik.myschool.model.ClassModel;
 import com.kartik.myschool.model.School;
 import com.kartik.myschool.model.Student;
+import com.kartik.myschool.SessionContext;
 import com.kartik.myschool.utils.PdfGenerator;
 
 import java.io.File;
@@ -50,12 +49,15 @@ public class IndexPageGenerator {
         // School Header
         doc.add(buildSchoolHeader(ctx, school, cls));
 
-        // Title
-        Font titleFont = sMarathiBase != null ? new Font(sMarathiBase, 22, Font.BOLD) : new Font(Font.FontFamily.HELVETICA, 22, Font.BOLD);
-        Paragraph title = new Paragraph(PdfLocalizer.get(ctx, "अनुक्रमणिका", "Index"), colored(titleFont, new BaseColor(40, 40, 90)));
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(15);
-        doc.add(title);
+        // Title: render Marathi through Android shaping so matras/conjuncts display correctly in PDF.
+        PdfGenerator.addMarathiParagraph(
+                doc,
+                PdfLocalizer.get(ctx, "\u0905\u0928\u0941\u0915\u094d\u0930\u092e\u0923\u093f\u0915\u093e", "Index"),
+                22f,
+                true,
+                new BaseColor(40, 40, 90),
+                0f,
+                15f);
 
         // Header Info table
         PdfPTable headerTbl = new PdfPTable(3);
@@ -64,7 +66,10 @@ public class IndexPageGenerator {
 
         // Row 1
         PdfPCell c1 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
-        PdfPCell c2 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester"), fBold)); c2.setBorder(Rectangle.NO_BORDER); c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        String semText = isSecondSemester()
+                ? PdfLocalizer.get(ctx, "\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u0938\u0924\u094d\u0930", "Second Semester")
+                : PdfLocalizer.get(ctx, "\u092a\u094d\u0930\u0925\u092e \u0938\u0924\u094d\u0930", "First Semester");
+        PdfPCell c2 = noBorderTextCell(semText, Element.ALIGN_CENTER);
         PdfPCell c3 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
 
@@ -129,5 +134,26 @@ public class IndexPageGenerator {
         }
         
         doc.add(tbl);
+    }
+
+    private static boolean isSecondSemester() {
+        return SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+    }
+
+    private static PdfPCell noBorderTextCell(String text, int align) {
+        PdfPCell cell = new PdfPCell();
+        cell.setBorder(Rectangle.NO_BORDER);
+        cell.setHorizontalAlignment(align);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        try {
+            com.itextpdf.text.Image img = MarathiText.renderLine(text, 10f, true, android.graphics.Color.BLACK);
+            img.setAlignment(align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT
+                    : align == Element.ALIGN_RIGHT ? com.itextpdf.text.Image.RIGHT
+                    : com.itextpdf.text.Image.MIDDLE);
+            cell.addElement(img);
+        } catch (Exception e) {
+            cell.setPhrase(new Phrase(text, fBold));
+        }
+        return cell;
     }
 }

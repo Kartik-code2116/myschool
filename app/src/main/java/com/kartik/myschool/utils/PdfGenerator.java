@@ -227,10 +227,17 @@ public class PdfGenerator {
                 doc.open();
                 doc.setMargins(15, 15, 30, 30); // Narrow margins for 20 columns
                 
-                // Title
-                Paragraph title = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", new Font(sMarathiBase, 16, Font.BOLD, C_DARK));
-                title.setAlignment(Element.ALIGN_CENTER);
-                doc.add(title);
+                // Title: render through Android shaping so Marathi header text displays correctly.
+                addMarathiParagraph(
+                        doc,
+                        PdfLocalizer.get(ctx,
+                                "\u0938\u093e\u0924\u0924\u094d\u092f\u092a\u0942\u0930\u094d\u0923 \u0938\u0930\u094d\u0935\u0902\u0915\u0937 \u092e\u0942\u0932\u094d\u092f\u092e\u093e\u092a\u0928",
+                                "Continuous Comprehensive Evaluation"),
+                        16f,
+                        true,
+                        C_DARK,
+                        0f,
+                        4f);
                 
                 // Header Tbl
                 PdfPTable hTbl = new PdfPTable(3);
@@ -238,11 +245,14 @@ public class PdfGenerator {
                 hTbl.setSpacingBefore(10); hTbl.setSpacingAfter(5);
                 
                 String udise = "Udise: " + nvl(school.udiseCode) + "\n" + nvl(school.name);
-                String term = isSem2 ? "द्वितीय सत्र" : "प्रथम सत्र";
+                String term = isSem2
+                        ? PdfLocalizer.get(ctx, "\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u0938\u0924\u094d\u0930", "Second Semester")
+                        : PdfLocalizer.get(ctx, "\u092a\u094d\u0930\u0925\u092e \u0938\u0924\u094d\u0930", "First Semester");
                 String rightTxt = "सन : " + nvl(cls.academicYearLabel) + "\nइयत्ता: " + nvl(cls.className) + ", तुकडी: " + nvl(cls.division);
                 
                 PdfPCell cL = new PdfPCell(new Phrase(udise, fSmallBold)); cL.setBorder(Rectangle.NO_BORDER); cL.setHorizontalAlignment(Element.ALIGN_LEFT);
-                PdfPCell cC = new PdfPCell(new Phrase(term, fSmallBold)); cC.setBorder(Rectangle.NO_BORDER); cC.setHorizontalAlignment(Element.ALIGN_CENTER); cC.setVerticalAlignment(Element.ALIGN_BOTTOM);
+                PdfPCell cC = noBorderMarathiCell(term, 10f, true, C_DARK, Element.ALIGN_CENTER);
+                cC.setVerticalAlignment(Element.ALIGN_BOTTOM);
                 PdfPCell cR = new PdfPCell(new Phrase(rightTxt, fSmallBold)); cR.setBorder(Rectangle.NO_BORDER); cR.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 
                 hTbl.addCell(cL); hTbl.addCell(cC); hTbl.addCell(cR);
@@ -431,10 +441,20 @@ public class PdfGenerator {
         } else if ("Second Semester".equals(termLabel)) {
             localizedTerm = PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester");
         }
-        Font termFont = (sMarathiBase != null) ? new Font(sMarathiBase, 12, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, C_DARK);
-        Paragraph pC = new Paragraph(localizedTerm, termFont);
-        pC.setAlignment(Element.ALIGN_CENTER);
-        cC.addElement(pC);
+        try {
+            com.itextpdf.text.Image termImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(
+                    localizedTerm,
+                    12f,
+                    true,
+                    android.graphics.Color.rgb(C_DARK.getRed(), C_DARK.getGreen(), C_DARK.getBlue()));
+            termImg.setAlignment(com.itextpdf.text.Image.MIDDLE);
+            cC.addElement(termImg);
+        } catch (Exception e) {
+            Font termFont = (sMarathiBase != null) ? new Font(sMarathiBase, 12, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, C_DARK);
+            Paragraph pC = new Paragraph(localizedTerm, termFont);
+            pC.setAlignment(Element.ALIGN_CENTER);
+            cC.addElement(pC);
+        }
 
         // Right Cell
         PdfPCell cR = new PdfPCell();
@@ -1023,6 +1043,30 @@ public class PdfGenerator {
     }
 
     /** Returns true if text contains any Devanagari Unicode character (U+0900–U+097F). */
+    private static PdfPCell noBorderMarathiCell(String text, float sizePt, boolean bold,
+                                                BaseColor textColor, int align) {
+        PdfPCell c = new PdfPCell();
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setHorizontalAlignment(align);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        try {
+            int androidColor = android.graphics.Color.rgb(
+                    textColor.getRed(), textColor.getGreen(), textColor.getBlue());
+            com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText
+                    .renderLine(text, sizePt, bold, androidColor);
+            img.setAlignment(align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT
+                    : align == Element.ALIGN_RIGHT ? com.itextpdf.text.Image.RIGHT
+                    : com.itextpdf.text.Image.MIDDLE);
+            c.addElement(img);
+        } catch (Exception e) {
+            Font fallback = sMarathiBase != null
+                    ? new Font(sMarathiBase, sizePt, bold ? Font.BOLD : Font.NORMAL, textColor)
+                    : new Font(Font.FontFamily.HELVETICA, sizePt, bold ? Font.BOLD : Font.NORMAL, textColor);
+            c.setPhrase(new Phrase(text, fallback));
+        }
+        return c;
+    }
+
     public static boolean containsDevanagari(String text) {
         if (text == null) return false;
         for (int i = 0; i < text.length(); i++) {
