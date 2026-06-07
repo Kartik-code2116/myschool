@@ -96,61 +96,7 @@ public class DescriptiveRemarksGenerator {
         return raw == null ? "" : raw.replace("||", ", ").trim();
     }
 
-    /**
-     * Builds the best possible marks map for each student across all data sources:
-     * sem1Marks, sem2Marks, AppCache.cachedDescriptiveMarksMap, AppCache.cachedMarksMap.
-     * Picks the record with the most populated remarks.
-     */
-    private static Map<String, MarksRecord> buildBestRemarksMap(
-            Map<String, MarksRecord> sem1Marks,
-            Map<String, MarksRecord> sem2Marks,
-            List<Student> students,
-            String classId) {
 
-        java.util.Map<String, MarksRecord> best = new java.util.HashMap<>();
-        if (students == null) return best;
-
-        for (Student s : students) {
-            MarksRecord bestRec = null;
-            int bestCount = 0;
-
-            MarksRecord r1 = sem1Marks != null ? sem1Marks.get(s.id) : null;
-            int c1 = countRemarks(r1);
-            if (c1 > bestCount) { bestRec = r1; bestCount = c1; }
-
-            MarksRecord r2 = sem2Marks != null ? sem2Marks.get(s.id) : null;
-            int c2 = countRemarks(r2);
-            if (c2 > bestCount) { bestRec = r2; bestCount = c2; }
-
-            if (com.kartik.myschool.AppCache.cachedDescriptiveMarksMap != null
-                    && java.util.Objects.equals(classId, com.kartik.myschool.AppCache.cachedDescriptiveClassId)) {
-                MarksRecord r3 = com.kartik.myschool.AppCache.cachedDescriptiveMarksMap.get(s.id);
-                int c3 = countRemarks(r3);
-                if (c3 > bestCount) { bestRec = r3; bestCount = c3; }
-            }
-
-            if (com.kartik.myschool.AppCache.cachedMarksMap != null
-                    && java.util.Objects.equals(classId, com.kartik.myschool.AppCache.cachedClassIdForStudents)) {
-                MarksRecord r4 = com.kartik.myschool.AppCache.cachedMarksMap.get(s.id);
-                int c4 = countRemarks(r4);
-                if (c4 > bestCount) { bestRec = r4; bestCount = c4; }
-            }
-
-            if (bestRec != null) best.put(s.id, bestRec);
-
-            Log.d(TAG, "Student " + s.name + " bestRemarkCount=" + bestCount);
-        }
-        return best;
-    }
-
-    private static int countRemarks(MarksRecord rec) {
-        if (rec == null || rec.detailedMarks == null) return 0;
-        int count = 0;
-        for (MarksRecord.SubjectMarksDetail d : rec.detailedMarks.values()) {
-            if (d != null && d.remark != null && !d.remark.trim().isEmpty()) count++;
-        }
-        return count;
-    }
 
     // ── Public entry point ─────────────────────────────────────────────────────
 
@@ -185,14 +131,11 @@ public class DescriptiveRemarksGenerator {
                 Log.d(TAG, "=== GENERATING DESCRIPTIVE PDF === sem=" + semNum
                         + " students=" + (students != null ? students.size() : "null"));
 
-                Map<String, MarksRecord> bestMap = buildBestRemarksMap(sem1Marks, sem2Marks, students, classId);
-
                 if (students != null && !students.isEmpty()) {
                     for (int si = 0; si < students.size(); si++) {
                         if (si > 0) doc.newPage();
                         Student student = students.get(si);
-                        MarksRecord rec = bestMap.get(student.id);
-                        if (rec == null && activeSemMarks != null) rec = activeSemMarks.get(student.id);
+                        MarksRecord rec = activeSemMarks != null ? activeSemMarks.get(student.id) : null;
 
                         addStudentPage(doc, school, cls, student, rec, semLabel, si + 1);
                     }

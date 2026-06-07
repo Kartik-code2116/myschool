@@ -167,19 +167,23 @@ public class EnterMarksActivity extends AppCompatActivity {
         }
 
         // ── Load existing marks (3-layer strategy) ───────────────────────────
+        String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
         // Layer 1: AppCache (same session, instant — already in RAM)
         if (AppCache.selectedMarks != null
                 && student.id != null
                 && student.id.equals(AppCache.selectedMarks.studentId)
                 && classModel.id != null
                 && classModel.id.equals(AppCache.selectedMarks.classId)) {
-            Log.d("SAVE_MARKS", "Layer1: Using AppCache.selectedMarks student=" + student.id);
-            existingMarks = AppCache.selectedMarks;
-            fillExistingMarks(existingMarks);
+            
+            boolean isSem1Fallback = (semId.equals("sem_1") || semId.contains("1")) && (AppCache.selectedMarks.semesterId == null || AppCache.selectedMarks.semesterId.isEmpty());
+            if (semId.equals(AppCache.selectedMarks.semesterId) || isSem1Fallback) {
+                Log.d("SAVE_MARKS", "Layer1: Using AppCache.selectedMarks student=" + student.id);
+                existingMarks = AppCache.selectedMarks;
+                fillExistingMarks(existingMarks);
+            }
         }
 
         // Layer 2: SharedPreferences (after app restart — fetch by stored doc ID)
-        String semId = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.id : "sem_1";
         String prefKey = "marks_doc_" + student.id + "_" + classModel.id + "_" + semId;
         String legacyPrefKey = "marks_doc_" + student.id + "_" + classModel.id;
         android.content.SharedPreferences docPrefs = getSharedPreferences("marks_doc_ids", MODE_PRIVATE);
@@ -198,10 +202,15 @@ public class EnterMarksActivity extends AppCompatActivity {
                         if (doc.exists()) {
                             MarksRecord m = doc.toObject(MarksRecord.class);
                             if (m != null) {
-                                Log.d("SAVE_MARKS", "Layer2 SUCCESS: loaded marks docId=" + finalStoredDocId);
-                                existingMarks = m;
-                                AppCache.selectedMarks = m;
-                                fillExistingMarks(m);
+                                boolean isSem1Fallback = (semId.equals("sem_1") || semId.contains("1")) && (m.semesterId == null || m.semesterId.isEmpty());
+                                if (semId.equals(m.semesterId) || isSem1Fallback) {
+                                    Log.d("SAVE_MARKS", "Layer2 SUCCESS: loaded marks docId=" + finalStoredDocId);
+                                    existingMarks = m;
+                                    AppCache.selectedMarks = m;
+                                    fillExistingMarks(m);
+                                } else {
+                                    Log.d("SAVE_MARKS", "Layer2 SKIPPED: mismatch semId. Expected " + semId + " got " + m.semesterId);
+                                }
                             }
                         } else {
                             Log.d("SAVE_MARKS", "Layer2: doc not found for id=" + finalStoredDocId);

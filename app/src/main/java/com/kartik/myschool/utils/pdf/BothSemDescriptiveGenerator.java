@@ -102,12 +102,6 @@ public class BothSemDescriptiveGenerator {
                         MarksRecord s1 = sem1Map != null ? sem1Map.get(student.id) : null;
                         MarksRecord s2 = sem2Map != null ? sem2Map.get(student.id) : null;
 
-                        // Also try AppCache for richer remark data
-                        if (s1 == null && com.kartik.myschool.AppCache.cachedDescriptiveMarksMap != null)
-                            s1 = com.kartik.myschool.AppCache.cachedDescriptiveMarksMap.get(student.id);
-                        if (s2 == null && com.kartik.myschool.AppCache.cachedMarksMap != null)
-                            s2 = com.kartik.myschool.AppCache.cachedMarksMap.get(student.id);
-
                         addStudentPage(doc, school, cls, student, s1, s2);
                     }
                 }

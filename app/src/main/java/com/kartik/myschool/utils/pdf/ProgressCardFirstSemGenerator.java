@@ -97,18 +97,9 @@ public class ProgressCardFirstSemGenerator {
                         isFirst = false;
                         MarksRecord rec = marksMap != null ? marksMap.get(student.id) : null;
                         
-                        // Try app cache if null
-                        if (rec == null && com.kartik.myschool.AppCache.cachedMarksMap != null) {
-                            rec = com.kartik.myschool.AppCache.cachedMarksMap.get(student.id);
-                        }
-
-                        // Best remark record logic
+                        // Strictly use the passed marksMap which represents Semester 1 marks.
+                        // Do not fallback to AppCache, as AppCache might hold Semester 2 data if the user navigated to Semester 2.
                         MarksRecord bestRemarkRec = rec;
-                        MarksRecord cDesc = com.kartik.myschool.AppCache.cachedDescriptiveMarksMap != null
-                                ? com.kartik.myschool.AppCache.cachedDescriptiveMarksMap.get(student.id) : null;
-                        if (cDesc != null && cDesc.detailedMarks != null && !cDesc.detailedMarks.isEmpty()) {
-                            bestRemarkRec = cDesc;
-                        }
 
                         addStudentPage(doc, ctx, school, cls, student, rec, bestRemarkRec);
                     }

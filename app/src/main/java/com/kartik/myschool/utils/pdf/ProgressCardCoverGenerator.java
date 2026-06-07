@@ -114,9 +114,61 @@ public class ProgressCardCoverGenerator {
         }).start();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Per-student page builder
-    // ─────────────────────────────────────────────────────────────────────────
+    private static class PanelBorderEvent implements com.itextpdf.text.pdf.PdfPCellEvent {
+        @Override
+        public void cellLayout(PdfPCell cell, Rectangle position, com.itextpdf.text.pdf.PdfContentByte[] canvases) {
+            com.itextpdf.text.pdf.PdfContentByte cb = canvases[PdfPTable.LINECANVAS];
+            cb.saveState();
+            cb.setColorStroke(new BaseColor(150, 160, 170));
+            cb.setLineWidth(1.5f);
+            cb.roundRectangle(position.getLeft() + 15, position.getBottom() + 15, position.getWidth() - 30, position.getHeight() - 30, 8);
+            cb.stroke();
+            cb.restoreState();
+        }
+    }
+
+    private static class RightPanelBackgroundEvent implements com.itextpdf.text.pdf.PdfPCellEvent {
+        @Override
+        public void cellLayout(PdfPCell cell, Rectangle position, com.itextpdf.text.pdf.PdfContentByte[] canvases) {
+            com.itextpdf.text.pdf.PdfContentByte cb = canvases[PdfPTable.BACKGROUNDCANVAS];
+            cb.saveState();
+            float x = position.getLeft() + 15;
+            float y = position.getBottom() + 15;
+            float w = position.getWidth() - 30;
+            float h = position.getHeight() - 30;
+
+            // Background white
+            cb.setColorFill(BaseColor.WHITE);
+            cb.rectangle(x, y, w, h);
+            cb.fill();
+
+            // Light cyan/blue elements at top
+            cb.setColorFill(new BaseColor(135, 225, 235)); // Cyan left
+            cb.roundRectangle(x - 5, y + h * 0.75f, w * 0.2f, h * 0.3f, 20);
+            cb.fill();
+            
+            cb.setColorFill(new BaseColor(13, 140, 200)); // Blue right
+            cb.roundRectangle(x + w * 0.85f, y + h * 0.8f, w * 0.2f, h * 0.2f, 20);
+            cb.fill();
+            
+            cb.setColorFill(new BaseColor(41, 193, 234)); // Light Blue right
+            cb.roundRectangle(x + w * 0.8f, y + h * 0.7f, w * 0.25f, h * 0.25f, 30);
+            cb.fill();
+
+            // Main Yellow Background
+            cb.setColorFill(new BaseColor(254, 221, 101));
+            cb.roundRectangle(x + w * 0.08f, y + h * 0.58f, w * 0.84f, h * 0.40f, 20);
+            cb.fill();
+
+            // Decorative swirl at bottom right of yellow box
+            cb.moveTo(x + w * 0.7f, y + h * 0.58f);
+            cb.curveTo(x + w * 0.72f, y + h * 0.5f, x + w * 0.85f, y + h * 0.48f, x + w * 0.82f, y + h * 0.58f);
+            cb.fill();
+
+            cb.restoreState();
+        }
+    }
+
     public static void addCardContent(Document doc, Context ctx, School school, ClassModel cls,
                                        Student student, MarksRecord sem1, MarksRecord sem2) throws Exception {
 
@@ -127,23 +179,33 @@ public class ProgressCardCoverGenerator {
 
         // ── LEFT PANEL ────────────────────────────────────────────────────────
         PdfPCell leftPanel = new PdfPCell();
-        leftPanel.setBackgroundColor(C_PANEL_BG);
-        leftPanel.setBorder(Rectangle.RIGHT);
-        leftPanel.setBorderColor(C_TEAL);
-        leftPanel.setBorderWidthRight(1.5f);
-        leftPanel.setPadding(10);
+        leftPanel.setBackgroundColor(BaseColor.WHITE);
+        leftPanel.setBorder(Rectangle.NO_BORDER);
+        leftPanel.setCellEvent(new PanelBorderEvent());
+        leftPanel.setPadding(25);
         leftPanel.setVerticalAlignment(Element.ALIGN_TOP);
 
         buildLeftPanel(leftPanel, ctx, student, sem1, sem2);
 
         // ── RIGHT PANEL ───────────────────────────────────────────────────────
         PdfPCell rightPanel = new PdfPCell();
-        rightPanel.setBackgroundColor(C_CREAM);
+        rightPanel.setBackgroundColor(BaseColor.WHITE);
         rightPanel.setBorder(Rectangle.NO_BORDER);
-        rightPanel.setPadding(0);
+        rightPanel.setCellEvent(new PanelBorderEvent());
+        rightPanel.setPadding(25);
         rightPanel.setVerticalAlignment(Element.ALIGN_TOP);
-
-        buildRightPanel(rightPanel, ctx, school, cls, student);
+        
+        // Add a nested table with the background event to ensure borders draw over background
+        PdfPTable innerRight = new PdfPTable(1);
+        innerRight.setWidthPercentage(100);
+        PdfPCell innerRightCell = new PdfPCell();
+        innerRightCell.setBorder(Rectangle.NO_BORDER);
+        innerRightCell.setCellEvent(new RightPanelBackgroundEvent());
+        innerRightCell.setPadding(10);
+        buildRightPanel(innerRightCell, ctx, school, cls, student);
+        innerRight.addCell(innerRightCell);
+        
+        rightPanel.addElement(innerRight);
 
         outer.addCell(leftPanel);
         outer.addCell(rightPanel);
@@ -167,15 +229,16 @@ public class ProgressCardCoverGenerator {
         attTbl.setWidthPercentage(100);
 
         // Header row 1
-        cellSpan(attTbl, "महिना",        fSmallBold, C_TEAL, C_WHITE, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "कामाचे\nदिवस", fSmallBold, C_TEAL, C_WHITE, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "हजर\nदिवस",    fSmallBold, C_TEAL, C_WHITE, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "स्वाक्षरी",    fSmallBold, C_TEAL, C_WHITE, 3, 1, Element.ALIGN_CENTER);
+        BaseColor headerBg = new BaseColor(254, 235, 150); // Light Yellow
+        cellSpan(attTbl, "महिना",        fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(attTbl, "कामाचे\nदिवस", fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(attTbl, "हजर\nदिवस",    fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(attTbl, "स्वाक्षरी",    fSmallBold, headerBg, C_DARK, 3, 1, Element.ALIGN_CENTER);
 
         // Header row 2: sub-headers under स्वाक्षरी
-        cellSpan(attTbl, "वर्गशिक्षक",    fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "पालक",          fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "मुख्याध्यापक", fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, "वर्गशिक्षक",    fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, "पालक",          fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, "मुख्याध्यापक", fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // Month rows
         boolean alt = false;
@@ -243,9 +306,25 @@ public class ProgressCardCoverGenerator {
         panel.addElement(healthTbl);
 
         // ── Grade scale at bottom ─────────────────────────────────────────────
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 6)));
-        panel.addElement(marathiImg(ctx, "श्रेणी सारा :", 8, true, C_DARK));
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 3)));
+        // Grade scale table
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
+
+        // Title with rounded background (left-aligned)
+        PdfPTable gsTitleTbl = new PdfPTable(1);
+        gsTitleTbl.setWidthPercentage(30);
+        gsTitleTbl.setHorizontalAlignment(Element.ALIGN_LEFT);
+        PdfPCell gsTitleCell = new PdfPCell();
+        gsTitleCell.setBorder(Rectangle.NO_BORDER);
+        gsTitleCell.setBackgroundColor(new BaseColor(254, 221, 101));
+        try {
+            Image img = marathiImg(ctx, "श्रेणी तक्ता :", 8, true, C_DARK);
+            img.setAlignment(Element.ALIGN_CENTER);
+            gsTitleCell.addElement(img);
+        } catch (Exception e) {}
+        gsTitleTbl.addCell(gsTitleCell);
+        panel.addElement(gsTitleTbl);
+        
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 2)));
 
         float[] gsWidths = new float[GRADE_SCALE.length];
         Arrays.fill(gsWidths, 1f);
@@ -254,11 +333,11 @@ public class ProgressCardCoverGenerator {
 
         // Range row
         for (String[] entry : GRADE_SCALE) {
-            cellSpan(gsTbl, entry[0], fMicro, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(gsTbl, entry[0], fMicro, BaseColor.WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
         // Grade label row
         for (String[] entry : GRADE_SCALE) {
-            cellSpan(gsTbl, entry[1], fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(gsTbl, entry[1], fSmallBold, new BaseColor(240, 245, 250), C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
         panel.addElement(gsTbl);
     }
@@ -269,74 +348,52 @@ public class ProgressCardCoverGenerator {
     private static void buildRightPanel(PdfPCell panel, Context ctx, School school,
                                          ClassModel cls, Student student) throws Exception {
 
-        // ── Teal header banner ────────────────────────────────────────────────
-        // Contains: "School UDISE: XXXX  जिल्हा परिषद"
-        PdfPTable banner = new PdfPTable(1);
-        banner.setWidthPercentage(100);
+        // Push text down into the yellow area
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 30)));
 
-        String udiseLine = "School UDISE: " + nvl(school != null ? school.udiseCode : null)
-                + "    जिल्हा परिषद";
-        PdfPCell bannerCell = new PdfPCell();
-        bannerCell.setBackgroundColor(C_TEAL);
-        bannerCell.setBorder(Rectangle.NO_BORDER);
-        bannerCell.setPadding(6);
-        bannerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        // Render Marathi + ASCII mix as image
+        String udiseLine = "School UDISE: " + nvl(school != null ? school.udiseCode : null) + "\nजिल्हा परिषद";
         try {
-            Image udiseImg = marathiImg(ctx, udiseLine, 9, false, BaseColor.WHITE);
+            Image udiseImg = marathiImg(ctx, udiseLine, 9, false, C_DARK);
             udiseImg.setAlignment(Element.ALIGN_CENTER);
-            bannerCell.addElement(udiseImg);
-        } catch (Exception e) {
-            bannerCell.addElement(new Phrase(udiseLine, fSmall));
-        }
-        banner.addCell(bannerCell);
+            panel.addElement(udiseImg);
+        } catch (Exception e) {}
 
-        panel.addElement(banner);
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
-        // ── School name (large, centered) ────────────────────────────────────
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 6)));
         try {
-            Image schoolImg = marathiImg(ctx,
-                    nvl(school != null ? school.name : "शाळेचे नाव"), 16, true, C_TEAL);
+            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : "शाळेचे नाव"), 20, true, C_DARK);
             schoolImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(schoolImg);
-        } catch (Exception e) {
-            panel.addElement(new Phrase(nvl(school != null ? school.name : ""), fHeader));
-        }
+        } catch (Exception e) {}
 
-        // ── School address & year ─────────────────────────────────────────────
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 4)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 6)));
+
         if (school != null && school.address != null && !school.address.isEmpty()) {
             try {
-                Image addrImg = marathiImg(ctx, school.address, 8, false, C_DARK);
+                Image addrImg = marathiImg(ctx, school.address, 10, false, C_DARK);
                 addrImg.setAlignment(Element.ALIGN_CENTER);
                 panel.addElement(addrImg);
-            } catch (Exception e) {
-                panel.addElement(new Phrase(school.address, fSmall));
-            }
+            } catch (Exception e) {}
         }
 
         String yearLabel = cls != null ? nvl(cls.academicYearLabel) : "";
         try {
-            Image yearImg = marathiImg(ctx, "सन : " + yearLabel, 9, true, C_DARK);
+            Image yearImg = marathiImg(ctx, "सन : " + yearLabel, 11, true, C_DARK);
             yearImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(yearImg);
-        } catch (Exception e) {
-            panel.addElement(new Phrase("सन : " + yearLabel, fSmallBold));
-        }
+        } catch (Exception e) {}
 
-        // ── Large "प्रगती पत्रक" title ────────────────────────────────────────
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 10)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
+
         try {
-            Image titleImg = marathiImg(ctx, "प्रगती पत्रक", 22, true, C_TEAL);
+            Image titleImg = marathiImg(ctx, "प्रगती पत्रक", 28, true, C_DARK);
             titleImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(titleImg);
-        } catch (Exception e) {
-            panel.addElement(new Phrase("प्रगती पत्रक", fTitle));
-        }
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 10)));
+        } catch (Exception e) {}
 
-        // ── Student details grid ──────────────────────────────────────────────
+        // Push student details grid below the yellow area
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 65)));
+
         buildStudentDetails(panel, ctx, cls, student);
     }
 
@@ -443,42 +500,13 @@ public class ProgressCardCoverGenerator {
     }
 
     /**
-     * Renders a Marathi/Devanagari string into a small Image using Android Canvas
-     * so it displays correctly in the iText PDF (bypasses iText's lack of
-     * Devanagari shaping support).
+     * Renders a Marathi/Devanagari string into a small Image.
      */
     private static Image marathiImg(Context ctx, String text, float ptSize,
                                      boolean bold, BaseColor color) throws Exception {
-        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-        float density = ctx.getResources().getDisplayMetrics().density;
-        // Scale up paint to get crisp pixels; we'll scale down in PDF
-        float paintPx = ptSize * density * 3f;
-        paint.setTextSize(paintPx);
-        paint.setColor(android.graphics.Color.rgb(color.getRed(), color.getGreen(), color.getBlue()));
-
-        if (PdfGenerator.sMarathiTypeface != null) {
-            paint.setTypeface(android.graphics.Typeface.create(
-                    PdfGenerator.sMarathiTypeface,
-                    bold ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL));
-        } else {
-            paint.setTypeface(bold ? android.graphics.Typeface.DEFAULT_BOLD : android.graphics.Typeface.DEFAULT);
-        }
-
-        android.graphics.Paint.FontMetrics fm = paint.getFontMetrics();
-        float textW = paint.measureText(text);
-        float textH = fm.descent - fm.ascent;
-
-        Bitmap bmp = Bitmap.createBitmap(
-                (int) Math.ceil(textW) + 8, (int) Math.ceil(textH) + 8,
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bmp);
-        canvas.drawText(text, 4, -fm.ascent + 4, paint);
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, bos);
-        Image img = Image.getInstance(bos.toByteArray());
-        // Scale to PDF points: 1 pt ≈ density*3 px
-        img.scalePercent(100f / (density * 3f) * 100f);
-        return img;
+        return com.kartik.myschool.utils.pdf.MarathiText.renderLine(
+                text, ptSize, bold,
+                android.graphics.Color.rgb(color.getRed(), color.getGreen(), color.getBlue())
+        );
     }
 }

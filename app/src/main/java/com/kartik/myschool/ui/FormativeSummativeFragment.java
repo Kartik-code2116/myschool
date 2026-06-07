@@ -215,7 +215,10 @@ public class FormativeSummativeFragment extends Fragment {
                                 Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
 
                                 // Merge network results with the fresh cache based on updatedAt
-                                if (AppCache.cachedMarksMap != null) {
+                                // ONLY if the cache belongs to the same semester we are currently fetching!
+                                if (AppCache.cachedMarksMap != null 
+                                        && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)
+                                        && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
                                     for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
                                         String sId = entry.getKey();
                                         MarksRecord cachedRecord = entry.getValue();
@@ -478,24 +481,28 @@ public class FormativeSummativeFragment extends Fragment {
 
                 MarksRecord marks = marksMap.get(s.id);
 
-                // Build Grade Chips Row
-                binding.layoutGradeChips.removeAllViews();
+                // Build Grade Chips Row using View Recycling
+                List<String> gradesToDisplay = new ArrayList<>();
                 if (marks != null && marks.detailedMarks != null && activeClass.subjects != null) {
                     for (Subject sub : activeClass.subjects) {
                         MarksRecord.SubjectMarksDetail detail = marks.detailedMarks
                                 .get(MarksRecord.sanitizeKey(sub.name));
-                        if (detail != null) {
-                            android.util.Log.d("GRADE_BUG", "Student: " + s.name 
-                                + " | Subject: " + sub.name 
-                                + " | grade: " + detail.grade 
-                                + " | nirikhshan: " + detail.nirikhshan
-                                + " | grandTotal: " + detail.grandTotal
-                                + " | entered: " + hasEnteredMarks(detail));
-                            if (detail.grade != null && !detail.grade.isEmpty() && hasEnteredMarks(detail)) {
-                                binding.layoutGradeChips.addView(createGradeChip(detail.grade));
-                            }
+                        if (detail != null && detail.grade != null && !detail.grade.isEmpty() && hasEnteredMarks(detail)) {
+                            gradesToDisplay.add(detail.grade);
                         }
                     }
+                }
+
+                while (binding.layoutGradeChips.getChildCount() < gradesToDisplay.size()) {
+                    binding.layoutGradeChips.addView(createGradeChipBase());
+                }
+                while (binding.layoutGradeChips.getChildCount() > gradesToDisplay.size()) {
+                    binding.layoutGradeChips.removeViewAt(binding.layoutGradeChips.getChildCount() - 1);
+                }
+
+                for (int i = 0; i < gradesToDisplay.size(); i++) {
+                    TextView tv = (TextView) binding.layoutGradeChips.getChildAt(i);
+                    bindGradeChip(tv, gradesToDisplay.get(i));
                 }
 
                 // Adjust card margins depending on layout mode
@@ -515,33 +522,98 @@ public class FormativeSummativeFragment extends Fragment {
                 // Show/hide grade chips under student name
                 binding.layoutGradeChips.setVisibility(isGridView ? View.GONE : View.VISIBLE);
 
-                // Build Subject Cards depending on layout mode
+                // Build Subject Cards depending on layout mode using View Recycling
                 binding.scrollSubjects.setVisibility(View.VISIBLE);
                 binding.layoutSummaryGrid.setVisibility(View.GONE);
-                binding.layoutSubjectsHorizontal.removeAllViews();
 
                 if (activeClass.subjects != null) {
-                    for (int i = 0; i < activeClass.subjects.size(); i++) {
-                        Subject sub = activeClass.subjects.get(i);
-                        View cardView;
-                        if (isGridView) {
-                            cardView = createSubjectCardCompact(s, sub, i + 1, marks);
-                        } else {
-                            cardView = createSubjectCard(s, sub, i + 1, marks);
+                    int subjectCount = activeClass.subjects.size();
+                    
+                    // Check if existing views are of the wrong type, and remove if so
+                    if (binding.layoutSubjectsHorizontal.getChildCount() > 0) {
+                        View firstChild = binding.layoutSubjectsHorizontal.getChildAt(0);
+                        boolean isCurrentCompact = firstChild.getTag() instanceof ItemEvaluationSubjectCardCompactBinding;
+                        if (isGridView != isCurrentCompact) {
+                            binding.layoutSubjectsHorizontal.removeAllViews();
                         }
-                        binding.layoutSubjectsHorizontal.addView(cardView);
                     }
+
+                    // Add needed views
+                    LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
+                    while (binding.layoutSubjectsHorizontal.getChildCount() < subjectCount) {
+                        if (isGridView) {
+                            ItemEvaluationSubjectCardCompactBinding cardB = ItemEvaluationSubjectCardCompactBinding.inflate(inflater, binding.layoutSubjectsHorizontal, false);
+                            
+                            // Set compact card layout width once
+                            android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
+                                    (int) (186 * density),
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                            int margin = (int) (6 * density);
+                            param.setMargins(margin, margin, margin, margin);
+                            cardB.getRoot().setLayoutParams(param);
+                            
+                            View cardView = cardB.getRoot();
+                            cardView.setTag(cardB);
+                            binding.layoutSubjectsHorizontal.addView(cardView);
+                        } else {
+                            ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(inflater, binding.layoutSubjectsHorizontal, false);
+                            
+                            // Set consistent layout width and margins for horizontal scrolling (300dp to fit table)
+                            android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
+                                    (int) (300 * density),
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                            int margin = (int) (6 * density);
+                            param.setMargins(margin, margin, margin, margin);
+                            cardB.getRoot().setLayoutParams(param);
+                            
+                            View cardView = cardB.getRoot();
+                            cardView.setTag(cardB);
+                            binding.layoutSubjectsHorizontal.addView(cardView);
+                        }
+                    }
+
+                    // Remove extra views
+                    while (binding.layoutSubjectsHorizontal.getChildCount() > subjectCount) {
+                        binding.layoutSubjectsHorizontal.removeViewAt(binding.layoutSubjectsHorizontal.getChildCount() - 1);
+                    }
+
+                    // Bind data
+                    for (int i = 0; i < subjectCount; i++) {
+                        Subject sub = activeClass.subjects.get(i);
+                        View cardView = binding.layoutSubjectsHorizontal.getChildAt(i);
+                        if (isGridView) {
+                            ItemEvaluationSubjectCardCompactBinding cardB = (ItemEvaluationSubjectCardCompactBinding) cardView.getTag();
+                            bindSubjectCardCompact(cardB, s, sub, i + 1, marks);
+                        } else {
+                            ItemEvaluationSubjectCardBinding cardB = (ItemEvaluationSubjectCardBinding) cardView.getTag();
+                            bindSubjectCard(cardB, s, sub, i + 1, marks);
+                        }
+                    }
+                } else {
+                    binding.layoutSubjectsHorizontal.removeAllViews();
                 }
             }
 
-            private View createGradeChip(String grade) {
+            private TextView createGradeChipBase() {
                 TextView tv = new TextView(itemView.getContext());
-                tv.setText(grade);
                 tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10);
                 tv.setGravity(android.view.Gravity.CENTER);
-                float density = getResources().getDisplayMetrics().density;
+                float density = itemView.getResources().getDisplayMetrics().density;
                 tv.setPadding((int) (8 * density), (int) (3 * density), (int) (8 * density), (int) (3 * density));
                 tv.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
+                
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMarginEnd((int) (6 * density));
+                tv.setLayoutParams(lp);
+                
+                return tv;
+            }
+
+            private void bindGradeChip(TextView tv, String grade) {
+                tv.setText(grade);
+                float density = itemView.getResources().getDisplayMetrics().density;
 
                 int textColor = 0xFF6C4CCF;
                 int borderColor = 0xFFE1D5FF;
@@ -576,24 +648,13 @@ public class FormativeSummativeFragment extends Fragment {
                 gd.setCornerRadius(6 * density);
                 gd.setStroke((int) (1 * density), borderColor);
                 tv.setBackground(gd);
-
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                lp.setMarginEnd((int) (6 * density));
-                tv.setLayoutParams(lp);
-
-                return tv;
             }
 
             private String formatVal(int val) {
                 return String.valueOf(val);
             }
 
-            private View createSubjectCard(Student student, Subject sub, int number, MarksRecord record) {
-                ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(
-                        LayoutInflater.from(itemView.getContext()), binding.layoutSubjectsHorizontal, false);
-
+            private void bindSubjectCard(ItemEvaluationSubjectCardBinding cardB, Student student, Subject sub, int number, MarksRecord record) {
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
                 // Default table values
@@ -701,23 +762,9 @@ public class FormativeSummativeFragment extends Fragment {
 
                 // JOIN TO ENTER MARKS PAGE: Click on the entire subject card opens marks entry!
                 cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
-
-                // Set consistent layout width and margins for horizontal scrolling (300dp to
-                // fit table)
-                android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
-                        (int) (300 * density),
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-                int margin = (int) (6 * density);
-                param.setMargins(margin, margin, margin, margin);
-                cardB.getRoot().setLayoutParams(param);
-
-                return cardB.getRoot();
             }
 
-            private View createSubjectCardCompact(Student student, Subject sub, int number, MarksRecord record) {
-                ItemEvaluationSubjectCardCompactBinding cardB = ItemEvaluationSubjectCardCompactBinding.inflate(
-                        LayoutInflater.from(itemView.getContext()), binding.layoutSubjectsHorizontal, false);
-
+            private void bindSubjectCardCompact(ItemEvaluationSubjectCardCompactBinding cardB, Student student, Subject sub, int number, MarksRecord record) {
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
                 // Default table values
@@ -807,17 +854,6 @@ public class FormativeSummativeFragment extends Fragment {
 
                 // Click on entire subject card opens marks entry!
                 cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
-
-                // Set compact card layout width
-                float density = itemView.getResources().getDisplayMetrics().density;
-                android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
-                        (int) (186 * density),
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-                int margin = (int) (6 * density);
-                param.setMargins(margin, margin, margin, margin);
-                cardB.getRoot().setLayoutParams(param);
-
-                return cardB.getRoot();
             }
 
             private void openMarksEntry(Student student) {

@@ -860,7 +860,10 @@ public class FirebaseRepository {
                             if (semesterId.equals(m.semesterId) || finalTargetSemNum == recordSemNum) {
                                 matches.add(m);
                             } else if (m.semesterId == null || m.semesterId.isEmpty()) {
-                                fallbacks.add(m);
+                                // Only fallback to empty/legacy records if we are looking for Semester 1
+                                if (finalTargetSemNum == 1) {
+                                    fallbacks.add(m);
+                                }
                             }
                         }
 
@@ -1005,16 +1008,18 @@ public class FirebaseRepository {
                                         }
                                     }
                                 } else if (m.semesterId == null || m.semesterId.isEmpty()) {
-                                    // No semesterId saved — include as fallback
-                                    MarksRecord fallbackExisting = fallbackMap.get(m.studentId);
-                                    if (fallbackExisting == null) {
-                                        fallbackMap.put(m.studentId, m);
-                                    } else {
-                                        if (m.updatedAt >= fallbackExisting.updatedAt) {
-                                            mergeRecords(m, fallbackExisting);
+                                    // No semesterId saved — include as fallback only if target is Sem 1
+                                    if (finalTargetSemNum == 1) {
+                                        MarksRecord fallbackExisting = fallbackMap.get(m.studentId);
+                                        if (fallbackExisting == null) {
                                             fallbackMap.put(m.studentId, m);
                                         } else {
-                                            mergeRecords(fallbackExisting, m);
+                                            if (m.updatedAt >= fallbackExisting.updatedAt) {
+                                                mergeRecords(m, fallbackExisting);
+                                                fallbackMap.put(m.studentId, m);
+                                            } else {
+                                                mergeRecords(fallbackExisting, m);
+                                            }
                                         }
                                     }
                                 }

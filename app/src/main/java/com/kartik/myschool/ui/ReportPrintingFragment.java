@@ -416,7 +416,9 @@ public class ReportPrintingFragment extends Fragment {
                                         studentsList, sem1Map, sem2Map, cb);
                                 break;
                             case 4:
-                                PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb); break;
+                                boolean isSem2_4 = SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+                                Map<String, MarksRecord> gradeChartMap = isSem2_4 ? sem2Map : sem1Map;
+                                PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, gradeChartMap, isSem2_4, cb); break;
                             case 6:
                                 // Option 7 – Roster Grade Table (semester-wide boys/girls per grade)
                                 boolean isSem2_6 = SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;

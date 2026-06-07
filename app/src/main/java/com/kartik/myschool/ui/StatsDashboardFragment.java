@@ -112,8 +112,10 @@ public class StatsDashboardFragment extends Fragment {
                     public void onSuccess(Map<String, MarksRecord> marksMap) {
                         progressBar.setVisibility(View.GONE);
                         
-                        // Merge with local cache
-                        if (AppCache.cachedDescriptiveMarksMap != null) {
+                        // Merge with local cache ONLY if cache belongs to the active class and semester
+                        if (AppCache.cachedDescriptiveMarksMap != null 
+                                && java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)
+                                && java.util.Objects.equals(activeSemesterId, AppCache.cachedDescriptiveSemesterId)) {
                             for (Map.Entry<String, MarksRecord> entry : AppCache.cachedDescriptiveMarksMap.entrySet()) {
                                 if (entry.getValue().updatedAt >= (marksMap.containsKey(entry.getKey()) ? marksMap.get(entry.getKey()).updatedAt : 0)) {
                                     marksMap.put(entry.getKey(), entry.getValue());
@@ -121,7 +123,9 @@ public class StatsDashboardFragment extends Fragment {
                             }
                         }
 
-                        if (AppCache.cachedMarksMap != null) {
+                        if (AppCache.cachedMarksMap != null
+                                && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
+                                && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
                             for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
                                 if (entry.getValue().updatedAt >= (marksMap.containsKey(entry.getKey()) ? marksMap.get(entry.getKey()).updatedAt : 0)) {
                                     marksMap.put(entry.getKey(), entry.getValue());
