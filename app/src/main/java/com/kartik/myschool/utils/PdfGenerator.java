@@ -408,10 +408,19 @@ public class PdfGenerator {
         // Left Cell
         PdfPCell cL = new PdfPCell();
         cL.setBorder(Rectangle.NO_BORDER);
-        Paragraph pL = new Paragraph();
-        pL.add(new Phrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + udiseCode + "\n", fSmallBold));
-        pL.add(new Phrase(PdfLocalizer.get(ctx, "शाळेचे नाव: ", "Name of School: ") + schoolName, fSmallBold));
-        cL.addElement(pL);
+        try {
+            com.itextpdf.text.Image udiseImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(
+                    PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + udiseCode, 9, true, android.graphics.Color.BLACK);
+            cL.addElement(udiseImg);
+            com.itextpdf.text.Image schoolImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(
+                    PdfLocalizer.get(ctx, "शाळेचे नाव: ", "School: ") + schoolName, 9, false, android.graphics.Color.BLACK);
+            cL.addElement(schoolImg);
+        } catch (Exception e) {
+            Paragraph pL = new Paragraph();
+            pL.add(new Phrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + udiseCode + "\n", fSmallBold));
+            pL.add(new Phrase(PdfLocalizer.get(ctx, "शाळेचे नाव: ", "Name of School: ") + schoolName, fSmallBold));
+            cL.addElement(pL);
+        }
 
         // Center Cell
         PdfPCell cC = new PdfPCell();
@@ -430,11 +439,22 @@ public class PdfGenerator {
         // Right Cell
         PdfPCell cR = new PdfPCell();
         cR.setBorder(Rectangle.NO_BORDER);
-        Paragraph pR = new Paragraph();
-        pR.setAlignment(Element.ALIGN_RIGHT);
-        pR.add(new Phrase(PdfLocalizer.get(ctx, "शैक्षणिक वर्ष: ", "Year: ") + yearLabel + "\n", fSmallBold));
-        pR.add(new Phrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Div: ") + division, fSmallBold));
-        cR.addElement(pR);
+        try {
+            com.itextpdf.text.Image yImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(
+                    PdfLocalizer.get(ctx, "शैक्षणिक वर्ष: ", "Year: ") + yearLabel, 9, true, android.graphics.Color.BLACK);
+            yImg.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(yImg);
+            com.itextpdf.text.Image dImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(
+                    PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Div: ") + division, 9, true, android.graphics.Color.BLACK);
+            dImg.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(dImg);
+        } catch (Exception e) {
+            Paragraph pR = new Paragraph();
+            pR.setAlignment(Element.ALIGN_RIGHT);
+            pR.add(new Phrase(PdfLocalizer.get(ctx, "शैक्षणिक वर्ष: ", "Year: ") + yearLabel + "\n", fSmallBold));
+            pR.add(new Phrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Div: ") + division, fSmallBold));
+            cR.addElement(pR);
+        }
 
         hTbl.addCell(cL);
         hTbl.addCell(cC);
@@ -536,14 +556,20 @@ public class PdfGenerator {
 
                 MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
                 if (d != null) {
+                    // Use blank for zero values so the PDF doesn't show "0" for un-entered marks
+                    String aStr = d.akarikTotal > 0 ? str(d.akarikTotal) : "";
+                    String sStr = d.sanklit > 0 ? str(d.sanklit) : "";
+                    String gTot = d.grandTotal > 0 ? str(d.grandTotal) :
+                            (d.akarikTotal > 0 || d.sanklit > 0) ? str(d.akarikTotal + d.sanklit) : "";
+                    String grade = d.grade != null && !d.grade.isEmpty() ? d.grade : "";
                     if (isNonAcademic) {
-                        cellSpan(tbl, str(d.akarikTotal), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, aStr, fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, grade, fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     } else {
-                        cellSpan(tbl, str(d.akarikTotal), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, str(d.sanklit), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, str(d.grandTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, aStr, fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, sStr, fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, gTot, fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, grade, fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     }
 
                     if (d.grade != null) {

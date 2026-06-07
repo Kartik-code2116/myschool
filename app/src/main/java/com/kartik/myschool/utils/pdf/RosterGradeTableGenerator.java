@@ -119,12 +119,36 @@ public class RosterGradeTableGenerator {
                 + PdfLocalizer.get(ctx, "\nइयत्ता: ", "\nClass: ") + nvl(cls != null ? cls.className : null)
                 + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : null);
 
-        PdfPCell hL = rawCell(udiseText, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        // Use MarathiText for correct Devanagari rendering in header
+        PdfPCell hL = new PdfPCell();
         hL.setBorder(Rectangle.NO_BORDER);
-        PdfPCell hC = rawCell(semText, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        try {
+            hL.addElement(com.kartik.myschool.utils.pdf.MarathiText.renderLine(udiseText.replace("\n", " | "), 9, true, android.graphics.Color.BLACK));
+        } catch (Exception e) {
+            hL.addElement(new Phrase(udiseText, fSmallBold));
+        }
+
+        PdfPCell hC = new PdfPCell();
         hC.setBorder(Rectangle.NO_BORDER);
-        PdfPCell hR = rawCell(rightText, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
+        hC.setHorizontalAlignment(Element.ALIGN_CENTER);
+        try {
+            com.itextpdf.text.Image semImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(semText, 11, true, android.graphics.Color.BLACK);
+            semImg.setAlignment(Element.ALIGN_CENTER);
+            hC.addElement(semImg);
+        } catch (Exception e) {
+            hC.addElement(new Phrase(semText, fSmallBold));
+        }
+
+        PdfPCell hR = new PdfPCell();
         hR.setBorder(Rectangle.NO_BORDER);
+        hR.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        try {
+            com.itextpdf.text.Image rImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(rightText.replace("\n", " | "), 9, true, android.graphics.Color.BLACK);
+            rImg.setAlignment(Element.ALIGN_RIGHT);
+            hR.addElement(rImg);
+        } catch (Exception e) {
+            hR.addElement(new Phrase(rightText, fSmallBold));
+        }
 
         hdr.addCell(hL);
         hdr.addCell(hC);

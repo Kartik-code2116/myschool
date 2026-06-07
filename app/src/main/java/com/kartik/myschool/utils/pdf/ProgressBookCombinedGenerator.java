@@ -198,7 +198,7 @@ public class ProgressBookCombinedGenerator {
                 MarksRecord s1 = sem1Map != null ? sem1Map.get(student.id) : null;
                 MarksRecord s2 = sem2Map != null ? sem2Map.get(student.id) : null;
 
-                // Calculate total attendance
+                // Calculate total attendance from student's monthly attendance
                 int presentDays = 0;
                 if (student.monthlyAttendance != null) {
                     for (String m : student.monthlyAttendance.keySet()) {
@@ -210,11 +210,14 @@ public class ProgressBookCombinedGenerator {
                         }
                     }
                 }
+                // Also use presentDays from the marks record if student-level attendance is missing
+                if (presentDays == 0 && s1 != null && s1.presentDays > 0) presentDays = s1.presentDays;
+                if (presentDays == 0 && s2 != null && s2.presentDays > 0) presentDays = s2.presentDays;
                 String attStr = presentDays > 0 ? String.valueOf(presentDays) : "";
 
                 int rowspan = (selectedSemNum == 0) ? 2 : 1;
 
-                // ROW 1: Sem 1 (only if selectSemNum is 0/both or 1)
+                // ROW 1: Sem 1 (only if selectedSemNum is 0/both or 1)
                 if (selectedSemNum == 0 || selectedSemNum == 1) {
                     PdfPCell cSr = noPadCell(String.valueOf(sr++), bg);
                     cSr.setRowspan(rowspan);
@@ -233,8 +236,8 @@ public class ProgressBookCombinedGenerator {
                     tbl.addCell(noPadCell("I", bg));
 
                     for (Subject sub : allSubs) {
-                        MarksRecord.SubjectMarksDetail d = s1 != null ? s1.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)) : null;
-                        String mStr = d != null && d.grandTotal > 0 ? String.valueOf(d.grandTotal) : "";
+                        MarksRecord.SubjectMarksDetail d = getSubjectDetail(s1, sub.name);
+                        String mStr = getMarksStr(d, s1, sub.name);
                         String gStr = d != null ? nvl(d.grade) : "";
                         tbl.addCell(noPadCell(mStr, bg));
                         tbl.addCell(noPadCellBold(gStr, bg));
@@ -248,10 +251,10 @@ public class ProgressBookCombinedGenerator {
                     tbl.addCell(noPadCellBold(s1Grade, bg));
                 }
 
-                // ROW 2: Sem 2 (only if selectSemNum is 0/both or 2)
+                // ROW 2: Sem 2 (only if selectedSemNum is 0/both or 2)
                 if (selectedSemNum == 0 || selectedSemNum == 2) {
                     if (selectedSemNum == 2) {
-                        // If only Sem 2 is selected, we need to add Sr, Name and Attendance columns first
+                        // Only Sem 2 selected: add Sr, Name and Attendance columns for this row
                         PdfPCell cSr = noPadCell(String.valueOf(sr++), bg);
                         cSr.setRowspan(rowspan);
                         tbl.addCell(cSr);
@@ -270,8 +273,8 @@ public class ProgressBookCombinedGenerator {
                     tbl.addCell(noPadCell("II", bg));
 
                     for (Subject sub : allSubs) {
-                        MarksRecord.SubjectMarksDetail d = s2 != null ? s2.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)) : null;
-                        String mStr = d != null && d.grandTotal > 0 ? String.valueOf(d.grandTotal) : "";
+                        MarksRecord.SubjectMarksDetail d = getSubjectDetail(s2, sub.name);
+                        String mStr = getMarksStr(d, s2, sub.name);
                         String gStr = d != null ? nvl(d.grade) : "";
                         tbl.addCell(noPadCell(mStr, bg));
                         tbl.addCell(noPadCellBold(gStr, bg));
@@ -288,6 +291,52 @@ public class ProgressBookCombinedGenerator {
         }
 
         doc.add(tbl);
+    }
+
+    /**
+     * Looks up the SubjectMarksDetail for a subject name, trying:
+     * 1. Sanitized key (MarksRecord.sanitizeKey(name))
+     * 2. Raw name as-is
+     * 3. Lowercase raw name
+     */
+    private static MarksRecord.SubjectMarksDetail getSubjectDetail(MarksRecord rec, String subName) {
+        if (rec == null || rec.detailedMarks == null || subName == null) return null;
+        // Try sanitized key first
+        String sanitizedKey = MarksRecord.sanitizeKey(subName);
+        MarksRecord.SubjectMarksDetail d = rec.detailedMarks.get(sanitizedKey);
+        if (d != null) return d;
+        // Try raw name
+        d = rec.detailedMarks.get(subName);
+        if (d != null) return d;
+        // Try trimmed name
+        d = rec.detailedMarks.get(subName.trim());
+        if (d != null) return d;
+        // Try sanitized lowercase
+        d = rec.detailedMarks.get(sanitizedKey.toLowerCase());
+        if (d != null) return d;
+        return null;
+    }
+
+    /**
+     * Gets marks string for a subject: uses grandTotal from detail,
+     * falls back to subjectMarks map if detail is missing or grandTotal==0.
+     */
+    private static String getMarksStr(MarksRecord.SubjectMarksDetail d, MarksRecord rec, String subName) {
+        // If we have a valid detail with grandTotal > 0, use it
+        if (d != null && d.grandTotal > 0) return String.valueOf(d.grandTotal);
+        // If detail exists but grandTotal == 0, try akarikTotal + sanklit
+        if (d != null && (d.akarikTotal > 0 || d.sanklit > 0)) {
+            int total = d.akarikTotal + d.sanklit;
+            return total > 0 ? String.valueOf(total) : "";
+        }
+        // Fallback to subjectMarks map
+        if (rec != null && rec.subjectMarks != null) {
+            String sanitizedKey = MarksRecord.sanitizeKey(subName);
+            Double val = rec.subjectMarks.get(sanitizedKey);
+            if (val == null) val = rec.subjectMarks.get(subName);
+            if (val != null && val > 0) return String.valueOf(val.intValue());
+        }
+        return "";
     }
 
     private static PdfPCell noPadCell(String text, BaseColor bg) {
