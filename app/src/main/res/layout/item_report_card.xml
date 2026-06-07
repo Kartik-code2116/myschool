@@ -3,133 +3,70 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardReportItem"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardBackgroundColor="#F9F9F9"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    app:strokeColor="#F0F0F0"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground">
 
-        <!-- Left Section: Mini A4 Preview Graphic -->
-        <RelativeLayout
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="8dp">
+        <!-- Left Icon Container -->
+        <FrameLayout
+            android:id="@+id/tvReportCategoryIconBackground"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_surface_rounded"
+            android:backgroundTint="#F0F0FF">
 
-            <!-- Margin Number Top: 5 -->
-            <TextView
-                android:id="@+id/tvMarginTop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:text="5"
-                android:textColor="#888888"
-                android:textSize="9sp" />
+            <ImageView
+                android:id="@+id/tvReportCategoryIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_reports"
+                app:tint="#6A5ACD" />
+        </FrameLayout>
 
-            <!-- Margin Number Left: 10 -->
-            <TextView
-                android:id="@+id/tvMarginLeft"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="10"
-                android:textColor="#888888"
-                android:textSize="9sp" />
-
-            <!-- A4 Document Shape -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="42dp"
-                android:layout_height="56dp"
-                android:layout_centerInParent="true"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="4dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#6A5ACD"
-                app:strokeWidth="1dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <!-- A4 Text in green -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/txt_a4"
-                        android:textColor="#9CCC65"
-                        android:textSize="11sp" />
-
-                    <!-- Mini folded corner graphic at bottom-right -->
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentEnd="true"
-                        android:background="#E0E0E0" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Margin Number Right: 5 -->
-            <TextView
-                android:id="@+id/tvMarginRight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:text="5"
-                android:textColor="#888888"
-                android:textSize="9sp" />
-
-            <!-- Margin Number Bottom: 3 -->
-            <TextView
-                android:id="@+id/tvMarginBottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:text="3"
-                android:textColor="#888888"
-                android:textSize="9sp" />
-        </RelativeLayout>
-
-        <!-- Center Section: Marathi Content -->
+        <!-- Center Section: Text Content -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
 
-            <!-- Small Category Text -->
+            <!-- Small Category Text Pill -->
             <TextView
                 android:id="@+id/tvReportCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/str_empty_27"
-                android:textColor="#888888"
-                android:textSize="11sp" />
+                android:textColor="#6A5ACD"
+                android:textSize="11sp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:background="@drawable/bg_pill_info" />
 
             <!-- Main Report Title -->
             <TextView
                 android:id="@+id/tvReportTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/txt_1_3"
-                android:textColor="#333333"
+                android:textColor="#202124"
                 android:textSize="16sp" />
 
             <!-- Description Text -->
@@ -141,42 +78,28 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="@string/str_empty_28"
-                android:textColor="#888888"
-                android:textSize="12sp" />
+                android:textColor="#5F6368"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2dp" />
         </LinearLayout>
 
         <!-- Right Action Section -->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="end|center_vertical"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="vertical"
-            android:layout_marginStart="8dp">
+            android:layout_marginStart="12dp">
 
-            <!-- Top outlined icon action button -->
             <ImageButton
                 android:id="@+id/btnReportAction"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_scan"
-                android:padding="6dp"
+                android:src="@drawable/ic_print"
+                android:padding="12dp"
                 app:tint="#6A5ACD" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <!-- Bottom settings gear icon -->
-            <ImageButton
-                android:id="@+id/btnReportSettings"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_settings"
-                android:padding="6dp"
-                app:tint="#888888" />
         </LinearLayout>
 
     </LinearLayout>

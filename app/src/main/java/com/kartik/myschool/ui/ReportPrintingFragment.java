@@ -130,7 +130,7 @@ public class ReportPrintingFragment extends Fragment {
         ensureSemestersThen(() -> {
             // Class-level (roster) reports — no student selection needed
             // Positions 0: Cover page, 1: Index, 3: Descriptive Remarks, 4,5,7,8,9,10,12,14: Class-wide progress and roster charts
-            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 6 || position == 7 || position == 8 || position == 9 || position == 10 || position == 11 || position == 12 || position == 13 || position == 14 || position == 15 || position == 16);
+            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 6 || position == 7 || position == 8 || position == 9 || position == 10 || position == 11 || position == 12 || position == 13 || position == 14 || position == 15 || position == 16 || position == 17);
 
             if (isClassReport) {
                 generateClassRosterReport(position);
@@ -537,7 +537,7 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
-        pd.setMessage("सर्व 15 रिपोर्ट तयार होत आहेत. कृपया प्रतीक्षा करा (यास काही मिनिटे लागू शकतात)...");
+        pd.setMessage("सर्व 18 रिपोर्ट तयार होत आहेत. कृपया प्रतीक्षा करा (यास काही मिनिटे लागू शकतात)...");
         pd.setCancelable(false);
         pd.show();
 
@@ -552,8 +552,8 @@ public class ReportPrintingFragment extends Fragment {
                         new Thread(() -> {
                             try {
                                 List<File> allFiles = new ArrayList<>();
-                                // Generate all 15 reports
-                                for (int i = 0; i <= 14; i++) {
+                                // Generate all 18 reports
+                                for (int i = 0; i <= 17; i++) {
                                     File f = generateReportPositionSync(i, sem1Map, sem2Map);
                                     if (f != null && f.exists()) allFiles.add(f);
                                 }
@@ -769,10 +769,25 @@ public class ReportPrintingFragment extends Fragment {
     private void downloadOrSharePdfFile(File file) {
         if (file == null || !file.exists()) return;
         try {
+            java.io.File downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS);
+            java.io.File destFile = new java.io.File(downloadsDir, file.getName());
+            
+            java.io.FileInputStream in = new java.io.FileInputStream(file);
+            java.io.FileOutputStream out = new java.io.FileOutputStream(destFile);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+            
+            Toast.makeText(getContext(), "PDF Downloads फोल्डरमध्ये सेव्ह केले!", Toast.LENGTH_LONG).show();
+            
             Uri uri = androidx.core.content.FileProvider.getUriForFile(
                     getContext(),
                     getContext().getPackageName() + ".fileprovider",
-                    file
+                    destFile
             );
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(uri, "application/pdf");
@@ -780,6 +795,7 @@ public class ReportPrintingFragment extends Fragment {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (Exception e) {
+            e.printStackTrace();
             sharePdfFile(file);
         }
     }

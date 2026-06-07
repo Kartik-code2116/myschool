@@ -105,16 +105,19 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
             categoryColor = 0xFF888888;
         }
         b.tvReportCategory.setTextColor(categoryColor);
+        // Also tint the pill background lightly to match the category color
+        b.tvReportCategory.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                androidx.core.graphics.ColorUtils.setAlphaComponent(categoryColor, 30)));
+        b.tvReportCategoryIcon.setColorFilter(categoryColor);
+        b.tvReportCategoryIconBackground.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                androidx.core.graphics.ColorUtils.setAlphaComponent(categoryColor, 20)));
+        b.btnReportAction.setColorFilter(categoryColor);
 
         b.cardReportItem.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item, position);
         });
 
         b.btnReportAction.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(item, position);
-        });
-
-        b.btnReportSettings.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item, position);
         });
 
