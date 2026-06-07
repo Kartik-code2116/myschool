@@ -94,13 +94,15 @@ public class BothSemDescriptiveGenerator {
                 doc.open();
                 doc.setMargins(10, 10, 14, 14);
 
+                int selectedSemNum = (com.kartik.myschool.SessionContext.selectedSemester != null)
+                        ? com.kartik.myschool.SessionContext.selectedSemester.number : 0;
                 boolean isFirst = true;
                 if (students != null) {
                     for (Student student : students) {
                         if (!isFirst) doc.newPage();
                         isFirst = false;
-                        MarksRecord s1 = sem1Map != null ? sem1Map.get(student.id) : null;
-                        MarksRecord s2 = sem2Map != null ? sem2Map.get(student.id) : null;
+                        MarksRecord s1 = (selectedSemNum == 0 || selectedSemNum == 1) && sem1Map != null ? sem1Map.get(student.id) : null;
+                        MarksRecord s2 = (selectedSemNum == 0 || selectedSemNum == 2) && sem2Map != null ? sem2Map.get(student.id) : null;
 
                         addStudentPage(doc, ctx, school, cls, student, s1, s2);
                     }

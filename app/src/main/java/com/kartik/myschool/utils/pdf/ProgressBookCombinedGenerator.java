@@ -67,6 +67,9 @@ public class ProgressBookCombinedGenerator {
                                    Map<String, MarksRecord> sem1Map,
                                    Map<String, MarksRecord> sem2Map) throws Exception {
 
+        int selectedSemNum = (com.kartik.myschool.SessionContext.selectedSemester != null)
+                ? com.kartik.myschool.SessionContext.selectedSemester.number : 0;
+
         // ── 1. Header ─────────────────────────────────────────────────────────
         PdfPTable hdr = new PdfPTable(3);
         hdr.setWidthPercentage(100);
@@ -94,12 +97,18 @@ public class ProgressBookCombinedGenerator {
             com.itextpdf.text.Image titleImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), 16, true, android.graphics.Color.BLACK);
             titleImg.setAlignment(Element.ALIGN_CENTER);
             cC.addElement(titleImg);
-            com.itextpdf.text.Image subImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "प्रथम व द्वितीय सत्र", "First & Second Semester"), 10, false, android.graphics.Color.BLACK);
+            String termText = (selectedSemNum == 1) ? PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester")
+                    : (selectedSemNum == 2) ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester")
+                    : PdfLocalizer.get(ctx, "प्रथम व द्वितीय सत्र", "First & Second Semester");
+            com.itextpdf.text.Image subImg = MarathiText.renderLine(termText, 10, false, android.graphics.Color.BLACK);
             subImg.setAlignment(Element.ALIGN_CENTER);
             cC.addElement(subImg);
         } catch (Exception e) {
+            String termText = (selectedSemNum == 1) ? PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester")
+                    : (selectedSemNum == 2) ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester")
+                    : PdfLocalizer.get(ctx, "प्रथम व द्वितीय सत्र", "First & Second Semester");
             cC.addElement(new Phrase(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), fTitle));
-            cC.addElement(new Phrase(PdfLocalizer.get(ctx, "प्रथम व द्वितीय सत्र", "First & Second Semester"), fSmall));
+            cC.addElement(new Phrase(termText, fSmall));
         }
         hdr.addCell(cC);
 
@@ -203,55 +212,78 @@ public class ProgressBookCombinedGenerator {
                 }
                 String attStr = presentDays > 0 ? String.valueOf(presentDays) : "";
 
-                // ROW 1: Sem 1
-                PdfPCell cSr = noPadCell(String.valueOf(sr++), bg);
-                cSr.setRowspan(2);
-                tbl.addCell(cSr);
+                int rowspan = (selectedSemNum == 0) ? 2 : 1;
 
-                PdfPCell cName = noPadCell(nvl(student.name), bg);
-                cName.setHorizontalAlignment(Element.ALIGN_LEFT);
-                cName.setPaddingLeft(4);
-                cName.setRowspan(2);
-                tbl.addCell(cName);
+                // ROW 1: Sem 1 (only if selectSemNum is 0/both or 1)
+                if (selectedSemNum == 0 || selectedSemNum == 1) {
+                    PdfPCell cSr = noPadCell(String.valueOf(sr++), bg);
+                    cSr.setRowspan(rowspan);
+                    tbl.addCell(cSr);
 
-                PdfPCell cAtt = noPadCell(attStr, bg);
-                cAtt.setRowspan(2);
-                tbl.addCell(cAtt);
+                    PdfPCell cName = noPadCell(nvl(student.name), bg);
+                    cName.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    cName.setPaddingLeft(4);
+                    cName.setRowspan(rowspan);
+                    tbl.addCell(cName);
 
-                tbl.addCell(noPadCell("I", bg));
+                    PdfPCell cAtt = noPadCell(attStr, bg);
+                    cAtt.setRowspan(rowspan);
+                    tbl.addCell(cAtt);
 
-                for (Subject sub : allSubs) {
-                    MarksRecord.SubjectMarksDetail d = s1 != null ? s1.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)) : null;
-                    String mStr = d != null && d.grandTotal > 0 ? String.valueOf(d.grandTotal) : "";
-                    String gStr = d != null ? nvl(d.grade) : "";
-                    tbl.addCell(noPadCell(mStr, bg));
-                    tbl.addCell(noPadCellBold(gStr, bg));
+                    tbl.addCell(noPadCell("I", bg));
+
+                    for (Subject sub : allSubs) {
+                        MarksRecord.SubjectMarksDetail d = s1 != null ? s1.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)) : null;
+                        String mStr = d != null && d.grandTotal > 0 ? String.valueOf(d.grandTotal) : "";
+                        String gStr = d != null ? nvl(d.grade) : "";
+                        tbl.addCell(noPadCell(mStr, bg));
+                        tbl.addCell(noPadCellBold(gStr, bg));
+                    }
+
+                    String s1Total = s1 != null && s1.totalObtained > 0 ? String.valueOf((int)s1.totalObtained) : "";
+                    String s1Perc = s1 != null && s1.percentage > 0 ? String.format(java.util.Locale.US, "%.1f", s1.percentage) : "";
+                    String s1Grade = s1 != null ? nvl(s1.grade) : "";
+                    tbl.addCell(noPadCellBold(s1Total, bg));
+                    tbl.addCell(noPadCellBold(s1Perc, bg));
+                    tbl.addCell(noPadCellBold(s1Grade, bg));
                 }
 
-                String s1Total = s1 != null && s1.totalObtained > 0 ? String.valueOf((int)s1.totalObtained) : "";
-                String s1Perc = s1 != null && s1.percentage > 0 ? String.format(java.util.Locale.US, "%.1f", s1.percentage) : "";
-                String s1Grade = s1 != null ? nvl(s1.grade) : "";
-                tbl.addCell(noPadCellBold(s1Total, bg));
-                tbl.addCell(noPadCellBold(s1Perc, bg));
-                tbl.addCell(noPadCellBold(s1Grade, bg));
+                // ROW 2: Sem 2 (only if selectSemNum is 0/both or 2)
+                if (selectedSemNum == 0 || selectedSemNum == 2) {
+                    if (selectedSemNum == 2) {
+                        // If only Sem 2 is selected, we need to add Sr, Name and Attendance columns first
+                        PdfPCell cSr = noPadCell(String.valueOf(sr++), bg);
+                        cSr.setRowspan(rowspan);
+                        tbl.addCell(cSr);
 
-                // ROW 2: Sem 2
-                tbl.addCell(noPadCell("II", bg));
+                        PdfPCell cName = noPadCell(nvl(student.name), bg);
+                        cName.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        cName.setPaddingLeft(4);
+                        cName.setRowspan(rowspan);
+                        tbl.addCell(cName);
 
-                for (Subject sub : allSubs) {
-                    MarksRecord.SubjectMarksDetail d = s2 != null ? s2.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)) : null;
-                    String mStr = d != null && d.grandTotal > 0 ? String.valueOf(d.grandTotal) : "";
-                    String gStr = d != null ? nvl(d.grade) : "";
-                    tbl.addCell(noPadCell(mStr, bg));
-                    tbl.addCell(noPadCellBold(gStr, bg));
+                        PdfPCell cAtt = noPadCell(attStr, bg);
+                        cAtt.setRowspan(rowspan);
+                        tbl.addCell(cAtt);
+                    }
+
+                    tbl.addCell(noPadCell("II", bg));
+
+                    for (Subject sub : allSubs) {
+                        MarksRecord.SubjectMarksDetail d = s2 != null ? s2.detailedMarks.get(MarksRecord.sanitizeKey(sub.name)) : null;
+                        String mStr = d != null && d.grandTotal > 0 ? String.valueOf(d.grandTotal) : "";
+                        String gStr = d != null ? nvl(d.grade) : "";
+                        tbl.addCell(noPadCell(mStr, bg));
+                        tbl.addCell(noPadCellBold(gStr, bg));
+                    }
+
+                    String s2Total = s2 != null && s2.totalObtained > 0 ? String.valueOf((int)s2.totalObtained) : "";
+                    String s2Perc = s2 != null && s2.percentage > 0 ? String.format(java.util.Locale.US, "%.1f", s2.percentage) : "";
+                    String s2Grade = s2 != null ? nvl(s2.grade) : "";
+                    tbl.addCell(noPadCellBold(s2Total, bg));
+                    tbl.addCell(noPadCellBold(s2Perc, bg));
+                    tbl.addCell(noPadCellBold(s2Grade, bg));
                 }
-
-                String s2Total = s2 != null && s2.totalObtained > 0 ? String.valueOf((int)s2.totalObtained) : "";
-                String s2Perc = s2 != null && s2.percentage > 0 ? String.format(java.util.Locale.US, "%.1f", s2.percentage) : "";
-                String s2Grade = s2 != null ? nvl(s2.grade) : "";
-                tbl.addCell(noPadCellBold(s2Total, bg));
-                tbl.addCell(noPadCellBold(s2Perc, bg));
-                tbl.addCell(noPadCellBold(s2Grade, bg));
             }
         }
 

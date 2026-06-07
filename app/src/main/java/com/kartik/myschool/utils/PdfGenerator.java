@@ -328,20 +328,31 @@ public class PdfGenerator {
                 doc.open();
                 doc.setMargins(15, 15, 15, 15);
 
+                int selectedSemNum = 0;
+                if (com.kartik.myschool.SessionContext.selectedSemester != null) {
+                    selectedSemNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+                }
+
                 boolean hasPage = false;
-                if (sem1Marks != null && !sem1Marks.isEmpty()) {
-                    addProgressBookPage(doc, ctx, school, cls, students, sem1Marks, "First Semester");
-                    hasPage = true;
-                }
-                if (sem2Marks != null && !sem2Marks.isEmpty()) {
-                    if (hasPage) {
-                        doc.newPage();
+                if (selectedSemNum == 1) {
+                    addProgressBookPage(doc, ctx, school, cls, students, sem1Marks != null ? sem1Marks : new java.util.HashMap<>(), "First Semester");
+                } else if (selectedSemNum == 2) {
+                    addProgressBookPage(doc, ctx, school, cls, students, sem2Marks != null ? sem2Marks : new java.util.HashMap<>(), "Second Semester");
+                } else {
+                    if (sem1Marks != null && !sem1Marks.isEmpty()) {
+                        addProgressBookPage(doc, ctx, school, cls, students, sem1Marks, "First Semester");
+                        hasPage = true;
                     }
-                    addProgressBookPage(doc, ctx, school, cls, students, sem2Marks, "Second Semester");
-                    hasPage = true;
-                }
-                if (!hasPage) {
-                    addProgressBookPage(doc, ctx, school, cls, students, new java.util.HashMap<>(), "First Semester");
+                    if (sem2Marks != null && !sem2Marks.isEmpty()) {
+                        if (hasPage) {
+                            doc.newPage();
+                        }
+                        addProgressBookPage(doc, ctx, school, cls, students, sem2Marks, "Second Semester");
+                        hasPage = true;
+                    }
+                    if (!hasPage) {
+                        addProgressBookPage(doc, ctx, school, cls, students, new java.util.HashMap<>(), "First Semester");
+                    }
                 }
 
                 doc.close();
@@ -371,10 +382,16 @@ public class PdfGenerator {
                                             List<Student> students, Map<String, MarksRecord> marksMap,
                                             String termLabel) throws Exception {
         // 1. Title
-        Paragraph title = new Paragraph("Continuous Comprehensive Evaluation", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_DARK));
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(4);
-        doc.add(title);
+        try {
+            addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
+                    16, true, C_DARK, 0, 4);
+        } catch (Exception e) {
+            Font titleFont = (sMarathiBase != null) ? new Font(sMarathiBase, 16, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_DARK);
+            Paragraph title = new Paragraph(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(4);
+            doc.add(title);
+        }
 
         // 2. Header / Metadata Table (3 columns)
         float[] headerWidths = {3f, 2f, 3f};
@@ -392,14 +409,21 @@ public class PdfGenerator {
         PdfPCell cL = new PdfPCell();
         cL.setBorder(Rectangle.NO_BORDER);
         Paragraph pL = new Paragraph();
-        pL.add(new Phrase("UDISE: " + udiseCode + "\n", fSmallBold));
-        pL.add(new Phrase("Name of School: " + schoolName, fSmallBold));
+        pL.add(new Phrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + udiseCode + "\n", fSmallBold));
+        pL.add(new Phrase(PdfLocalizer.get(ctx, "शाळेचे नाव: ", "Name of School: ") + schoolName, fSmallBold));
         cL.addElement(pL);
 
         // Center Cell
         PdfPCell cC = new PdfPCell();
         cC.setBorder(Rectangle.NO_BORDER);
-        Paragraph pC = new Paragraph(termLabel, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, C_DARK));
+        String localizedTerm = termLabel;
+        if ("First Semester".equals(termLabel)) {
+            localizedTerm = PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
+        } else if ("Second Semester".equals(termLabel)) {
+            localizedTerm = PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester");
+        }
+        Font termFont = (sMarathiBase != null) ? new Font(sMarathiBase, 12, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, C_DARK);
+        Paragraph pC = new Paragraph(localizedTerm, termFont);
         pC.setAlignment(Element.ALIGN_CENTER);
         cC.addElement(pC);
 
@@ -408,8 +432,8 @@ public class PdfGenerator {
         cR.setBorder(Rectangle.NO_BORDER);
         Paragraph pR = new Paragraph();
         pR.setAlignment(Element.ALIGN_RIGHT);
-        pR.add(new Phrase("Year: " + yearLabel + "\n", fSmallBold));
-        pR.add(new Phrase("Class: " + className + ", Div: " + division, fSmallBold));
+        pR.add(new Phrase(PdfLocalizer.get(ctx, "शैक्षणिक वर्ष: ", "Year: ") + yearLabel + "\n", fSmallBold));
+        pR.add(new Phrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Div: ") + division, fSmallBold));
         cR.addElement(pR);
 
         hTbl.addCell(cL);
@@ -444,8 +468,8 @@ public class PdfGenerator {
         tbl.setWidthPercentage(100);
 
         // Row 1 Headers
-        cellSpan(tbl, "Sr.", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-        cellVerticalSpan(tbl, ctx, "Name of Student", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "अ.नं.", "Sr."), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Name of Student"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
         for (Subject sub : subjects) {
             int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
             boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
@@ -458,13 +482,13 @@ public class PdfGenerator {
             int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
             boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
             if (isNonAcademic) {
-                cellVerticalSpan(tbl, ctx, "Formative", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellVerticalSpan(tbl, ctx, "Grade", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "आकारिक", "Formative"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
             } else {
-                cellVerticalSpan(tbl, ctx, "Formative", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellVerticalSpan(tbl, ctx, "Summative", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellVerticalSpan(tbl, ctx, "Total (A+B)", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellVerticalSpan(tbl, ctx, "Grade", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "आकारिक", "Formative"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "संकलित", "Summative"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "एकूण (अ+ब)", "Total (A+B)"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
             }
         }
 
@@ -558,13 +582,13 @@ public class PdfGenerator {
         PdfPTable sumTbl = new PdfPTable(sumWidths);
         sumTbl.setWidthPercentage(100);
 
-        cellSpan(sumTbl, "Sr.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(sumTbl, "Subject", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "अ.नं.", "Sr."), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
         String[] gradesList = {"A-1", "A-2", "B-1", "B-2", "C-1", "C-2", "D", "E-1", "E-2"};
         for (String g : gradesList) {
             cellSpan(sumTbl, g, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
-        cellSpan(sumTbl, "Total", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         boolean sumAlt = false;
         for (int i = 0; i < subjects.size(); i++) {
@@ -594,10 +618,10 @@ public class PdfGenerator {
         sigTbl.setWidthPercentage(100);
         sigTbl.setSpacingBefore(30);
 
-        PdfPCell s1 = rawCell("Class Teacher Signature\n\n\n\n" + nvl(cls != null ? cls.teacherName : null), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "वर्गशिक्षकाची सही\n\n\n\n", "Class Teacher Signature\n\n\n\n") + nvl(cls != null ? cls.teacherName : null), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s1.setBorder(Rectangle.TOP); s1.setBorderColorTop(C_DARK); s1.setBorderWidthTop(0.5f); s1.setPaddingTop(4);
 
-        PdfPCell s2 = rawCell("Headmaster Signature\n\n\n\n" + nvl(school != null ? school.principalName : null), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s2 = rawCell(PdfLocalizer.get(ctx, "मुख्याध्यापकाची सही\n\n\n\n", "Headmaster Signature\n\n\n\n") + nvl(school != null ? school.principalName : null), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s2.setBorder(Rectangle.TOP); s2.setBorderColorTop(C_DARK); s2.setBorderWidthTop(0.5f); s2.setPaddingTop(4);
 
         sigTbl.addCell(s1);
