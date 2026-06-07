@@ -20,6 +20,7 @@ import com.kartik.myschool.EnterDescriptiveActivity;
 import com.kartik.myschool.HomeActivity;
 import com.kartik.myschool.R;
 import com.kartik.myschool.SessionContext;
+import com.kartik.myschool.SubjectRemarkEntryActivity;
 import com.kartik.myschool.databinding.FragmentDescriptiveEntriesBinding;
 import com.kartik.myschool.databinding.ItemDescriptiveStudentBlockBinding;
 import com.kartik.myschool.databinding.ItemDescriptiveSubjectCardBinding;
@@ -732,8 +733,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                     cardRoot.setStrokeColor(0xFFFFB74D);
                 }
 
-                // Tap anywhere on card → open entry screen
-                cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
+                // Tap anywhere on card -> open this subject's remark screen
+                cardB.getRoot().setOnClickListener(v -> openSubjectRemarkEntry(student, sub, number - 1));
 
                 // Layout params configured depending on active mode (Grid mode has weight,
                 // Slide mode has fixed 240dp width)
@@ -938,6 +939,23 @@ public class DescriptiveEntriesFragment extends Fragment {
                 android.util.Log.d("DESCRIPTIVE", "openMarksEntry: student=" + student.id
                         + " existingRecord=" + (existingRecord != null ? existingRecord.id : "null"));
                 Intent intent = new Intent(itemView.getContext(), EnterDescriptiveActivity.class);
+                itemView.getContext().startActivity(intent);
+            }
+
+            private void openSubjectRemarkEntry(Student student, Subject subject, int subjectIndex) {
+                AppCache.selectedStudent = student;
+                ClassModel freshClass = SessionContext.selectedClass != null
+                        ? SessionContext.selectedClass
+                        : activeClass;
+                AppCache.selectedClass = freshClass;
+                activeClass = freshClass;
+                AppCache.selectedSubjectName = subject != null ? subject.name : null;
+                AppCache.selectedSubjectIndex = subjectIndex;
+                AppCache.selectedMarks = getDisplayMarksForStudent(student);
+                android.util.Log.d("DESCRIPTIVE", "openSubjectRemarkEntry: student=" + student.id
+                        + " subject=" + AppCache.selectedSubjectName
+                        + " record=" + (AppCache.selectedMarks != null ? AppCache.selectedMarks.id : "null"));
+                Intent intent = new Intent(itemView.getContext(), SubjectRemarkEntryActivity.class);
                 itemView.getContext().startActivity(intent);
             }
         }

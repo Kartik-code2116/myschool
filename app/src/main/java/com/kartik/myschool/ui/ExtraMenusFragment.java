@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,13 +23,18 @@ import com.kartik.myschool.model.Semester;
 import com.kartik.myschool.model.Student;
 import com.kartik.myschool.model.Subject;
 import com.kartik.myschool.repository.FirebaseRepository;
+import com.google.android.material.chip.Chip;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExtraMenusFragment extends Fragment {
 
     private FragmentExtraMenusBinding b;
     private String menuType = "school_info";
+    private final List<String> remarkBankSubjects = new ArrayList<>();
+    private final List<String> remarkBankOptions = new ArrayList<>();
+    private String selectedRemarkBankSubject = "General";
 
     @Nullable
     @Override
@@ -118,6 +125,9 @@ public class ExtraMenusFragment extends Fragment {
             if (menuType.equals("class_teacher")) {
                 setupClassTeacherEditor(activeClass);
             }
+            if (menuType.equals("subject")) {
+                setupRemarkBankEditor(activeClass);
+            }
 
             // Real-time student statistics for active class (Gender & Cast categories)
             FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
@@ -188,6 +198,160 @@ public class ExtraMenusFragment extends Fragment {
 
         // Save Default admission baseline click listener
         b.btnSaveDefaults.setOnClickListener(v -> Toast.makeText(getContext(), R.string.msg_admission_defaults_baseline_se, Toast.LENGTH_SHORT).show());
+    }
+
+    private void setupRemarkBankEditor(ClassModel activeClass) {
+        if (!isAdded() || activeClass == null) return;
+
+        remarkBankSubjects.clear();
+        remarkBankSubjects.add("General");
+        if (activeClass.subjects != null) {
+            for (Subject subject : activeClass.subjects) {
+                if (subject != null && subject.name != null && !subject.name.trim().isEmpty()) {
+                    remarkBankSubjects.add(subject.name);
+                }
+            }
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                remarkBankSubjects
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        b.spRemarkBankSubject.setAdapter(adapter);
+        b.spRemarkBankSubject.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                selectedRemarkBankSubject = remarkBankSubjects.get(position);
+                loadRemarkBankOptions();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+        b.btnAddRemarkBankOption.setOnClickListener(v -> showAddRemarkOptionDialog());
+        loadRemarkBankOptions();
+    }
+
+    private void loadRemarkBankOptions() {
+        String schoolId = getActiveSchoolId();
+        List<String> cached = AppCache.cachedRemarkBank.get(selectedRemarkBankSubject);
+        if (cached != null && !cached.isEmpty()) {
+            remarkBankOptions.clear();
+            remarkBankOptions.addAll(cached);
+            renderRemarkBankOptions();
+            return;
+        }
+
+        FirebaseRepository.get().getRemarkBank(schoolId, selectedRemarkBankSubject,
+                new FirebaseRepository.OnResult<List<String>>() {
+                    @Override
+                    public void onSuccess(List<String> options) {
+                        if (!isAdded()) return;
+                        remarkBankOptions.clear();
+                        if (options != null) {
+                            remarkBankOptions.addAll(options);
+                        }
+                        AppCache.cachedRemarkBank.put(selectedRemarkBankSubject, new ArrayList<>(remarkBankOptions));
+                        renderRemarkBankOptions();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        if (!isAdded()) return;
+                        remarkBankOptions.clear();
+                        remarkBankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(selectedRemarkBankSubject));
+                        renderRemarkBankOptions();
+                    }
+                });
+    }
+
+    private void renderRemarkBankOptions() {
+        if (b == null) return;
+        b.cgRemarkBankOptions.removeAllViews();
+        for (String option : remarkBankOptions) {
+            Chip chip = new Chip(requireContext());
+            chip.setText(option);
+            chip.setCloseIconVisible(true);
+            chip.setEnsureMinTouchTargetSize(false);
+            chip.setOnCloseIconClickListener(v -> confirmRemoveRemarkOption(option));
+            chip.setOnLongClickListener(v -> {
+                confirmRemoveRemarkOption(option);
+                return true;
+            });
+            b.cgRemarkBankOptions.addView(chip);
+        }
+    }
+
+    private void showAddRemarkOptionDialog() {
+        if (!isAdded()) return;
+        EditText input = new EditText(requireContext());
+        input.setHint("Remark option");
+        input.setSingleLine(false);
+        input.setMinLines(2);
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Add remark option")
+                .setView(input)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String text = input.getText() != null ? input.getText().toString().trim() : "";
+                    if (text.isEmpty()) {
+                        Toast.makeText(getContext(), "Enter a remark option.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (!remarkBankOptions.contains(text)) {
+                        remarkBankOptions.add(text);
+                    }
+                    saveRemarkBankOptions("Option added.");
+                })
+                .show();
+    }
+
+    private void confirmRemoveRemarkOption(String option) {
+        if (!isAdded()) return;
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Remove option?")
+                .setMessage(option)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Remove", (dialog, which) -> {
+                    remarkBankOptions.remove(option);
+                    saveRemarkBankOptions("Option removed.");
+                })
+                .show();
+    }
+
+    private void saveRemarkBankOptions(String message) {
+        String schoolId = getActiveSchoolId();
+        b.btnAddRemarkBankOption.setEnabled(false);
+        FirebaseRepository.get().saveRemarkBank(schoolId, selectedRemarkBankSubject,
+                new ArrayList<>(remarkBankOptions), new FirebaseRepository.OnResult<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        if (!isAdded()) return;
+                        AppCache.cachedRemarkBank.put(selectedRemarkBankSubject, new ArrayList<>(remarkBankOptions));
+                        b.btnAddRemarkBankOption.setEnabled(true);
+                        renderRemarkBankOptions();
+                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        if (!isAdded()) return;
+                        b.btnAddRemarkBankOption.setEnabled(true);
+                        Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        loadRemarkBankOptions();
+                    }
+                });
+    }
+
+    private String getActiveSchoolId() {
+        if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.id != null) {
+            return SessionContext.selectedSchool.id;
+        }
+        ClassModel activeClass = SessionContext.selectedClass;
+        return activeClass != null ? activeClass.schoolId : null;
     }
 
     private List<Semester> semestersList = new java.util.ArrayList<>();

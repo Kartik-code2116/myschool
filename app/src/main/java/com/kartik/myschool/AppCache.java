@@ -55,4 +55,11 @@ public class AppCache {
     public static boolean descriptiveJustSaved           = false;
     public static String  descriptiveJustSavedStudentId  = null;
     public static MarksRecord descriptiveJustSavedRecord = null;
+
+    // Per-subject remark entry context (set before launching SubjectRemarkEntryActivity)
+    public static String selectedSubjectName  = null;
+    public static int    selectedSubjectIndex = 0;
+
+    // In-memory remark bank cache: subjectName -> list of remark options
+    public static java.util.Map<String, java.util.List<String>> cachedRemarkBank = new java.util.HashMap<>();
 }

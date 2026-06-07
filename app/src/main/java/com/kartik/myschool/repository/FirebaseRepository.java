@@ -1216,6 +1216,61 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    // REMARK BANK — per-subject dropdown options (customisable by teacher)
+    // ═══════════════════════════════════════════════════════════════════
+
+    private static final String COL_REMARK_BANKS = "remarkBanks";
+
+    /**
+     * Fetches remark options for a given subject from Firestore.
+     * Falls back to RemarkBank.defaultOptionsFor(subjectName) when no doc exists.
+     */
+    public void getRemarkBank(String schoolId, String subjectName,
+                              OnResult<java.util.List<String>> cb) {
+        String docId = makeRemarkBankId(schoolId, subjectName);
+        db.collection(COL_REMARK_BANKS).document(docId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        com.kartik.myschool.model.RemarkBank bank =
+                                doc.toObject(com.kartik.myschool.model.RemarkBank.class);
+                        if (bank != null && bank.options != null && !bank.options.isEmpty()) {
+                            cb.onSuccess(bank.options);
+                            return;
+                        }
+                    }
+                    // No custom bank → return defaults
+                    cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName));
+                })
+                .addOnFailureListener(e -> {
+                    // On network error also fall back to defaults
+                    cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName));
+                });
+    }
+
+    /**
+     * Saves (creates or overwrites) the remark bank for a subject.
+     */
+    public void saveRemarkBank(String schoolId, String subjectName,
+                               java.util.List<String> options,
+                               OnResult<Void> cb) {
+        com.kartik.myschool.model.RemarkBank bank =
+                new com.kartik.myschool.model.RemarkBank(schoolId, subjectName, options);
+        String docId = makeRemarkBankId(schoolId, subjectName);
+        db.collection(COL_REMARK_BANKS).document(docId)
+                .set(bank)
+                .addOnSuccessListener(v -> cb.onSuccess(null))
+                .addOnFailureListener(cb::onError);
+    }
+
+    private String makeRemarkBankId(String schoolId, String subjectName) {
+        String safe = subjectName != null
+                ? subjectName.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
+                : "general";
+        return (schoolId != null ? schoolId : "default") + "_" + safe;
+    }
+
     // ---------- Callback interface ----------
     public interface OnResult<T> {
         void onSuccess(T result);
