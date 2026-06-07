@@ -228,11 +228,16 @@ public class DescriptiveRemarksGenerator {
         Font fRowB   = sMarathiBase != null ? new Font(sMarathiBase,  9, Font.BOLD,   C_DARK)
                                             : new Font(Font.FontFamily.HELVETICA,  9, Font.BOLD, C_DARK);
 
-        // ── 1. Page Title ──────────────────────────────────────────────────────
-        Paragraph titlePara = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", fTitle);
-        titlePara.setAlignment(Element.ALIGN_CENTER);
-        titlePara.setSpacingAfter(8);
-        doc.add(titlePara);
+        // ── 1. Page Title (rendered via MarathiText for correct Devanagari) ────
+        try {
+            PdfGenerator.addMarathiParagraph(doc, "सातत्यपूर्ण सर्वंकष मूल्यमापन",
+                    15, true, C_DARK, 0, 8);
+        } catch (Exception e) {
+            Paragraph titlePara = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", fTitle);
+            titlePara.setAlignment(Element.ALIGN_CENTER);
+            titlePara.setSpacingAfter(8);
+            doc.add(titlePara);
+        }
 
         // ── 2. Student Info Header ─────────────────────────────────────────────
         PdfPTable hdr = new PdfPTable(new float[]{2.5f, 0.2f, 1.5f});
@@ -299,17 +304,14 @@ public class DescriptiveRemarksGenerator {
     // ── Cell helpers ──────────────────────────────────────────────────────────
 
     private static void addNoBorderCell(PdfPTable tbl, String text, Font font, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        PdfPCell c = PdfGenerator.rawCell(text, font, BaseColor.WHITE, C_DARK, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(align);
         c.setPadding(2f);
         tbl.addCell(c);
     }
 
     private static void addHeaderCell(PdfPTable tbl, String text, Font font, BaseColor bg) {
-        PdfPCell c = new PdfPCell(new Phrase(text, font));
-        c.setBackgroundColor(bg);
-        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell c = PdfGenerator.rawCell(text, font, bg, C_WHITE, Element.ALIGN_CENTER);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
         c.setPadding(5f);
         tbl.addCell(c);
@@ -317,9 +319,7 @@ public class DescriptiveRemarksGenerator {
 
     private static void addDataCell(PdfPTable tbl, String text, Font font,
                                     BaseColor bg, int align, float minH) {
-        PdfPCell c = new PdfPCell(new Phrase(text != null ? text : "", font));
-        c.setBackgroundColor(bg);
-        c.setHorizontalAlignment(align);
+        PdfPCell c = PdfGenerator.rawCell(text != null ? text : "", font, bg, C_DARK, align);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
         c.setPadding(5f);
         c.setMinimumHeight(minH);

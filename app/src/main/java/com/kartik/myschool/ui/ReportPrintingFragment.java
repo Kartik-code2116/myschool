@@ -130,7 +130,7 @@ public class ReportPrintingFragment extends Fragment {
         ensureSemestersThen(() -> {
             // Class-level (roster) reports — no student selection needed
             // Positions 0: Cover page, 1: Index, 3: Descriptive Remarks, 4,5,7,8,9,10,12,14: Class-wide progress and roster charts
-            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 7 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
+            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 6 || position == 7 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
 
             if (isClassReport) {
                 generateClassRosterReport(position);
@@ -393,12 +393,38 @@ public class ReportPrintingFragment extends Fragment {
                         };
                         switch (reportPosition) {
                             case 3:
-                            case 7:
                                 com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb); break;
+                            case 7: {
+                                // Option 8 – Marks-Grade Ledger
+                                boolean isSem2_7 = SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+                                Map<String, MarksRecord> ledgerMap = isSem2_7 ? sem2Map : sem1Map;
+                                com.kartik.myschool.utils.pdf.MarksGradeLedgerGenerator.generateMarksGradeLedger(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, ledgerMap, isSem2_7, cb);
+                                break;
+                            }
+                            case 8:
+                                // Option 9 – Progress Card Cover (one page per student, landscape)
+                                com.kartik.myschool.utils.pdf.ProgressCardCoverGenerator.generateProgressCardCover(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, sem1Map, sem2Map, cb);
+                                break;
+                            case 9:
+                                // Option 10 – Both-Semester Descriptive Remarks (landscape, side-by-side)
+                                com.kartik.myschool.utils.pdf.BothSemDescriptiveGenerator.generateBothSemDescriptive(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, sem1Map, sem2Map, cb);
+                                break;
                             case 4:
                                 PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb); break;
                             case 6:
-                                PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem2Map, true, cb); break;
+                                // Option 7 – Roster Grade Table (semester-wide boys/girls per grade)
+                                boolean isSem2_6 = SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+                                Map<String, MarksRecord> rosterMap = isSem2_6 ? sem2Map : sem1Map;
+                                com.kartik.myschool.utils.pdf.RosterGradeTableGenerator.generateRosterGradeTable(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, rosterMap, isSem2_6, cb);
+                                break;
                             case 5:
                             case 10:
                             case 12:
@@ -523,7 +549,25 @@ public class ReportPrintingFragment extends Fragment {
         } else if (position == 4) {
             PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, false, cb);
         } else if (position == 6) {
-            PdfGenerator.generateGradeChart(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem2Map, true, cb);
+            // Option 7 – Roster Grade Table (Semester 2 for Master Report)
+            com.kartik.myschool.utils.pdf.RosterGradeTableGenerator.generateRosterGradeTable(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem2Map, true, cb);
+        } else if (position == 7) {
+            // Option 8 – Marks-Grade Ledger (Semester 1 for Master Report)
+            com.kartik.myschool.utils.pdf.MarksGradeLedgerGenerator.generateMarksGradeLedger(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem1Map, false, cb);
+        } else if (position == 8) {
+            // Option 9 – Progress Card Cover
+            com.kartik.myschool.utils.pdf.ProgressCardCoverGenerator.generateProgressCardCover(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem1Map, sem2Map, cb);
+        } else if (position == 9) {
+            // Option 10 – Both-Semester Descriptive Remarks
+            com.kartik.myschool.utils.pdf.BothSemDescriptiveGenerator.generateBothSemDescriptive(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem1Map, sem2Map, cb);
         } else if (isClassReport) {
             PdfGenerator.generateProgressBook(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb);
         } else {

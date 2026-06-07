@@ -71,21 +71,37 @@ public class PdfGenerator {
 
     public static synchronized void ensureFonts(Context ctx) {
         if (sMarathiBase != null) return;
+
+        // ── Step 1: Load Android Typeface for bitmap rendering (MarathiText) ──
+        // NotoSansDevanagari has the broadest Unicode Devanagari coverage and
+        // renders ALL matras/conjuncts correctly via Android's Harfbuzz engine.
+        try {
+            File notoFile = new File(ctx.getFilesDir(), "noto_dev.ttf");
+            InputStream nis = ctx.getAssets().open("fonts/NotoSansDevanagari-Regular.ttf");
+            FileOutputStream nos = new FileOutputStream(notoFile);
+            byte[] buf2 = new byte[4096]; int len2;
+            while ((len2 = nis.read(buf2)) > 0) nos.write(buf2, 0, len2);
+            nis.close(); nos.close();
+            sMarathiTypeface = android.graphics.Typeface.createFromFile(notoFile);
+            android.util.Log.d("PDF_FONT", "Loaded NotoSansDevanagari Typeface for rendering");
+        } catch (Exception e) {
+            android.util.Log.w("PDF_FONT", "NotoSans load failed, will use system typeface", e);
+        }
+
+        // ── Step 2: Load iText BaseFont (TiroDevanagariHindi) for embedded PDF font ──
+        // This is used for numbers, ASCII and fallback text in iText Phrases.
         try {
             File fontFile = new File(ctx.getFilesDir(), "tiro_dev.ttf");
-            // Force copy every time in case it was corrupted
             InputStream is = ctx.getAssets().open("fonts/TiroDevanagariHindi-Regular.ttf");
             FileOutputStream os = new FileOutputStream(fontFile);
             byte[] buf = new byte[4096]; int len;
             while ((len = is.read(buf)) > 0) os.write(buf, 0, len);
             is.close(); os.close();
-
             sMarathiBase = BaseFont.createFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            sMarathiTypeface = android.graphics.Typeface.createFromFile(fontFile);
-            android.util.Log.d("PDF_FONT", "Successfully loaded Marathi font from assets!");
+            android.util.Log.d("PDF_FONT", "Loaded TiroDevanagariHindi iText BaseFont");
         } catch (Exception e) {
-            android.util.Log.e("PDF_FONT", "Failed to load Marathi font from assets", e);
-            // Fallback 1: Try system font
+            android.util.Log.e("PDF_FONT", "TiroDevanagari load failed, trying system fonts", e);
+            // Fallback: Try system Devanagari fonts for BaseFont
             String[] systemFonts = {
                 "/system/fonts/NotoSansDevanagari-Regular.ttf",
                 "/system/fonts/NotoSansDevanagari-UI-Regular.ttf",
@@ -96,8 +112,9 @@ public class PdfGenerator {
                 try {
                     if (new File(sysFont).exists()) {
                         sMarathiBase = BaseFont.createFont(sysFont, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        sMarathiTypeface = android.graphics.Typeface.createFromFile(sysFont);
-                        android.util.Log.d("PDF_FONT", "Successfully loaded system font: " + sysFont);
+                        if (sMarathiTypeface == null)
+                            sMarathiTypeface = android.graphics.Typeface.createFromFile(sysFont);
+                        android.util.Log.d("PDF_FONT", "Loaded system font: " + sysFont);
                         break;
                     }
                 } catch (Exception ignored) {
@@ -305,133 +322,290 @@ public class PdfGenerator {
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Pragati_" + ts() + ".pdf");
-                Document doc = new Document(PageSize.A4);
+                Document doc = new Document(PageSize.A4.rotate());
                 PdfWriter.getInstance(doc, new FileOutputStream(out));
                 doc.open();
-                doc.setMargins(30, 30, 30, 30);
+                doc.setMargins(15, 15, 15, 15);
 
-                // Page 1: Index (अनुक्रमणिका)
-                Paragraph indexTitle = new Paragraph("अनुक्रमणिका", new Font(sMarathiBase, 18, Font.BOLD, C_DARK));
-                indexTitle.setAlignment(Element.ALIGN_CENTER);
-                doc.add(indexTitle);
-                
-                PdfPTable indexTop = new PdfPTable(3);
-                indexTop.setWidthPercentage(100); indexTop.setSpacingBefore(10); indexTop.setSpacingAfter(10);
-                String udiseStr = "युडायस: " + (school.udiseCode!=null?school.udiseCode:"");
-                String schoolStr = "शाळा: " + (school.name!=null?school.name:"");
-                cellSpan(indexTop, udiseStr + "\n" + schoolStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
-                cellSpan(indexTop, "प्रथम सत्र", fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                String yearStr = "सन: " + (cls.academicYearLabel!=null?cls.academicYearLabel:"");
-                String classStr = "इयत्ता: " + (cls.className!=null?cls.className:"");
-                cellSpan(indexTop, yearStr + "\n" + classStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
-                doc.add(indexTop);
-
-                PdfPTable indexTbl = new PdfPTable(new float[]{0.6f, 3.0f, 1.0f, 1.2f, 0.8f});
-                indexTbl.setWidthPercentage(100);
-                cellHorizontalImageSpan(indexTbl, ctx, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellHorizontalImageSpan(indexTbl, ctx, "विद्यार्थ्याचे नाव", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellHorizontalImageSpan(indexTbl, ctx, "रजि.नं.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellHorizontalImageSpan(indexTbl, ctx, "जन्मतारीख", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                cellHorizontalImageSpan(indexTbl, ctx, "पृष्ठ क्र.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-
-                boolean alt = false;
-                for (int i=0; i<students.size(); i++) {
-                    Student s = students.get(i);
-                    BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-                    cellSpan(indexTbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(indexTbl, nvl(s.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
-                    cellSpan(indexTbl, "-", fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(indexTbl, "-", fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(indexTbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                boolean hasPage = false;
+                if (sem1Marks != null && !sem1Marks.isEmpty()) {
+                    addProgressBookPage(doc, ctx, school, cls, students, sem1Marks, "First Semester");
+                    hasPage = true;
                 }
-                doc.add(indexTbl);
-
-                // Pages 2+: Subjects
-                if (cls.subjects != null) {
-                    for (int si = 0; si < cls.subjects.size(); si++) {
+                if (sem2Marks != null && !sem2Marks.isEmpty()) {
+                    if (hasPage) {
                         doc.newPage();
-                        Subject sub = cls.subjects.get(si);
-                        
-                        Paragraph pageTitle = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", new Font(sMarathiBase, 18, Font.BOLD, C_DARK));
-                        pageTitle.setAlignment(Element.ALIGN_CENTER);
-                        pageTitle.setSpacingAfter(10);
-                        doc.add(pageTitle);
-                        
-                        PdfPTable top = new PdfPTable(3);
-                        top.setWidthPercentage(100); top.setSpacingAfter(5);
-                        cellSpan(top, schoolStr + "\n" + classStr, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
-                        cellSpan(top, sub.name, fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(top, yearStr + "\n" + "प्रथम सत्र", fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_RIGHT);
-                        doc.add(top);
-
-                        float[] widths = {0.6f, 1.2f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.7f, 0.8f, 0.7f, 0.7f, 0.7f, 0.8f, 0.8f, 0.8f, 0.8f};
-                        PdfPTable tbl = new PdfPTable(widths);
-                        tbl.setWidthPercentage(100); tbl.setSpacingAfter(10);
-
-                        cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                        cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-                        cellHorizontalImageSpan(tbl, ctx, "आकारिक (अ)", fSmallBold, C_HEADER_BG, C_DARK, 9, 1);
-                        cellHorizontalImageSpan(tbl, ctx, "संकलित (ब)", fSmallBold, C_HEADER_BG, C_DARK, 4, 1);
-                        cellVerticalSpan(tbl, ctx, "अ+ब", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-                        cellVerticalSpan(tbl, ctx, "शे.गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-                        cellVerticalSpan(tbl, ctx, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-
-                        String[] formatives = {"निरीक्षण", "तोंडीकाम", "प्रात्यक्षिक", "उपक्रम", "प्रकल्प", "चाचणी", "स्वाध्याय", "इतर", "एकूण"};
-                        for (String f : formatives) cellVerticalSpan(tbl, ctx, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-                        String[] summatives = {"तोंडी", "प्रात्य.", "लेखी", "एकूण"};
-                        for (String s : summatives) cellVerticalSpan(tbl, ctx, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-
-
-                        // Row 3: max marks
-                        String[] maxMarksForm = {strZero(sub.maxNirikhshan), strZero(sub.maxTondiKam), strZero(sub.maxPratyakshik), strZero(sub.maxUpkram), strZero(sub.maxPrakalp), strZero(sub.maxChachani), strZero(sub.maxSwadhyay), strZero(sub.maxItar), str(sub.maxMarks / 2)};
-                        for (String m : maxMarksForm) cellSpan(tbl, m, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        String[] maxMarksSumm = {strZero(sub.maxTondi), strZero(sub.maxPratyakshikB), strZero(sub.maxLekhi), str(sub.maxMarks - sub.maxMarks / 2)};
-                        for (String m : maxMarksSumm) cellSpan(tbl, m, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-
-                        alt = false;
-                        for (int i = 0; i < students.size(); i++) {
-                            Student s = students.get(i);
-                            BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-                            cellSpan(tbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                            cellSpan(tbl, nvl(s.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
-
-                            MarksRecord rec = null;
-                            if (sem1Marks != null) rec = sem1Marks.get(s.id);
-                            if (rec == null && sem2Marks != null) rec = sem2Marks.get(s.id);
-                            
-                            MarksRecord.SubjectMarksDetail d = rec != null ? detail(rec, sub.name) : null;
-
-                            if (d != null) {
-                                cellSpan(tbl, strZero(d.nirikhshan), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.tondiKam), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.pratyakshik), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.upkram), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.prakalp), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.chachani), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.swadhyay), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.itar), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, str(d.akarikTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                
-                                cellSpan(tbl, strZero(d.tondi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.pratyakshikB), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, strZero(d.lekhi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, str(d.sanklit), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                
-                                cellSpan(tbl, str(d.grandTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, calculatePercentageString(d.grandTotal, sub.maxMarks), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                                cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                            } else {
-                                for (int k = 0; k < 16; k++) cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
-                            }
-                        }
-                        doc.add(tbl);
                     }
+                    addProgressBookPage(doc, ctx, school, cls, students, sem2Marks, "Second Semester");
+                    hasPage = true;
+                }
+                if (!hasPage) {
+                    addProgressBookPage(doc, ctx, school, cls, students, new java.util.HashMap<>(), "First Semester");
                 }
 
                 doc.close();
                 cb.onSuccess(out);
-            } catch (Exception e) { cb.onError(e); }
+            } catch (Exception e) {
+                cb.onError(e);
+            }
         }).start();
+    }
+
+    public static String normalizeGrade(String g) {
+        if (g == null) return "";
+        String s = g.trim().toUpperCase().replace(" ", "").replace("-", "");
+        if (s.equals("A1")) return "A-1";
+        if (s.equals("A2")) return "A-2";
+        if (s.equals("B1")) return "B-1";
+        if (s.equals("B2")) return "B-2";
+        if (s.equals("C1")) return "C-1";
+        if (s.equals("C2")) return "C-2";
+        if (s.equals("D")) return "D";
+        if (s.equals("E1")) return "E-1";
+        if (s.equals("E2")) return "E-2";
+        return g;
+    }
+
+    private static void addProgressBookPage(Document doc, Context ctx, School school, ClassModel cls,
+                                            List<Student> students, Map<String, MarksRecord> marksMap,
+                                            String termLabel) throws Exception {
+        // 1. Title
+        Paragraph title = new Paragraph("Continuous Comprehensive Evaluation", new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_DARK));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(4);
+        doc.add(title);
+
+        // 2. Header / Metadata Table (3 columns)
+        float[] headerWidths = {3f, 2f, 3f};
+        PdfPTable hTbl = new PdfPTable(headerWidths);
+        hTbl.setWidthPercentage(100);
+        hTbl.setSpacingAfter(8);
+
+        String schoolName = school != null && school.name != null ? school.name : "-";
+        String udiseCode = school != null && school.udiseCode != null ? school.udiseCode : "-";
+        String yearLabel = cls != null && cls.academicYearLabel != null ? cls.academicYearLabel : "-";
+        String className = cls != null && cls.className != null ? cls.className : "-";
+        String division = cls != null && cls.division != null ? cls.division : "-";
+
+        // Left Cell
+        PdfPCell cL = new PdfPCell();
+        cL.setBorder(Rectangle.NO_BORDER);
+        Paragraph pL = new Paragraph();
+        pL.add(new Phrase("UDISE: " + udiseCode + "\n", fSmallBold));
+        pL.add(new Phrase("Name of School: " + schoolName, fSmallBold));
+        cL.addElement(pL);
+
+        // Center Cell
+        PdfPCell cC = new PdfPCell();
+        cC.setBorder(Rectangle.NO_BORDER);
+        Paragraph pC = new Paragraph(termLabel, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, C_DARK));
+        pC.setAlignment(Element.ALIGN_CENTER);
+        cC.addElement(pC);
+
+        // Right Cell
+        PdfPCell cR = new PdfPCell();
+        cR.setBorder(Rectangle.NO_BORDER);
+        Paragraph pR = new Paragraph();
+        pR.setAlignment(Element.ALIGN_RIGHT);
+        pR.add(new Phrase("Year: " + yearLabel + "\n", fSmallBold));
+        pR.add(new Phrase("Class: " + className + ", Div: " + division, fSmallBold));
+        cR.addElement(pR);
+
+        hTbl.addCell(cL);
+        hTbl.addCell(cC);
+        hTbl.addCell(cR);
+        doc.add(hTbl);
+
+        // 3. Prepare Subjects
+        List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new ArrayList<>();
+        int numCols = 2; // Sr, Student Name
+        for (Subject sub : subjects) {
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+            numCols += isNonAcademic ? 2 : 4;
+        }
+
+        float[] widths = new float[numCols];
+        widths[0] = 0.3f; // Sr.
+        widths[1] = 1.0f; // Name of Student
+        int idx = 2;
+        for (Subject sub : subjects) {
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+            if (isNonAcademic) {
+                widths[idx++] = 0.3f; widths[idx++] = 0.3f;
+            } else {
+                widths[idx++] = 0.3f; widths[idx++] = 0.3f; widths[idx++] = 0.3f; widths[idx++] = 0.3f;
+            }
+        }
+
+        PdfPTable tbl = new PdfPTable(widths);
+        tbl.setWidthPercentage(100);
+
+        // Row 1 Headers
+        cellSpan(tbl, "Sr.", fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        cellVerticalSpan(tbl, ctx, "Name of Student", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        for (Subject sub : subjects) {
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+            int colspan = isNonAcademic ? 2 : 4;
+            cellSpan(tbl, sub.name, fSmallBold, C_HEADER_BG, C_DARK, colspan, 1, Element.ALIGN_CENTER);
+        }
+
+        // Row 2 Headers
+        for (Subject sub : subjects) {
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+            if (isNonAcademic) {
+                cellVerticalSpan(tbl, ctx, "Formative", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, "Grade", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            } else {
+                cellVerticalSpan(tbl, ctx, "Formative", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, "Summative", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, "Total (A+B)", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                cellVerticalSpan(tbl, ctx, "Grade", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            }
+        }
+
+        // Row 3 Headers
+        for (Subject sub : subjects) {
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+            int akarikMaxVal = sub.maxMarks / 2;
+            int sanklitMaxVal = sub.maxMarks - akarikMaxVal;
+            if (isNonAcademic) {
+                cellSpan(tbl, str(sub.maxMarks), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            } else {
+                cellSpan(tbl, str(akarikMaxVal), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(tbl, str(sanklitMaxVal), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(tbl, str(sub.maxMarks), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            }
+        }
+
+        // Grade frequency counters
+        Map<String, Map<String, Integer>> gradeCounts = new java.util.HashMap<>();
+        for (Subject sub : subjects) {
+            Map<String, Integer> counts = new java.util.HashMap<>();
+            for (String g : new String[]{"A-1", "A-2", "B-1", "B-2", "C-1", "C-2", "D", "E-1", "E-2"}) {
+                counts.put(g, 0);
+            }
+            gradeCounts.put(sub.name, counts);
+        }
+
+        // Data Rows
+        boolean alt = false;
+        for (int sIdx = 0; sIdx < students.size(); sIdx++) {
+            Student student = students.get(sIdx);
+            BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
+
+            cellSpan(tbl, str(sIdx + 1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, nvl(student.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+
+            MarksRecord rec = marksMap != null ? marksMap.get(student.id) : null;
+
+            for (Subject sub : subjects) {
+                int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+                boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+
+                MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
+                if (d != null) {
+                    if (isNonAcademic) {
+                        cellSpan(tbl, str(d.akarikTotal), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    } else {
+                        cellSpan(tbl, str(d.akarikTotal), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.sanklit), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.grandTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, nvl(d.grade), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    }
+
+                    if (d.grade != null) {
+                        String normG = normalizeGrade(d.grade);
+                        Map<String, Integer> counts = gradeCounts.get(sub.name);
+                        if (counts != null && counts.containsKey(normG)) {
+                            counts.put(normG, counts.get(normG) + 1);
+                        }
+                    }
+                } else {
+                    if (isNonAcademic) {
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    } else {
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    }
+                }
+            }
+        }
+        doc.add(tbl);
+
+        // 4. Summary Table and Signatures (Side-by-side using a parent 2-column table)
+        float[] bottomWidths = {6.5f, 3.5f};
+        PdfPTable bottomTbl = new PdfPTable(bottomWidths);
+        bottomTbl.setWidthPercentage(100);
+        bottomTbl.setSpacingBefore(12);
+
+        // Left Cell: Summary Table
+        PdfPCell leftCell = new PdfPCell();
+        leftCell.setBorder(Rectangle.NO_BORDER);
+
+        float[] sumWidths = {0.4f, 2.0f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.6f};
+        PdfPTable sumTbl = new PdfPTable(sumWidths);
+        sumTbl.setWidthPercentage(100);
+
+        cellSpan(sumTbl, "Sr.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, "Subject", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        String[] gradesList = {"A-1", "A-2", "B-1", "B-2", "C-1", "C-2", "D", "E-1", "E-2"};
+        for (String g : gradesList) {
+            cellSpan(sumTbl, g, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        }
+        cellSpan(sumTbl, "Total", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+
+        boolean sumAlt = false;
+        for (int i = 0; i < subjects.size(); i++) {
+            Subject sub = subjects.get(i);
+            BaseColor sBg = sumAlt ? C_ROW_ALT : C_WHITE; sumAlt = !sumAlt;
+            cellSpan(sumTbl, str(i + 1), fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(sumTbl, sub.name, fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+
+            int totalGradeCount = 0;
+            Map<String, Integer> counts = gradeCounts.get(sub.name);
+            for (String g : gradesList) {
+                int count = counts != null ? counts.get(g) : 0;
+                totalGradeCount += count;
+                cellSpan(sumTbl, str(count), fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            }
+            cellSpan(sumTbl, str(totalGradeCount), fSmallBold, sBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        }
+        leftCell.addElement(sumTbl);
+        bottomTbl.addCell(leftCell);
+
+        // Right Cell: Signatures
+        PdfPCell rightCell = new PdfPCell();
+        rightCell.setBorder(Rectangle.NO_BORDER);
+        rightCell.setPaddingLeft(15);
+
+        PdfPTable sigTbl = new PdfPTable(2);
+        sigTbl.setWidthPercentage(100);
+        sigTbl.setSpacingBefore(30);
+
+        PdfPCell s1 = rawCell("Class Teacher Signature\n\n\n\n" + nvl(cls != null ? cls.teacherName : null), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        s1.setBorder(Rectangle.TOP); s1.setBorderColorTop(C_DARK); s1.setBorderWidthTop(0.5f); s1.setPaddingTop(4);
+
+        PdfPCell s2 = rawCell("Headmaster Signature\n\n\n\n" + nvl(school != null ? school.principalName : null), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        s2.setBorder(Rectangle.TOP); s2.setBorderColorTop(C_DARK); s2.setBorderWidthTop(0.5f); s2.setPaddingTop(4);
+
+        sigTbl.addCell(s1);
+        sigTbl.addCell(s2);
+        rightCell.addElement(sigTbl);
+        bottomTbl.addCell(rightCell);
+
+        bottomTbl.setKeepTogether(true);
+        doc.add(bottomTbl);
     }
 
     // ═════════════════════════════════════════════════════════════════════════
@@ -532,7 +706,7 @@ public class PdfGenerator {
                 tbl.setWidthPercentage(100); tbl.setSpacingBefore(6);
 
                 cell(tbl, "अ.नं",   fBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
-                cell(tbl, "तपशील",  fBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
+                cellVerticalSpan(tbl, ctx, "तपशील", fBold, C_PRIMARY, C_WHITE, 1, 1);
                 cell(tbl, "प्रथम सत्र",   fBold, C_PRIMARY_LIGHT, C_DARK,  1, Element.ALIGN_CENTER);
                 cell(tbl, "द्वितीय सत्र", fBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
 
@@ -751,13 +925,87 @@ public class PdfGenerator {
     }
 
     public static PdfPCell rawCell(String text, Font font, BaseColor bg, BaseColor textColor, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, colored(font, textColor)));
+        PdfPCell c = new PdfPCell();
         c.setBackgroundColor(bg);
         c.setBorderColor(C_BORDER);
         c.setBorderWidth(0.5f);
         c.setPadding(4);
         c.setHorizontalAlignment(align);
+
+        // Use MarathiText bitmap rendering for any text containing Devanagari,
+        // so matras, conjuncts and half-forms render correctly via Android's
+        // Harfbuzz shaping engine (iText 5 cannot do this on its own).
+        if (text != null && containsDevanagari(text) && sMarathiTypeface != null) {
+            try {
+                boolean bold = (font.getStyle() & Font.BOLD) != 0;
+                float size = font.getSize() > 0 ? font.getSize() : 9f;
+                int androidColor = android.graphics.Color.rgb(
+                        textColor.getRed(), textColor.getGreen(), textColor.getBlue());
+                com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText
+                        .renderLine(text, size, bold, androidColor);
+                int imgAlign = align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT
+                        : align == Element.ALIGN_RIGHT ? com.itextpdf.text.Image.RIGHT
+                        : com.itextpdf.text.Image.MIDDLE;
+                img.setAlignment(imgAlign);
+                c.addElement(img);
+                return c;
+            } catch (Exception ignored) {
+                // Fall through to iText rendering
+            }
+        }
+        // Fallback: iText font rendering (fine for numbers/ASCII/Latin)
+        c.setPhrase(new Phrase(text, colored(font, textColor)));
         return c;
+    }
+
+    /** Returns true if text contains any Devanagari Unicode character (U+0900–U+097F). */
+    public static boolean containsDevanagari(String text) {
+        if (text == null) return false;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch >= 0x0900 && ch <= 0x097F) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds a centred Marathi paragraph to the document, rendered as a bitmap
+     * image for correct Devanagari shaping. Falls back to iText Paragraph if
+     * the typeface is unavailable.
+     */
+    public static void addMarathiParagraph(Document doc, String text,
+                                            float sizePt, boolean bold,
+                                            BaseColor color,
+                                            float spaceBefore, float spaceAfter) throws Exception {
+        if (text != null && containsDevanagari(text) && sMarathiTypeface != null) {
+            try {
+                int androidColor = android.graphics.Color.rgb(
+                        color.getRed(), color.getGreen(), color.getBlue());
+                com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText
+                        .renderLine(text, sizePt, bold, androidColor);
+                img.setAlignment(com.itextpdf.text.Image.MIDDLE);
+                PdfPTable wrap = new PdfPTable(1);
+                wrap.setWidthPercentage(100);
+                wrap.setSpacingBefore(spaceBefore);
+                wrap.setSpacingAfter(spaceAfter);
+                PdfPCell wc = new PdfPCell();
+                wc.setBorder(Rectangle.NO_BORDER);
+                wc.setHorizontalAlignment(Element.ALIGN_CENTER);
+                wc.addElement(img);
+                wrap.addCell(wc);
+                doc.add(wrap);
+                return;
+            } catch (Exception ignored) {}
+        }
+        // Fallback
+        Font f = sMarathiBase != null
+                ? new Font(sMarathiBase, sizePt, bold ? Font.BOLD : Font.NORMAL, color)
+                : new Font(Font.FontFamily.HELVETICA, sizePt, bold ? Font.BOLD : Font.NORMAL, color);
+        Paragraph p = new Paragraph(text, f);
+        p.setAlignment(Element.ALIGN_CENTER);
+        p.setSpacingBefore(spaceBefore);
+        p.setSpacingAfter(spaceAfter);
+        doc.add(p);
     }
 
     public static void cellSpan(PdfPTable t, String text, Font font, BaseColor bg, BaseColor textColor, int colspan, int rowspan, int align) {
@@ -775,6 +1023,16 @@ public class PdfGenerator {
 
     public static Font colored(Font src, BaseColor color) {
         Font f = new Font(src); f.setColor(color); return f;
+    }
+
+    /**
+     * Shorthand: add a properly-shaped Marathi table cell.
+     * Uses MarathiText (Android Canvas bitmap) so all glyphs render correctly.
+     */
+    public static void cellM(PdfPTable t, String text, boolean bold, BaseColor bg,
+                              BaseColor fg, int colSpan, int rowSpan, int align) {
+        com.kartik.myschool.utils.pdf.MarathiText.cell(
+                t, text, bold ? 10f : 9f, bold, bg, fg, colSpan, rowSpan, align);
     }
 
     private static Paragraph para(String text, Font font) {

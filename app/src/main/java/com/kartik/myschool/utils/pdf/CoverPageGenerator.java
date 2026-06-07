@@ -6,6 +6,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -122,11 +123,11 @@ public class CoverPageGenerator {
         addCentred(doc, "जिल्हा परिषद प्राथमिक शाळा",
                 mkFont(11, Font.BOLD, C_GREY_TEXT), 2, 0);
 
-        // ── 4. SCHOOL NAME ────────────────────────────────────────────────────
+        // ── 4. SCHOOL NAME (rendered via MarathiText for correct Devanagari) ───
         String schoolName = (school != null && school.name != null && !school.name.isEmpty())
                 ? school.name : "शाळेचे नाव";
-        addCentred(doc, schoolName.toUpperCase(),
-                mkFont(14, Font.BOLD, C_INDIGO_DARK), 4, 2);
+        addMarathiCentred(doc, schoolName.toUpperCase(), 14, true,
+                android.graphics.Color.rgb(40, 53, 147), 4, 2);
 
         // ── 5. UDISE ──────────────────────────────────────────────────────────
         String udise = (school != null && school.udiseCode != null) ? school.udiseCode : "—";
@@ -142,11 +143,11 @@ public class CoverPageGenerator {
         addFilledCell(divider, C_AMBER_DARK, 4);
         doc.add(divider);
 
-        // ── 7. BIG MARATHI TITLE ──────────────────────────────────────────────
-        addCentred(doc, "सातत्यपूर्ण सर्वंकष",
-                mkFont(34, Font.BOLD, C_INDIGO), 0, 0);
-        addCentred(doc, "मूल्यमापन",
-                mkFont(34, Font.BOLD, C_INDIGO), 0, 6);
+        // ── 7. BIG MARATHI TITLE (via MarathiText for correct shaping) ────────
+        addMarathiCentred(doc, "सातत्यपूर्ण सर्वंकष",
+                34, true, android.graphics.Color.rgb(63, 81, 181), 0, 0);
+        addMarathiCentred(doc, "मूल्यमापन",
+                34, true, android.graphics.Color.rgb(63, 81, 181), 0, 6);
         addCentred(doc, "( CCE )",
                 mkFont(13, Font.NORMAL, C_GREY_TEXT), 2, 22);
 
@@ -334,20 +335,36 @@ public class CoverPageGenerator {
         };
 
         for (String[] row : rows) {
-            PdfPCell labelCell = new PdfPCell(
-                    new Phrase(row[0], mkFont(10, Font.BOLD, C_INDIGO_DARK)));
+            // Label — rendered via MarathiText for correct Devanagari shaping
+            PdfPCell labelCell = new PdfPCell();
             labelCell.setBorder(Rectangle.BOTTOM);
             labelCell.setBorderColor(C_INDIGO_LIGHT);
             labelCell.setPaddingBottom(8);
             labelCell.setPaddingTop(6);
-            labelCell.setBackgroundColor(new BaseColor(0,0,0,0));
+            labelCell.setBackgroundColor(new BaseColor(0, 0, 0, 0));
+            try {
+                Image lImg = MarathiText.renderLine(row[0], 10f, true,
+                        android.graphics.Color.rgb(40, 53, 147));
+                lImg.setAlignment(Image.LEFT);
+                labelCell.addElement(lImg);
+            } catch (Exception ex) {
+                labelCell.setPhrase(new Phrase(row[0], mkFont(10, Font.BOLD, C_INDIGO_DARK)));
+            }
 
-            PdfPCell valueCell = new PdfPCell(
-                    new Phrase(row[1], mkFont(10, Font.NORMAL, C_DARK_TEXT)));
+            // Value
+            PdfPCell valueCell = new PdfPCell();
             valueCell.setBorder(Rectangle.BOTTOM);
             valueCell.setBorderColor(C_INDIGO_LIGHT);
             valueCell.setPaddingBottom(8);
             valueCell.setPaddingTop(6);
+            try {
+                Image vImg = MarathiText.renderLine(row[1], 10f, false,
+                        android.graphics.Color.rgb(28, 27, 31));
+                vImg.setAlignment(Image.LEFT);
+                valueCell.addElement(vImg);
+            } catch (Exception ex) {
+                valueCell.setPhrase(new Phrase(row[1], mkFont(10, Font.NORMAL, C_DARK_TEXT)));
+            }
 
             inner.addCell(labelCell);
             inner.addCell(valueCell);
@@ -365,6 +382,42 @@ public class CoverPageGenerator {
         if (sMarathiBase != null)
             return new Font(sMarathiBase, size, style, color);
         return new Font(Font.FontFamily.HELVETICA, size, style, color);
+    }
+
+    /**
+     * Renders Marathi text as a bitmap image and adds it as a centred paragraph.
+     * Uses Android's Harfbuzz engine for correct Devanagari shaping.
+     */
+    private static void addMarathiCentred(Document doc, String text,
+                                           float sizePt, boolean bold,
+                                           int androidColor,
+                                           float spaceBefore, float spaceAfter) throws Exception {
+        try {
+            Image img = MarathiText.renderLine(text, sizePt, bold, androidColor);
+            img.setAlignment(Image.MIDDLE);
+            // Wrap in a 1-cell centred table so it flows like a paragraph
+            PdfPTable imgRow = new PdfPTable(1);
+            imgRow.setWidthPercentage(100);
+            imgRow.setSpacingBefore(spaceBefore);
+            imgRow.setSpacingAfter(spaceAfter);
+            PdfPCell imgCell = new PdfPCell();
+            imgCell.setBorder(Rectangle.NO_BORDER);
+            imgCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            imgCell.addElement(img);
+            imgRow.addCell(imgCell);
+            doc.add(imgRow);
+        } catch (Exception e) {
+            // Fallback to standard paragraph
+            Paragraph p = new Paragraph(text, mkFont((int) sizePt, Font.BOLD,
+                    new BaseColor(
+                            (androidColor >> 16) & 0xFF,
+                            (androidColor >> 8) & 0xFF,
+                            androidColor & 0xFF)));
+            p.setAlignment(Element.ALIGN_CENTER);
+            p.setSpacingBefore(spaceBefore);
+            p.setSpacingAfter(spaceAfter);
+            doc.add(p);
+        }
     }
 
     private static void addCentred(Document doc, String text, Font font,

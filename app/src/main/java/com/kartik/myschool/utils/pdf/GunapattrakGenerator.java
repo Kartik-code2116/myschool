@@ -143,30 +143,41 @@ public class GunapattrakGenerator {
         doc.add(buildSchoolHeader(school, cls));
 
         // Title
-        Font titleFont = sMarathiBase != null ? new Font(sMarathiBase, 18, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, C_DARK);
-        Paragraph title = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", titleFont);
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(15);
-        doc.add(title);
+        try {
+            PdfGenerator.addMarathiParagraph(doc, "सातत्यपूर्ण सर्वंकष मूल्यमापन",
+                    18, true, C_DARK, 0, 15);
+        } catch (Exception e) {
+            Font titleFont = sMarathiBase != null ? new Font(sMarathiBase, 18, Font.BOLD, C_DARK) : new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, C_DARK);
+            Paragraph title = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(15);
+            doc.add(title);
+        }
 
         // Header Info table
         PdfPTable headerTbl = new PdfPTable(3);
         headerTbl.setWidthPercentage(100);
         headerTbl.setWidths(new float[]{1.5f, 1f, 1f});
 
-        // Row 1
-        PdfPCell c1 = new PdfPCell(new Phrase("नाव: " + (student != null ? nvl(student.name) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
-        PdfPCell c2 = new PdfPCell(new Phrase(" ", fBold)); c2.setBorder(Rectangle.NO_BORDER); // Empty middle
-        PdfPCell c3 = new PdfPCell(new Phrase("सन : " + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        // Row 1: name | empty | year
+        PdfPCell c1 = rawCell("नाव: " + (student != null ? nvl(student.name) : ""), fBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        c1.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c2 = rawCell(" ", fBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        c2.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c3 = rawCell("सन : " + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
+        c3.setBorder(Rectangle.NO_BORDER);
         headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
 
         // Row 2
         int activeSem = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
         MarksRecord rec = (activeSem == 2) ? (sem2 != null ? sem2 : sem1) : (sem1 != null ? sem1 : sem2);
         String termLabel = (rec == sem2) ? "द्वितीय सत्र" : "प्रथम सत्र";
-        PdfPCell c4 = new PdfPCell(new Phrase("इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-"), fBold)); c4.setBorder(Rectangle.NO_BORDER);
-        PdfPCell c5 = new PdfPCell(new Phrase("रोल नं.: " + (student != null ? nvl(student.rollNo) : ""), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_CENTER);
-        PdfPCell c6 = new PdfPCell(new Phrase(termLabel, fBold)); c6.setBorder(Rectangle.NO_BORDER); c6.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c4 = rawCell("इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-"), fBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        c4.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c5 = rawCell("रोल नं.: " + (student != null ? nvl(student.rollNo) : ""), fBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        c5.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c6 = rawCell(termLabel, fBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
+        c6.setBorder(Rectangle.NO_BORDER);
         headerTbl.addCell(c4); headerTbl.addCell(c5); headerTbl.addCell(c6);
         
         headerTbl.setSpacingAfter(10);
@@ -181,7 +192,8 @@ public class GunapattrakGenerator {
 
         // Row 1
         cellVerticalSpan(tbl, ctx, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-        cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 2, 1);
+        cellVerticalSpan(tbl, ctx, "विषय", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
         cellHorizontalImageSpan(tbl, ctx, "आकारिक (अ)", fSmallBold, C_HEADER_BG, C_DARK, 9, 1); // Horizontal perfect image
         cellHorizontalImageSpan(tbl, ctx, "संकलित (ब)", fSmallBold, C_HEADER_BG, C_DARK, 4, 1); // Horizontal perfect image
         cellVerticalSpan(tbl, ctx, "अ+ब", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
@@ -189,9 +201,6 @@ public class GunapattrakGenerator {
         cellVerticalSpan(tbl, ctx, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
 
         // Row 2
-        cellVerticalSpan(tbl, ctx, "विषय", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-        cellVerticalSpan(tbl, ctx, "गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-        
         String[] formatives = {"निरीक्षण", "तोंडीकाम", "प्रात्यक्षिक", "उपक्रम", "प्रकल्प", "चाचणी", "स्वाध्याय", "इतर", "एकूण"};
         for (String f : formatives) cellVerticalSpan(tbl, ctx, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
         
@@ -285,14 +294,14 @@ public class GunapattrakGenerator {
         sigTbl.setWidthPercentage(100);
         sigTbl.setSpacingBefore(40);
         
-        PdfPCell cSig1 = new PdfPCell(new Phrase("वर्गशिक्षक स्वाक्षरी\n" + (cls != null ? nvl(cls.teacherName) : ""), fSmallBold));
-        cSig1.setBorder(Rectangle.NO_BORDER); cSig1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell cSig1 = rawCell("वर्गशिक्षक स्वाक्षरी\n" + (cls != null ? nvl(cls.teacherName) : ""), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        cSig1.setBorder(Rectangle.NO_BORDER);
         
         PdfPCell cSig2 = new PdfPCell(new Phrase(" ", fSmallBold));
         cSig2.setBorder(Rectangle.NO_BORDER); cSig2.setHorizontalAlignment(Element.ALIGN_CENTER);
         
-        PdfPCell cSig3 = new PdfPCell(new Phrase("मुख्याध्यापक स्वाक्षरी\n" + (school != null ? nvl(school.principalName) : ""), fSmallBold));
-        cSig3.setBorder(Rectangle.NO_BORDER); cSig3.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell cSig3 = rawCell("मुख्याध्यापक स्वाक्षरी\n" + (school != null ? nvl(school.principalName) : ""), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        cSig3.setBorder(Rectangle.NO_BORDER);
         
         sigTbl.addCell(cSig1); sigTbl.addCell(cSig2); sigTbl.addCell(cSig3);
         doc.add(sigTbl);
