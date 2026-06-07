@@ -48,11 +48,11 @@ public class IndexPageGenerator {
 
     public static void addIndexPageContent(Document doc, Context ctx, School school, ClassModel cls, List<Student> students) throws Exception {
         // School Header
-        doc.add(buildSchoolHeader(school, cls));
+        doc.add(buildSchoolHeader(ctx, school, cls));
 
         // Title
         Font titleFont = sMarathiBase != null ? new Font(sMarathiBase, 22, Font.BOLD) : new Font(Font.FontFamily.HELVETICA, 22, Font.BOLD);
-        Paragraph title = new Paragraph("अनुक्रमणिका", colored(titleFont, new BaseColor(40, 40, 90)));
+        Paragraph title = new Paragraph(PdfLocalizer.get(ctx, "अनुक्रमणिका", "Index"), colored(titleFont, new BaseColor(40, 40, 90)));
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(15);
         doc.add(title);
@@ -63,14 +63,14 @@ public class IndexPageGenerator {
         headerTbl.setWidths(new float[]{1.5f, 1f, 1f});
 
         // Row 1
-        PdfPCell c1 = new PdfPCell(new Phrase("युडायस: " + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
-        PdfPCell c2 = new PdfPCell(new Phrase("प्रथम सत्र", fBold)); c2.setBorder(Rectangle.NO_BORDER); c2.setHorizontalAlignment(Element.ALIGN_CENTER);
-        PdfPCell c3 = new PdfPCell(new Phrase("सन : " + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c1 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c2 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester"), fBold)); c2.setBorder(Rectangle.NO_BORDER); c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell c3 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
 
         // Row 2
-        PdfPCell c4 = new PdfPCell(new Phrase("शाळा: " + (school != null ? nvl(school.name) : ""), fBold)); c4.setBorder(Rectangle.NO_BORDER); c4.setColspan(2);
-        PdfPCell c5 = new PdfPCell(new Phrase("इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-"), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c4 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "शाळा: ", "School: ") + (school != null ? nvl(school.name) : ""), fBold)); c4.setBorder(Rectangle.NO_BORDER); c4.setColspan(2);
+        PdfPCell c5 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + (cls != null ? nvl(cls.className) : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + (cls != null ? nvl(cls.division) : "-"), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTbl.addCell(c4); headerTbl.addCell(c5);
         
         headerTbl.setSpacingAfter(15);
@@ -83,15 +83,17 @@ public class IndexPageGenerator {
 
         BaseColor headerBg = new BaseColor(218, 233, 245); // Light blue
 
-        String[] headers = {"Sr.No.", "Student Name", "Roll No.", "Birth Date", "Page No."};
+        String[] headers = {
+            PdfLocalizer.get(ctx, "अ.क्र.", "Sr.No."),
+            PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"),
+            PdfLocalizer.get(ctx, "हजेरी क्र.", "Roll No."),
+            PdfLocalizer.get(ctx, "जन्मतारीख", "Birth Date"),
+            PdfLocalizer.get(ctx, "पान क्र.", "Page No.")
+        };
         for (String h : headers) {
-            PdfPCell c = new PdfPCell(new Phrase(h, fBold));
-            c.setBackgroundColor(headerBg);
-            c.setHorizontalAlignment(Element.ALIGN_CENTER);
+            PdfPCell c = rawCell(h, fBold, headerBg, C_DARK, Element.ALIGN_CENTER);
             c.setVerticalAlignment(Element.ALIGN_MIDDLE);
             c.setPadding(8);
-            c.setBorderColor(C_DARK);
-            c.setBorderWidth(0.5f);
             tbl.addCell(c);
         }
 

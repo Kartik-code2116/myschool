@@ -79,6 +79,13 @@ public class MarksGradeLedgerGenerator {
     // Page builder (also callable for Master Report merge)
     // ─────────────────────────────────────────────────────────────────────────
 
+    private static String getGradeLabel(Context ctx, int gi) {
+        if (PdfLocalizer.isEnglish(ctx)) {
+            return GRADES[gi];
+        }
+        return GRADE_LABELS[gi];
+    }
+
     public static void addLedgerContent(Document doc, Context ctx, School school, ClassModel cls,
                                         List<Student> students,
                                         Map<String, MarksRecord> marksMap,
@@ -88,7 +95,7 @@ public class MarksGradeLedgerGenerator {
         int numSubs = Math.min(subjects.size(), 9); // cap at 9 for layout
 
         // ── 1. Title ─────────────────────────────────────────────────────────
-        PdfGenerator.addMarathiParagraph(doc, "सातत्यपूर्ण सर्वंकष मूल्यमापन",
+        PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
                 14, true, C_DARK, 0, 5);
 
         // ── 2. Meta header ────────────────────────────────────────────────────
@@ -96,12 +103,19 @@ public class MarksGradeLedgerGenerator {
         hdr.setWidthPercentage(100);
         hdr.setSpacingAfter(4);
 
-        String udiseText = "युडायस: " + nvl(school != null ? school.udiseCode : null)
-                + "\nशाळा: " + nvl(school != null ? school.name : null);
-        String semText = isSem2 ? "द्वितीय सत्र" : "प्रथम सत्र";
-        String rightText = "सन : " + nvl(cls != null ? cls.academicYearLabel : null)
-                + "\nइयत्ता: " + nvl(cls != null ? cls.className : null)
-                + ", तुकडी: " + nvl(cls != null ? cls.division : null);
+        String udiseText = PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + nvl(school != null ? school.udiseCode : null)
+                + PdfLocalizer.get(ctx, "\nशाळा: ", "\nSchool: ") + nvl(school != null ? school.name : null);
+        String semText = isSem2 
+                ? PdfLocalizer.get(ctx, "कार्यात्मक द्वितीय सत्र", "Second Semester") 
+                : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
+        // Wait, the original just had "द्वितीय सत्र" : "प्रथम सत्र"
+        semText = isSem2 
+                ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester") 
+                : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
+
+        String rightText = PdfLocalizer.get(ctx, "सन: ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : null)
+                + PdfLocalizer.get(ctx, "\nइयत्ता: ", "\nClass: ") + nvl(cls != null ? cls.className : null)
+                + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : null);
 
         PdfPCell hL = rawCell(udiseText, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
         hL.setBorder(Rectangle.NO_BORDER);
@@ -133,21 +147,21 @@ public class MarksGradeLedgerGenerator {
         topTbl.setSpacingAfter(8);
 
         // ── Header Row 1: fixed cols (rowspan 2) + subject names (colspan 2 each) ──
-        cellSpan(topTbl, "अ.नं",              fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(topTbl, "विद्यार्थ्यांचे नाव", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, "लिंग",       fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-        GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, "हजर दिवस",  fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        cellSpan(topTbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."),              fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(topTbl, PdfLocalizer.get(ctx, "विद्यार्थ्यांचे नाव", "Student Name"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, PdfLocalizer.get(ctx, "लिंग", "Gender"),       fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, PdfLocalizer.get(ctx, "हजर दिवस", "Attendance"),  fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
 
         for (int si = 0; si < numSubs; si++) {
             String subName = subjects.get(si).name;
             // Use short abbreviation for wide subject names
-            cellSpan(topTbl, subName, fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+            cellSpan(topTbl, PdfLocalizer.translateSubject(ctx, subName), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
         }
 
         // ── Header Row 2: प्र. (marks) + श्रे. (grade) per subject ───────────
         for (int si = 0; si < numSubs; si++) {
-            GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, "प्र.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-            GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, "श्रे.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, PdfLocalizer.get(ctx, "प्र.", "Obt."), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(topTbl, ctx, PdfLocalizer.get(ctx, "श्रे.", "Grd."), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
         }
 
         // ── Grade distribution accumulator ────────────────────────────────────
@@ -208,6 +222,7 @@ public class MarksGradeLedgerGenerator {
                 }
             }
         }
+        topTbl.setKeepTogether(true);
         doc.add(topTbl);
 
         // ── 4. BOTTOM TABLE: grade distribution per subject ───────────────────
@@ -225,12 +240,12 @@ public class MarksGradeLedgerGenerator {
         botTbl.setSpacingBefore(4);
 
         // Header row
-        cellSpan(botTbl, "अ.नं",   fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(botTbl, "विषय",   fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        for (String gl : GRADE_LABELS) {
-            cellSpan(botTbl, gl, fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(botTbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."),   fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(botTbl, PdfLocalizer.get(ctx, "विषय", "Subject"),   fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        for (int gi = 0; gi < GRADES.length; gi++) {
+            cellSpan(botTbl, getGradeLabel(ctx, gi), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
-        cellSpan(botTbl, "एकूण", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(botTbl, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // Data rows
         boolean botAlt = false;
@@ -240,7 +255,7 @@ public class MarksGradeLedgerGenerator {
             botAlt = !botAlt;
 
             cellSpan(botTbl, str(si + 1),   fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(botTbl, nvl(sub.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+            cellSpan(botTbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
 
             int rowTotal = 0;
             for (int gi = 0; gi < GRADES.length; gi++) {
@@ -277,14 +292,14 @@ public class MarksGradeLedgerGenerator {
         String teacherName   = (cls   != null && cls.teacherName   != null) ? cls.teacherName   : "";
         String principalName = (school != null && school.principalName != null) ? school.principalName : "";
 
-        PdfPCell s1 = rawCell("वर्गशिक्षक स्वाक्षरी\n" + teacherName,
+        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\n", "Class Teacher Signature\n") + teacherName,
                 fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s1.setBorder(Rectangle.TOP);
         s1.setBorderColorTop(C_DARK);
         s1.setBorderWidthTop(0.5f);
         s1.setPaddingTop(6);
 
-        PdfPCell s2 = rawCell("मुख्याध्यापक स्वाक्षरी\n" + principalName,
+        PdfPCell s2 = rawCell(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\n", "Headmaster Signature\n") + principalName,
                 fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s2.setBorder(Rectangle.TOP);
         s2.setBorderColorTop(C_DARK);

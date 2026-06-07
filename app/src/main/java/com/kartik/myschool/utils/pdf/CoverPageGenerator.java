@@ -89,7 +89,7 @@ public class CoverPageGenerator {
         // ══════════════════════════════════════════════════════════════════════
 
         // ── 1. TOP HEADER BAND spacer (the band is drawn in background) ──────
-        addSpacer(doc, 148);   // height of the top band
+        addSpacer(doc, 58);   // center of circle is H-130; with top margin of 36, spacer of 58 puts logo top at H-94
 
         // ── 2. LOGO ───────────────────────────────────────────────────────────
         PdfPTable logoRow = new PdfPTable(1);
@@ -100,7 +100,7 @@ public class CoverPageGenerator {
         logoCell.setPaddingBottom(4);
         try {
             android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat
-                    .getDrawable(ctx, com.kartik.myschool.R.drawable.ic_school);
+                    .getDrawable(ctx, com.kartik.myschool.R.drawable.app_logo);
             if (d != null) {
                 int w = Math.max(d.getIntrinsicWidth(),  1);
                 int h = Math.max(d.getIntrinsicHeight(), 1);
@@ -113,25 +113,46 @@ public class CoverPageGenerator {
                 bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bs);
                 com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(bs.toByteArray());
                 img.scaleToFit(72, 72);
+                img.setAlignment(Element.ALIGN_CENTER);
                 logoCell.addElement(img);
             }
         } catch (Exception ignored) {}
         logoRow.addCell(logoCell);
         doc.add(logoRow);
 
+        // Spacer to maintain exact flow height of original layout (220 - 58 - 72 = 90)
+        addSpacer(doc, 90);
+
+        android.content.SharedPreferences prefs = ctx.getSharedPreferences("myschool_settings_prefs", Context.MODE_PRIVATE);
+        String lang = prefs.getString("language", "mr");
+        boolean isEn = "en".equals(lang);
+
+        String labelGovtSchool = isEn ? "ZILLA PARISHAD PRIMARY SCHOOL" : "जिल्हा परिषद प्राथमिक शाळा";
+        String labelSchoolNameFallback = isEn ? "SCHOOL NAME" : "शाळेचे नाव";
+        String labelUdise = isEn ? "UDISE : " : "युडायस : ";
+        String labelTitle1 = isEn ? "CONTINUOUS & COMPREHENSIVE" : "सातत्यपूर्ण सर्वंकष";
+        String labelTitle2 = isEn ? "EVALUATION" : "मूल्यमापन";
+        
+        String labelYear = isEn ? "Academic Year" : "शैक्षणिक वर्ष";
+        String labelClass = isEn ? "Standard" : "इयत्ता";
+        String labelDiv = isEn ? "Division" : "तुकडी";
+        String labelUdiseCode = isEn ? "UDISE Code" : "युडायस कोड";
+        String labelTeacher = isEn ? "Class Teacher" : "वर्गशिक्षक";
+        String labelPrincipal = isEn ? "Headmaster" : "मुख्याध्यापक";
+
         // ── 3. GOVT. LABEL ────────────────────────────────────────────────────
-        addCentred(doc, "जिल्हा परिषद प्राथमिक शाळा",
+        addCentred(doc, labelGovtSchool,
                 mkFont(11, Font.BOLD, C_GREY_TEXT), 2, 0);
 
         // ── 4. SCHOOL NAME (rendered via MarathiText for correct Devanagari) ───
         String schoolName = (school != null && school.name != null && !school.name.isEmpty())
-                ? school.name : "शाळेचे नाव";
+                ? school.name : labelSchoolNameFallback;
         addMarathiCentred(doc, schoolName.toUpperCase(), 14, true,
                 android.graphics.Color.rgb(40, 53, 147), 4, 2);
 
         // ── 5. UDISE ──────────────────────────────────────────────────────────
         String udise = (school != null && school.udiseCode != null) ? school.udiseCode : "—";
-        addCentred(doc, "युडायस : " + udise,
+        addCentred(doc, labelUdise + udise,
                 mkFont(9, Font.NORMAL, C_GREY_TEXT), 0, 16);
 
         // ── 6. DECORATIVE AMBER DIVIDER ───────────────────────────────────────
@@ -144,10 +165,17 @@ public class CoverPageGenerator {
         doc.add(divider);
 
         // ── 7. BIG MARATHI TITLE (via MarathiText for correct shaping) ────────
-        addMarathiCentred(doc, "सातत्यपूर्ण सर्वंकष",
-                34, true, android.graphics.Color.rgb(63, 81, 181), 0, 0);
-        addMarathiCentred(doc, "मूल्यमापन",
-                34, true, android.graphics.Color.rgb(63, 81, 181), 0, 6);
+        if (isEn) {
+            addCentred(doc, labelTitle1,
+                    mkFont(24, Font.BOLD, C_INDIGO), 0, 0);
+            addCentred(doc, labelTitle2,
+                    mkFont(24, Font.BOLD, C_INDIGO), 0, 6);
+        } else {
+            addMarathiCentred(doc, labelTitle1,
+                    34, true, android.graphics.Color.rgb(63, 81, 181), 0, 0);
+            addMarathiCentred(doc, labelTitle2,
+                    34, true, android.graphics.Color.rgb(63, 81, 181), 0, 6);
+        }
         addCentred(doc, "( CCE )",
                 mkFont(13, Font.NORMAL, C_GREY_TEXT), 2, 22);
 
@@ -158,7 +186,7 @@ public class CoverPageGenerator {
         String teacher    = (cls != null && cls.teacherName != null && !cls.teacherName.isEmpty()) ? cls.teacherName : "—";
         String principal  = (school != null && school.principalName != null && !school.principalName.isEmpty()) ? school.principalName : "—";
 
-        doc.add(buildInfoCard(yearLabel, className, division, teacher, principal));
+        doc.add(buildInfoCard(yearLabel, className, division, teacher, principal, udise, labelYear, labelClass, labelDiv, labelUdiseCode, labelTeacher, labelPrincipal));
 
         // ── 9. BOTTOM SPACER (footer band is bg artwork) ─────────────────────
         addSpacer(doc, 10);
@@ -292,7 +320,9 @@ public class CoverPageGenerator {
     // INFO CARD (rounded box with left accent bar per row)
     // ══════════════════════════════════════════════════════════════════════════
     private static PdfPTable buildInfoCard(String year, String cls, String div,
-                                           String teacher, String principal) throws Exception {
+                                           String teacher, String principal, String udise,
+                                           String labelYear, String labelClass, String labelDiv,
+                                           String labelUdise, String labelTeacher, String labelPrincipal) throws Exception {
         // Outer wrapper — provides left/right padding
         PdfPTable outer = new PdfPTable(1);
         outer.setWidthPercentage(78);
@@ -327,11 +357,12 @@ public class CoverPageGenerator {
         inner.setWidthPercentage(100);
 
         String[][] rows = {
-            { "शैक्षणिक वर्ष", year   },
-            { "इयत्ता",        cls    },
-            { "तुकडी",         div    },
-            { "वर्गशिक्षक",    teacher },
-            { "मुख्याध्यापक",  principal },
+            { labelYear,      year   },
+            { labelClass,     cls    },
+            { labelDiv,       div    },
+            { labelUdise,     udise  },
+            { labelTeacher,   teacher },
+            { labelPrincipal, principal },
         };
 
         for (String[] row : rows) {

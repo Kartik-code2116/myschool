@@ -119,25 +119,25 @@ public class ProgressCardFirstSemGenerator {
         PdfPCell leftCell = new PdfPCell();
         leftCell.setBorder(Rectangle.NO_BORDER);
         leftCell.setPaddingRight(15);
-        buildLeftPanel(leftCell, school, cls, student);
+        buildLeftPanel(leftCell, ctx, school, cls, student);
 
         PdfPCell rightCell = new PdfPCell();
         rightCell.setBorder(Rectangle.NO_BORDER);
         rightCell.setPaddingLeft(15);
-        buildRightPanel(rightCell, cls, rec, bestRemarkRec);
+        buildRightPanel(rightCell, ctx, cls, rec, bestRemarkRec);
 
         outer.addCell(leftCell);
         outer.addCell(rightCell);
         doc.add(outer);
     }
 
-    private static void buildLeftPanel(PdfPCell panel, School school, ClassModel cls, Student student) throws Exception {
+    private static void buildLeftPanel(PdfPCell panel, Context ctx, School school, ClassModel cls, Student student) throws Exception {
         // ── 1. Header ─────────────────────────────────────────────────────────
         PdfPTable hdr = new PdfPTable(1);
         hdr.setWidthPercentage(100);
 
-        String udise = "School UDISE: " + nvl(school != null ? school.udiseCode : "");
-        addCenterText(hdr, udise + "\nजिल्हा परिषद", fSmall);
+        String udise = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : "");
+        addCenterText(hdr, udise + PdfLocalizer.get(ctx, "\nजिल्हा परिषद", "\nZilla Parishad"), fSmall);
         
         String sName = nvl(school != null ? school.name : "");
         addCenterText(hdr, sName, fTitle); // Large bold
@@ -145,7 +145,7 @@ public class ProgressCardFirstSemGenerator {
         String addr = nvl(school != null ? school.address : "");
         addCenterText(hdr, addr, fSmall);
 
-        String year = "सन : " + nvl(cls != null ? cls.academicYearLabel : "");
+        String year = PdfLocalizer.get(ctx, "सन: ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
         addCenterText(hdr, year, fSmallBold);
         
         hdr.setSpacingAfter(10);
@@ -163,13 +163,13 @@ public class ProgressCardFirstSemGenerator {
         pillCell.setPaddingBottom(10);
 
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine("प्रगती पत्रक", 18, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
+            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), 18, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
             img.setAlignment(Element.ALIGN_CENTER);
             pillCell.addElement(img);
         } catch (Exception e) {
             Font pinkFont = sMarathiBase != null ? new Font(sMarathiBase, 16, Font.BOLD, C_PINK_FG)
                                                  : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_PINK_FG);
-            pillCell.setPhrase(new Phrase("प्रगती पत्रक", pinkFont));
+            pillCell.setPhrase(new Phrase(PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), pinkFont));
         }
         pillTbl.addCell(pillCell);
         pillTbl.setSpacingAfter(15);
@@ -199,20 +199,20 @@ public class ProgressCardFirstSemGenerator {
                     long diffMs = System.currentTimeMillis() - dob.getTime();
                     long years  = diffMs / (365L * 24 * 60 * 60 * 1000);
                     long months = (diffMs % (365L * 24 * 60 * 60 * 1000)) / (30L * 24 * 60 * 60 * 1000);
-                    ageStr = years + " व., " + months + " म.";
+                    ageStr = years + PdfLocalizer.get(ctx, " व., ", " Y., ") + months + PdfLocalizer.get(ctx, " म.", " M.");
                 }
             } catch (Exception ignored) {}
         }
 
-        addRowFull(det, "नाव", ": " + nvl(student.name));
-        addPairEmptyRight(det, "स्टुडंट ID", ": " + nvl(student.studentIdNumber));
-        addPair(det, "हजेरी क्रमांक", ": " + nvl(student.rollNo), "रजि.नंबर", ": " + nvl(student.registrationNo));
-        addPair(det, "इयत्ता", ": " + className, "तुकडी", ": " + division);
-        addPair(det, "माध्यम", ": " + nvl(student.medium), "जन्मतारीख", ": " + nvl(student.dob));
-        addPair(det, "मातृभाषा", ": " + nvl(student.motherTongue), "वय", ": " + ageStr);
-        addRowFull(det, "आईचे नाव", ": " + nvl(student.motherName));
-        addRowFull(det, "वडिलांचे नाव", ": " + nvl(student.fatherName));
-        addRowFull(det, "पत्ता", ": " + nvl(student.address));
+        addRowFull(det, PdfLocalizer.get(ctx, "नाव", "Name"), ": " + nvl(student.name));
+        addPairEmptyRight(det, PdfLocalizer.get(ctx, "स्टुडंट ID", "Student ID"), ": " + nvl(student.studentIdNumber));
+        addPair(det, PdfLocalizer.get(ctx, "हजेरी क्रमांक", "Roll No."), ": " + nvl(student.rollNo), PdfLocalizer.get(ctx, "रजि.नंबर", "Reg. No."), ": " + nvl(student.registrationNo));
+        addPair(det, PdfLocalizer.get(ctx, "इयत्ता", "Class"), ": " + className, PdfLocalizer.get(ctx, "तुकडी", "Division"), ": " + division);
+        addPair(det, PdfLocalizer.get(ctx, "माध्यम", "Medium"), ": " + nvl(student.medium), PdfLocalizer.get(ctx, "जन्मतारीख", "Date of Birth"), ": " + nvl(student.dob));
+        addPair(det, PdfLocalizer.get(ctx, "मातृभाषा", "Mother Tongue"), ": " + nvl(student.motherTongue), PdfLocalizer.get(ctx, "वय", "Age"), ": " + ageStr);
+        addRowFull(det, PdfLocalizer.get(ctx, "आईचे नाव", "Mother's Name"), ": " + nvl(student.motherName));
+        addRowFull(det, PdfLocalizer.get(ctx, "वडिलांचे नाव", "Father's Name"), ": " + nvl(student.fatherName));
+        addRowFull(det, PdfLocalizer.get(ctx, "पत्ता", "Address"), ": " + nvl(student.address));
 
         blockCell.addElement(det);
         block.addCell(blockCell);
@@ -225,10 +225,10 @@ public class ProgressCardFirstSemGenerator {
         PdfPCell attTitleCell = new PdfPCell();
         attTitleCell.setBorder(Rectangle.NO_BORDER);
         try {
-            com.itextpdf.text.Image aImg = MarathiText.renderLine("उपस्थिती", 12, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
+            com.itextpdf.text.Image aImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"), 12, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
             attTitleCell.addElement(aImg);
         } catch (Exception e) {
-            attTitleCell.setPhrase(new Phrase("उपस्थिती", fSmallBold));
+            attTitleCell.setPhrase(new Phrase(PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"), fSmallBold));
         }
         attTitle.addCell(attTitleCell);
         attTitle.setSpacingAfter(5);
@@ -237,8 +237,14 @@ public class ProgressCardFirstSemGenerator {
         PdfPTable attTbl = new PdfPTable(new float[]{2f, 1f, 1f, 1f, 1f, 1f, 1f}); // महिना + 6 months
         attTbl.setWidthPercentage(100);
         
-        MarathiText.cell(attTbl, "महिना", 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
-        for (String m : MONTHS_EN) {
+        MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "महिना", "Month"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
+        
+        String[] monthsEN = MONTHS_EN;
+        String[] monthsMR = MONTHS_MR;
+        boolean isEn = PdfLocalizer.isEnglish(ctx);
+        String[] activeMonths = isEn ? monthsEN : monthsMR;
+        
+        for (String m : activeMonths) {
             PdfPCell mc = new PdfPCell(new Phrase(m, fSmallBold));
             mc.setHorizontalAlignment(Element.ALIGN_CENTER);
             mc.setBackgroundColor(C_WHITE);
@@ -252,7 +258,7 @@ public class ProgressCardFirstSemGenerator {
         int[] pd = new int[6];
         if (student.monthlyAttendance != null) {
             for (int i = 0; i < 6; i++) {
-                String att = student.monthlyAttendance.get(MONTHS_MR[i]);
+                String att = student.monthlyAttendance.get(monthsMR[i]);
                 if (att != null && att.contains("/")) {
                     String[] parts = att.split("/");
                     try { pd[i] = Integer.parseInt(parts[0].trim()); } catch (Exception ignored) {}
@@ -263,7 +269,7 @@ public class ProgressCardFirstSemGenerator {
             }
         }
 
-        MarathiText.cell(attTbl, "कामाचे दिवस", 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "कामाचे दिवस", "Working Days"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
         for (int i = 0; i < 6; i++) {
             String val = wd[i] > 0 ? String.valueOf(wd[i]) : "";
             PdfPCell wc = new PdfPCell(new Phrase(val, fSmall));
@@ -274,7 +280,7 @@ public class ProgressCardFirstSemGenerator {
             attTbl.addCell(wc);
         }
 
-        MarathiText.cell(attTbl, "हजर दिवस", 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "हजर दिवस", "Present Days"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
         for (int i = 0; i < 6; i++) {
             String val = pd[i] > 0 ? String.valueOf(pd[i]) : (wd[i] > 0 ? "0" : "");
             PdfPCell pc = new PdfPCell(new Phrase(val, fSmall));
@@ -288,17 +294,17 @@ public class ProgressCardFirstSemGenerator {
         panel.addElement(attTbl);
     }
 
-    private static void buildRightPanel(PdfPCell panel, ClassModel cls, MarksRecord rec, MarksRecord bestRemarkRec) throws Exception {
+    private static void buildRightPanel(PdfPCell panel, Context ctx, ClassModel cls, MarksRecord rec, MarksRecord bestRemarkRec) throws Exception {
         PdfPTable titleTbl = new PdfPTable(1);
         titleTbl.setWidthPercentage(100);
         PdfPCell titleCell = new PdfPCell();
         titleCell.setBorder(Rectangle.NO_BORDER);
         titleCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine("प्रथम सत्र : श्रेणी व नोंदी", 12, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
+            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "प्रथम सत्र : श्रेणी व नोंदी", "First Semester: Grades & Remarks"), 12, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
             titleCell.addElement(img);
         } catch (Exception e) {
-            titleCell.setPhrase(new Phrase("प्रथम सत्र : श्रेणी व नोंदी", fSmallBold));
+            titleCell.setPhrase(new Phrase(PdfLocalizer.get(ctx, "प्रथम सत्र : श्रेणी व नोंदी", "First Semester: Grades & Remarks"), fSmallBold));
         }
         titleTbl.addCell(titleCell);
         titleTbl.setSpacingAfter(10);
@@ -308,15 +314,22 @@ public class ProgressCardFirstSemGenerator {
         PdfPTable tbl = new PdfPTable(new float[]{0.6f, 1.8f, 1.0f, 4f});
         tbl.setWidthPercentage(100);
         
-        MarathiText.cell(tbl, "अ.नं.", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        MarathiText.cell(tbl, "विषय", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        MarathiText.cell(tbl, "श्रेणी", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        MarathiText.cell(tbl, "वर्णनात्मक नोंदी", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "अ.नं.", "Sr.No."), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "वर्णनात्मक नोंदी", "Descriptive Remarks"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         List<Subject> subjects = (cls != null && cls.subjects != null) ? cls.subjects : new java.util.ArrayList<>();
-        String[] defaultSubs = {"मराठी", "हिंदी", "इंग्रजी", "गणित", "सा.वि./ प.अ.", "स.शा.", "कला", "कार्यानुभव", "शा.शि."};
         
-        String[] remLabels = {"विशेष प्रगती : ", "आवड, छंद इ. : ", "सुधारणा आवश्यक : "};
+        String[] defaultSubsMR = {"मराठी", "हिंदी", "इंग्रजी", "गणित", "सा.वि./ प.अ.", "स.शा.", "कला", "कार्यानुभव", "शा.शि."};
+        String[] defaultSubsEN = {"Marathi", "Hindi", "English", "Maths", "Science", "Social Sci.", "Art", "Work Exp.", "P.E."};
+        String[] defaultSubs = PdfLocalizer.isEnglish(ctx) ? defaultSubsEN : defaultSubsMR;
+        
+        String[] remLabels = {
+            PdfLocalizer.get(ctx, "विशेष प्रगती : ", "Special Progress: "),
+            PdfLocalizer.get(ctx, "आवड, छंद इ. : ", "Interests & Hobbies: "),
+            PdfLocalizer.get(ctx, "सुधारणा आवश्यक : ", "Improvement Needed: ")
+        };
         String[] remKeys = {"विशेष प्रगती", "आवड", "सुधारणा"};
         
         for (int i = 0; i < 9; i++) {
@@ -395,24 +408,24 @@ public class ProgressCardFirstSemGenerator {
         sigTbl.setWidthPercentage(100);
         sigTbl.setSpacingBefore(30f);
 
-        PdfPCell s1 = rawCell("शिक्षक स्वाक्षरी", fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "शिक्षक स्वाक्षरी", "Teacher Signature"), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s1.setBorder(Rectangle.NO_BORDER);
-        PdfPCell s2 = rawCell("पालक स्वाक्षरी", fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s2 = rawCell(PdfLocalizer.get(ctx, "पालक स्वाक्षरी", "Parent Signature"), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s2.setBorder(Rectangle.NO_BORDER);
-        PdfPCell s3 = rawCell("मुख्याध्यापक स्वाक्षरी", fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s3 = rawCell(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी", "Headmaster Signature"), fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s3.setBorder(Rectangle.NO_BORDER);
 
         try {
             s1 = new PdfPCell(); s1.setBorder(Rectangle.NO_BORDER); s1.setHorizontalAlignment(Element.ALIGN_CENTER);
-            com.itextpdf.text.Image img1 = MarathiText.renderLine("शिक्षक स्वाक्षरी", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img1 = MarathiText.renderLine(PdfLocalizer.get(ctx, "शिक्षक स्वाक्षरी", "Teacher Signature"), 10, false, android.graphics.Color.BLACK);
             img1.setAlignment(Element.ALIGN_CENTER); s1.addElement(img1);
             
             s2 = new PdfPCell(); s2.setBorder(Rectangle.NO_BORDER); s2.setHorizontalAlignment(Element.ALIGN_CENTER);
-            com.itextpdf.text.Image img2 = MarathiText.renderLine("पालक स्वाक्षरी", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img2 = MarathiText.renderLine(PdfLocalizer.get(ctx, "पालक स्वाक्षरी", "Parent Signature"), 10, false, android.graphics.Color.BLACK);
             img2.setAlignment(Element.ALIGN_CENTER); s2.addElement(img2);
 
             s3 = new PdfPCell(); s3.setBorder(Rectangle.NO_BORDER); s3.setHorizontalAlignment(Element.ALIGN_CENTER);
-            com.itextpdf.text.Image img3 = MarathiText.renderLine("मुख्याध्यापक स्वाक्षरी", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img3 = MarathiText.renderLine(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी", "Headmaster Signature"), 10, false, android.graphics.Color.BLACK);
             img3.setAlignment(Element.ALIGN_CENTER); s3.addElement(img3);
         } catch(Exception ignored){}
 

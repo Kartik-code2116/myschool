@@ -84,7 +84,7 @@ public class SettingsFragment extends Fragment {
 
         // 1. Initial State UI Restoration
         int themeMode = settingsPrefs.getInt("theme_mode", 0);
-        String lang = settingsPrefs.getString("language", "en");
+        String lang = settingsPrefs.getString("language", "mr");
         updateThemeUi(themeMode);
         updateLanguageUi(lang);
 
@@ -147,7 +147,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void selectLanguage(String lang) {
-        String currentLang = settingsPrefs.getString("language", "en");
+        String currentLang = settingsPrefs.getString("language", "mr");
         if (currentLang.equals(lang)) return;
 
         settingsPrefs.edit().putString("language", lang).apply();

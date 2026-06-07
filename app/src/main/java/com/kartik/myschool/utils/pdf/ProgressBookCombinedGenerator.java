@@ -74,44 +74,60 @@ public class ProgressBookCombinedGenerator {
 
         PdfPCell cL = new PdfPCell();
         cL.setBorder(Rectangle.NO_BORDER);
-        String udise = "Udise: " + nvl(school != null ? school.udiseCode : "");
+        String udise = PdfLocalizer.get(ctx, "युडायस : ", "UDISE: ") + nvl(school != null ? school.udiseCode : "");
         String sName = nvl(school != null ? school.name : "");
-        cL.addElement(new Phrase(udise, fSmallBold));
-        cL.addElement(new Phrase(sName, fSmall));
+        try {
+            com.itextpdf.text.Image uImg = MarathiText.renderLine(udise, 9, true, android.graphics.Color.BLACK);
+            cL.addElement(uImg);
+            com.itextpdf.text.Image sImg = MarathiText.renderLine(sName, 9, false, android.graphics.Color.BLACK);
+            cL.addElement(sImg);
+        } catch (Exception e) {
+            cL.addElement(new Phrase(udise, fSmallBold));
+            cL.addElement(new Phrase(sName, fSmall));
+        }
         hdr.addCell(cL);
 
         PdfPCell cC = new PdfPCell();
         cC.setBorder(Rectangle.NO_BORDER);
         cC.setHorizontalAlignment(Element.ALIGN_CENTER);
         try {
-            com.itextpdf.text.Image titleImg = MarathiText.renderLine("सातत्यपूर्ण सर्वंकष मूल्यमापन", 16, true, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image titleImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), 16, true, android.graphics.Color.BLACK);
             titleImg.setAlignment(Element.ALIGN_CENTER);
             cC.addElement(titleImg);
-            com.itextpdf.text.Image subImg = MarathiText.renderLine("प्रथम व द्वितीय सत्र", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image subImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "प्रथम व द्वितीय सत्र", "First & Second Semester"), 10, false, android.graphics.Color.BLACK);
             subImg.setAlignment(Element.ALIGN_CENTER);
             cC.addElement(subImg);
         } catch (Exception e) {
-            cC.addElement(new Phrase("सातत्यपूर्ण सर्वंकष मूल्यमापन", fTitle));
-            cC.addElement(new Phrase("प्रथम व द्वितीय सत्र", fSmall));
+            cC.addElement(new Phrase(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), fTitle));
+            cC.addElement(new Phrase(PdfLocalizer.get(ctx, "प्रथम व द्वितीय सत्र", "First & Second Semester"), fSmall));
         }
         hdr.addCell(cC);
 
         PdfPCell cR = new PdfPCell();
         cR.setBorder(Rectangle.NO_BORDER);
         cR.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        String year = "सन : " + nvl(cls != null ? cls.academicYearLabel : "");
-        String cDiv = "इयत्ता: " + nvl(cls != null ? cls.className : "") + ", तुकडी: " + nvl(cls != null ? cls.division : "-");
-        Phrase p1 = new Phrase(year, fSmallBold);
-        p1.getFont().setColor(C_DARK);
-        Paragraph pr1 = new Paragraph(p1);
-        pr1.setAlignment(Element.ALIGN_RIGHT);
-        cR.addElement(pr1);
-        
-        Phrase p2 = new Phrase(cDiv, fSmallBold);
-        p2.getFont().setColor(C_DARK);
-        Paragraph pr2 = new Paragraph(p2);
-        pr2.setAlignment(Element.ALIGN_RIGHT);
-        cR.addElement(pr2);
+        String year = PdfLocalizer.get(ctx, "सन : ", "Year : ") + nvl(cls != null ? cls.academicYearLabel : "");
+        String cDiv = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + nvl(cls != null ? cls.className : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : "-");
+        try {
+            com.itextpdf.text.Image yImg = MarathiText.renderLine(year, 9, true, android.graphics.Color.BLACK);
+            yImg.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(yImg);
+            com.itextpdf.text.Image dImg = MarathiText.renderLine(cDiv, 9, true, android.graphics.Color.BLACK);
+            dImg.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(dImg);
+        } catch (Exception e) {
+            Phrase p1 = new Phrase(year, fSmallBold);
+            p1.getFont().setColor(C_DARK);
+            Paragraph pr1 = new Paragraph(p1);
+            pr1.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(pr1);
+            
+            Phrase p2 = new Phrase(cDiv, fSmallBold);
+            p2.getFont().setColor(C_DARK);
+            Paragraph pr2 = new Paragraph(p2);
+            pr2.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(pr2);
+        }
         hdr.addCell(cR);
 
         hdr.setSpacingAfter(8);
@@ -143,23 +159,23 @@ public class ProgressBookCombinedGenerator {
         tbl.setHeaderRows(2); // Repeat headers on new pages
 
         // ── 3. Table Headers (Row 1) ──────────────────────────────────────────
-        MarathiText.cell(tbl, "अ.नं", 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        MarathiText.cell(tbl, "विद्यार्थ्याचे नाव", 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "उपस्थिती", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "सत्र", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."), 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"), 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "सत्र", "Term"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
 
         for (Subject sub : allSubs) {
-            MarathiText.cell(tbl, nvl(sub.name), 9, true, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+            MarathiText.cell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 9, true, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
         }
 
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "एकूण", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-        MarathiText.cell(tbl, "शेकडा गुण", 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "शेकडा गुण", "Percentage"), 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
 
         // ── 4. Table Headers (Row 2) ──────────────────────────────────────────
         for (Subject sub : allSubs) {
-            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "श्रेणी", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "गुण", "Marks"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
         }
 
         // ── 5. Data Rows ──────────────────────────────────────────────────────

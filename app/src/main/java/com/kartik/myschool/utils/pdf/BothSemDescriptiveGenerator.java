@@ -102,7 +102,7 @@ public class BothSemDescriptiveGenerator {
                         MarksRecord s1 = sem1Map != null ? sem1Map.get(student.id) : null;
                         MarksRecord s2 = sem2Map != null ? sem2Map.get(student.id) : null;
 
-                        addStudentPage(doc, school, cls, student, s1, s2);
+                        addStudentPage(doc, ctx, school, cls, student, s1, s2);
                     }
                 }
                 doc.close();
@@ -115,7 +115,7 @@ public class BothSemDescriptiveGenerator {
 
     // ── Per-student page ──────────────────────────────────────────────────────
 
-    private static void addStudentPage(Document doc, School school, ClassModel cls,
+    private static void addStudentPage(Document doc, Context ctx, School school, ClassModel cls,
                                         Student student, MarksRecord sem1, MarksRecord sem2) throws Exception {
 
         // Outer 2-column wrapper: left panel | right panel
@@ -131,14 +131,14 @@ public class BothSemDescriptiveGenerator {
         leftCell.setBorder(Rectangle.NO_BORDER);
         leftCell.setPadding(8);
         leftCell.setVerticalAlignment(Element.ALIGN_TOP);
-        buildSemPanel(leftCell, school, cls, student, sem1, "● प्रथम सत्र ●");
+        buildSemPanel(leftCell, ctx, school, cls, student, sem1, PdfLocalizer.get(ctx, "● प्रथम सत्र ●", "● First Semester ●"));
 
         // ── RIGHT: द्वितीय सत्र ─────────────────────────────────────────────
         PdfPCell rightCell = new PdfPCell();
         rightCell.setBorder(Rectangle.NO_BORDER);
         rightCell.setPadding(8);
         rightCell.setVerticalAlignment(Element.ALIGN_TOP);
-        buildSemPanel(rightCell, school, cls, student, sem2, "● द्वितीय सत्र ●");
+        buildSemPanel(rightCell, ctx, school, cls, student, sem2, PdfLocalizer.get(ctx, "● द्वितीय सत्र ●", "● Second Semester ●"));
 
         outer.addCell(leftCell);
         outer.addCell(rightCell);
@@ -147,7 +147,7 @@ public class BothSemDescriptiveGenerator {
 
     // ── Single-semester panel builder ─────────────────────────────────────────
 
-    private static void buildSemPanel(PdfPCell panel, School school, ClassModel cls,
+    private static void buildSemPanel(PdfPCell panel, Context ctx, School school, ClassModel cls,
                                        Student student, MarksRecord rec, String semTitle) throws Exception {
 
         BaseColor C_HDR = new BaseColor(0, 151, 167);   // teal header
@@ -168,12 +168,12 @@ public class BothSemDescriptiveGenerator {
         PdfPTable hdr = new PdfPTable(new float[]{2f, 1f, 1.4f});
         hdr.setWidthPercentage(100);
 
-        String nameText  = "नाव: " + nvl(student != null ? student.name : null);
-        String yearText  = "सन : " + nvl(cls != null ? cls.academicYearLabel : null);
-        String clasDiv   = "इयत्ता: " + nvl(cls != null ? cls.className : null)
-                + ", तुकडी: " + nvl(cls != null ? cls.division : null);
-        String rollText  = "हजेरी क्रमांक : " + nvl(student != null ? student.rollNo : null);
-        String udiseText = "Udise: " + nvl(school != null ? school.udiseCode : null);
+        String nameText  = PdfLocalizer.get(ctx, "नाव: ", "Name: ") + nvl(student != null ? student.name : null);
+        String yearText  = PdfLocalizer.get(ctx, "सन: ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : null);
+        String clasDiv   = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + nvl(cls != null ? cls.className : null)
+                + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : null);
+        String rollText  = PdfLocalizer.get(ctx, "हजेरी क्रमांक: ", "Roll No: ") + nvl(student != null ? student.rollNo : null);
+        String udiseText = PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + nvl(school != null ? school.udiseCode : null);
 
         // Row 1: नाव | (empty) | सन
         addHdrCell(hdr, nameText,  fSmallBold, Element.ALIGN_LEFT);
@@ -195,10 +195,10 @@ public class BothSemDescriptiveGenerator {
         tbl.setWidthPercentage(100);
 
         // Header
-        addTableHdr(tbl, "अ.नं",             C_HDR);
-        addTableHdr(tbl, "विषय",             C_HDR);
-        addTableHdr(tbl, "श्रेणी",           C_HDR);
-        addTableHdr(tbl, "वर्णनात्मक नोंदी", C_HDR);
+        addTableHdr(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."),             C_HDR);
+        addTableHdr(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"),             C_HDR);
+        addTableHdr(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),           C_HDR);
+        addTableHdr(tbl, PdfLocalizer.get(ctx, "वर्णनात्मक नोंदी", "Descriptive Remarks"), C_HDR);
 
         List<Subject> subjects = (cls != null && cls.subjects != null) ? cls.subjects : new java.util.ArrayList<>();
         boolean alt = false;
@@ -210,7 +210,7 @@ public class BothSemDescriptiveGenerator {
             String remark = findRemark(rec, sub.name);
 
             addDataCell(tbl, String.valueOf(rowIdx++), fSmallBold, bg, Element.ALIGN_CENTER, 28f);
-            addDataCell(tbl, nvl(sub.name),            fSmall,     bg, Element.ALIGN_LEFT,   28f);
+            addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, Element.ALIGN_LEFT,   28f);
             addDataCell(tbl, grade,                    fSmallBold, bg, Element.ALIGN_CENTER, 28f);
             addRemarkCell(tbl, remark,                             bg, 28f);
         }
@@ -225,10 +225,10 @@ public class BothSemDescriptiveGenerator {
         String teacherName   = (cls   != null && cls.teacherName    != null) ? cls.teacherName    : "";
         String principalName = (school != null && school.principalName != null) ? school.principalName : "";
 
-        PdfPCell s1 = rawCell("शिक्षक स्वाक्षरी\n" + teacherName,
+        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "शिक्षक स्वाक्षरी\n", "Teacher Signature\n") + teacherName,
                 fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s1.setBorder(Rectangle.NO_BORDER);
-        PdfPCell s2 = rawCell("मुख्याध्यापक स्वाक्षरी\n" + principalName,
+        PdfPCell s2 = rawCell(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\n", "Headmaster Signature\n") + principalName,
                 fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s2.setBorder(Rectangle.NO_BORDER);
 
@@ -240,9 +240,8 @@ public class BothSemDescriptiveGenerator {
     // ── Cell helpers ──────────────────────────────────────────────────────────
 
     private static void addHdrCell(PdfPTable tbl, String text, Font font, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        PdfPCell c = rawCell(text, font, BaseColor.WHITE, C_DARK, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(align);
         c.setPadding(2);
         tbl.addCell(c);
     }

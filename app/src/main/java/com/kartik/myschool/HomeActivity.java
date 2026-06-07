@@ -59,6 +59,8 @@ public class HomeActivity extends AppCompatActivity {
         topLevel.add(R.id.nav_weightage);
         topLevel.add(R.id.nav_dropdown);
         topLevel.add(R.id.nav_extra);
+        topLevel.add(R.id.nav_school_info);
+        topLevel.add(R.id.nav_gender);
         topLevel.add(R.id.nav_print_report);
         topLevel.add(R.id.nav_dashboard);
 
@@ -328,8 +330,10 @@ public class HomeActivity extends AppCompatActivity {
                 group3.setTitle(getString(R.string.section_school_level));
             }
         }
-        android.view.MenuItem itemExtra = menu.findItem(R.id.nav_extra);
-        if (itemExtra != null) itemExtra.setTitle(getString(R.string.menu_extra_menus));
+        android.view.MenuItem itemSchoolInfo = menu.findItem(R.id.nav_school_info);
+        if (itemSchoolInfo != null) itemSchoolInfo.setTitle(getString(R.string.txt_school_information));
+        android.view.MenuItem itemGender = menu.findItem(R.id.nav_gender);
+        if (itemGender != null) itemGender.setTitle(getString(R.string.txt_gender));
 
         // 4. Group 4: Bottom Action
         if (menu.size() > 3) {
@@ -434,7 +438,7 @@ public class HomeActivity extends AppCompatActivity {
                     // Fully functional bilingual language selector dialog
                     String[] languages = {"English", "मराठी (Marathi)"};
                     android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
-                    String currentLang = prefs.getString("language", "en");
+                    String currentLang = prefs.getString("language", "mr");
                     int checkedItem = "mr".equals(currentLang) ? 1 : 0;
 
                     new androidx.appcompat.app.AlertDialog.Builder(this)
@@ -563,7 +567,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public void changeLanguage(String lang) {
         android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
-        String currentLang = prefs.getString("language", "en");
+        String currentLang = prefs.getString("language", "mr");
         if (currentLang.equals(lang)) return;
 
         prefs.edit().putString("language", lang).apply();

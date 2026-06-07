@@ -108,13 +108,13 @@ public class ResultSheetGenerator {
         c1.setBorder(Rectangle.NO_BORDER);
         c1.setHorizontalAlignment(Element.ALIGN_CENTER);
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine("● निकालपत्रक ●", 16, true, android.graphics.Color.rgb(C_PINK.getRed(), C_PINK.getGreen(), C_PINK.getBlue()));
+            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "● निकालपत्रक ●", "● RESULT SHEET ●"), 16, true, android.graphics.Color.rgb(C_PINK.getRed(), C_PINK.getGreen(), C_PINK.getBlue()));
             img.setAlignment(com.itextpdf.text.Image.MIDDLE);
             c1.addElement(img);
         } catch (Exception e) {
             Font pinkFont = sMarathiBase != null ? new Font(sMarathiBase, 16, Font.BOLD, C_PINK)
                                                  : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_PINK);
-            c1.setPhrase(new Phrase("● निकालपत्रक ●", pinkFont));
+            c1.setPhrase(new Phrase(PdfLocalizer.get(ctx, "● निकालपत्रक ●", "● RESULT SHEET ●"), pinkFont));
         }
         titleTbl.addCell(c1);
 
@@ -124,11 +124,11 @@ public class ResultSheetGenerator {
         c2.setHorizontalAlignment(Element.ALIGN_CENTER);
         c2.setPaddingBottom(10);
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine("वार्षिक परीक्षा " + className, 10, true, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "वार्षिक परीक्षा ", "Annual Examination ") + className, 10, true, android.graphics.Color.BLACK);
             img.setAlignment(com.itextpdf.text.Image.MIDDLE);
             c2.addElement(img);
         } catch (Exception e) {
-            c2.setPhrase(new Phrase("वार्षिक परीक्षा " + className, fSmallBold));
+            c2.setPhrase(new Phrase(PdfLocalizer.get(ctx, "वार्षिक परीक्षा ", "Annual Examination ") + className, fSmallBold));
         }
         titleTbl.addCell(c2);
 
@@ -138,10 +138,10 @@ public class ResultSheetGenerator {
         PdfPTable hdr = new PdfPTable(new float[]{3f, 1.5f});
         hdr.setWidthPercentage(100);
 
-        String schoolName = "शाळेचे नाव : " + nvl(school != null ? school.name : "");
-        String udiseText  = "Udise: " + nvl(school != null ? school.udiseCode : "");
-        String clsDiv     = "इयत्ता: " + className + ", तुकडी: " + nvl(cls != null ? cls.division : "-");
-        String yearText   = "सन : " + nvl(cls != null ? cls.academicYearLabel : "");
+        String schoolName = PdfLocalizer.get(ctx, "शाळेचे नाव : ", "School Name: ") + nvl(school != null ? school.name : "");
+        String udiseText  = PdfLocalizer.get(ctx, "युडायस : ", "UDISE : ") + nvl(school != null ? school.udiseCode : "");
+        String clsDiv     = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : "-");
+        String yearText   = PdfLocalizer.get(ctx, "सन : ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
 
         addHdrCell(hdr, schoolName, Element.ALIGN_LEFT);
         addHdrCell(hdr, udiseText,  Element.ALIGN_RIGHT);
@@ -175,29 +175,29 @@ public class ResultSheetGenerator {
         tbl.setHeaderRows(2); // Repeat headers on new pages
 
         // ── 4. Table Headers (Row 1) ──────────────────────────────────────────
-        addTh(tbl, "अ.नं.", 1, 2);
-        addTh(tbl, "नाव", 1, 2);
-        addTh(tbl, "हजर दिन", 1, 2);
+        addTh(tbl, PdfLocalizer.get(ctx, "अ.नं.", "Sr.No."), 1, 2);
+        addTh(tbl, PdfLocalizer.get(ctx, "नाव", "Student Name"), 1, 2);
+        addTh(tbl, PdfLocalizer.get(ctx, "हजर दिन", "Attendance"), 1, 2);
         
         for (Subject sub : acaSubs) {
-            addTh(tbl, nvl(sub.name), 3, 1);
+            addTh(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 3, 1);
         }
         for (Subject sub : nonAcaSubs) {
-            addTh(tbl, nvl(sub.name), 1, 1);
+            addTh(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 1, 1);
         }
         
-        addTh(tbl, "एकूण " + maxTotal, 1, 2);
-        addTh(tbl, "शेकडा गुण", 1, 2);
-        addTh(tbl, "शेरा", 1, 2);
+        addTh(tbl, PdfLocalizer.get(ctx, "एकूण ", "Total ") + maxTotal, 1, 2);
+        addTh(tbl, PdfLocalizer.get(ctx, "शेकडा गुण", "Percentage"), 1, 2);
+        addTh(tbl, PdfLocalizer.get(ctx, "शेरा", "Remark"), 1, 2);
 
         // ── 5. Table Headers (Row 2) ──────────────────────────────────────────
         for (int i = 0; i < acaSubs.size(); i++) {
-            addTh(tbl, "गुण", 1, 1);
-            addTh(tbl, "ग्रेस", 1, 1);
-            addTh(tbl, "शेरा", 1, 1);
+            addTh(tbl, PdfLocalizer.get(ctx, "गुण", "Marks"), 1, 1);
+            addTh(tbl, PdfLocalizer.get(ctx, "ग्रेस", "Grace"), 1, 1);
+            addTh(tbl, PdfLocalizer.get(ctx, "शेरा", "Remark"), 1, 1);
         }
         for (int i = 0; i < nonAcaSubs.size(); i++) {
-            addTh(tbl, "श्रेणी", 1, 1);
+            addTh(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), 1, 1);
         }
 
         // ── 6. Student Data ───────────────────────────────────────────────────
@@ -237,7 +237,7 @@ public class ResultSheetGenerator {
 
                 // Totals
                 String percStr = maxTotal > 0 ? String.format(java.util.Locale.US, "%.1f", (totalObtained * 100.0f) / maxTotal) : "0.0";
-                String passResult = hasFailed ? "अनुत्तीर्ण" : "उत्तीर्ण";
+                String passResult = hasFailed ? PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail") : PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass");
 
                 addTd(tbl, String.valueOf(totalObtained), Element.ALIGN_CENTER);
                 addTd(tbl, percStr,                       Element.ALIGN_CENTER);
@@ -275,7 +275,8 @@ public class ResultSheetGenerator {
 
     private static boolean isNonAcademic(String sub) {
         if (sub == null) return false;
-        String s = sub.trim();
-        return s.contains("कला") || s.contains("कार्यानुभव") || s.contains("शा.शि.") || s.contains("शारीरिक");
+        String s = sub.trim().toLowerCase();
+        return s.contains("कला") || s.contains("कार्यानुभव") || s.contains("शा.शि.") || s.contains("शारीरिक")
+            || s.contains("art") || s.contains("work experience") || s.contains("p.e.") || s.contains("physical education") || s.contains("craft");
     }
 }

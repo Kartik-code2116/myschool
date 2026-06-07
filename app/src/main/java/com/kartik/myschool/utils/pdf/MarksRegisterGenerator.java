@@ -107,7 +107,7 @@ public class MarksRegisterGenerator {
                                         Subject sub, boolean isSem2) throws Exception {
 
         // ── 1. Title ─────────────────────────────────────────────────────────
-        PdfGenerator.addMarathiParagraph(doc, "सातत्यपूर्ण सर्वंकष मूल्यमापन",
+        PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
                 14, true, C_DARK, 0, 6);
 
         // ── 2. Meta header ────────────────────────────────────────────────────
@@ -115,22 +115,22 @@ public class MarksRegisterGenerator {
         String yearLabel  = cls   != null ? nvl(cls.academicYearLabel) : "";
         String className  = cls   != null ? nvl(cls.className)         : "";
         String division   = cls   != null ? nvl(cls.division)          : "";
-        String semLabel   = isSem2 ? "द्वितीय सत्र" : "प्रथम सत्र";
+        String semLabel   = isSem2 ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester") : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
 
         // Row 1: school name (left) | empty | year (right)
         PdfPTable hdr1 = new PdfPTable(new float[]{2f, 1f, 1.5f});
         hdr1.setWidthPercentage(100);
         addNoBorder(hdr1, schoolName,         fSmall,     Element.ALIGN_LEFT);
         addNoBorder(hdr1, "",                 fSmall,     Element.ALIGN_CENTER);
-        addNoBorder(hdr1, "सन : " + yearLabel, fSmallBold, Element.ALIGN_RIGHT);
+        addNoBorder(hdr1, PdfLocalizer.get(ctx, "सन : ", "Year : ") + yearLabel, fSmallBold, Element.ALIGN_RIGHT);
         hdr1.setSpacingAfter(2);
         doc.add(hdr1);
 
         // Row 2: class+div (left) | subject (center) | semester (right)
         PdfPTable hdr2 = new PdfPTable(new float[]{1.5f, 1f, 1f});
         hdr2.setWidthPercentage(100);
-        addNoBorder(hdr2, "इयत्ता: " + className + ", तुकडी: " + division, fSmall,     Element.ALIGN_LEFT);
-        addNoBorder(hdr2, nvl(sub.name),                                    fSmallBold, Element.ALIGN_CENTER);
+        addNoBorder(hdr2, PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + division, fSmall,     Element.ALIGN_LEFT);
+        addNoBorder(hdr2, PdfLocalizer.translateSubject(ctx, sub.name),                                    fSmallBold, Element.ALIGN_CENTER);
         addNoBorder(hdr2, semLabel,                                         fSmallBold, Element.ALIGN_RIGHT);
         hdr2.setSpacingAfter(5);
         doc.add(hdr2);
@@ -144,18 +144,34 @@ public class MarksRegisterGenerator {
         // अ.नं (rowspan 3), तपशील (rowspan 3),
         // आकारिक (अ) colspan 9, संकलित (ब) colspan 4,
         // अ+ब (rowspan 3), श्रे.गुण (rowspan 3), श्रेणी (rowspan 3)
-        cellSpan(tbl, "अ. नं",   fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-        cellSpan(tbl, "तपशील",   fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-        cellSpan(tbl, "आकारिक (अ)",  fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, "संकलित (ब)",  fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "अ+ब",     fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "श्रे.गुण", fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "श्रेणी",   fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "अ. नं", "Sr.No."),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "तपशील", "Details"),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"),  fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"),  fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ+ब", "A+B"),     fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रे.गुण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
 
         // ── Header row 2: sub-column names ────────────────────────────────────
-        String[] formNames = {"निरीक्षण", "तोंडीकाम", "प्रात्यक्षिक", "उपक्रम", "प्रकल्प", "चाचणी", "स्वाध्याय", "इतर", "एकूण"};
+        String[] formNames = {
+            PdfLocalizer.get(ctx, "निरीक्षण", "Observation"),
+            PdfLocalizer.get(ctx, "तोंडीकाम", "Oral Work"),
+            PdfLocalizer.get(ctx, "प्रात्यक्षिक", "Practical"),
+            PdfLocalizer.get(ctx, "उपक्रम", "Activity"),
+            PdfLocalizer.get(ctx, "प्रकल्प", "Project"),
+            PdfLocalizer.get(ctx, "चाचणी", "Test"),
+            PdfLocalizer.get(ctx, "स्वाध्याय", "Assignment"),
+            PdfLocalizer.get(ctx, "इतर", "Other"),
+            PdfLocalizer.get(ctx, "एकूण", "Total")
+        };
         for (String f : formNames) GunapattrakGenerator.cellVerticalSpan(tbl, ctx, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        String[] summNames = {"तोंडी", "प्रात्य.", "लेखी", "एकूण"};
+        
+        String[] summNames = {
+            PdfLocalizer.get(ctx, "तोंडी", "Oral"),
+            PdfLocalizer.get(ctx, "प्रात्य.", "Pract."),
+            PdfLocalizer.get(ctx, "लेखी", "Written"),
+            PdfLocalizer.get(ctx, "एकूण", "Total")
+        };
         for (String s : summNames) GunapattrakGenerator.cellVerticalSpan(tbl, ctx, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
 
         // ── Header row 3: Max marks row ───────────────────────────────────────
@@ -227,9 +243,9 @@ public class MarksRegisterGenerator {
     // ── Helper ────────────────────────────────────────────────────────────────
 
     private static void addNoBorder(PdfPTable tbl, String text, Font font, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        BaseColor tc = font.getColor() != null ? font.getColor() : C_DARK;
+        PdfPCell c = PdfGenerator.rawCell(text, font, BaseColor.WHITE, tc, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(align);
         c.setPadding(2);
         tbl.addCell(c);
     }

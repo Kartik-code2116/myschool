@@ -88,6 +88,13 @@ public class RosterGradeTableGenerator {
     // Main page builder
     // ─────────────────────────────────────────────────────────────────────────
 
+    private static String getGradeLabel(Context ctx, int gi) {
+        if (PdfLocalizer.isEnglish(ctx)) {
+            return GRADES[gi];
+        }
+        return GRADE_LABELS[gi];
+    }
+
     public static void addRosterContent(Document doc, Context ctx, School school, ClassModel cls,
                                         List<Student> students, Map<String, MarksRecord> marksMap,
                                         boolean isSem2) throws Exception {
@@ -95,7 +102,7 @@ public class RosterGradeTableGenerator {
         List<Subject> subjects = (cls != null && cls.subjects != null) ? cls.subjects : new ArrayList<>();
 
         // ── 1. Main title ────────────────────────────────────────────────────
-        PdfGenerator.addMarathiParagraph(doc, "सातत्यपूर्ण सर्वंकष मूल्यमापन",
+        PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
                 14, true, C_DARK, 0, 6);
 
         // ── 2. Meta header: UDISE | Semester | Year / Class ──────────────────
@@ -103,12 +110,14 @@ public class RosterGradeTableGenerator {
         hdr.setWidthPercentage(100);
         hdr.setSpacingAfter(5);
 
-        String udiseText = "युडायस: " + nvl(school != null ? school.udiseCode : null)
-                + "\nशाळा: " + nvl(school != null ? school.name : null);
-        String semText = isSem2 ? "द्वितीय सत्र" : "प्रथम सत्र";
-        String rightText = "सन : " + nvl(cls != null ? cls.academicYearLabel : null)
-                + "\nइयत्ता: " + nvl(cls != null ? cls.className : null)
-                + ", तुकडी: " + nvl(cls != null ? cls.division : null);
+        String udiseText = PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + nvl(school != null ? school.udiseCode : null)
+                + PdfLocalizer.get(ctx, "\nशाळा: ", "\nSchool: ") + nvl(school != null ? school.name : null);
+        String semText = isSem2 
+                ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester") 
+                : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
+        String rightText = PdfLocalizer.get(ctx, "सन: ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : null)
+                + PdfLocalizer.get(ctx, "\nइयत्ता: ", "\nClass: ") + nvl(cls != null ? cls.className : null)
+                + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : null);
 
         PdfPCell hL = rawCell(udiseText, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
         hL.setBorder(Rectangle.NO_BORDER);
@@ -187,18 +196,18 @@ public class RosterGradeTableGenerator {
         tbl.setSpacingBefore(4);
 
         // ── Row 1: अ.नं(rowspan 2) | विषय(rowspan 2) | grade headers (colspan 2) × 9 | एकूण(colspan 2) ──
-        cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(tbl, "विषय", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
 
         for (int gi = 0; gi < numGrades; gi++) {
-            cellSpan(tbl, GRADE_LABELS[gi], fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, getGradeLabel(ctx, gi), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
         }
-        cellSpan(tbl, "एकूण", fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+        cellSpan(tbl, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
 
         // ── Row 2: मुले / मुली under each grade + under एकूण ──────────────────
         for (int gi = 0; gi <= numGrades; gi++) { // numGrades grades + 1 total column
-            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "मुले", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "मुली", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "मुले", "Boys"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "मुली", "Girls"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
         }
 
         // ── Data rows — one per subject ───────────────────────────────────────
@@ -209,7 +218,7 @@ public class RosterGradeTableGenerator {
             alt = !alt;
 
             cellSpan(tbl, String.valueOf(si + 1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, nvl(sub.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
 
             int rowBoys = 0, rowGirls = 0;
             for (int gi = 0; gi < numGrades; gi++) {
@@ -242,19 +251,19 @@ public class RosterGradeTableGenerator {
         PdfPTable sumTbl = new PdfPTable(sumWidths);
         sumTbl.setWidthPercentage(80);
 
-        cellSpan(sumTbl, "तपशील",    fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(sumTbl, "मुले",     fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(sumTbl, "मुली",     fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(sumTbl, "एकूण",     fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "तपशील", "Detail"),    fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "मुले", "Boys"),     fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "मुली", "Girls"),     fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "एकूण", "Total"),     fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // पट row
-        cellSpan(sumTbl, "पट",           fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "पट", "Enrolled"),           fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_LEFT);
         cellSpan(sumTbl, str(patBoys),   fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
         cellSpan(sumTbl, str(patGirls),  fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
         cellSpan(sumTbl, str(patBoys + patGirls), fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // उपस्थिती row
-        cellSpan(sumTbl, "उपस्थिती",    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_LEFT);
+        cellSpan(sumTbl, PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_LEFT);
         cellSpan(sumTbl, str(attBoys),  fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
         cellSpan(sumTbl, str(attGirls), fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
         cellSpan(sumTbl, str(attBoys + attGirls), fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
@@ -274,13 +283,13 @@ public class RosterGradeTableGenerator {
         String teacherName    = cls != null && cls.teacherName    != null ? cls.teacherName    : "";
         String principalName  = school != null && school.principalName != null ? school.principalName : "";
 
-        PdfPCell s1 = rawCell("वर्गशिक्षक स्वाक्षरी\n" + teacherName, fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\n", "Class Teacher Signature\n") + teacherName, fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s1.setBorder(Rectangle.TOP);
         s1.setBorderColorTop(C_DARK);
         s1.setBorderWidthTop(0.5f);
         s1.setPaddingTop(4);
 
-        PdfPCell s2 = rawCell("मुख्याध्यापक स्वाक्षरी\n" + principalName, fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell s2 = rawCell(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\n", "Headmaster Signature\n") + principalName, fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s2.setBorder(Rectangle.TOP);
         s2.setBorderColorTop(C_DARK);
         s2.setBorderWidthTop(0.5f);

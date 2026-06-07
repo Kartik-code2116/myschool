@@ -75,39 +75,59 @@ public class CasteGradeTableGenerator {
 
         PdfPCell cL = new PdfPCell();
         cL.setBorder(Rectangle.NO_BORDER);
-        cL.addElement(new Phrase("युडायस: " + nvl(school != null ? school.udiseCode : ""), fSmallBold));
-        cL.addElement(new Phrase("शाळा: " + nvl(school != null ? school.name : ""), fSmall));
+        String udise = PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + nvl(school != null ? school.udiseCode : "");
+        String sName = PdfLocalizer.get(ctx, "शाळा: ", "School: ") + nvl(school != null ? school.name : "");
+        try {
+            com.itextpdf.text.Image uImg = MarathiText.renderLine(udise, 9, true, android.graphics.Color.BLACK);
+            cL.addElement(uImg);
+            com.itextpdf.text.Image sImg = MarathiText.renderLine(sName, 9, false, android.graphics.Color.BLACK);
+            cL.addElement(sImg);
+        } catch (Exception e) {
+            cL.addElement(new Phrase(udise, fSmallBold));
+            cL.addElement(new Phrase(sName, fSmall));
+        }
         hdr.addCell(cL);
 
         PdfPCell cC = new PdfPCell();
         cC.setBorder(Rectangle.NO_BORDER);
         cC.setHorizontalAlignment(Element.ALIGN_CENTER);
         try {
-            com.itextpdf.text.Image titleImg = MarathiText.renderLine("सातत्यपूर्ण सर्वंकष मूल्यमापन", 16, true, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image titleImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), 16, true, android.graphics.Color.BLACK);
             titleImg.setAlignment(Element.ALIGN_CENTER);
             cC.addElement(titleImg);
-            String semStr = isSem2 ? "द्वितीय सत्र" : "प्रथम सत्र";
+            String semStr = isSem2 ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester") : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
             com.itextpdf.text.Image subImg = MarathiText.renderLine(semStr, 10, false, android.graphics.Color.BLACK);
             subImg.setAlignment(Element.ALIGN_CENTER);
             cC.addElement(subImg);
         } catch (Exception e) {
-            cC.addElement(new Phrase("सातत्यपूर्ण सर्वंकष मूल्यमापन", fTitle));
-            cC.addElement(new Phrase(isSem2 ? "द्वितीय सत्र" : "प्रथम सत्र", fSmall));
+            cC.addElement(new Phrase(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), fTitle));
+            cC.addElement(new Phrase(isSem2 ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester") : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester"), fSmall));
         }
         hdr.addCell(cC);
 
         PdfPCell cR = new PdfPCell();
         cR.setBorder(Rectangle.NO_BORDER);
         cR.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        Phrase pYear = new Phrase("सन : " + nvl(cls != null ? cls.academicYearLabel : ""), fSmallBold);
-        com.itextpdf.text.Paragraph prYear = new com.itextpdf.text.Paragraph(pYear);
-        prYear.setAlignment(Element.ALIGN_RIGHT);
-        cR.addElement(prYear);
+        String yearVal = PdfLocalizer.get(ctx, "सन : ", "Year : ") + nvl(cls != null ? cls.academicYearLabel : "");
+        String cDivVal = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + nvl(cls != null ? cls.className : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : "-");
+        try {
+            com.itextpdf.text.Image yImg = MarathiText.renderLine(yearVal, 9, true, android.graphics.Color.BLACK);
+            yImg.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(yImg);
+            com.itextpdf.text.Image dImg = MarathiText.renderLine(cDivVal, 9, true, android.graphics.Color.BLACK);
+            dImg.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(dImg);
+        } catch (Exception e) {
+            Phrase pYear = new Phrase(yearVal, fSmallBold);
+            com.itextpdf.text.Paragraph prYear = new com.itextpdf.text.Paragraph(pYear);
+            prYear.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(prYear);
 
-        Phrase pDiv = new Phrase("इयत्ता: " + nvl(cls != null ? cls.className : "") + ", तुकडी: " + nvl(cls != null ? cls.division : "-"), fSmallBold);
-        com.itextpdf.text.Paragraph prDiv = new com.itextpdf.text.Paragraph(pDiv);
-        prDiv.setAlignment(Element.ALIGN_RIGHT);
-        cR.addElement(prDiv);
+            Phrase pDiv = new Phrase(cDivVal, fSmallBold);
+            com.itextpdf.text.Paragraph prDiv = new com.itextpdf.text.Paragraph(pDiv);
+            prDiv.setAlignment(Element.ALIGN_RIGHT);
+            cR.addElement(prDiv);
+        }
         hdr.addCell(cR);
 
         hdr.setSpacingAfter(10);
@@ -174,22 +194,26 @@ public class CasteGradeTableGenerator {
         tbl.setWidthPercentage(100);
 
         // Header Row 1
-        MarathiText.cell(tbl, "अ.नं", 10, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        MarathiText.cell(tbl, "जात संवर्ग", 10, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."), 10, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        MarathiText.cell(tbl, PdfLocalizer.get(ctx, "जात संवर्ग", "Caste Category"), 10, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
         
-        String[] gradeHeaders = {"अ-1", "अ-2", "ब-1", "ब-2", "क-1", "क-2", "ड", "इ-1", "इ-2", "एकूण"};
+        String[] gradeHeaders = PdfLocalizer.isEnglish(ctx)
+                ? new String[]{"A-1", "A-2", "B-1", "B-2", "C-1", "C-2", "D", "E-1", "E-2", "Total"}
+                : new String[]{"अ-1", "अ-2", "ब-1", "ब-2", "क-1", "क-2", "ड", "इ-1", "इ-2", "एकूण"};
         for (String g : gradeHeaders) {
             MarathiText.cell(tbl, g, 10, true, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
         }
 
         // Header Row 2
         for (int i = 0; i < 10; i++) {
-            MarathiText.cell(tbl, "मुले", 9, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            MarathiText.cell(tbl, "मुली", 9, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            MarathiText.cell(tbl, PdfLocalizer.get(ctx, "मुले", "Boys"), 9, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            MarathiText.cell(tbl, PdfLocalizer.get(ctx, "मुली", "Girls"), 9, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
 
         // Data Rows
-        String[] casteNames = {"अनु.जाती", "अनु.जमाती", "विमुक्त जाती", "भटक्या जाती", "इतर मागासवर्ग", "बिगर मागास", "एकूण"};
+        String[] casteNames = PdfLocalizer.isEnglish(ctx)
+                ? new String[]{"SC", "ST", "VJ", "NT", "OBC", "OPEN", "Total"}
+                : new String[]{"अनु.जाती", "अनु.जमाती", "विमुक्त जाती", "भटक्या जाती", "इतर मागासवर्ग", "बिगर मागास", "एकूण"};
         for (int c = 0; c < 7; c++) {
             BaseColor bg = (c % 2 == 1) ? C_ROW_ALT : C_WHITE;
             
@@ -219,19 +243,19 @@ public class CasteGradeTableGenerator {
         statTbl.setSpacingBefore(10f);
         statTbl.setWidths(new float[]{1.5f, 1f, 1f, 1f});
 
-        MarathiText.cell(statTbl, "तपशील", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        MarathiText.cell(statTbl, "मुले", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        MarathiText.cell(statTbl, "मुली", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        MarathiText.cell(statTbl, "एकूण", 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(statTbl, PdfLocalizer.get(ctx, "तपशील", "Details"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(statTbl, PdfLocalizer.get(ctx, "मुले", "Boys"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(statTbl, PdfLocalizer.get(ctx, "मुली", "Girls"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(statTbl, PdfLocalizer.get(ctx, "एकूण", "Total"), 10, true, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // Enrolled
-        MarathiText.cell(statTbl, "पट", 9, false, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(statTbl, PdfLocalizer.get(ctx, "पट", "Roll"), 9, false, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
         statTbl.addCell(numCell(enrolledBoys, C_WHITE));
         statTbl.addCell(numCell(enrolledGirls, C_WHITE));
         statTbl.addCell(numCell(enrolledBoys + enrolledGirls, C_WHITE));
 
         // Present
-        MarathiText.cell(statTbl, "उपस्थिती", 9, false, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(statTbl, PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"), 9, false, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
         statTbl.addCell(numCell(presentBoys, C_WHITE));
         statTbl.addCell(numCell(presentGirls, C_WHITE));
         statTbl.addCell(numCell(presentBoys + presentGirls, C_WHITE));
@@ -248,7 +272,7 @@ public class CasteGradeTableGenerator {
         sig1.setBorder(Rectangle.NO_BORDER);
         sig1.setHorizontalAlignment(Element.ALIGN_CENTER);
         try {
-            com.itextpdf.text.Image img1 = MarathiText.renderLine("वर्गशिक्षक स्वाक्षरी", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img1 = MarathiText.renderLine(PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी", "Class Teacher Signature"), 10, false, android.graphics.Color.BLACK);
             img1.setAlignment(Element.ALIGN_CENTER);
             sig1.addElement(img1);
             if (cls != null && cls.teacherName != null && !cls.teacherName.isEmpty()) {
@@ -257,7 +281,7 @@ public class CasteGradeTableGenerator {
                 sig1.addElement(img2);
             }
         } catch (Exception e) {
-            sig1.addElement(new Phrase("वर्गशिक्षक स्वाक्षरी\n" + (cls != null ? nvl(cls.teacherName) : ""), fSmall));
+            sig1.addElement(new Phrase(PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\n", "Class Teacher Signature\n") + (cls != null ? nvl(cls.teacherName) : ""), fSmall));
         }
         sigTbl.addCell(sig1);
 
@@ -265,11 +289,11 @@ public class CasteGradeTableGenerator {
         sig2.setBorder(Rectangle.NO_BORDER);
         sig2.setHorizontalAlignment(Element.ALIGN_CENTER);
         try {
-            com.itextpdf.text.Image img1 = MarathiText.renderLine("मुख्याध्यापक स्वाक्षरी", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img1 = MarathiText.renderLine(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी", "Headmaster Signature"), 10, false, android.graphics.Color.BLACK);
             img1.setAlignment(Element.ALIGN_CENTER);
             sig2.addElement(img1);
         } catch (Exception e) {
-            sig2.addElement(new Phrase("मुख्याध्यापक स्वाक्षरी", fSmall));
+            sig2.addElement(new Phrase(PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी", "Headmaster Signature"), fSmall));
         }
         sigTbl.addCell(sig2);
 

@@ -4,6 +4,7 @@ import static com.kartik.myschool.utils.pdf.GunapattrakGenerator.cellVerticalSpa
 import static com.kartik.myschool.utils.pdf.GunapattrakGenerator.cellHorizontalImageSpan;
 
 import android.content.Context;
+import com.kartik.myschool.utils.pdf.PdfLocalizer;
 
 import com.kartik.myschool.model.ClassModel;
 import com.kartik.myschool.model.MarksRecord;
@@ -267,7 +268,7 @@ public class PdfGenerator {
                 cellSpan(tbl, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
                 cellVerticalSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
                 for (int i = 0; i < numSubjects; i++) {
-                    cellSpan(tbl, subjects.get(i).name, fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, PdfLocalizer.translateSubject(ctx, subjects.get(i).name), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
                 }
                 
                 // Row 2 (Vertical subheaders)
@@ -449,7 +450,7 @@ public class PdfGenerator {
             int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
             boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
             int colspan = isNonAcademic ? 2 : 4;
-            cellSpan(tbl, sub.name, fSmallBold, C_HEADER_BG, C_DARK, colspan, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmallBold, C_HEADER_BG, C_DARK, colspan, 1, Element.ALIGN_CENTER);
         }
 
         // Row 2 Headers
@@ -570,7 +571,7 @@ public class PdfGenerator {
             Subject sub = subjects.get(i);
             BaseColor sBg = sumAlt ? C_ROW_ALT : C_WHITE; sumAlt = !sumAlt;
             cellSpan(sumTbl, str(i + 1), fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(sumTbl, sub.name, fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+            cellSpan(sumTbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_LEFT);
 
             int totalGradeCount = 0;
             Map<String, Integer> counts = gradeCounts.get(sub.name);
@@ -768,6 +769,10 @@ public class PdfGenerator {
     }
 
     public static PdfPTable buildSchoolHeader(School school, ClassModel cls) throws DocumentException {
+        return buildSchoolHeader(null, school, cls);
+    }
+
+    public static PdfPTable buildSchoolHeader(Context ctx, School school, ClassModel cls) throws DocumentException {
         PdfPTable t = new PdfPTable(1);
         t.setWidthPercentage(100); t.setSpacingAfter(4);
         PdfPCell c = new PdfPCell();
@@ -775,8 +780,8 @@ public class PdfGenerator {
         Paragraph p = new Paragraph();
         String name = (school != null && school.name != null) ? school.name.toUpperCase() : "SCHOOL";
         p.add(new Phrase(name + "\n", colored(fTitle, C_WHITE)));
-        String udise = (school != null && school.udiseCode != null) ? "युडायस: " + school.udiseCode : "";
-        String year  = (cls != null && cls.academicYearLabel != null) ? "  सन: " + cls.academicYearLabel : "";
+        String udise = (school != null && school.udiseCode != null) ? PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + school.udiseCode : "";
+        String year  = (cls != null && cls.academicYearLabel != null) ? PdfLocalizer.get(ctx, "  सन: ", "  Year: ") + cls.academicYearLabel : "";
         p.add(new Phrase(udise + year, colored(fTitleSub, new BaseColor(255,255,255,200))));
         c.addElement(p); t.addCell(c);
         return t;
@@ -818,12 +823,21 @@ public class PdfGenerator {
     }
 
     public static PdfPTable buildSignatureRow(School school, ClassModel cls) throws DocumentException {
+        return buildSignatureRow(null, school, cls);
+    }
+
+    public static PdfPTable buildSignatureRow(Context ctx, School school, ClassModel cls) throws DocumentException {
         PdfPTable t = new PdfPTable(2); t.setWidthPercentage(100); t.setSpacingBefore(28);
-        String teacher   = cls!=null && cls.teacherName!=null ? cls.teacherName : "वर्गशिक्षक";
-        String principal = school!=null && school.principalName!=null ? school.principalName : "मुख्याध्यापक";
-        PdfPCell s1 = rawCell("वर्गशिक्षक स्वाक्षरी\n" + teacher, fSmall, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        String defaultTeacher = PdfLocalizer.get(ctx, "वर्गशिक्षक", "Class Teacher");
+        String defaultPrincipal = PdfLocalizer.get(ctx, "मुख्याध्यापक", "Headmaster");
+        String teacher   = cls!=null && cls.teacherName!=null ? cls.teacherName : defaultTeacher;
+        String principal = school!=null && school.principalName!=null ? school.principalName : defaultPrincipal;
+        String teacherSig = PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\n", "Class Teacher Signature\n");
+        String principalSig = PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\n", "Headmaster Signature\n");
+        
+        PdfPCell s1 = rawCell(teacherSig + teacher, fSmall, C_WHITE, C_DARK, Element.ALIGN_LEFT);
         s1.setBorderWidthTop(0.5f); s1.setBorderColorTop(C_DARK); s1.setPaddingTop(6);
-        PdfPCell s2 = rawCell("मुख्याध्यापक स्वाक्षरी\n" + principal, fSmall, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
+        PdfPCell s2 = rawCell(principalSig + principal, fSmall, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
         s2.setBorderWidthTop(0.5f); s2.setBorderColorTop(C_DARK); s2.setPaddingTop(6);
         t.addCell(s1); t.addCell(s2);
         return t;
@@ -865,8 +879,8 @@ public class PdfGenerator {
         cell(t, "नाव",  fSmallBold, C_PRIMARY, C_WHITE, 1, Element.ALIGN_CENTER);
         if (cls.subjects != null) {
             for (Subject sub : cls.subjects) {
-                cell(t, sub.name+"\nस1", fSmallBold, C_PRIMARY_LIGHT, C_DARK,  1, Element.ALIGN_CENTER);
-                cell(t, sub.name+"\nस2", fSmallBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
+                cell(t, PdfLocalizer.translateSubject(null, sub.name)+"\nस1", fSmallBold, C_PRIMARY_LIGHT, C_DARK,  1, Element.ALIGN_CENTER);
+                cell(t, PdfLocalizer.translateSubject(null, sub.name)+"\nस2", fSmallBold, C_PRIMARY,       C_WHITE, 1, Element.ALIGN_CENTER);
             }
         }
         cell(t, "एकूण\nस1", fSmallBold, C_PRIMARY_LIGHT, C_DARK,  1, Element.ALIGN_CENTER);

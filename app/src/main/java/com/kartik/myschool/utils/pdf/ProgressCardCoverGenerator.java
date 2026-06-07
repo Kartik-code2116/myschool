@@ -62,11 +62,28 @@ public class ProgressCardCoverGenerator {
             "नोव्हेंबर", "डिसेंबर", "जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे"
     };
 
+    private static String[] getMonths(Context ctx) {
+        if (PdfLocalizer.isEnglish(ctx)) {
+            return new String[]{"June", "July", "August", "September", "October", "November", "December", "January", "February", "March", "April", "May"};
+        }
+        return MONTHS_MR;
+    }
+
     // Grade scale entries: range label → grade label
     private static final String[][] GRADE_SCALE = {
             {"91-100", "अ-1"}, {"81-90", "अ-2"}, {"71-80", "ब-1"}, {"61-70", "ब-2"},
             {"51-60", "क-1"}, {"41-50", "क-2"}, {"33-40", "ड"},   {"21-32", "इ-1"}, {"0-20", "इ-2"}
     };
+
+    private static String[][] getGradeScale(Context ctx) {
+        if (PdfLocalizer.isEnglish(ctx)) {
+            return new String[][]{
+                {"91-100", "A-1"}, {"81-90", "A-2"}, {"71-80", "B-1"}, {"61-70", "B-2"},
+                {"51-60", "C-1"}, {"41-50", "C-2"}, {"33-40", "D"},   {"21-32", "E-1"}, {"0-20", "E-2"}
+            };
+        }
+        return GRADE_SCALE;
+    }
 
     // Colors matching the screenshot
     private static final BaseColor C_TEAL      = new BaseColor(0,  151, 167);   // #0097A7
@@ -219,7 +236,7 @@ public class ProgressCardCoverGenerator {
                                         MarksRecord sem1, MarksRecord sem2) throws Exception {
 
         // ── Section title: उपस्थिती ──────────────────────────────────────────
-        panel.addElement(marathiImg(ctx, "उपस्थिती :", 9, true, C_TEAL));
+        panel.addElement(marathiImg(ctx, PdfLocalizer.get(ctx, "उपस्थिती :", "Attendance :"), 9, true, C_TEAL));
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 3)));
 
         // ── Monthly attendance table ──────────────────────────────────────────
@@ -230,19 +247,20 @@ public class ProgressCardCoverGenerator {
 
         // Header row 1
         BaseColor headerBg = new BaseColor(254, 235, 150); // Light Yellow
-        cellSpan(attTbl, "महिना",        fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "कामाचे\nदिवस", fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "हजर\nदिवस",    fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "स्वाक्षरी",    fSmallBold, headerBg, C_DARK, 3, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "महिना", "Month"),        fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "कामाचे\nदिवस", "Working\nDays"), fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "हजर\nदिवस", "Present\nDays"),    fSmallBold, headerBg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "स्वाक्षरी", "Signature"),    fSmallBold, headerBg, C_DARK, 3, 1, Element.ALIGN_CENTER);
 
         // Header row 2: sub-headers under स्वाक्षरी
-        cellSpan(attTbl, "वर्गशिक्षक",    fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "पालक",          fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(attTbl, "मुख्याध्यापक", fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "वर्गशिक्षक", "Class Teacher"),    fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "पालक", "Parent"),          fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(attTbl, PdfLocalizer.get(ctx, "मुख्याध्यापक", "Headmaster"), fSmallBold, headerBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // Month rows
         boolean alt = false;
-        for (String month : MONTHS_MR) {
+        String[] months = getMonths(ctx);
+        for (String month : months) {
             BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
 
             // Parse attendance: "present/total" or just "present"
@@ -273,11 +291,11 @@ public class ProgressCardCoverGenerator {
 
         // ── Summer vacation note ──────────────────────────────────────────────
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 4)));
-        panel.addElement(marathiImg(ctx, "उन्हाळी सुट्टीनंतर शाळा १५ जून रोजी सुरू होईल.", 7, false, C_DARK));
+        panel.addElement(marathiImg(ctx, PdfLocalizer.get(ctx, "उन्हाळी सुट्टीनंतर शाळा १५ जून रोजी सुरू होईल.", "School will reopen on June 15 after summer vacation."), 7, false, C_DARK));
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 5)));
 
         // ── Health info ───────────────────────────────────────────────────────
-        panel.addElement(marathiImg(ctx, "आरोग्य विषयक माहिती", 8, true, C_TEAL));
+        panel.addElement(marathiImg(ctx, PdfLocalizer.get(ctx, "आरोग्य विषयक माहिती", "Health Information"), 8, true, C_TEAL));
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 3)));
 
         float[] healthWidths = {1.2f, 1f, 1f};
@@ -286,27 +304,26 @@ public class ProgressCardCoverGenerator {
         healthTbl.setHorizontalAlignment(Element.ALIGN_LEFT);
 
         cellSpan(healthTbl, "-",         fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(healthTbl, "प्रथम सत्र",  fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(healthTbl, "द्वितीय सत्र", fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(healthTbl, PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester"),  fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
+        cellSpan(healthTbl, PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester"), fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
 
         // Weight row (not stored in MarksRecord — show dash)
         String w1 = "-";
         String w2 = "-";
-        cellSpan(healthTbl, "वजन",  fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_LEFT);
+        cellSpan(healthTbl, PdfLocalizer.get(ctx, "वजन", "Weight"),  fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_LEFT);
         cellSpan(healthTbl, w1,     fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_CENTER);
         cellSpan(healthTbl, w2,     fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         // Height row
         String h1 = "-";
         String h2 = "-";
-        cellSpan(healthTbl, "उंची", fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_LEFT);
+        cellSpan(healthTbl, PdfLocalizer.get(ctx, "उंची", "Height"), fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_LEFT);
         cellSpan(healthTbl, h1,     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
         cellSpan(healthTbl, h2,     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         panel.addElement(healthTbl);
 
         // ── Grade scale at bottom ─────────────────────────────────────────────
-        // Grade scale table
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
 
         // Title with rounded background (left-aligned)
@@ -317,7 +334,7 @@ public class ProgressCardCoverGenerator {
         gsTitleCell.setBorder(Rectangle.NO_BORDER);
         gsTitleCell.setBackgroundColor(new BaseColor(254, 221, 101));
         try {
-            Image img = marathiImg(ctx, "श्रेणी तक्ता :", 8, true, C_DARK);
+            Image img = marathiImg(ctx, PdfLocalizer.get(ctx, "श्रेणी तक्ता :", "Grade Scale :"), 8, true, C_DARK);
             img.setAlignment(Element.ALIGN_CENTER);
             gsTitleCell.addElement(img);
         } catch (Exception e) {}
@@ -326,17 +343,18 @@ public class ProgressCardCoverGenerator {
         
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 2)));
 
-        float[] gsWidths = new float[GRADE_SCALE.length];
+        String[][] scale = getGradeScale(ctx);
+        float[] gsWidths = new float[scale.length];
         Arrays.fill(gsWidths, 1f);
         PdfPTable gsTbl = new PdfPTable(gsWidths);
         gsTbl.setWidthPercentage(100);
 
         // Range row
-        for (String[] entry : GRADE_SCALE) {
+        for (String[] entry : scale) {
             cellSpan(gsTbl, entry[0], fMicro, BaseColor.WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
         // Grade label row
-        for (String[] entry : GRADE_SCALE) {
+        for (String[] entry : scale) {
             cellSpan(gsTbl, entry[1], fSmallBold, new BaseColor(240, 245, 250), C_DARK, 1, 1, Element.ALIGN_CENTER);
         }
         panel.addElement(gsTbl);
@@ -351,7 +369,8 @@ public class ProgressCardCoverGenerator {
         // Push text down into the yellow area
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 30)));
 
-        String udiseLine = "School UDISE: " + nvl(school != null ? school.udiseCode : null) + "\nजिल्हा परिषद";
+        String udiseLine = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : null) 
+                + PdfLocalizer.get(ctx, "\nजिल्हा परिषद", "\nZilla Parishad");
         try {
             Image udiseImg = marathiImg(ctx, udiseLine, 9, false, C_DARK);
             udiseImg.setAlignment(Element.ALIGN_CENTER);
@@ -361,7 +380,7 @@ public class ProgressCardCoverGenerator {
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
         try {
-            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : "शाळेचे नाव"), 20, true, C_DARK);
+            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : PdfLocalizer.get(ctx, "शाळेचे नाव", "SCHOOL NAME")), 20, true, C_DARK);
             schoolImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(schoolImg);
         } catch (Exception e) {}
@@ -378,7 +397,7 @@ public class ProgressCardCoverGenerator {
 
         String yearLabel = cls != null ? nvl(cls.academicYearLabel) : "";
         try {
-            Image yearImg = marathiImg(ctx, "सन : " + yearLabel, 11, true, C_DARK);
+            Image yearImg = marathiImg(ctx, PdfLocalizer.get(ctx, "सन: ", "Year: ") + yearLabel, 11, true, C_DARK);
             yearImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(yearImg);
         } catch (Exception e) {}
@@ -386,7 +405,7 @@ public class ProgressCardCoverGenerator {
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
 
         try {
-            Image titleImg = marathiImg(ctx, "प्रगती पत्रक", 28, true, C_DARK);
+            Image titleImg = marathiImg(ctx, PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), 28, true, C_DARK);
             titleImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(titleImg);
         } catch (Exception e) {}
@@ -413,7 +432,7 @@ public class ProgressCardCoverGenerator {
                     long diffMs = System.currentTimeMillis() - dob.getTime();
                     long years  = diffMs / (365L * 24 * 60 * 60 * 1000);
                     long months = (diffMs % (365L * 24 * 60 * 60 * 1000)) / (30L * 24 * 60 * 60 * 1000);
-                    ageStr = years + " व. " + months + " म.";
+                    ageStr = years + PdfLocalizer.get(ctx, " व. ", " Y. ") + months + PdfLocalizer.get(ctx, " म.", " M.");
                 }
             } catch (Exception ignored) {}
         }
@@ -430,42 +449,43 @@ public class ProgressCardCoverGenerator {
         det.setHorizontalAlignment(Element.ALIGN_CENTER);
 
         // Row 1: नाव (full width)
-        addDetailFull(det, ctx, "• नाव", ": " + nvl(student.name), 4);
+        addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• नाव", "• Name"), ": " + nvl(student.name), 4);
 
         // Row 2: स्टुडंट ID | रजि.नंबर
         addDetailPair(det, ctx,
-                "• स्टुडंट ID",    ": " + nvl(student.studentIdNumber),
-                "  रजि.नंबर",     ": " + nvl(student.registrationNo));
+                PdfLocalizer.get(ctx, "• स्टुडंट ID", "• Student ID"),    ": " + nvl(student.studentIdNumber),
+                PdfLocalizer.get(ctx, "  रजि.नंबर", "  Reg. No."),     ": " + nvl(student.registrationNo));
 
         // Row 3: हजेरी क्रमांक | (blank for extra spacing)
         addDetailPair(det, ctx,
-                "• हजेरी क्रमांक", ": " + nvl(student.rollNo),
-                "  रजि.नंबर",      ": " + nvl(student.rollNo2));
+                PdfLocalizer.get(ctx, "• हजेरी क्रमांक", "• Roll No."), ": " + nvl(student.rollNo),
+                PdfLocalizer.get(ctx, "  रजि.नंबर", "  Reg. No."),      ": " + nvl(student.rollNo2));
 
         // Row 4: इयत्ता | तुकडी
         addDetailPair(det, ctx,
-                "• इयत्ता",  ": " + className,
-                "  तुकडी",   ": " + division);
+                PdfLocalizer.get(ctx, "• इयत्ता", "• Class"),  ": " + className,
+                PdfLocalizer.get(ctx, "  तुकडी", "  Division"),   ": " + division);
 
         // Row 5: माध्यम | जन्मतारीख
         addDetailPair(det, ctx,
-                "• माध्यम",     ": " + nvl(student.medium),
-                "  जन्मतारीख",  ": " + nvl(student.dob));
+                PdfLocalizer.get(ctx, "• माध्यम", "• Medium"),     ": " + nvl(student.medium),
+                PdfLocalizer.get(ctx, "  जन्मतारीख", "  Date of Birth"),  ": " + nvl(student.dob));
 
         // Row 6: मातृभाषा | वय
         addDetailPair(det, ctx,
-                "• मातृभाषा", ": " + nvl(student.motherTongue),
-                "  वय",        ": " + ageStr);
+                PdfLocalizer.get(ctx, "• मातृभाषा", "• Mother Tongue"), ": " + nvl(student.motherTongue),
+                PdfLocalizer.get(ctx, "  वय", "  Age"),        ": " + ageStr);
 
         // Row 7: आईचे नाव (full)
-        addDetailFull(det, ctx, "• आईचे नाव", ": " + nvl(student.motherName), 4);
+        addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• आईचे नाव", "• Mother's Name"), ": " + nvl(student.motherName), 4);
 
         // Row 8: वडिलांचे नाव (full)
-        addDetailFull(det, ctx, "• वडिलांचे नाव", ": " + nvl(student.fatherName), 4);
+        addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• वडिलांचे नाव", "• Father's Name"), ": " + nvl(student.fatherName), 4);
 
         // Row 9: पत्ता (full)
-        addDetailFull(det, ctx, "• पत्ता", ": " + nvl(student.address), 4);
+        addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• पत्ता", "• Address"), ": " + nvl(student.address), 4);
 
+        det.setKeepTogether(true);
         panel.addElement(det);
     }
 
@@ -492,9 +512,8 @@ public class ProgressCardCoverGenerator {
     }
 
     private static PdfPCell noBorderCell(String text, Font font, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        PdfPCell c = PdfGenerator.rawCell(text, font, BaseColor.WHITE, C_DARK, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(align);
         c.setPaddingBottom(3);
         return c;
     }

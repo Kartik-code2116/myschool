@@ -30,7 +30,7 @@ public class MySchoolApplication extends Application {
         applyTheme(themeMode);
 
         // 3. Load and apply persistent locale language
-        String lang = settingsPrefs.getString("language", "en"); // default English
+        String lang = settingsPrefs.getString("language", "mr"); // default Marathi
         applyLocale(lang);
     }
 
@@ -48,6 +48,43 @@ public class MySchoolApplication extends Application {
         Locale locale = new Locale(lang);
         Locale.setDefault(locale);
         Resources res = getResources();
+        Configuration config = res.getConfiguration();
+        config.setLocale(locale);
+        res.updateConfiguration(config, res.getDisplayMetrics());
+
+        // Register ActivityLifecycleCallbacks to dynamically apply the locale to all activities on startup
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(android.app.Activity activity, android.os.Bundle savedInstanceState) {
+                applyLocaleForContext(activity);
+            }
+
+            @Override
+            public void onActivityStarted(android.app.Activity activity) {}
+
+            @Override
+            public void onActivityResumed(android.app.Activity activity) {}
+
+            @Override
+            public void onActivityPaused(android.app.Activity activity) {}
+
+            @Override
+            public void onActivityStopped(android.app.Activity activity) {}
+
+            @Override
+            public void onActivitySaveInstanceState(android.app.Activity activity, android.os.Bundle outState) {}
+
+            @Override
+            public void onActivityDestroyed(android.app.Activity activity) {}
+        });
+    }
+
+    public void applyLocaleForContext(android.content.Context context) {
+        android.content.SharedPreferences settingsPrefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
+        String lang = settingsPrefs.getString("language", "mr"); // default Marathi
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Resources res = context.getResources();
         Configuration config = res.getConfiguration();
         config.setLocale(locale);
         res.updateConfiguration(config, res.getDisplayMetrics());

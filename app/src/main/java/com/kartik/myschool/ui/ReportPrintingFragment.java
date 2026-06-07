@@ -178,6 +178,18 @@ public class ReportPrintingFragment extends Fragment {
         return new String[] { sem1Id, sem2Id };
     }
 
+    private boolean isSelectedSemesterTwo() {
+        return SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+    }
+
+    private MarksRecord selectedSemesterRecord(MarksRecord sem1, MarksRecord sem2) {
+        return isSelectedSemesterTwo() ? sem2 : sem1;
+    }
+
+    private Map<String, MarksRecord> selectedSemesterMap(Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map) {
+        return isSelectedSemesterTwo() ? sem2Map : sem1Map;
+    }
+
     private void generateIndividualReport(Student student, int reportPosition) {
         Toast.makeText(getContext(), student.name + " चा रिपोर्ट तयार होत आहे...", Toast.LENGTH_SHORT).show();
         

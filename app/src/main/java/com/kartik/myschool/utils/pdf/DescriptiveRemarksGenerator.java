@@ -123,7 +123,9 @@ public class DescriptiveRemarksGenerator {
                 // Detect active semester label
                 int semNum = com.kartik.myschool.SessionContext.selectedSemester != null
                         ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
-                String semLabel = semNum == 2 ? "द्वितीय सत्र" : "प्रथम सत्र";
+                String semLabel = semNum == 2 
+                        ? PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester") 
+                        : PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
 
                 // Choose the semester marks map to use as primary
                 Map<String, MarksRecord> activeSemMarks = semNum == 2 ? sem2Marks : sem1Marks;
@@ -137,7 +139,7 @@ public class DescriptiveRemarksGenerator {
                         Student student = students.get(si);
                         MarksRecord rec = activeSemMarks != null ? activeSemMarks.get(student.id) : null;
 
-                        addStudentPage(doc, school, cls, student, rec, semLabel, si + 1);
+                        addStudentPage(doc, ctx, school, cls, student, rec, semLabel, si + 1);
                     }
                 }
 
@@ -153,7 +155,7 @@ public class DescriptiveRemarksGenerator {
 
     // ── Per-student page renderer ──────────────────────────────────────────────
 
-    private static void addStudentPage(Document doc, School school, ClassModel cls,
+    private static void addStudentPage(Document doc, Context ctx, School school, ClassModel cls,
                                        Student student, MarksRecord rec,
                                        String semLabel, int pageIndex)
             throws DocumentException {
@@ -173,10 +175,10 @@ public class DescriptiveRemarksGenerator {
 
         // ── 1. Page Title (rendered via MarathiText for correct Devanagari) ────
         try {
-            PdfGenerator.addMarathiParagraph(doc, "सातत्यपूर्ण सर्वंकष मूल्यमापन",
+            PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
                     15, true, C_DARK, 0, 8);
         } catch (Exception e) {
-            Paragraph titlePara = new Paragraph("सातत्यपूर्ण सर्वंकष मूल्यमापन", fTitle);
+            Paragraph titlePara = new Paragraph(PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"), fTitle);
             titlePara.setAlignment(Element.ALIGN_CENTER);
             titlePara.setSpacingAfter(8);
             doc.add(titlePara);
@@ -188,13 +190,13 @@ public class DescriptiveRemarksGenerator {
         hdr.setSpacingAfter(6);
 
         // Row 1: Name  |  |  Year
-        addNoBorderCell(hdr, "नाव: " + nvl(student != null ? student.name : null), fMetaB, Element.ALIGN_LEFT);
+        addNoBorderCell(hdr, PdfLocalizer.get(ctx, "नाव: ", "Name: ") + nvl(student != null ? student.name : null), fMetaB, Element.ALIGN_LEFT);
         addNoBorderCell(hdr, "", fMeta, Element.ALIGN_CENTER);
-        addNoBorderCell(hdr, "सन : " + (cls != null ? nvl(cls.academicYearLabel) : "-"), fMetaB, Element.ALIGN_RIGHT);
+        addNoBorderCell(hdr, PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "-"), fMetaB, Element.ALIGN_RIGHT);
 
         // Row 2: Class, Div  |  Roll No  |  Semester
-        String classDiv = "इयत्ता: " + (cls != null ? nvl(cls.className) : "") + ", तुकडी: " + (cls != null ? nvl(cls.division) : "-");
-        String rollStr  = "रोल नं.: " + nvl(student != null ? student.rollNo : null);
+        String classDiv = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + (cls != null ? nvl(cls.className) : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + (cls != null ? nvl(cls.division) : "-");
+        String rollStr  = PdfLocalizer.get(ctx, "रोल नं.: ", "Roll No.: ") + nvl(student != null ? student.rollNo : null);
         addNoBorderCell(hdr, classDiv, fMeta, Element.ALIGN_LEFT);
         addNoBorderCell(hdr, rollStr,  fMeta, Element.ALIGN_CENTER);
         addNoBorderCell(hdr, semLabel, fMetaB, Element.ALIGN_RIGHT);
@@ -207,9 +209,9 @@ public class DescriptiveRemarksGenerator {
         tbl.setSpacingBefore(4);
 
         // Header row
-        addHeaderCell(tbl, "अ.नं", fHdr, C_PRIMARY);
-        addHeaderCell(tbl, "विषय", fHdr, C_PRIMARY);
-        addHeaderCell(tbl, "विषयवार वर्णनात्मक नोंद", fHdr, C_PRIMARY);
+        addHeaderCell(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."), fHdr, C_PRIMARY);
+        addHeaderCell(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fHdr, C_PRIMARY);
+        addHeaderCell(tbl, PdfLocalizer.get(ctx, "विषयवार वर्णनात्मक नोंद", "Subject-wise Descriptive Remark"), fHdr, C_PRIMARY);
 
         int rowIdx = 1;
         boolean alt = false;
@@ -221,18 +223,35 @@ public class DescriptiveRemarksGenerator {
                 String remark = findRemark(rec, sub.name);
 
                 addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 32f);
-                addDataCell(tbl, sub.name,                 fRow,  bg, Element.ALIGN_LEFT,   32f);
+                addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fRow,  bg, Element.ALIGN_LEFT,   32f);
                 addDataCell(tbl, remark,                   fRow,  bg, Element.ALIGN_LEFT,   32f);
             }
         }
 
         // Extra fixed rows
-        for (int i = 0; i < EXTRA_LABELS.length; i++) {
+        for (int i = 0; i < EXTRA_KEYS.length; i++) {
             BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
             String remark = remarkContaining(rec, EXTRA_KEYS[i]);
 
+            String label;
+            switch(i) {
+                case 0:
+                    label = PdfLocalizer.get(ctx, "विशेष प्रगती", "Special Progress");
+                    break;
+                case 1:
+                    label = PdfLocalizer.get(ctx, "आवड, छंद कला, क्रीडा, साहित्य इ.", "Interests & Hobbies (Arts, Sports, Literature etc.)");
+                    break;
+                case 2:
+                    label = PdfLocalizer.get(ctx, "सुधारणा आवश्यक", "Improvement Needed");
+                    break;
+                case 3:
+                default:
+                    label = PdfLocalizer.get(ctx, "व्यक्तिमत्व गुण विशेष\n(अभिवृत्ती, कल, मूल्ये, स्वभाव गुणविशेष)", "Personality Traits\n(Attitude, Aptitude, Values, Personality Details)");
+                    break;
+            }
+
             addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 40f);
-            addDataCell(tbl, EXTRA_LABELS[i],          fRow,  bg, Element.ALIGN_LEFT,   40f);
+            addDataCell(tbl, label,                   fRow,  bg, Element.ALIGN_LEFT,   40f);
             addDataCell(tbl, remark,                   fRow,  bg, Element.ALIGN_LEFT,   40f);
         }
 
@@ -240,7 +259,7 @@ public class DescriptiveRemarksGenerator {
 
         // ── 4. Signature row ──────────────────────────────────────────────────
         try {
-            doc.add(PdfGenerator.buildSignatureRow(school, cls));
+            doc.add(PdfGenerator.buildSignatureRow(ctx, school, cls));
         } catch (Exception ignored) {}
     }
 

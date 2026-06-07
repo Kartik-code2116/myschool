@@ -106,8 +106,8 @@ public class ProgressCardPortraitGenerator {
         PdfPTable hdr = new PdfPTable(1);
         hdr.setWidthPercentage(100);
 
-        String udise = "School UDISE: " + nvl(school != null ? school.udiseCode : "");
-        addCenterText(hdr, udise + "\nजिल्हा परिषद", fSmall);
+        String udise = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : "");
+        addCenterText(hdr, udise + PdfLocalizer.get(ctx, "\nजिल्हा परिषद", "\nZilla Parishad"), fSmall);
         
         String sName = nvl(school != null ? school.name : "");
         addCenterText(hdr, sName, fTitle); // Large bold
@@ -115,7 +115,7 @@ public class ProgressCardPortraitGenerator {
         String addr = nvl(school != null ? school.address : "");
         addCenterText(hdr, addr, fSmall);
 
-        String year = "सन : " + nvl(cls != null ? cls.academicYearLabel : "");
+        String year = PdfLocalizer.get(ctx, "सन: ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
         addCenterText(hdr, year, fSmallBold);
         
         hdr.setSpacingAfter(10);
@@ -133,13 +133,13 @@ public class ProgressCardPortraitGenerator {
         pillCell.setPaddingBottom(12);
 
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine("प्रगती पत्रक", 22, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
+            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), 22, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
             img.setAlignment(Element.ALIGN_CENTER);
             pillCell.addElement(img);
         } catch (Exception e) {
             Font pinkFont = sMarathiBase != null ? new Font(sMarathiBase, 20, Font.BOLD, C_PINK_FG)
                                                  : new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, C_PINK_FG);
-            pillCell.setPhrase(new Phrase("प्रगती पत्रक", pinkFont));
+            pillCell.setPhrase(new Phrase(PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), pinkFont));
         }
         pillTbl.addCell(pillCell);
         pillTbl.setSpacingAfter(20);
@@ -169,20 +169,20 @@ public class ProgressCardPortraitGenerator {
                     long diffMs = System.currentTimeMillis() - dob.getTime();
                     long years  = diffMs / (365L * 24 * 60 * 60 * 1000);
                     long months = (diffMs % (365L * 24 * 60 * 60 * 1000)) / (30L * 24 * 60 * 60 * 1000);
-                    ageStr = years + " व., " + months + " म.";
+                    ageStr = years + PdfLocalizer.get(ctx, " व., ", " Y., ") + months + PdfLocalizer.get(ctx, " म.", " M.");
                 }
             } catch (Exception ignored) {}
         }
 
-        addRowFull(det, "नाव", ": " + nvl(student.name));
-        addPairEmptyRight(det, "स्टुडंट ID", ": " + nvl(student.studentIdNumber));
-        addPair(det, "हजेरी क्रमांक", ": " + nvl(student.rollNo), "रजि.नंबर", ": " + nvl(student.registrationNo));
-        addPair(det, "इयत्ता", ": " + className, "तुकडी", ": " + division);
-        addPair(det, "माध्यम", ": " + nvl(student.medium), "जन्मतारीख", ": " + nvl(student.dob));
-        addPair(det, "मातृभाषा", ": " + nvl(student.motherTongue), "वय", ": " + ageStr);
-        addRowFull(det, "आईचे नाव", ": " + nvl(student.motherName));
-        addRowFull(det, "वडिलांचे नाव", ": " + nvl(student.fatherName));
-        addRowFull(det, "पत्ता", ": " + nvl(student.address));
+        addRowFull(det, PdfLocalizer.get(ctx, "नाव", "Name"), ": " + nvl(student.name));
+        addPairEmptyRight(det, PdfLocalizer.get(ctx, "स्टुडंट ID", "Student ID"), ": " + nvl(student.studentIdNumber));
+        addPair(det, PdfLocalizer.get(ctx, "हजेरी क्रमांक", "Roll No."), ": " + nvl(student.rollNo), PdfLocalizer.get(ctx, "रजि.नंबर", "Reg. No."), ": " + nvl(student.registrationNo));
+        addPair(det, PdfLocalizer.get(ctx, "इयत्ता", "Class"), ": " + className, PdfLocalizer.get(ctx, "तुकडी", "Division"), ": " + division);
+        addPair(det, PdfLocalizer.get(ctx, "माध्यम", "Medium"), ": " + nvl(student.medium), PdfLocalizer.get(ctx, "जन्मतारीख", "Date of Birth"), ": " + nvl(student.dob));
+        addPair(det, PdfLocalizer.get(ctx, "मातृभाषा", "Mother Tongue"), ": " + nvl(student.motherTongue), PdfLocalizer.get(ctx, "वय", "Age"), ": " + ageStr);
+        addRowFull(det, PdfLocalizer.get(ctx, "आईचे नाव", "Mother's Name"), ": " + nvl(student.motherName));
+        addRowFull(det, PdfLocalizer.get(ctx, "वडिलांचे नाव", "Father's Name"), ": " + nvl(student.fatherName));
+        addRowFull(det, PdfLocalizer.get(ctx, "पत्ता", "Address"), ": " + nvl(student.address));
 
         blockCell.addElement(det);
         block.addCell(blockCell);
@@ -196,10 +196,10 @@ public class ProgressCardPortraitGenerator {
         nCell.setBorder(Rectangle.NO_BORDER);
         nCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         try {
-            com.itextpdf.text.Image nImg = MarathiText.renderLine("उन्हाळी सुट्टीनंतर शाळा १५ जून २०२६ रोजी सुरू होईल .", 10, false, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image nImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "उन्हाळी सुट्टीनंतर शाळा १५ जून २०२६ रोजी सुरू होईल .", "School will reopen on June 15, 2026 after summer vacation."), 10, false, android.graphics.Color.BLACK);
             nCell.addElement(nImg);
         } catch (Exception e) {
-            nCell.setPhrase(new Phrase("उन्हाळी सुट्टीनंतर शाळा १५ जून २०२६ रोजी सुरू होईल .", fSmall));
+            nCell.setPhrase(new Phrase(PdfLocalizer.get(ctx, "उन्हाळी सुट्टीनंतर शाळा १५ जून २०२६ रोजी सुरू होईल .", "School will reopen on June 15, 2026 after summer vacation."), fSmall));
         }
         notice.addCell(nCell);
         notice.setSpacingAfter(30); // push attendance table down a bit
@@ -211,10 +211,10 @@ public class ProgressCardPortraitGenerator {
         PdfPCell attTitleCell = new PdfPCell();
         attTitleCell.setBorder(Rectangle.NO_BORDER);
         try {
-            com.itextpdf.text.Image aImg = MarathiText.renderLine("उपस्थिती :", 12, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
+            com.itextpdf.text.Image aImg = MarathiText.renderLine(PdfLocalizer.get(ctx, "उपस्थिती :", "Attendance :"), 12, true, android.graphics.Color.rgb(C_PINK_FG.getRed(), C_PINK_FG.getGreen(), C_PINK_FG.getBlue()));
             attTitleCell.addElement(aImg);
         } catch (Exception e) {
-            attTitleCell.setPhrase(new Phrase("उपस्थिती :", fSmallBold));
+            attTitleCell.setPhrase(new Phrase(PdfLocalizer.get(ctx, "उपस्थिती :", "Attendance :"), fSmallBold));
         }
         attTitle.addCell(attTitleCell);
         attTitle.setSpacingAfter(5);
@@ -224,8 +224,14 @@ public class ProgressCardPortraitGenerator {
         attTbl.setWidthPercentage(95);
         
         // Month headers
-        MarathiText.cell(attTbl, "महिना", 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
-        for (String m : MONTHS_EN) {
+        MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "महिना", "Month"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
+        
+        String[] monthsEN = MONTHS_EN;
+        String[] monthsMR = MONTHS_MR;
+        boolean isEn = PdfLocalizer.isEnglish(ctx);
+        String[] activeMonths = isEn ? monthsEN : monthsMR;
+        
+        for (String m : activeMonths) {
             PdfPCell mc = new PdfPCell(new Phrase(m, fSmallBold));
             mc.setHorizontalAlignment(Element.ALIGN_CENTER);
             mc.setBackgroundColor(C_WHITE);
@@ -240,7 +246,7 @@ public class ProgressCardPortraitGenerator {
         int[] pd = new int[12];
         if (student.monthlyAttendance != null) {
             for (int i = 0; i < 12; i++) {
-                String att = student.monthlyAttendance.get(MONTHS_MR[i]);
+                String att = student.monthlyAttendance.get(monthsMR[i]);
                 if (att != null && att.contains("/")) {
                     String[] parts = att.split("/");
                     try { pd[i] = Integer.parseInt(parts[0].trim()); } catch (Exception ignored) {}
@@ -252,7 +258,7 @@ public class ProgressCardPortraitGenerator {
         }
 
         // Working Days row
-        MarathiText.cell(attTbl, "कामाचे दिवस", 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "कामाचे दिवस", "Working Days"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
         for (int i = 0; i < 12; i++) {
             String val = wd[i] > 0 ? String.valueOf(wd[i]) : "";
             PdfPCell wc = new PdfPCell(new Phrase(val, fSmall));
@@ -264,7 +270,7 @@ public class ProgressCardPortraitGenerator {
         }
 
         // Present Days row
-        MarathiText.cell(attTbl, "हजर दिवस", 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
+        MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "हजर दिवस", "Present Days"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
         for (int i = 0; i < 12; i++) {
             String val = pd[i] > 0 ? String.valueOf(pd[i]) : (wd[i] > 0 ? "0" : "");
             PdfPCell pc = new PdfPCell(new Phrase(val, fSmall));

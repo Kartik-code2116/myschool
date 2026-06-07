@@ -96,14 +96,12 @@ public class AnnualMarksheetGenerator {
         Font pinkFont = sMarathiBase != null ? new Font(sMarathiBase, 18, Font.BOLD, C_PINK)
                                              : new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, C_PINK);
         
-        PdfPCell c1 = new PdfPCell(new Phrase("● गुणपत्रक ●", pinkFont));
+        PdfPCell c1 = PdfGenerator.rawCell(PdfLocalizer.get(ctx, "● गुणपत्रक ●", "● MARKSHEET ●"), pinkFont, BaseColor.WHITE, C_PINK, Element.ALIGN_CENTER);
         c1.setBorder(Rectangle.NO_BORDER);
-        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
         titleTbl.addCell(c1);
 
-        PdfPCell c2 = new PdfPCell(new Phrase("वार्षिक परीक्षा", fNormal));
+        PdfPCell c2 = PdfGenerator.rawCell(PdfLocalizer.get(ctx, "वार्षिक परीक्षा", "Annual Examination"), fNormal, BaseColor.WHITE, C_DARK, Element.ALIGN_CENTER);
         c2.setBorder(Rectangle.NO_BORDER);
-        c2.setHorizontalAlignment(Element.ALIGN_CENTER);
         c2.setPaddingBottom(15);
         titleTbl.addCell(c2);
 
@@ -113,12 +111,13 @@ public class AnnualMarksheetGenerator {
         PdfPTable hdr = new PdfPTable(new float[]{3f, 1.5f});
         hdr.setWidthPercentage(100);
 
-        String schoolName = "शाळेचे नाव : " + nvl(school != null ? school.name : "");
-        String udiseText  = "Udise: " + nvl(school != null ? school.udiseCode : "");
-        String stuName    = "नाव : " + nvl(student != null ? student.name : "");
-        String yearText   = "सन : " + nvl(cls != null ? cls.academicYearLabel : "");
-        String rollText   = "हजेरी क्रमांक : " + nvl(student != null ? student.rollNo : "");
-        String clsDiv     = "इयत्ता: " + nvl(cls != null ? cls.className : "") + ", तुकडी: " + nvl(cls != null ? cls.division : "");
+        String schoolName = PdfLocalizer.get(ctx, "शाळेचे नाव : ", "School Name: ") + nvl(school != null ? school.name : "");
+        String udiseText  = PdfLocalizer.get(ctx, "युडायस : ", "UDISE : ") + nvl(school != null ? school.udiseCode : "");
+        String stuName    = PdfLocalizer.get(ctx, "नाव : ", "Name: ") + nvl(student != null ? student.name : "");
+        String yearText   = PdfLocalizer.get(ctx, "सन : ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
+        String rollText   = PdfLocalizer.get(ctx, "हजेरी क्रमांक : ", "Roll No: ") + nvl(student != null ? student.rollNo : "");
+        String clsDiv     = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + nvl(cls != null ? cls.className : "") 
+                + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : "");
 
         addHdrCell(hdr, schoolName, Element.ALIGN_LEFT);
         addHdrCell(hdr, udiseText,  Element.ALIGN_RIGHT);
@@ -137,9 +136,9 @@ public class AnnualMarksheetGenerator {
 
         BaseColor bgHeader = new BaseColor(218, 230, 243); // Light blue header
 
-        addTh(tbl, "अ.नं.", bgHeader);
-        addTh(tbl, "विषय", bgHeader);
-        addTh(tbl, "किमान\nआवश्यक गुण", bgHeader);
+        addTh(tbl, PdfLocalizer.get(ctx, "अ.नं.", "Sr.No."), bgHeader);
+        addTh(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), bgHeader);
+        addTh(tbl, PdfLocalizer.get(ctx, "किमान\nआवश्यक गुण", "Min\nRequired Marks"), bgHeader);
         
         // Find academic max marks dynamically for header (assume first academic subject's max marks)
         int acaMax = 50;
@@ -154,9 +153,9 @@ public class AnnualMarksheetGenerator {
         if (!academicSubs.isEmpty() && academicSubs.get(0).maxMarks > 0) {
             acaMax = academicSubs.get(0).maxMarks;
         }
-        addTh(tbl, "एकूण गुण\n(" + acaMax + " पैकी)\nप्राप्त", bgHeader);
-        addTh(tbl, "सवलतीचे\nगुण", bgHeader);
-        addTh(tbl, "शेरा\n(उत्तीर्ण/\nअनुत्तीर्ण)", bgHeader);
+        addTh(tbl, PdfLocalizer.get(ctx, "एकूण गुण\n(" + acaMax + " पैकी)\nप्राप्त", "Total Marks\n(Out of " + acaMax + ")\nObtained"), bgHeader);
+        addTh(tbl, PdfLocalizer.get(ctx, "सवलतीचे\nगुण", "Grace\nMarks"), bgHeader);
+        addTh(tbl, PdfLocalizer.get(ctx, "शेरा\n(उत्तीर्ण/\nअनुत्तीर्ण)", "Remark\n(Pass/\nFail)"), bgHeader);
 
         int rowIdx = 1;
         int totalObtained = 0;
@@ -175,11 +174,11 @@ public class AnnualMarksheetGenerator {
             if (!passed) hasFailed = true;
 
             addTd(tbl, String.valueOf(rowIdx++), Element.ALIGN_CENTER);
-            addTd(tbl, nvl(sub.name),            Element.ALIGN_LEFT);
+            addTd(tbl, PdfLocalizer.translateSubject(ctx, sub.name), Element.ALIGN_LEFT);
             addTd(tbl, String.valueOf(minPass),  Element.ALIGN_CENTER);
             addTdBold(tbl, String.valueOf(obt),  Element.ALIGN_CENTER);
             addTd(tbl, "-",                      Element.ALIGN_CENTER);
-            addTd(tbl, passed ? "उत्तीर्ण" : "अनुत्तीर्ण", Element.ALIGN_CENTER);
+            addTd(tbl, passed ? PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass") : PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail"), Element.ALIGN_CENTER);
         }
 
         // Non-Academic Subjects
@@ -189,8 +188,8 @@ public class AnnualMarksheetGenerator {
             String grade = d != null && d.grade != null && !d.grade.isEmpty() ? normalizeGrade(d.grade) : "-";
 
             addTd(tbl, String.valueOf(rowIdx++), Element.ALIGN_CENTER);
-            addTd(tbl, nvl(sub.name),            Element.ALIGN_LEFT);
-            addTd(tbl, "श्रेणी",                 Element.ALIGN_CENTER);
+            addTd(tbl, PdfLocalizer.translateSubject(ctx, sub.name), Element.ALIGN_LEFT);
+            addTd(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),                 Element.ALIGN_CENTER);
             addTdBold(tbl, grade,                Element.ALIGN_CENTER);
 
             // For the first non-academic subject, add the merged cell for cols 5 and 6
@@ -212,15 +211,15 @@ public class AnnualMarksheetGenerator {
         sumTbl.setWidthPercentage(100);
         
         String percStr = maxTotal > 0 ? String.format(java.util.Locale.US, "%.1f", (totalObtained * 100.0f) / maxTotal) + "%" : "0.0%";
-        String passResult = hasFailed ? "अनुत्तीर्ण" : "उत्तीर्ण";
+        String passResult = hasFailed ? PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail") : PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass");
 
-        addNoBorderCell(sumTbl, "एकूण गुण : " + totalObtained, fBold, Element.ALIGN_LEFT);
-        addNoBorderCell(sumTbl, "शेकडा गुण : " + percStr, fBold, Element.ALIGN_RIGHT);
+        addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "एकूण गुण : ", "Total Marks: ") + totalObtained, fBold, Element.ALIGN_LEFT);
+        addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "शेकडा गुण : ", "Percentage: ") + percStr, fBold, Element.ALIGN_RIGHT);
         
         // Date formatting: today's date or static if preferred
         String dateStr = new java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(new java.util.Date());
-        addNoBorderCell(sumTbl, "निकाल दिनांक : " + dateStr, fNormal, Element.ALIGN_LEFT);
-        addNoBorderCell(sumTbl, "शेरा : " + passResult, fBold, Element.ALIGN_RIGHT);
+        addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "निकाल दिनांक : ", "Result Date: ") + dateStr, fNormal, Element.ALIGN_LEFT);
+        addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "शेरा : ", "Remark: ") + passResult, fBold, Element.ALIGN_RIGHT);
 
         sumTbl.setSpacingAfter(40);
         doc.add(sumTbl);
@@ -232,8 +231,8 @@ public class AnnualMarksheetGenerator {
         String teacherName   = cls != null ? nvl(cls.teacherName) : "";
         String principalName = school != null ? nvl(school.principalName) : "";
 
-        addNoBorderCell(sigTbl, "वर्गशिक्षक स्वाक्षरी\nश्रीम . " + teacherName, fSmall, Element.ALIGN_CENTER);
-        addNoBorderCell(sigTbl, "मुख्याध्यापक स्वाक्षरी\nश्री " + principalName, fSmall, Element.ALIGN_CENTER);
+        addNoBorderCell(sigTbl, PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\nश्रीम . ", "Class Teacher Signature\n") + teacherName, fSmall, Element.ALIGN_CENTER);
+        addNoBorderCell(sigTbl, PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\nश्री ", "Headmaster Signature\n") + principalName, fSmall, Element.ALIGN_CENTER);
 
         doc.add(sigTbl);
     }
@@ -241,18 +240,14 @@ public class AnnualMarksheetGenerator {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static void addHdrCell(PdfPTable tbl, String text, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, fNormal));
+        PdfPCell c = PdfGenerator.rawCell(text, fNormal, BaseColor.WHITE, C_DARK, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(align);
         c.setPaddingBottom(4);
         tbl.addCell(c);
     }
 
     private static void addTh(PdfPTable tbl, String text, BaseColor bg) {
-        PdfPCell c = new PdfPCell(new Phrase(text, fSmallBold));
-        c.setBackgroundColor(bg);
-        c.setBorderColor(C_DARK);
-        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell c = PdfGenerator.rawCell(text, fSmallBold, bg, C_DARK, Element.ALIGN_CENTER);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
         c.setPadding(6);
         c.setMinimumHeight(40);
@@ -260,9 +255,7 @@ public class AnnualMarksheetGenerator {
     }
 
     private static void addTd(PdfPTable tbl, String text, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, fSmall));
-        c.setBorderColor(C_DARK);
-        c.setHorizontalAlignment(align);
+        PdfPCell c = PdfGenerator.rawCell(text, fSmall, BaseColor.WHITE, C_DARK, align);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
         c.setPadding(6);
         c.setMinimumHeight(25);
@@ -270,9 +263,7 @@ public class AnnualMarksheetGenerator {
     }
 
     private static void addTdBold(PdfPTable tbl, String text, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, fSmallBold));
-        c.setBorderColor(C_DARK);
-        c.setHorizontalAlignment(align);
+        PdfPCell c = PdfGenerator.rawCell(text, fSmallBold, BaseColor.WHITE, C_DARK, align);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
         c.setPadding(6);
         c.setMinimumHeight(25);
@@ -280,16 +271,17 @@ public class AnnualMarksheetGenerator {
     }
 
     private static void addNoBorderCell(PdfPTable tbl, String text, Font font, int align) {
-        PdfPCell c = new PdfPCell(new Phrase(text, font));
+        BaseColor tc = font.getColor() != null ? font.getColor() : C_DARK;
+        PdfPCell c = PdfGenerator.rawCell(text, font, BaseColor.WHITE, tc, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setHorizontalAlignment(align);
         c.setPaddingTop(5);
         tbl.addCell(c);
     }
 
     private static boolean isNonAcademic(String sub) {
         if (sub == null) return false;
-        String s = sub.trim();
-        return s.contains("कला") || s.contains("कार्यानुभव") || s.contains("शा.शि.") || s.contains("शारीरिक");
+        String s = sub.trim().toLowerCase();
+        return s.contains("कला") || s.contains("कार्यानुभव") || s.contains("शा.शि.") || s.contains("शारीरिक")
+            || s.contains("art") || s.contains("work experience") || s.contains("p.e.") || s.contains("physical education") || s.contains("craft");
     }
 }

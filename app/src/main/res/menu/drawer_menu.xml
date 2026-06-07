@@ -42,9 +42,13 @@
     <item android:title="@string/txt_school_level">
         <menu>
             <item
-                android:id="@+id/nav_extra"
-                android:icon="@drawable/ic_settings"
-                android:title="@string/txt_see_extra_menus" />
+                android:id="@+id/nav_school_info"
+                android:icon="@drawable/ic_home"
+                android:title="@string/txt_school_information" />
+            <item
+                android:id="@+id/nav_gender"
+                android:icon="@drawable/ic_person"
+                android:title="@string/txt_gender" />
         </menu>
     </item>
 
