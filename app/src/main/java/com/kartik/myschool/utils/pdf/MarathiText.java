@@ -180,7 +180,7 @@ public class MarathiText {
     /**
      * Renders multi-line wrapped text using StaticLayout for proper Devanagari line breaking.
      */
-    private static Image renderMultiLine(String text,
+    public static Image renderMultiLine(String text,
                                           float textSizePt,
                                           boolean bold,
                                           int androidColor,

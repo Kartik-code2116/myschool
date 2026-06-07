@@ -704,4 +704,12 @@
     <string name="report_desc_14">A4 size colorful progress card cover</string>
     <string name="report_title_15">15. Annual Result Ledger</string>
     <string name="report_desc_15">Marks &amp; grade table according to semester and subject</string>
+    <string name="report_cat_result_alt">Result Sheet</string>
+    <string name="report_cat_progress_card">Progress Card</string>
+    <string name="report_title_16">16. Annual Marksheet</string>
+    <string name="report_desc_16">Both semesters combined comprehensive table</string>
+    <string name="report_title_17">17. Caste Grade Table</string>
+    <string name="report_desc_17">Semester, Class-wise, Caste-wise Boys-Girls Grade Table.</string>
+    <string name="report_title_18">18. Progress Card Cover</string>
+    <string name="report_desc_18">A4 First Semester Progress Card</string>
 </resources>

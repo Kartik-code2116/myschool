@@ -704,4 +704,12 @@
     <string name="report_desc_14">A4 साईज कलरफुल प्रगतीपत्रक</string>
     <string name="report_title_15">15. वार्षिक निकालपत्रक</string>
     <string name="report_desc_15">सत्र व विषयनुसार गुण व श्रेणी तक्का</string>
+    <string name="report_cat_result_alt">निकालपत्रक</string>
+    <string name="report_cat_progress_card">प्रगतीपत्रक</string>
+    <string name="report_title_16">16. वार्षिक निकालपत्रक</string>
+    <string name="report_desc_16">दोन्ही सत्र एकत्र सर्वसमावेशीत तक्ता</string>
+    <string name="report_title_17">17. जात श्रेणी तक्ता</string>
+    <string name="report_desc_17">सत्र, वर्गवार, जातवार मुले-मुली श्रेणी तक्ता.</string>
+    <string name="report_title_18">18. प्रगतीपत्रक मुखपृष्ठ</string>
+    <string name="report_desc_18">A4 प्रथम सत्र प्रगतीपत्रक</string>
 </resources>

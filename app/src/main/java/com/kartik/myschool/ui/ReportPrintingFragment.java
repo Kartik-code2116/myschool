@@ -130,7 +130,7 @@ public class ReportPrintingFragment extends Fragment {
         ensureSemestersThen(() -> {
             // Class-level (roster) reports — no student selection needed
             // Positions 0: Cover page, 1: Index, 3: Descriptive Remarks, 4,5,7,8,9,10,12,14: Class-wide progress and roster charts
-            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 6 || position == 7 || position == 8 || position == 9 || position == 10 || position == 12 || position == 14);
+            boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 6 || position == 7 || position == 8 || position == 9 || position == 10 || position == 11 || position == 12 || position == 13 || position == 14 || position == 15 || position == 16);
 
             if (isClassReport) {
                 generateClassRosterReport(position);
@@ -426,11 +426,62 @@ public class ReportPrintingFragment extends Fragment {
                                         studentsList, rosterMap, isSem2_6, cb);
                                 break;
                             case 5:
-                            case 10:
-                            case 12:
                             case 14:
                             default:
                                 PdfGenerator.generateProgressBook(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb); break;
+                            case 15: {
+                                // Option 16 - Continuous Comprehensive Evaluation
+                                com.kartik.myschool.utils.pdf.ProgressBookCombinedGenerator.generateProgressBookCombined(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, sem1Map, sem2Map, cb);
+                                break;
+                            }
+                            case 16: {
+                                // Option 17 - Caste Grade Table
+                                boolean isSem2_17 = SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+                                Map<String, MarksRecord> marksMap = isSem2_17 ? sem2Map : sem1Map;
+                                com.kartik.myschool.utils.pdf.CasteGradeTableGenerator.generateCasteGradeTable(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, marksMap, isSem2_17, cb);
+                                break;
+                            }
+                            case 13: {
+                                // Option 14 – Progress Card Portrait (प्रगती पत्रक)
+                                com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, cb);
+                                break;
+                            }
+                            case 12: {
+                                // Option 13 – Result Sheet (निकालपत्रक)
+                                com.kartik.myschool.utils.pdf.ResultSheetGenerator.generateResultSheet(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, sem2Map, cb);
+                                break;
+                            }
+                            case 11: {
+                                // Option 12 – Annual Marksheet (वार्षिक परीक्षा गुणपत्रक)
+                                com.kartik.myschool.utils.pdf.AnnualMarksheetGenerator.generateAnnualMarksheet(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, sem2Map, cb);
+                                break;
+                            }
+                            case 10: {
+                                // Option 11 – Subject-wise Marks Register
+                                boolean isSem2_10 = SessionContext.selectedSemester != null && SessionContext.selectedSemester.number == 2;
+                                Map<String, MarksRecord> regMap = isSem2_10 ? sem2Map : sem1Map;
+                                com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateMarksRegister(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, regMap, isSem2_10, cb);
+                                break;
+                            }
+                            case 17: {
+                                // Option 18 – Progress Card First Sem
+                                com.kartik.myschool.utils.pdf.ProgressCardFirstSemGenerator.generateProgressCardFirstSem(
+                                        getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                                        studentsList, sem1Map, cb);
+                                break;
+                            }
                         }
                     }
                     @Override
@@ -540,7 +591,7 @@ public class ReportPrintingFragment extends Fragment {
         };
 
         boolean isClassReport = (position == 0 || position == 1 || position == 4 || position == 5 || position == 6
-                || position == 7 || position == 10 || position == 12 || position == 14);
+                || position == 7 || position == 10 || position == 11 || position == 12 || position == 13 || position == 14 || position == 15 || position == 16);
 
         if (position == 0) { // Cover page
             com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, null, null, null, cb);
@@ -568,8 +619,43 @@ public class ReportPrintingFragment extends Fragment {
             com.kartik.myschool.utils.pdf.BothSemDescriptiveGenerator.generateBothSemDescriptive(
                     getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
                     studentsList, sem1Map, sem2Map, cb);
-        } else if (isClassReport) {
+        } else if (position == 5 || position == 14) {
             PdfGenerator.generateProgressBook(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, cb);
+        } else if (position == 10) {
+            // Option 11 – Subject-wise Marks Register (Sem 1 for Master Report)
+            com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateMarksRegister(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem1Map, false, cb);
+        } else if (position == 11) {
+            // Option 12 – Annual Marksheet (Sem 2 marks usually)
+            com.kartik.myschool.utils.pdf.AnnualMarksheetGenerator.generateAnnualMarksheet(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem2Map, cb);
+        } else if (position == 12) {
+            // Option 13 – Result Sheet
+            com.kartik.myschool.utils.pdf.ResultSheetGenerator.generateResultSheet(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem2Map, cb);
+        } else if (position == 13) {
+            // Option 14 – Progress Card Portrait
+            com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, cb);
+        } else if (position == 15) {
+            // Option 16 - Continuous Comprehensive Evaluation
+            com.kartik.myschool.utils.pdf.ProgressBookCombinedGenerator.generateProgressBookCombined(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem1Map, sem2Map, cb);
+        } else if (position == 16) {
+            // Option 17 - Caste Grade Table
+            com.kartik.myschool.utils.pdf.CasteGradeTableGenerator.generateCasteGradeTable(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem2Map, true, cb);
+        } else if (position == 17) {
+            // Option 18 - Progress Card First Sem
+            com.kartik.myschool.utils.pdf.ProgressCardFirstSemGenerator.generateProgressCardFirstSem(
+                    getContext(), SessionContext.selectedSchool, SessionContext.selectedClass,
+                    studentsList, sem1Map, cb);
         } else {
             PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, position, cb);
         }

@@ -58,6 +58,12 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         items.add(new ReportTemplate(R.string.report_cat_marksheet, R.string.report_title_14, R.string.report_desc_14));
         
         items.add(new ReportTemplate(R.string.report_cat_result, R.string.report_title_15, R.string.report_desc_15));
+        
+        items.add(new ReportTemplate(R.string.report_cat_result_alt, R.string.report_title_16, R.string.report_desc_16));
+        
+        items.add(new ReportTemplate(R.string.report_cat_result_alt, R.string.report_title_17, R.string.report_desc_17));
+        
+        items.add(new ReportTemplate(R.string.report_cat_progress_card, R.string.report_title_18, R.string.report_desc_18));
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -87,7 +93,9 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
             categoryColor = 0xFF5A4FCF; // indigo
         } else if (item.categoryResId == R.string.report_cat_result) {
             categoryColor = 0xFFD32F2F; // red
-        } else if (item.categoryResId == R.string.report_cat_marksheet) {
+        } else if (item.categoryResId == R.string.report_cat_marksheet ||
+                   item.categoryResId == R.string.report_cat_result_alt ||
+                   item.categoryResId == R.string.report_cat_progress_card) {
             categoryColor = 0xFF6A5ACD; // purple
         } else if (item.categoryResId == R.string.report_cat_tables) {
             categoryColor = 0xFF757575; // grey
