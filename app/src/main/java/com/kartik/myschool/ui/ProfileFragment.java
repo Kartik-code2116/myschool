@@ -308,11 +308,7 @@ public class ProfileFragment extends Fragment {
         
         // Preassign default subjects if none exist for the class
         if (c.subjects == null || c.subjects.isEmpty()) {
-            c.subjects = new ArrayList<>();
-            c.subjects.add(new com.kartik.myschool.model.Subject("English", 100));
-            c.subjects.add(new com.kartik.myschool.model.Subject("Mathematics", 100));
-            c.subjects.add(new com.kartik.myschool.model.Subject("Science", 100));
-            c.subjects.add(new com.kartik.myschool.model.Subject("Marathi", 100));
+            c.subjects = com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(c.className);
             FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
                 @Override public void onSuccess(String id) {}
                 @Override public void onError(Exception e) {}

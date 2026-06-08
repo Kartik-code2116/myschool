@@ -70,6 +70,15 @@ public class PdfLocalizer {
         if (s.equals("physical education") || s.equals("p.e.") || s.equals("p.e") || s.equals("शारीरिक शिक्षण") || s.equals("शा.शि.") || s.equals("शा. शिक्षण")) {
             return isEn ? "Physical Education" : "शारीरिक शिक्षण";
         }
+        if (s.equals("personality development") || s.equals("व्यक्तित्व विकास") || s.equals("व्यक्तिमत्त्व विकास")) {
+            return isEn ? "Personality Development" : "व्यक्तिमत्त्व विकास";
+        }
+        if (s.contains("information & comm") || s.contains("ict") || s.contains("माहिती व संप्रेषण")) {
+            return isEn ? "Information & Comm. Technology (ICT)" : "माहिती व संप्रेषण तंत्रज्ञान (ICT)";
+        }
+        if (s.contains("water security") || s.contains("जलसुरक्षा")) {
+            return isEn ? "Water Security & Environment Studies" : "जलसुरक्षा व पर्यावरण अभ्यास";
+        }
         
         // General contains checks
         if (s.contains("english") || s.contains("इंग्रजी")) return isEn ? "English" : "इंग्रजी";
@@ -81,6 +90,9 @@ public class PdfLocalizer {
         if (s.contains("art") || s.contains("drawing") || s.contains("कला")) return isEn ? "Art" : "कला";
         if (s.contains("work exp") || s.contains("workexp") || s.contains("कार्यानुभव")) return isEn ? "Work Experience" : "कार्यानुभव";
         if (s.contains("phys") || s.contains("p.e.") || s.contains("pe") || s.contains("शारीरिक") || s.contains("शा.शि.")) return isEn ? "Physical Education" : "शारीरिक शिक्षण";
+        if (s.contains("personality") || s.contains("व्यक्तित्व") || s.contains("व्यक्तिमत्त्व")) return isEn ? "Personality Development" : "व्यक्तिमत्त्व विकास";
+        if (s.contains("ict") || s.contains("संप्रेषण")) return isEn ? "Information & Comm. Technology (ICT)" : "माहिती व संप्रेषण तंत्रज्ञान (ICT)";
+        if (s.contains("water security") || s.contains("जलसुरक्षा")) return isEn ? "Water Security & Environment Studies" : "जलसुरक्षा व पर्यावरण अभ्यास";
         if (s.contains("इतिहास")) return isEn ? "History" : "इतिहास";
         if (s.contains("भूगोल")) return isEn ? "Geography" : "भूगोल";
 

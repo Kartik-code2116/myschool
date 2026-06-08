@@ -82,10 +82,7 @@ public class ClassSetupActivity extends AppCompatActivity {
             c.subjects = new ArrayList<>();
         }
         if (!isEdit && c.subjects.isEmpty()) {
-            c.subjects.add(new Subject("Marathi", 100));
-            c.subjects.add(new Subject("English", 100));
-            c.subjects.add(new Subject("Mathematics", 100));
-            c.subjects.add(new Subject("Science / EVS", 100));
+            c.subjects.addAll(Subject.getDefaultSubjectsForClass(className));
         }
         
         c.schoolId  = (AppCache.selectedSchool != null && AppCache.selectedSchool.id != null) ? AppCache.selectedSchool.id : "";

@@ -164,6 +164,10 @@ public class SubjectsFragment extends Fragment {
         list.add(new SubjectAdapter.SubjectItem("Physical Education", "101203", "10", "Activities",  100, "FE: 100", "",       "", "#4CAF50"));
         // ── Personality development ────────────────────────────────────────────
         list.add(new SubjectAdapter.SubjectItem("Special Development","101301", "11", "Personality", 100, "FE: 100", "",       "", "#009688"));
+        list.add(new SubjectAdapter.SubjectItem("Personality Development","101302", "12", "Personality", 100, "FE: 100", "",   "", "#009688"));
+        // ── State Board Additions ──────────────────────────────────────────────
+        list.add(new SubjectAdapter.SubjectItem("Information & Comm. Technology (ICT)", "101401", "13", "State Board", 100, "FE: 50", "SE: 50", "", "#FF9800"));
+        list.add(new SubjectAdapter.SubjectItem("Water Security & Environment Studies", "101402", "14", "State Board", 100, "FE: 50", "SE: 50", "", "#FF9800"));
         return list;
     }
 }
