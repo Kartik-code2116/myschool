@@ -134,58 +134,5 @@ public class DeclareWeightageFragment extends Fragment {
         });
     }
 
-    // ---------- Enforcing screen fullscreen custom Top Bar visibility ----------
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity ha = (HomeActivity) getActivity();
-            View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) {
-                appBar.setVisibility(View.GONE);
-            }
-            View bottomNav = ha.findViewById(R.id.bottomNav);
-            if (bottomNav != null) {
-                bottomNav.setVisibility(View.GONE);
-            }
-            
-            // Fix CoordinatorLayout scrolling behavior offset bug:
-            View navHost = ha.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
-                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
-                params.setBehavior(null);
-                params.bottomMargin = 0;
-                navHost.setLayoutParams(params);
-            }
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity ha = (HomeActivity) getActivity();
-            View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) {
-                appBar.setVisibility(View.VISIBLE);
-            }
-            View bottomNav = ha.findViewById(R.id.bottomNav);
-            if (bottomNav != null) {
-                bottomNav.setVisibility(View.VISIBLE);
-            }
-            
-            // Restore CoordinatorLayout scrolling behavior and margins:
-            View navHost = ha.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
-                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
-                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
-        }
-    }
 }

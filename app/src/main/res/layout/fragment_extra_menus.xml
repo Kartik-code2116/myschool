@@ -335,35 +335,11 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/txt_class_subjects_details"
-                            android:textSize="18sp"
-                            android:textColor="@color/on_surface"
+                            android:layout_marginBottom="6dp"
                             android:fontFamily="sans-serif-medium"
-                            android:layout_marginBottom="16dp"/>
-
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_1_marathi_max_marks_100_fe_70" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_2_hindi_max_marks_100_fe_70_se" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_3_english_max_marks_100_fe_70" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_4_mathematics_max_marks_100_fe" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
-
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_you_can_toggle_active_subjects" android:textSize="12sp" android:textColor="#888888"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginBottom="16dp"
-                            android:background="#E0E0E0" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="Remark Bank"
-                            android:textColor="@color/on_surface"
-                            android:textSize="16sp" />
+                            android:text="Select Subject"
+                            android:textColor="@color/primary"
+                            android:textSize="12sp" />
 
                         <Spinner
                             android:id="@+id/spRemarkBankSubject"
@@ -372,11 +348,21 @@
                             android:layout_marginBottom="12dp"
                             android:background="@drawable/bg_spinner_border" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Remark Options (Tap to remove)"
+                            android:textColor="@color/on_surface_variant"
+                            android:textSize="12sp" />
+
                         <com.google.android.material.chip.ChipGroup
                             android:id="@+id/cgRemarkBankOptions"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
+                            android:layout_marginBottom="16dp"
                             app:chipSpacingHorizontal="8dp"
                             app:chipSpacingVertical="8dp"
                             app:singleLine="false" />
@@ -386,7 +372,7 @@
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Add option"
+                            android:text="Add remark option"
                             app:cornerRadius="8dp"
                             app:icon="@drawable/ic_add_circle" />
                     </LinearLayout>

@@ -93,9 +93,24 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
     }
 
     private void bindHeader() {
-        b.tvStudentName.setText(student.name != null ? student.name : "Student");
-        String roll = student.rollNo != null ? student.rollNo : "";
-        b.tvSubjectContext.setText(subjectName + " | Roll: " + roll + " | " + classModel.getDisplayName());
+        String name = student.name != null ? student.name : "Student";
+        String roll = student.rollNo != null ? student.rollNo : "-";
+        
+        // Top line: Class
+        String classContext = "<b>Class:</b> " + classModel.getDisplayName();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            b.tvSubjectContext.setText(android.text.Html.fromHtml(classContext, android.text.Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            b.tvSubjectContext.setText(android.text.Html.fromHtml(classContext));
+        }
+
+        // Bottom line: Student Name, Roll No, and Subject Name
+        String studentDetails = "<b>" + name + "</b> (Roll: " + roll + ") &nbsp;&nbsp;•&nbsp;&nbsp; <b>" + subjectName + "</b>";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            b.tvStudentName.setText(android.text.Html.fromHtml(studentDetails, android.text.Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            b.tvStudentName.setText(android.text.Html.fromHtml(studentDetails));
+        }
     }
 
     private void loadExistingSelection() {

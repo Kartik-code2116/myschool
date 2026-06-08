@@ -33,22 +33,27 @@
             android:paddingBottom="16dp">
 
             <TextView
-                android:id="@+id/tvStudentName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/txt_student_name"
-                android:textColor="@color/on_surface"
-                android:textSize="16sp" />
-
-            <TextView
                 android:id="@+id/tvSubjectContext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Subject"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="12sp" />
+                android:fontFamily="sans-serif-medium"
+                android:text="Class"
+                android:textColor="#37474F"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvStudentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/txt_student_name"
+                android:textColor="#1A237E"
+                android:textSize="16sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 

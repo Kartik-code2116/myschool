@@ -130,7 +130,7 @@
     <string name="menu_student_list">विद्यार्थी यादी</string>
     <string name="menu_subjects">विषय निश्चिती</string>
     <string name="menu_declare_weightage">भारांश निश्चिती</string>
-    <string name="menu_dropdown_list">ड्रॉपडाऊन वर्णनात्मक नोंदी</string>
+    <string name="menu_dropdown_list">वर्णनात्मक नोंदी बदला</string>
     <string name="menu_extra_menus">शाळेची माहिती</string>
     <string name="menu_print_report">अहवाल छापा</string>
     

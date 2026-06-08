@@ -126,11 +126,10 @@
     <string name="menu_formative_summative">Formative Summative</string>
     <string name="menu_descriptive_entries">Descriptive Entries</string>
     <string name="menu_attendance">Attendance</string>
-    <string name="menu_list_students">Class &amp; Div</string>
     <string name="menu_student_list">List of Students</string>
     <string name="menu_subjects">Subjects</string>
     <string name="menu_declare_weightage">Declare Weightage</string>
-    <string name="menu_dropdown_list">Dropdown List</string>
+    <string name="menu_dropdown_list">Change Descriptive Entries</string>
     <string name="menu_extra_menus">School Settings</string>
     <string name="menu_print_report">Print Report</string>
     <!-- Info & Print -->

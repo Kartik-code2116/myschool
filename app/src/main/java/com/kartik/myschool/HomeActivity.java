@@ -104,6 +104,11 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_subjects) {
                 title = "Subject";
                 subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_weightage) {
+                title = getString(R.string.menu_declare_weightage);
+                subtitle = SessionContext.getClassDivLabel();
+            } else if (id == R.id.nav_dropdown) {
+                subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_school_info) {
                 title = "School Information";
                 subtitle = SessionContext.getClassDivLabel();
