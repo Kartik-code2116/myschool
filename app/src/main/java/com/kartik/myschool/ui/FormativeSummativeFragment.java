@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kartik.myschool.AppCache;
 import com.kartik.myschool.EnterMarksActivity;
+import com.kartik.myschool.SingleSubjectMarksDialog;
 import com.kartik.myschool.HomeActivity;
 import com.kartik.myschool.R;
 import com.kartik.myschool.SessionContext;
@@ -748,10 +749,14 @@ public class FormativeSummativeFragment extends Fragment {
                     androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
                             itemView.getContext(), v);
                     popup.getMenu().add(0, 1, 0, "Enter Marks");
-                    popup.getMenu().add(0, 2, 1, "Quick View Info");
+                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
+                    popup.getMenu().add(0, 2, 2, "Quick View Info");
                     popup.setOnMenuItemClickListener(item -> {
                         if (item.getItemId() == 1) {
                             openMarksEntry(student);
+                            return true;
+                        } else if (item.getItemId() == 3) {
+                            openSingleSubjectMarks(student, sub);
                             return true;
                         }
                         Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
@@ -760,8 +765,8 @@ public class FormativeSummativeFragment extends Fragment {
                     popup.show();
                 });
 
-                // JOIN TO ENTER MARKS PAGE: Click on the entire subject card opens marks entry!
-                cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
+                // Click on the entire subject card opens the single subject dialog!
+                cardB.getRoot().setOnClickListener(v -> openSingleSubjectMarks(student, sub));
             }
 
             private void bindSubjectCardCompact(ItemEvaluationSubjectCardCompactBinding cardB, Student student, Subject sub, int number, MarksRecord record) {
@@ -840,10 +845,14 @@ public class FormativeSummativeFragment extends Fragment {
                     androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
                             itemView.getContext(), v);
                     popup.getMenu().add(0, 1, 0, "Enter Marks");
-                    popup.getMenu().add(0, 2, 1, "Quick View Info");
+                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
+                    popup.getMenu().add(0, 2, 2, "Quick View Info");
                     popup.setOnMenuItemClickListener(item -> {
                         if (item.getItemId() == 1) {
                             openMarksEntry(student);
+                            return true;
+                        } else if (item.getItemId() == 3) {
+                            openSingleSubjectMarks(student, sub);
                             return true;
                         }
                         Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
@@ -852,8 +861,22 @@ public class FormativeSummativeFragment extends Fragment {
                     popup.show();
                 });
 
-                // Click on entire subject card opens marks entry!
-                cardB.getRoot().setOnClickListener(v -> openMarksEntry(student));
+                // Click on entire subject card opens the single subject dialog!
+                cardB.getRoot().setOnClickListener(v -> openSingleSubjectMarks(student, sub));
+            }
+
+            private void openSingleSubjectMarks(Student student, Subject subject) {
+                MarksRecord record = marksMap.get(student.id);
+                ClassModel freshClass = SessionContext.selectedClass != null
+                        ? SessionContext.selectedClass
+                        : activeClass;
+
+                SingleSubjectMarksDialog dialog = SingleSubjectMarksDialog.newInstance(
+                        student, subject, freshClass, record);
+                dialog.setOnMarksSavedListener((studentId, newRecord) -> {
+                    patchStudentMarks(studentId, newRecord);
+                });
+                dialog.show(FormativeSummativeFragment.this.getChildFragmentManager(), "SingleSubjectMarksDialog");
             }
 
             private void openMarksEntry(Student student) {

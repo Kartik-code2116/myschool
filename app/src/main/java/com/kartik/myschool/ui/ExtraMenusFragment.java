@@ -128,6 +128,9 @@ public class ExtraMenusFragment extends Fragment {
             if (menuType.equals("subject")) {
                 setupRemarkBankEditor(activeClass);
             }
+            if (menuType.equals("working_days")) {
+                setupWorkingDaysEditor(activeClass);
+            }
 
             // Real-time student statistics for active class (Gender & Cast categories)
             FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
@@ -599,5 +602,133 @@ public class ExtraMenusFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void setupWorkingDaysEditor(ClassModel activeClass) {
+        if (activeClass == null) return;
+
+        prepopulateMonthField(b.etWorkingDaysJun, "जून", activeClass);
+        prepopulateMonthField(b.etWorkingDaysJul, "जुलै", activeClass);
+        prepopulateMonthField(b.etWorkingDaysAug, "ऑगस्ट", activeClass);
+        prepopulateMonthField(b.etWorkingDaysSep, "सप्टें", activeClass);
+        prepopulateMonthField(b.etWorkingDaysOct, "ऑक्टो", activeClass);
+        prepopulateMonthField(b.etWorkingDaysNov, "नोव्हे", activeClass);
+        prepopulateMonthField(b.etWorkingDaysDec, "डिसें", activeClass);
+        prepopulateMonthField(b.etWorkingDaysJan, "जाने", activeClass);
+        prepopulateMonthField(b.etWorkingDaysFeb, "फेब्रु", activeClass);
+        prepopulateMonthField(b.etWorkingDaysMar, "मार्च", activeClass);
+        prepopulateMonthField(b.etWorkingDaysApr, "एप्रिल", activeClass);
+        prepopulateMonthField(b.etWorkingDaysMay, "मे", activeClass);
+
+        // Check if there is already configured working days
+        boolean hasConfiguredDays = false;
+        if (activeClass.monthlyWorkingDays != null && !activeClass.monthlyWorkingDays.isEmpty()) {
+            for (Integer val : activeClass.monthlyWorkingDays.values()) {
+                if (val != null && val > 0) {
+                    hasConfiguredDays = true;
+                    break;
+                }
+            }
+        }
+
+        // Set initial state
+        setWorkingDaysFieldsEditable(!hasConfiguredDays);
+
+        b.btnEditWorkingDays.setOnClickListener(v -> setWorkingDaysFieldsEditable(true));
+
+        b.btnSaveWorkingDays.setOnClickListener(v -> {
+            activeClass.monthlyWorkingDays.put("जून", parseVal(b.etWorkingDaysJun));
+            activeClass.monthlyWorkingDays.put("जुलै", parseVal(b.etWorkingDaysJul));
+            activeClass.monthlyWorkingDays.put("ऑगस्ट", parseVal(b.etWorkingDaysAug));
+            activeClass.monthlyWorkingDays.put("सप्टें", parseVal(b.etWorkingDaysSep));
+            activeClass.monthlyWorkingDays.put("ऑक्टो", parseVal(b.etWorkingDaysOct));
+            activeClass.monthlyWorkingDays.put("नोव्हे", parseVal(b.etWorkingDaysNov));
+            activeClass.monthlyWorkingDays.put("डिसें", parseVal(b.etWorkingDaysDec));
+            activeClass.monthlyWorkingDays.put("जाने", parseVal(b.etWorkingDaysJan));
+            activeClass.monthlyWorkingDays.put("फेब्रु", parseVal(b.etWorkingDaysFeb));
+            activeClass.monthlyWorkingDays.put("मार्च", parseVal(b.etWorkingDaysMar));
+            activeClass.monthlyWorkingDays.put("एप्रिल", parseVal(b.etWorkingDaysApr));
+            activeClass.monthlyWorkingDays.put("मे", parseVal(b.etWorkingDaysMay));
+
+            b.btnSaveWorkingDays.setEnabled(false);
+            FirebaseRepository.get().saveClass(activeClass, new FirebaseRepository.OnResult<String>() {
+                @Override
+                public void onSuccess(String classId) {
+                    if (!isAdded()) return;
+                    activeClass.id = classId;
+
+                    // Update AppCache.cachedClasses
+                    if (AppCache.cachedClasses == null) {
+                        AppCache.cachedClasses = new ArrayList<>();
+                    }
+                    boolean found = false;
+                    for (int i = 0; i < AppCache.cachedClasses.size(); i++) {
+                        if (AppCache.cachedClasses.get(i).id != null && AppCache.cachedClasses.get(i).id.equals(classId)) {
+                            AppCache.cachedClasses.set(i, activeClass);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        AppCache.cachedClasses.add(activeClass);
+                    }
+
+                    // Update SessionContext active class
+                    SessionContext.selectedClass = activeClass;
+                    SessionContext.save(getContext());
+
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            b.btnSaveWorkingDays.setEnabled(true);
+                            setWorkingDaysFieldsEditable(false);
+                            Toast.makeText(getContext(), "कामकाजाचे दिवस यशस्वीरित्या जतन झाले!", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            b.btnSaveWorkingDays.setEnabled(true);
+                            Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    private void setWorkingDaysFieldsEditable(boolean editable) {
+        EditText[] fields = {
+            b.etWorkingDaysJun, b.etWorkingDaysJul, b.etWorkingDaysAug, b.etWorkingDaysSep,
+            b.etWorkingDaysOct, b.etWorkingDaysNov, b.etWorkingDaysDec, b.etWorkingDaysJan,
+            b.etWorkingDaysFeb, b.etWorkingDaysMar, b.etWorkingDaysApr, b.etWorkingDaysMay
+        };
+        for (EditText et : fields) {
+            et.setEnabled(editable);
+            et.setFocusable(editable);
+            et.setFocusableInTouchMode(editable);
+            et.setAlpha(editable ? 1.0f : 0.65f);
+        }
+        b.btnSaveWorkingDays.setVisibility(editable ? View.VISIBLE : View.GONE);
+        b.btnEditWorkingDays.setVisibility(editable ? View.GONE : View.VISIBLE);
+    }
+
+    private void prepopulateMonthField(EditText et, String month, ClassModel activeClass) {
+        if (activeClass.monthlyWorkingDays != null) {
+            Integer val = activeClass.monthlyWorkingDays.get(month);
+            et.setText(val != null && val > 0 ? String.valueOf(val) : "");
+        }
+    }
+
+    private int parseVal(EditText et) {
+        String text = et.getText() != null ? et.getText().toString().trim() : "";
+        if (text.isEmpty()) return 0;
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

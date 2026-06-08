@@ -1,0 +1,798 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialogRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/dialogCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginVertical="48dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/outline_variant"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedHeight="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <!-- Header with Back Button -->
+        <LinearLayout
+            android:id="@+id/headerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:background="#FAF8FF"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/actionBarItemBackground"
+                android:src="@drawable/ic_close"
+                app:tint="@color/primary"
+                android:contentDescription="Close"
+                android:layout_marginEnd="8dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvDialogTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-bold"
+                    android:textColor="@color/primary"
+                    android:textSize="15sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="Enter Marks" />
+
+                <TextView
+                    android:id="@+id/tvStudentName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="Student: Name" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/headerDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/outline_variant"
+            app:layout_constraintTop_toBottomOf="@id/headerLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ScrollView constrained to parent height -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintTop_toBottomOf="@id/headerDivider"
+            app:layout_constraintBottom_toTopOf="@id/bottomDivider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp">
+
+                <!-- Formative Section Title -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/label_formative_evaluation"
+                        android:textColor="@color/primary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvAkarikMax"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/primary_container"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Max: 50"
+                        android:textColor="@color/primary"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Formative Rows (Reduced height and vertical margins) -->
+                <!-- Row 1: Observation & Oral Work -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_observation"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etNirikhshan"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvNirikhshanMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/10"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_oral_work"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etTondiKam"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvTondiKamMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/10"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Row 2: Practical & Activity -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_practical"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etPratyakshik"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvPratyakshikAMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/10"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_activity"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etUpkram"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvUpkramMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/5"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Row 3: Project & Test -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_project"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etPrakalp"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvPrakalpMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/5"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_test"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etChachani"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvChachaniMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/5"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Row 4: Assignment & Other -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_assignment"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etSwadhyay"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvSwadhyayMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/5"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_other"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etItar"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvItarMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/—"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Formative Subtotal Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@color/primary_container"
+                    android:paddingHorizontal="10dp"
+                    android:layout_marginBottom="14dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_formative_total"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/primary"/>
+                    <TextView
+                        android:id="@+id/tvAkarikTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 / 50"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:textColor="@color/primary"/>
+                </LinearLayout>
+
+                <!-- Summative Section Title -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/label_summative_evaluation"
+                        android:textColor="@color/secondary"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvSanklitMax"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/secondary_container"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Max: 50"
+                        android:textColor="@color/secondary"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Summative Rows -->
+                <!-- Row 1: Oral & Practical B -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_oral"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etTondiB"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvTondiBMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/10"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_practical"
+                            android:textSize="9sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:layout_marginBottom="2dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <EditText
+                                android:id="@+id/etPratyakshikB"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:textSize="13sp"
+                                android:gravity="center"
+                                android:background="@drawable/bg_surface_rounded"
+                                android:hint="0" />
+                            <TextView
+                                android:id="@+id/tvPratyakshikBMax"
+                                android:layout_width="26dp"
+                                android:layout_height="wrap_content"
+                                android:text="/10"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_surface_variant"
+                                android:gravity="center" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Row 2: Written (Lekhi) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_written"
+                        android:textSize="9sp"
+                        android:textColor="@color/on_surface_variant"
+                        android:layout_marginBottom="2dp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <EditText
+                            android:id="@+id/etLekhi"
+                            android:layout_width="0dp"
+                            android:layout_height="38dp"
+                            android:layout_weight="1"
+                            android:inputType="number"
+                            android:textSize="13sp"
+                            android:gravity="center"
+                            android:background="@drawable/bg_surface_rounded"
+                            android:hint="0" />
+                        <TextView
+                            android:id="@+id/tvLekhiMax"
+                            android:layout_width="26dp"
+                            android:layout_height="wrap_content"
+                            android:text="/30"
+                            android:textSize="10sp"
+                            android:textColor="@color/on_surface_variant"
+                            android:gravity="center" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Summative Subtotal Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@color/secondary_container"
+                    android:paddingHorizontal="10dp"
+                    android:layout_marginBottom="14dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_summative_total"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/secondary"/>
+                    <TextView
+                        android:id="@+id/tvSanklitTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 / 50"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:textColor="@color/secondary"/>
+                </LinearLayout>
+
+                <!-- Grand Total Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@color/primary"
+                    android:paddingHorizontal="10dp"
+                    android:layout_marginBottom="2dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_grand_total_ab"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/white"/>
+                    <TextView
+                        android:id="@+id/tvGrandTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 / 100"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-bold"
+                        android:textColor="@color/white"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/outline_variant"
+            app:layout_constraintBottom_toTopOf="@id/bottomActions"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Bottom Actions (Slightly reduced paddings) -->
+        <LinearLayout
+            android:id="@+id/bottomActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:background="#FAF8FF"
+            app:layout_constraintBottom_toTopOf="@id/progress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Cancel" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClear"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Clear"
+                android:textColor="@color/error"
+                android:layout_marginStart="6dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                style="@style/Widget.Myschool.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:minHeight="44dp"
+                android:text="Save"
+                app:cornerRadius="8dp"
+                android:layout_marginStart="10dp" />
+        </LinearLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/primary"
+            app:trackColor="@color/primary_container"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,7 +20,7 @@ import com.kartik.myschool.EnterDescriptiveActivity;
 import com.kartik.myschool.HomeActivity;
 import com.kartik.myschool.R;
 import com.kartik.myschool.SessionContext;
-import com.kartik.myschool.SubjectRemarkEntryActivity;
+import com.kartik.myschool.SubjectRemarkEntryDialog;
 import com.kartik.myschool.databinding.FragmentDescriptiveEntriesBinding;
 import com.kartik.myschool.databinding.ItemDescriptiveStudentBlockBinding;
 import com.kartik.myschool.databinding.ItemDescriptiveSubjectCardBinding;
@@ -943,20 +943,18 @@ public class DescriptiveEntriesFragment extends Fragment {
             }
 
             private void openSubjectRemarkEntry(Student student, Subject subject, int subjectIndex) {
-                AppCache.selectedStudent = student;
                 ClassModel freshClass = SessionContext.selectedClass != null
                         ? SessionContext.selectedClass
                         : activeClass;
-                AppCache.selectedClass = freshClass;
                 activeClass = freshClass;
-                AppCache.selectedSubjectName = subject != null ? subject.name : null;
-                AppCache.selectedSubjectIndex = subjectIndex;
-                AppCache.selectedMarks = getDisplayMarksForStudent(student);
-                android.util.Log.d("DESCRIPTIVE", "openSubjectRemarkEntry: student=" + student.id
-                        + " subject=" + AppCache.selectedSubjectName
-                        + " record=" + (AppCache.selectedMarks != null ? AppCache.selectedMarks.id : "null"));
-                Intent intent = new Intent(itemView.getContext(), SubjectRemarkEntryActivity.class);
-                itemView.getContext().startActivity(intent);
+                MarksRecord record = getDisplayMarksForStudent(student);
+
+                SubjectRemarkEntryDialog dialog = SubjectRemarkEntryDialog.newInstance(
+                        student, subject, subjectIndex, freshClass, record);
+                dialog.setOnRemarkSavedListener((studentId, newRecord) -> {
+                    adapter.patchStudentMarks(studentId, newRecord);
+                });
+                dialog.show(DescriptiveEntriesFragment.this.getChildFragmentManager(), "SubjectRemarkEntryDialog");
             }
         }
     }

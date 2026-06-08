@@ -17,7 +17,7 @@ import com.kartik.myschool.HomeActivity;
 import com.kartik.myschool.R;
 import com.kartik.myschool.SessionContext;
 import com.kartik.myschool.adapter.AttendanceAdapter;
-import com.kartik.myschool.databinding.DialogEditAttendanceBinding;
+import com.kartik.myschool.EditAttendanceDialog;
 import com.kartik.myschool.databinding.FragmentAttendanceBinding;
 import com.kartik.myschool.model.AttendanceRecord;
 import com.kartik.myschool.model.Student;
@@ -189,81 +189,9 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     }
 
     private void showEditDialog(Student student, AttendanceRecord record) {
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_attendance, null, false);
-        DialogEditAttendanceBinding binding = DialogEditAttendanceBinding.bind(view);
-
-        // Prepopulate inputs
-        prepopPair(binding.etJunPresent, binding.etJunTotal, record.monthlyData.get("जून"));
-        prepopPair(binding.etJulPresent, binding.etJulTotal, record.monthlyData.get("जुलै"));
-        prepopPair(binding.etAugPresent, binding.etAugTotal, record.monthlyData.get("ऑगस्ट"));
-        prepopPair(binding.etSepPresent, binding.etSepTotal, record.monthlyData.get("सप्टें"));
-        prepopPair(binding.etOctPresent, binding.etOctTotal, record.monthlyData.get("ऑक्टो"));
-        prepopPair(binding.etNovPresent, binding.etNovTotal, record.monthlyData.get("नोव्हे"));
-        prepopPair(binding.etDecPresent, binding.etDecTotal, record.monthlyData.get("डिसें"));
-        prepopPair(binding.etJanPresent, binding.etJanTotal, record.monthlyData.get("जाने"));
-        prepopPair(binding.etFebPresent, binding.etFebTotal, record.monthlyData.get("फेब्रु"));
-        prepopPair(binding.etMarPresent, binding.etMarTotal, record.monthlyData.get("मार्च"));
-        prepopPair(binding.etAprPresent, binding.etAprTotal, record.monthlyData.get("एप्रिल"));
-        prepopPair(binding.etMayPresent, binding.etMayTotal, record.monthlyData.get("मे"));
-
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setView(view)
-                .create();
-
-        binding.btnCancel.setOnClickListener(v -> dialog.dismiss());
-        binding.btnSave.setOnClickListener(v -> {
-            savePair(binding.etJunPresent, binding.etJunTotal, "जून", record);
-            savePair(binding.etJulPresent, binding.etJulTotal, "जुलै", record);
-            savePair(binding.etAugPresent, binding.etAugTotal, "ऑगस्ट", record);
-            savePair(binding.etSepPresent, binding.etSepTotal, "सप्टें", record);
-            savePair(binding.etOctPresent, binding.etOctTotal, "ऑक्टो", record);
-            savePair(binding.etNovPresent, binding.etNovTotal, "नोव्हे", record);
-            savePair(binding.etDecPresent, binding.etDecTotal, "डिसें", record);
-            savePair(binding.etJanPresent, binding.etJanTotal, "जाने", record);
-            savePair(binding.etFebPresent, binding.etFebTotal, "फेब्रु", record);
-            savePair(binding.etMarPresent, binding.etMarTotal, "मार्च", record);
-            savePair(binding.etAprPresent, binding.etAprTotal, "एप्रिल", record);
-            savePair(binding.etMayPresent, binding.etMayTotal, "मे", record);
-
-            // Copy monthly data back to student object
-            if (student.monthlyAttendance == null) student.monthlyAttendance = new HashMap<>();
-            student.monthlyAttendance.clear();
-            student.monthlyAttendance.putAll(record.monthlyData);
-
-            FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
-                @Override
-                public void onSuccess(String id) {
-                    Toast.makeText(getContext(), student.name + " ची उपस्थिती जतन झाली!", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    loadData();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        });
-
-        dialog.show();
-    }
-
-    private void prepopPair(EditText etPresent, EditText etTotal, String val) {
-        if (val != null && val.contains("/")) {
-            String[] parts = val.split("/");
-            if (parts.length == 2) {
-                etPresent.setText(parts[0].trim());
-                etTotal.setText(parts[1].trim());
-            }
-        }
-    }
-
-    private void savePair(EditText etPresent, EditText etTotal, String month, AttendanceRecord r) {
-        String pStr = etPresent.getText() != null ? etPresent.getText().toString().trim() : "0";
-        String tStr = etTotal.getText() != null ? etTotal.getText().toString().trim() : "0";
-        if (pStr.isEmpty()) pStr = "0";
-        if (tStr.isEmpty()) tStr = "0";
-        r.monthlyData.put(month, pStr + "/" + tStr);
+        EditAttendanceDialog dialog = EditAttendanceDialog.newInstance(student, record);
+        dialog.setOnAttendanceSavedListener(this::loadData);
+        dialog.show(getChildFragmentManager(), "EditAttendanceDialog");
     }
 
     private void showDuplicateDialog(Student srcStudent, AttendanceRecord srcRecord) {

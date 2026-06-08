@@ -20,6 +20,7 @@ public class ClassModel {
     public String teacherPhone;
     public int studentCount;
     public List<Subject> subjects = new ArrayList<>();
+    public java.util.Map<String, Integer> monthlyWorkingDays = new java.util.HashMap<>();
 
     public ClassModel() {}
 

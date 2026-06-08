@@ -1,14 +1,19 @@
 package com.kartik.myschool;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.chip.Chip;
-import com.kartik.myschool.databinding.ActivitySubjectRemarkEntryBinding;
+import com.kartik.myschool.databinding.DialogSubjectRemarkEntryBinding;
 import com.kartik.myschool.model.ClassModel;
 import com.kartik.myschool.model.MarksRecord;
 import com.kartik.myschool.model.Student;
@@ -20,48 +25,59 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
-public class SubjectRemarkEntryActivity extends AppCompatActivity {
+public class SubjectRemarkEntryDialog extends DialogFragment {
 
-    private ActivitySubjectRemarkEntryBinding b;
+    public interface OnRemarkSavedListener {
+        void onRemarkSaved(String studentId, MarksRecord record);
+    }
+
+    private DialogSubjectRemarkEntryBinding b;
     private Student student;
     private ClassModel classModel;
-    private MarksRecord marksRecord;
+    private MarksRecord existingMarks;
     private String subjectName;
     private int subjectIndex;
     private final List<String> bankOptions = new ArrayList<>();
     private final LinkedHashSet<String> selectedRemarks = new LinkedHashSet<>();
+    private OnRemarkSavedListener saveListener;
+
+    public static SubjectRemarkEntryDialog newInstance(Student student, Subject subject, int subjectIndex, ClassModel classModel, MarksRecord existingMarks) {
+        SubjectRemarkEntryDialog dialog = new SubjectRemarkEntryDialog();
+        dialog.student = student;
+        dialog.classModel = classModel;
+        dialog.subjectName = subject != null ? subject.name : null;
+        dialog.subjectIndex = subjectIndex;
+        dialog.existingMarks = existingMarks;
+        return dialog;
+    }
+
+    public void setOnRemarkSavedListener(OnRemarkSavedListener listener) {
+        this.saveListener = listener;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        ClassModel callerClass = AppCache.selectedClass;
-        SessionContext.load(this);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setStyle(STYLE_NORMAL, R.style.SingleSubjectMarksDialogTheme);
+    }
 
-        b = ActivitySubjectRemarkEntryBinding.inflate(getLayoutInflater());
-        setContentView(b.getRoot());
-        setSupportActionBar(b.toolbar);
-        b.toolbar.setNavigationOnClickListener(v -> finish());
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        b = DialogSubjectRemarkEntryBinding.inflate(inflater, container, false);
+        return b.getRoot();
+    }
 
-        student = AppCache.selectedStudent;
-        classModel = AppCache.selectedClass != null ? AppCache.selectedClass : callerClass;
-        subjectName = AppCache.selectedSubjectName;
-        subjectIndex = AppCache.selectedSubjectIndex;
-        marksRecord = AppCache.selectedMarks;
-
-        if (classModel == null) {
-            classModel = SessionContext.selectedClass;
-        }
-        if (subjectName == null || subjectName.trim().isEmpty()) {
-            subjectName = getSubjectNameFromIndex();
-        }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         if (student == null || classModel == null || subjectName == null || subjectName.trim().isEmpty()) {
-            Toast.makeText(this, "Missing student or subject details.", Toast.LENGTH_SHORT).show();
-            finish();
+            Toast.makeText(getContext(), "Missing student or subject details.", Toast.LENGTH_SHORT).show();
+            dismiss();
             return;
         }
 
-        ensureSemester();
         bindHeader();
         loadExistingSelection();
         renderSelection();
@@ -69,26 +85,18 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
 
         b.btnChooseRemarks.setOnClickListener(v -> showRemarkDialog());
         b.btnSaveRemark.setOnClickListener(v -> saveSubjectRemark());
+        b.btnCancel.setOnClickListener(v -> dismiss());
+        b.btnBack.setOnClickListener(v -> dismiss());
+        b.dialogRoot.setOnClickListener(v -> dismiss());
     }
 
-    private String getSubjectNameFromIndex() {
-        if (classModel != null && classModel.subjects != null
-                && subjectIndex >= 0 && subjectIndex < classModel.subjects.size()) {
-            Subject subject = classModel.subjects.get(subjectIndex);
-            return subject != null ? subject.name : null;
-        }
-        return null;
-    }
-
-    private void ensureSemester() {
-        if (SessionContext.selectedSemester == null && classModel.semesterId != null
-                && !classModel.semesterId.isEmpty()) {
-            com.kartik.myschool.model.Semester fallbackSem = new com.kartik.myschool.model.Semester();
-            fallbackSem.id = classModel.semesterId;
-            fallbackSem.yearId = classModel.yearId;
-            fallbackSem.number = classModel.semesterId.contains("2") ? 2 : 1;
-            fallbackSem.name = fallbackSem.number == 2 ? "Second Semester" : "First Semester";
-            SessionContext.selectedSemester = fallbackSem;
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setSoftInputMode(
+                    android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+            );
         }
     }
 
@@ -96,21 +104,8 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
         String name = student.name != null ? student.name : "Student";
         String roll = student.rollNo != null ? student.rollNo : "-";
         
-        // Top line: Class
-        String classContext = "<b>Class:</b> " + classModel.getDisplayName();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            b.tvSubjectContext.setText(android.text.Html.fromHtml(classContext, android.text.Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            b.tvSubjectContext.setText(android.text.Html.fromHtml(classContext));
-        }
-
-        // Bottom line: Student Name, Roll No, and Subject Name
-        String studentDetails = "<b>" + name + "</b> (Roll: " + roll + ") &nbsp;&nbsp;•&nbsp;&nbsp; <b>" + subjectName + "</b>";
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            b.tvStudentName.setText(android.text.Html.fromHtml(studentDetails, android.text.Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            b.tvStudentName.setText(android.text.Html.fromHtml(studentDetails));
-        }
+        b.tvDialogTitle.setText("Remarks: " + subjectName);
+        b.tvStudentName.setText("Student: " + name + " (Roll: " + roll + ")\nClass: " + classModel.getDisplayName());
     }
 
     private void loadExistingSelection() {
@@ -168,7 +163,7 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
             checked[i] = selectedRemarks.contains(labels[i]);
         }
 
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(requireContext())
                 .setTitle("Choose remarks")
                 .setMultiChoiceItems(labels, checked, (dialog, which, isChecked) -> {
                     if (isChecked) {
@@ -183,6 +178,7 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
     }
 
     private void renderSelection() {
+        if (getContext() == null || b == null) return;
         b.cgSelectedRemarks.removeAllViews();
         if (selectedRemarks.isEmpty()) {
             b.tvSelectedSummary.setText("No remarks selected");
@@ -191,7 +187,7 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
         }
 
         for (String remark : selectedRemarks) {
-            Chip chip = new Chip(this);
+            Chip chip = new Chip(requireContext());
             chip.setText(remark);
             chip.setCloseIconVisible(true);
             chip.setOnCloseIconClickListener(v -> {
@@ -210,7 +206,7 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
             finalRemarks.add(custom);
         }
 
-        MarksRecord record = marksRecord != null ? marksRecord : new MarksRecord();
+        MarksRecord record = existingMarks != null ? existingMarks : new MarksRecord();
         record.studentId = student.id;
         record.classId = classModel.id;
         record.examName = classModel.examName;
@@ -236,13 +232,15 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String id) {
                 record.id = id;
-                marksRecord = record;
+                existingMarks = record;
                 AppCache.selectedMarks = record;
-                getSharedPreferences("marks_doc_ids", MODE_PRIVATE)
-                        .edit()
-                        .putString(getMarksDocPrefKey(record), id)
-                        .putString("marks_doc_" + record.studentId + "_" + record.classId, id)
-                        .apply();
+                if (getActivity() != null) {
+                    getActivity().getSharedPreferences("marks_doc_ids", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString(getMarksDocPrefKey(record), id)
+                            .putString("marks_doc_" + record.studentId + "_" + record.classId, id)
+                            .apply();
+                }
 
                 AppCache.descriptiveJustSaved = true;
                 AppCache.descriptiveJustSavedStudentId = student.id;
@@ -250,23 +248,25 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
                 syncCaches(record);
                 FirebaseRepository.get().updateMarksInCache(record.classId, record.semesterId, student.id, record);
 
+                if (saveListener != null) {
+                    saveListener.onRemarkSaved(student.id, record);
+                }
+
                 showLoading(false);
-                Toast.makeText(SubjectRemarkEntryActivity.this, "Remark saved successfully.", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
-                finish();
+                Toast.makeText(getContext(), "Remark saved successfully.", Toast.LENGTH_SHORT).show();
+                dismiss();
             }
 
             @Override
             public void onError(Exception e) {
                 showLoading(false);
-                Toast.makeText(SubjectRemarkEntryActivity.this,
-                        "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private MarksRecord.SubjectMarksDetail getCurrentSubjectDetail(boolean create) {
-        return getCurrentSubjectDetail(create, marksRecord);
+        return getCurrentSubjectDetail(create, existingMarks);
     }
 
     private MarksRecord.SubjectMarksDetail getCurrentSubjectDetail(boolean create, MarksRecord record) {
@@ -335,8 +335,11 @@ public class SubjectRemarkEntryActivity extends AppCompatActivity {
     }
 
     private void showLoading(boolean show) {
+        if (b == null) return;
         b.progress.setVisibility(show ? View.VISIBLE : View.GONE);
         b.btnSaveRemark.setEnabled(!show);
         b.btnChooseRemarks.setEnabled(!show);
+        b.btnCancel.setEnabled(!show);
+        b.btnBack.setEnabled(!show);
     }
 }

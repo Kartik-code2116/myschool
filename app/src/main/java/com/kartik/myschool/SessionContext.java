@@ -132,9 +132,25 @@ public final class SessionContext {
             } else {
                 editor.remove("class_subjects_json");
             }
+
+            // Serialize monthlyWorkingDays
+            if (selectedClass.monthlyWorkingDays != null) {
+                try {
+                    org.json.JSONObject mwd = new org.json.JSONObject();
+                    for (java.util.Map.Entry<String, Integer> entry : selectedClass.monthlyWorkingDays.entrySet()) {
+                        mwd.put(entry.getKey(), entry.getValue());
+                    }
+                    editor.putString("class_monthly_working_days_json", mwd.toString());
+                } catch (org.json.JSONException e) {
+                    android.util.Log.e("SessionContext", "Error serializing monthly working days", e);
+                }
+            } else {
+                editor.remove("class_monthly_working_days_json");
+            }
         } else {
             editor.remove("class_id");
             editor.remove("class_subjects_json");
+            editor.remove("class_monthly_working_days_json");
         }
 
         editor.apply();
@@ -225,6 +241,22 @@ public final class SessionContext {
                     }
                 } catch (org.json.JSONException e) {
                     android.util.Log.e("SessionContext", "Error deserializing subjects", e);
+                }
+            }
+
+            // Deserialize monthlyWorkingDays
+            String mwdJson = prefs.getString("class_monthly_working_days_json", null);
+            if (mwdJson != null) {
+                try {
+                    org.json.JSONObject mwd = new org.json.JSONObject(mwdJson);
+                    selectedClass.monthlyWorkingDays = new java.util.HashMap<>();
+                    java.util.Iterator<String> keys = mwd.keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        selectedClass.monthlyWorkingDays.put(key, mwd.getInt(key));
+                    }
+                } catch (org.json.JSONException e) {
+                    android.util.Log.e("SessionContext", "Error deserializing monthly working days", e);
                 }
             }
         }
