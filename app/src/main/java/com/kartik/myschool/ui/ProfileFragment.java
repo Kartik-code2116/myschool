@@ -96,11 +96,21 @@ public class ProfileFragment extends Fragment {
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
 
+        b.fabPromoteStudents.setOnClickListener(v -> {
+            UiAnimations.pulse(b.fabPromoteStudents);
+            if (SessionContext.selectedClass == null) {
+                Toast.makeText(requireContext(), "Please select an active class first.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            startActivity(new Intent(requireContext(), com.kartik.myschool.PromoteStudentsActivity.class));
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+        });
+
         // ── Phase 1: show whatever is already in cache instantly ───────────────
         showCachedDataImmediately();
 
         setViewMode(false);
-        UiAnimations.staggerFadeIn(b.cardProfileInfo, b.rvProfileClasses, b.btnLogout, b.fabAddClass);
+        UiAnimations.staggerFadeIn(b.cardProfileInfo, b.rvProfileClasses, b.btnLogout, b.fabPromoteStudents, b.fabAddClass);
 
         // ── Phase 2: load fresh data in parallel ───────────────────────────────
         loadAllParallel();
@@ -130,6 +140,16 @@ public class ProfileFragment extends Fragment {
             List<ProfileClassItem> items = buildItems(loadedClasses, counts);
             lastItems.clear(); lastItems.addAll(items);
             bindClassList(items, buildDivisionsSummaryMap(items));
+        } else if (SessionContext.selectedClass != null) {
+            int std = parseStd(SessionContext.selectedClass.className);
+            ProfileClassItem activeItem = new ProfileClassItem(std, SessionContext.selectedClass);
+            if (AppCache.cachedStudentCountByClassId != null && AppCache.cachedStudentCountByClassId.containsKey(SessionContext.selectedClass.id)) {
+                activeItem.studentCount = AppCache.cachedStudentCountByClassId.get(SessionContext.selectedClass.id);
+            } else {
+                activeItem.studentCount = SessionContext.selectedClass.studentCount;
+            }
+            showActiveClassDetail(activeItem);
+            b.cardActiveClassDetail.setVisibility(View.VISIBLE);
         }
     }
 
@@ -142,62 +162,58 @@ public class ProfileFragment extends Fragment {
      * Each result updates the UI independently as soon as it arrives.
      */
     private void loadAllParallel() {
-        AtomicReference<Teacher>           teacherRef = new AtomicReference<>();
-        AtomicReference<List<ClassModel>>  classesRef = new AtomicReference<>();
-        // Count down from 2 (teacher + classes) before merging
-        AtomicInteger latch = new AtomicInteger(2);
-
-        Runnable onBothDone = () -> {
-            if (latch.decrementAndGet() != 0) return;
-            if (!isViewActive()) return;
-            Teacher t = teacherRef.get();
-            List<ClassModel> cls = classesRef.get();
-            if (t != null) { currentTeacher = t; AppCache.cachedTeacherName = t.name; }
-            if (cls != null) { loadedClasses.clear(); loadedClasses.addAll(cls); AppCache.cachedClasses = new ArrayList<>(cls); }
-            // Update teacher UI immediately
-            requireActivity().runOnUiThread(() -> {
-                if (!isViewActive()) return;
-                if (currentTeacher != null && !editMode) bindSummary(currentTeacher);
-            });
-            // Now load student counts (needs class IDs)
-            loadStudentCounts(loadedClasses);
-        };
-
-        // ── Fetch teacher ──────────────────────────────────────────────────────
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
             @Override public void onSuccess(Teacher t) {
-                teacherRef.set(t);
-                // Update school in background while waiting for the latch
+                if (!isViewActive()) return;
+                currentTeacher = t;
                 if (t != null) {
+                    AppCache.cachedTeacherName = t.name;
+                    requireActivity().runOnUiThread(() -> {
+                        if (isViewActive() && !editMode) bindSummary(t);
+                    });
+                    
                     FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<School>() {
-                        @Override public void onSuccess(School s) { SessionContext.selectedSchool = s; AppCache.selectedSchool = s; }
-                        @Override public void onError(Exception e) {}
+                        @Override public void onSuccess(School s) {
+                            if (!isViewActive()) return;
+                            SessionContext.selectedSchool = s;
+                            AppCache.selectedSchool = s;
+                            fetchClassesAndCounts(s.id);
+                        }
+                        @Override public void onError(Exception e) {
+                            if (!isViewActive()) return;
+                            if (SessionContext.selectedSchool != null) {
+                                fetchClassesAndCounts(SessionContext.selectedSchool.id);
+                            }
+                        }
                     });
                 }
-                onBothDone.run();
             }
-            @Override public void onError(Exception e) { onBothDone.run(); }
+            @Override public void onError(Exception e) {
+                if (!isViewActive()) return;
+                if (SessionContext.selectedSchool != null) {
+                    fetchClassesAndCounts(SessionContext.selectedSchool.id);
+                }
+            }
         });
-
-        // ── Fetch classes ──────────────────────────────────────────────────────
-        AcademicYear y = SessionContext.selectedYear;
-        if (y != null && y.id != null) {
-            FirebaseRepository.get().getClassesForYear(y.id, new FirebaseRepository.OnResult<List<ClassModel>>() {
-                @Override public void onSuccess(List<ClassModel> list) { classesRef.set(list); onBothDone.run(); }
-                @Override public void onError(Exception e)             { fetchClassesBySchool(classesRef, onBothDone); }
-            });
-        } else {
-            fetchClassesBySchool(classesRef, onBothDone);
-        }
     }
 
-    private void fetchClassesBySchool(AtomicReference<List<ClassModel>> ref, Runnable done) {
-        if (SessionContext.selectedSchool == null) { ref.set(null); done.run(); return; }
-        FirebaseRepository.get().getClassesForSchool(SessionContext.selectedSchool.id,
-                new FirebaseRepository.OnResult<List<ClassModel>>() {
-                    @Override public void onSuccess(List<ClassModel> list) { ref.set(list); done.run(); }
-                    @Override public void onError(Exception e)             { ref.set(null); done.run(); }
-                });
+    private void fetchClassesAndCounts(String schoolId) {
+        if (schoolId == null) return;
+        FirebaseRepository.get().getClassesForSchool(schoolId, new FirebaseRepository.OnResult<List<ClassModel>>() {
+            @Override public void onSuccess(List<ClassModel> list) {
+                if (!isViewActive()) return;
+                List<ClassModel> classes = list != null ? list : new ArrayList<>();
+                loadedClasses.clear();
+                loadedClasses.addAll(classes);
+                AppCache.cachedClasses = new ArrayList<>(loadedClasses);
+                loadStudentCounts(loadedClasses);
+            }
+            @Override public void onError(Exception e) {
+                if (isViewActive()) {
+                    loadStudentCounts(loadedClasses);
+                }
+            }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -291,12 +307,26 @@ public class ProfileFragment extends Fragment {
         String selectedId = SessionContext.selectedClass != null ? SessionContext.selectedClass.id : null;
         classAdapter.setSelectedClassId(selectedId);
         if (selectedId != null) {
+            ProfileClassItem activeItem = null;
             for (ProfileClassItem item : items) {
                 if (item.hasClass() && java.util.Objects.equals(selectedId, item.classModel.id)) {
-                    showActiveClassDetail(item);
-                    b.cardActiveClassDetail.setVisibility(View.VISIBLE);
-                    return;
+                    activeItem = item;
+                    break;
                 }
+            }
+            if (activeItem == null && SessionContext.selectedClass != null) {
+                int std = parseStd(SessionContext.selectedClass.className);
+                activeItem = new ProfileClassItem(std, SessionContext.selectedClass);
+                if (AppCache.cachedStudentCountByClassId != null && AppCache.cachedStudentCountByClassId.containsKey(selectedId)) {
+                    activeItem.studentCount = AppCache.cachedStudentCountByClassId.get(selectedId);
+                } else {
+                    activeItem.studentCount = SessionContext.selectedClass.studentCount;
+                }
+            }
+            if (activeItem != null) {
+                showActiveClassDetail(activeItem);
+                b.cardActiveClassDetail.setVisibility(View.VISIBLE);
+                return;
             }
         }
         b.cardActiveClassDetail.setVisibility(View.GONE);
@@ -355,7 +385,11 @@ public class ProfileFragment extends Fragment {
         ClassModel c = item.classModel;
         if (c == null) { b.cardActiveClassDetail.setVisibility(View.GONE); return; }
         String div = item.getDivision();
-        b.tvActiveClassTitle.setText(getString(R.string.class_div_format, String.valueOf(item.standard), div));
+        String title = getString(R.string.class_div_format, String.valueOf(item.standard), div);
+        if (c.academicYearLabel != null && !c.academicYearLabel.isEmpty()) {
+            title += " (" + c.academicYearLabel + ")";
+        }
+        b.tvActiveClassTitle.setText(title);
         b.tvActiveClassStudents.setText(getString(R.string.profile_students_count, item.studentCount));
 
         String allDivs = buildDivisionsSummaryForStd(item.standard, loadedClasses);

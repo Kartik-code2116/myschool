@@ -209,7 +209,7 @@ public class HomeActivity extends AppCompatActivity {
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
 
-            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_extra) {
+            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_school_info || id == R.id.nav_weightage || id == R.id.nav_extra) {
                 b.btnToolbarMore.setVisibility(View.VISIBLE);
                 b.ivProfilePic.setVisibility(View.VISIBLE);
             } else {
@@ -522,16 +522,23 @@ public class HomeActivity extends AppCompatActivity {
             b.btnToolbarNotifications.setOnClickListener(onNotificationsClick);
             b.btnToolbarMore.setOnClickListener(onMoreClick);
             b.ivProfilePic.setVisibility(View.GONE);
+            b.btnToolbarHelp.setVisibility(View.GONE);
         } else {
             b.btnToolbarNotifications.setVisibility(View.GONE);
+            b.btnToolbarNotifications.setImageResource(R.drawable.ic_notifications); // restore default
             b.btnToolbarMore.setOnClickListener(this::handleHomeMoreClick);
-            if (navController != null && navController.getCurrentDestination() != null
-                    && navController.getCurrentDestination().getId() == R.id.nav_info_print) {
-                b.btnToolbarMore.setVisibility(View.VISIBLE);
+            if (navController != null && navController.getCurrentDestination() != null) {
+                int destId = navController.getCurrentDestination().getId();
+                if (destId == R.id.nav_info_print || destId == R.id.nav_profile || destId == R.id.nav_school_info || destId == R.id.nav_weightage || destId == R.id.nav_extra) {
+                    b.btnToolbarMore.setVisibility(View.VISIBLE);
+                } else {
+                    b.btnToolbarMore.setVisibility(View.GONE);
+                }
             } else {
                 b.btnToolbarMore.setVisibility(View.GONE);
             }
             b.ivProfilePic.setVisibility(View.VISIBLE);
+            b.btnToolbarHelp.setVisibility(View.VISIBLE);
         }
     }
 

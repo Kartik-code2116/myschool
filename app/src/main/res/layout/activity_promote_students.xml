@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="#FFFFFF"
+        app:navigationIcon="@drawable/ic_close"
+        app:navigationIconTint="#5A4FCF"
+        app:title="@string/title_promote_students"
+        app:titleTextColor="#2E2E2E"
+        app:titleCentered="false"
+        app:elevation="2dp"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- PREVIOUS CLASS (SOURCE) CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lbl_previous_class_source"
+                        android:textColor="#5A4FCF"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"
+                        android:fontFamily="sans-serif-black"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lbl_year"
+                                android:textColor="#888888"
+                                android:textSize="11sp"/>
+                            <TextView
+                                android:id="@+id/tvSourceYear"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2026-27"
+                                android:textColor="#222222"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lbl_class"
+                                android:textColor="#888888"
+                                android:textSize="11sp"/>
+                            <TextView
+                                android:id="@+id/tvSourceClass"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Class 7"
+                                android:textColor="#222222"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lbl_division"
+                                android:textColor="#888888"
+                                android:textSize="11sp"/>
+                            <TextView
+                                android:id="@+id/tvSourceDivision"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Div A"
+                                android:textColor="#222222"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- NEW TARGET CLASS CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lbl_new_target_class"
+                        android:textColor="#5A4FCF"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"
+                        android:fontFamily="sans-serif-black"/>
+
+                    <!-- Academic Year Selector Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lbl_target_academic_year"
+                                android:textColor="#888888"
+                                android:textSize="12sp"
+                                android:layout_marginBottom="4dp"/>
+                            <Spinner
+                                android:id="@+id/spTargetYear"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:background="@drawable/bg_class_num_normal"
+                                android:padding="8dp"/>
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/btnAddNewYear"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_add_circle"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="#5A4FCF"
+                            android:contentDescription="Add New Year"/>
+
+                    </LinearLayout>
+
+                    <!-- Standard and Division Selectors -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="6dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lbl_target_class_std"
+                                android:textColor="#888888"
+                                android:textSize="12sp"
+                                android:layout_marginBottom="4dp"/>
+                            <Spinner
+                                android:id="@+id/spTargetClass"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:background="@drawable/bg_class_num_normal"
+                                android:padding="8dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="6dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lbl_target_division"
+                                android:textColor="#888888"
+                                android:textSize="12sp"
+                                android:layout_marginBottom="4dp"/>
+                            <Spinner
+                                android:id="@+id/spTargetDivision"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:background="@drawable/bg_class_num_normal"
+                                android:padding="8dp"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Dynamically shown indicator if target class exists or not -->
+                    <TextView
+                        android:id="@+id/tvTargetClassStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:textColor="#E65100"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/status_class_not_exist"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- PROMOTION MODE CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lbl_adjustment_mode"
+                        android:textColor="#5A4FCF"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"
+                        android:fontFamily="sans-serif-black"/>
+
+                    <RadioGroup
+                        android:id="@+id/rgMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/rbModePromote"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:buttonTint="#5A4FCF"
+                            android:text="@string/lbl_promote_copy"
+                            android:textColor="#222222"
+                            android:textSize="14sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
+                            android:layout_marginBottom="12dp"
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:text="@string/lbl_promote_desc"/>
+
+                        <RadioButton
+                            android:id="@+id/rbModeTransfer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="#5A4FCF"
+                            android:text="@string/lbl_transfer_move"
+                            android:textColor="#222222"
+                            android:textSize="14sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:text="@string/lbl_transfer_desc"/>
+
+                    </RadioGroup>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- STUDENT SELECTION LIST CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lbl_select_students"
+                            android:textColor="#5A4FCF"
+                            android:textSize="15sp"
+                            android:fontFamily="sans-serif-black"/>
+
+                        <CheckBox
+                            android:id="@+id/cbSelectAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lbl_select_all"
+                            android:checked="true"
+                            android:buttonTint="#5A4FCF"
+                            android:textSize="13sp"
+                            android:textColor="#555555"/>
+
+                    </LinearLayout>
+
+                    <!-- Student Checklist Recycler -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvStudentsChecklist"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:scrollbars="vertical"
+                        android:nestedScrollingEnabled="true"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnProcessPromotion"
+                style="@style/Widget.Myschool.Button"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:textSize="16sp"
+                app:cornerRadius="30dp"
+                android:text="@string/btn_execute_adjustment"
+                app:backgroundTint="#5A4FCF"/>
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:indeterminate="true"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

@@ -86,17 +86,6 @@
                         android:visibility="gone"
                         android:contentDescription="Notifications"/>
 
-                    <ImageButton
-                        android:id="@+id/btnToolbarMore"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_more_vert"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
-                        android:padding="8dp"
-                        android:visibility="gone"
-                        android:contentDescription="More options"/>
-
                     <!-- Help Icon -->
                     <ImageButton
                         android:id="@+id/btnToolbarHelp"
@@ -117,6 +106,17 @@
                         android:padding="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         app:tint="#5A4FCF"/>
+
+                    <ImageButton
+                        android:id="@+id/btnToolbarMore"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:contentDescription="More options"/>
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>

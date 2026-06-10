@@ -169,10 +169,12 @@ public class HelpDialogHelper {
                 message = isMarathi
                         ? "❤️ तुमचे शिक्षक प्रोफाइल आणि शाळा जोडणीचे तपशील पहा.\n\n"
                         + "📌 युडायस कोड (UDISE), शाळेचे नाव आणि चालू सत्र दुरुस्त करा.\n\n"
-                        + "📌 तुमचे संपर्क तपशील येथे अद्ययावत ठेवा."
+                        + "📌 तुमचे संपर्क तपशील येथे अद्ययावत ठेवा.\n\n"
+                        + "📌 नवीन शैक्षणिक वर्षात किंवा तुकडीमध्ये विद्यार्थी वर्गोन्नती/बदलासाठी 'Promote Students' वर टॅप करा."
                         : "❤️ View and edit teacher profile details and school association.\n\n"
                         + "📌 Configure your UDISE code, school info, and academic year settings.\n\n"
-                        + "📌 Ensure your personal and contact details are kept up to date.";
+                        + "📌 Ensure your personal and contact details are kept up to date.\n\n"
+                        + "📌 Tap 'Promote Students' to batch promote/transfer students into a new academic year or division.";
                 break;
 
             case "settings":
@@ -228,6 +230,23 @@ public class HelpDialogHelper {
                         : "❤️ Record student qualities, special interests, and qualitative descriptive remarks.\n\n"
                         + "📌 Choose from templates or enter custom text remarks.\n\n"
                         + "📌 Tap 'Save Remarks' to save remarks to Firestore.";
+                break;
+
+            case "promote_students":
+                title = isMarathi ? "विद्यार्थी वर्गोन्नती आणि बदली :" : "Student Promotion & Transfer :";
+                message = isMarathi
+                        ? "❤️ एकाच वेळी अनेक विद्यार्थ्यांची पुढील वर्गात वर्गोन्नती किंवा बदली करा.\n\n"
+                        + "📌 चालू वर्ग आणि तुकडीची माहिती वरील पहिल्या कार्डमध्ये दिसेल.\n\n"
+                        + "📌 नवीन शैक्षणिक वर्ष (उदा. 2027-28), इयत्ता आणि तुकडी निवडा.\n\n"
+                        + "📌 नवीन वर्ष उपलब्ध नसेल तर '+' दाबून त्वरित नवीन वर्ष तयार करा.\n\n"
+                        + "📌 ॲडजस्टमेंट मोड निवडा: 'वर्गोन्नती' (विद्यार्थ्याची नवीन कॉपी तयार करणे) किंवा 'बदली' (चालू विद्यार्थ्याचा वर्ग बदलणे).\n\n"
+                        + "📌 विद्यार्थ्यांची नावे निवडा आणि 'Execute Adjustment' बटण दाबा."
+                        : "❤️ Batch promote or transfer multiple students into another class at once.\n\n"
+                        + "📌 The top card displays the active previous class, standard, and division.\n\n"
+                        + "📌 Select the new target Academic Year, Class standard, and Division.\n\n"
+                        + "📌 Tap the '+' icon to easily create/register a new academic year on the fly.\n\n"
+                        + "📌 Choose an Adjustment Mode: 'Promote (Copy)' to copy profiles to the new year, or 'Transfer (Move)' to update class pointers for division transfers.\n\n"
+                        + "📌 Check/select the students in the roster checklist, and tap 'Execute Adjustment'.";
                 break;
 
             default:

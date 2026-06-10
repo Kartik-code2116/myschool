@@ -18,14 +18,18 @@ public class StudentProgressDashboardAdapter extends RecyclerView.Adapter<Studen
 
     public static class StudentProgressStats {
         public Student student;
-        public int totalSubjects;
+        public int totalFormativeSubjects;
+        public int totalSummativeSubjects;
+        public int totalDescriptiveSubjects;
         public int formativeFilled;
         public int summativeFilled;
         public int descriptiveFilled;
 
-        public StudentProgressStats(Student student, int totalSubjects) {
+        public StudentProgressStats(Student student, int totalFormativeSubjects, int totalSummativeSubjects, int totalDescriptiveSubjects) {
             this.student = student;
-            this.totalSubjects = totalSubjects;
+            this.totalFormativeSubjects = totalFormativeSubjects;
+            this.totalSummativeSubjects = totalSummativeSubjects;
+            this.totalDescriptiveSubjects = totalDescriptiveSubjects;
         }
     }
 
@@ -53,9 +57,9 @@ public class StudentProgressDashboardAdapter extends RecyclerView.Adapter<Studen
         holder.tvStudentName.setText((position + 1) + ". " + stat.student.name);
         holder.tvRollNo.setText("Roll No: " + stat.student.rollNo);
 
-        holder.tvFormativeProgress.setText(stat.formativeFilled + "/" + stat.totalSubjects);
-        holder.tvSummativeProgress.setText(stat.summativeFilled + "/" + stat.totalSubjects);
-        holder.tvDescriptiveProgress.setText(stat.descriptiveFilled + "/" + stat.totalSubjects);
+        holder.tvFormativeProgress.setText(stat.formativeFilled + "/" + stat.totalFormativeSubjects);
+        holder.tvSummativeProgress.setText(stat.summativeFilled + "/" + stat.totalSummativeSubjects);
+        holder.tvDescriptiveProgress.setText(stat.descriptiveFilled + "/" + stat.totalDescriptiveSubjects);
     }
 
     @Override

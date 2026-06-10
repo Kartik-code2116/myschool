@@ -722,4 +722,40 @@
     <string name="report_desc_17">Semester, Class-wise, Caste-wise Boys-Girls Grade Table.</string>
     <string name="report_title_18">18. Progress Card Cover</string>
     <string name="report_desc_18">A4 First Semester Progress Card</string>
+
+    <!-- Promote Students Screen -->
+    <string name="title_promote_students">Promote / Transfer Students</string>
+    <string name="lbl_previous_class_source">Previous Class (Source)</string>
+    <string name="lbl_year">Year</string>
+    <string name="lbl_class">Class</string>
+    <string name="lbl_division">Division</string>
+    <string name="lbl_new_target_class">New Target Class (Updated)</string>
+    <string name="lbl_target_academic_year">Target Academic Year</string>
+    <string name="lbl_target_class_std">Target Class / Std</string>
+    <string name="lbl_target_division">Target Division</string>
+    <string name="lbl_adjustment_mode">Adjustment Mode</string>
+    <string name="lbl_promote_copy">Promote (Copy to target class)</string>
+    <string name="lbl_promote_desc">Recommended for new Academic Years. Creates new student documents in the target year. Keeps historical marks and attendance maps in the original class intact.</string>
+    <string name="lbl_transfer_move">Transfer (Move to target class/division)</string>
+    <string name="lbl_transfer_desc">Directly edits the class pointers on current student documents. Perfect for correcting registration mistakes, shifting divisions (e.g., A to B), or transferring students within the same year.</string>
+    <string name="lbl_select_students">Select Students</string>
+    <string name="lbl_select_all">Select All</string>
+    <string name="btn_execute_adjustment">Execute Adjustment</string>
+    <string name="btn_execute_adjustment_count">Execute Adjustment (%1$d Selected)</string>
+    <string name="status_class_ready">✓ Target Class setup is complete and ready.</string>
+    <string name="status_class_not_exist">⚠ Target Class does not exist. It will be created automatically.</string>
+    <string name="err_no_active_class">No active class selected.</string>
+    <string name="err_no_students_found">No students found in source class.</string>
+    <string name="err_failed_load_students">Failed to load students: %1$s</string>
+    <string name="err_failed_load_years">Failed to load academic years.</string>
+    <string name="err_failed_create_year">Failed to create year: %1$s</string>
+    <string name="err_select_valid_year">Select a valid target Academic Year.</string>
+    <string name="err_select_one_student">Select at least one student.</string>
+    <string name="err_failed_init_class">Failed to initialize target class: %1$s</string>
+    <string name="msg_adjustment_complete">Adjustment executed successfully!\nSuccess: %1$d\nFailed: %2$d</string>
+    <string name="title_process_complete">Process Complete</string>
+    <string name="title_add_academic_year">Add Academic Year</string>
+    <string name="msg_enter_year_label">Enter the label for the new Academic Year:</string>
+    <string name="msg_year_empty">Label cannot be empty.</string>
+    <string name="msg_year_sem_created">Academic Year and Semesters created.</string>
 </resources>

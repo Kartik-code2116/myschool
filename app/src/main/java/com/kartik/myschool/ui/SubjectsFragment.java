@@ -123,9 +123,10 @@ public class SubjectsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).showCustomToolbarActions(
+            HomeActivity activity = (HomeActivity) getActivity();
+            activity.showCustomToolbarActions(
                     true,
-                    v -> Toast.makeText(getContext(), R.string.msg_subjects_help_guidelines, Toast.LENGTH_SHORT).show(),
+                    v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(activity, "subjects"),
                     v -> {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
                         popup.getMenu().add("Refresh Subjects");
@@ -137,6 +138,11 @@ public class SubjectsFragment extends Fragment {
                         popup.show();
                     }
             );
+            android.widget.ImageButton btn = activity.findViewById(R.id.btnToolbarNotifications);
+            if (btn != null) {
+                btn.setImageResource(R.drawable.ic_help_outline);
+                btn.setContentDescription("Help");
+            }
         }
     }
 

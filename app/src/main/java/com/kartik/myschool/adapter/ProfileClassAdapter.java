@@ -69,9 +69,12 @@ public class ProfileClassAdapter extends RecyclerView.Adapter<ProfileClassAdapte
         } else {
             holder.b.cardProfileClass.setAlpha(1f);
             String div = item.getDivision();
-            holder.b.tvProfileClassTitle.setText(
-                    holder.itemView.getContext().getString(R.string.class_div_format,
-                            String.valueOf(item.standard), div));
+            String title = holder.itemView.getContext().getString(R.string.class_div_format,
+                    String.valueOf(item.standard), div);
+            if (c != null && c.academicYearLabel != null && !c.academicYearLabel.isEmpty()) {
+                title += " (" + c.academicYearLabel + ")";
+            }
+            holder.b.tvProfileClassTitle.setText(title);
             holder.b.tvProfileClassStatus.setText(
                     holder.itemView.getContext().getString(R.string.profile_students_count,
                             item.studentCount));
@@ -79,32 +82,8 @@ public class ProfileClassAdapter extends RecyclerView.Adapter<ProfileClassAdapte
             holder.b.ivClassSelected.setVisibility(selected ? View.VISIBLE : View.GONE);
             if (selected) {
                 holder.b.ivClassSelected.setImageTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#5A4FCF")));
-                holder.b.panelClassExpanded.setVisibility(View.VISIBLE);
-                holder.b.panelClassExpanded.setBackgroundColor(android.graphics.Color.parseColor("#F1F0FF"));
-                holder.b.tvClassStudentCount.setText(
-                        holder.itemView.getContext().getString(R.string.profile_students_count,
-                                item.studentCount));
-                holder.b.tvClassDivisionInfo.setText(
-                        holder.itemView.getContext().getString(R.string.profile_division_line, div));
-
-                String allDivs = divisionsByStd.get(item.standard);
-                if (allDivs != null && !allDivs.isEmpty()) {
-                    holder.b.tvClassStdDivisions.setText(
-                            holder.itemView.getContext().getString(
-                                    R.string.profile_divisions_in_std, allDivs));
-                    holder.b.tvClassStdDivisions.setVisibility(View.VISIBLE);
-                } else {
-                    holder.b.tvClassStdDivisions.setVisibility(View.GONE);
-                }
-
-                String t1 = c.teacherName != null ? c.teacherName : "—";
-                String t2 = c.assistantTeacherName != null ? c.assistantTeacherName : "—";
-                holder.b.tvClassTeachers.setText(
-                        holder.itemView.getContext().getString(
-                                R.string.profile_class_teachers, t1, t2));
-            } else {
-                holder.b.panelClassExpanded.setVisibility(View.GONE);
             }
+            holder.b.panelClassExpanded.setVisibility(View.GONE);
         }
 
         if (selected) {

@@ -218,11 +218,21 @@ public class StatsDashboardFragment extends Fragment {
         List<DashboardSubjectAdapter.SubjectStats> statsList = new ArrayList<>();
         List<StudentProgressDashboardAdapter.StudentProgressStats> studentStatsList = new ArrayList<>();
         
-        int totalSubjects = activeClass.subjects.size();
+        int totalFormativeSubjects = 0;
+        int totalSummativeSubjects = 0;
+        int totalDescriptiveSubjects = activeClass.subjects.size();
+
+        for (Subject sub : activeClass.subjects) {
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            if (summativeMax > 0) {
+                totalSummativeSubjects++;
+            }
+            totalFormativeSubjects++; // All subjects have formative
+        }
 
         // Initialize student stats
         for (Student student : students) {
-            studentStatsList.add(new StudentProgressDashboardAdapter.StudentProgressStats(student, totalSubjects));
+            studentStatsList.add(new StudentProgressDashboardAdapter.StudentProgressStats(student, totalFormativeSubjects, totalSummativeSubjects, totalDescriptiveSubjects));
         }
 
         for (int i = 0; i < activeClass.subjects.size(); i++) {

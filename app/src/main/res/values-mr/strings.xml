@@ -722,4 +722,40 @@
     <string name="report_desc_17">सत्र, वर्गवार, जातवार मुले-मुली श्रेणी तक्ता.</string>
     <string name="report_title_18">18. प्रगतीपत्रक मुखपृष्ठ</string>
     <string name="report_desc_18">A4 प्रथम सत्र प्रगतीपत्रक</string>
+
+    <!-- Promote Students Screen -->
+    <string name="title_promote_students">विद्यार्थी वर्गोन्नती आणि बदली</string>
+    <string name="lbl_previous_class_source">मागील वर्ग (स्रोत)</string>
+    <string name="lbl_year">वर्ष</string>
+    <string name="lbl_class">वर्ग</string>
+    <string name="lbl_division">तुकडी</string>
+    <string name="lbl_new_target_class">नवीन लक्ष्य वर्ग (अद्ययावत)</string>
+    <string name="lbl_target_academic_year">लक्ष्य शैक्षणिक वर्ष</string>
+    <string name="lbl_target_class_std">लक्ष्य वर्ग / इयत्ता</string>
+    <string name="lbl_target_division">लक्ष्य तुकडी</string>
+    <string name="lbl_adjustment_mode">अ‍ॅडजस्टमेंट मोड</string>
+    <string name="lbl_promote_copy">वर्गोन्नती (नवीन वर्गात कॉपी करणे)</string>
+    <string name="lbl_promote_desc">नवीन शैक्षणिक वर्षासाठी शिफारस केलेले. लक्ष्य वर्षात नवीन विद्यार्थी दस्तऐवज तयार करते. मूळ वर्गातील ऐतिहासिक गुण आणि उपस्थिती तशीच ठेवते.</string>
+    <string name="lbl_transfer_move">बदली (लक्ष्य वर्ग/तुकडीमध्ये हलवणे)</string>
+    <string name="lbl_transfer_desc">चालू विद्यार्थी दस्तऐवजावरील वर्ग पॉइंटर्स थेट संपादित करते. नोंदणी दुरुस्त करणे, तुकडी बदलणे (उदा. A ते B) किंवा एकाच वर्षात वर्ग बदलण्यासाठी योग्य.</string>
+    <string name="lbl_select_students">विद्यार्थी निवडा</string>
+    <string name="lbl_select_all">सर्व निवडा</string>
+    <string name="btn_execute_adjustment">प्रक्रिया पूर्ण करा</string>
+    <string name="btn_execute_adjustment_count">प्रक्रिया पूर्ण करा (%1$d निवडले)</string>
+    <string name="status_class_ready">✓ लक्ष्य वर्ग सेटअप पूर्ण आणि तयार आहे.</string>
+    <string name="status_class_not_exist">⚠ लक्ष्य वर्ग अस्तित्वात नाही. तो स्वयंचलितपणे तयार केला जाईल.</string>
+    <string name="err_no_active_class">कोणताही सक्रिय वर्ग निवडलेला नाही.</string>
+    <string name="err_no_students_found">स्रोत वर्गात कोणतेही विद्यार्थी आढळले नाहीत.</string>
+    <string name="err_failed_load_students">विद्यार्थी लोड करण्यात अपयशी: %1$s</string>
+    <string name="err_failed_load_years">शैक्षणिक वर्ष लोड करण्यात अपयश आले.</string>
+    <string name="err_failed_create_year">वर्ष तयार करण्यात अपयश आले: %1$s</string>
+    <string name="err_select_valid_year">कृपया वैध लक्ष्य शैक्षणिक वर्ष निवडा.</string>
+    <string name="err_select_one_student">किमान एक विद्यार्थी निवडा.</string>
+    <string name="err_failed_init_class">लक्ष्य वर्ग सुरू करण्यात अपयश आले: %1$s</string>
+    <string name="msg_adjustment_complete">अ‍ॅडजस्टमेंट यशस्वीरित्या पूर्ण झाली!\nयशस्वी: %1$d\nअपयशी: %2$d</string>
+    <string name="title_process_complete">प्रक्रिया पूर्ण झाली</string>
+    <string name="title_add_academic_year">शैक्षणिक वर्ष जोडा</string>
+    <string name="msg_enter_year_label">नवीन शैक्षणिक वर्षाचे नाव प्रविष्ट करा:</string>
+    <string name="msg_year_empty">नाव रिकामे ठेवता येणार नाही.</string>
+    <string name="msg_year_sem_created">शैक्षणिक वर्ष आणि सत्रे तयार झाली.</string>
 </resources>

@@ -516,6 +516,13 @@
                         android:textColor="@color/primary"/>
                 </LinearLayout>
 
+                <!-- Summative Section Wrapper -->
+                <LinearLayout
+                    android:id="@+id/layoutSummativeContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
                 <!-- Summative Section Title -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -697,6 +704,8 @@
                         android:textSize="12sp"
                         android:fontFamily="sans-serif-bold"
                         android:textColor="@color/secondary"/>
+                </LinearLayout>
+                
                 </LinearLayout>
 
                 <!-- Grand Total Bar -->

@@ -128,6 +128,11 @@ public class SingleSubjectMarksDialog extends DialogFragment {
             int aMax = subject.maxMarks / 2;
             int sMax = subject.maxMarks - aMax;
 
+            if (Subject.isNonAcademic(subject.name)) {
+                aMax = subject.maxMarks;
+                sMax = 0;
+            }
+
             nirikhshanMax = aMax * 10 / 50;
             tondiKamMax = aMax * 10 / 50;
             pratyakshikAMax = aMax * 10 / 50;
@@ -165,6 +170,12 @@ public class SingleSubjectMarksDialog extends DialogFragment {
         b.tvTondiBMax.setText("/" + tondiBMax);
         b.tvPratyakshikBMax.setText("/" + pratyakshikBMax);
         b.tvLekhiMax.setText("/" + lekhiMax);
+
+        if (sanklitMax == 0) {
+            b.layoutSummativeContainer.setVisibility(View.GONE);
+        } else {
+            b.layoutSummativeContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setupValidators() {

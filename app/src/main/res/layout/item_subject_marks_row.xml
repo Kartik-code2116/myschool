@@ -344,6 +344,12 @@
             <!--  SECTION B: संकलित मूल्यमापन           -->
             <!-- ─────────────────────────────────────── -->
             <LinearLayout
+                android:id="@+id/layoutSummativeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -472,6 +478,8 @@
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-bold"
                     android:textColor="@color/secondary"/>
+            </LinearLayout>
+
             </LinearLayout>
 
             <!-- ─────────────────────────────────────── -->

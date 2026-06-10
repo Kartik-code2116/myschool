@@ -306,6 +306,11 @@ public class EnterMarksActivity extends AppCompatActivity {
             int akarikMax = maxMarks / 2;
             int sanklitMax = maxMarks - akarikMax;
 
+            if (Subject.isNonAcademic(sub.name)) {
+                akarikMax = maxMarks;
+                sanklitMax = 0;
+            }
+
             nirikhshanMax = akarikMax * 10 / 50;
             tondiKamMax = akarikMax * 10 / 50;
             pratyakshikAMax = akarikMax * 10 / 50;
@@ -362,6 +367,12 @@ public class EnterMarksActivity extends AppCompatActivity {
         setupMaxMarksValidation(row.etTondiB, tondiBMax);
         setupMaxMarksValidation(row.etPratyakshikB, pratyakshikBMax);
         setupMaxMarksValidation(row.etLekhi, lekhiMax);
+
+        if (sanklitMax == 0) {
+            row.layoutSummativeContainer.setVisibility(View.GONE);
+        } else {
+            row.layoutSummativeContainer.setVisibility(View.VISIBLE);
+        }
 
         // ── Initial display of totals ──────────────────────────────────────────
         int rowIdx = marksRows.size();

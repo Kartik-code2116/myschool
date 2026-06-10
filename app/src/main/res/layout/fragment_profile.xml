@@ -278,61 +278,81 @@
                 android:id="@+id/cardActiveClassDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:visibility="gone"
-                app:cardBackgroundColor="#E8E6FF"
+                app:cardBackgroundColor="#5A4FCF"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#5A4FCF"
-                app:strokeWidth="2dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-bold"
-                        android:text="@string/profile_active_class"
-                        android:textColor="#5A4FCF"
-                        android:textSize="13sp"/>
+                        android:orientation="vertical"
+                        android:layout_toStartOf="@+id/ivActiveIcon">
 
-                    <TextView
-                        android:id="@+id/tvActiveClassTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textColor="#2E2E2E"
-                        android:textSize="16sp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                            android:text="⭐ ACTIVE CLASS (NOW SELECTED)"
+                            android:textColor="#D1C4E9"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.08"/>
 
-                    <TextView
-                        android:id="@+id/tvActiveClassStudents"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="#5A4FCF"
-                        android:textSize="14sp"/>
+                        <TextView
+                            android:id="@+id/tvActiveClassTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="sans-serif-black"
+                            android:textColor="#FFFFFF"
+                            android:textSize="22sp"
+                            android:textStyle="bold"/>
 
-                    <TextView
-                        android:id="@+id/tvActiveClassDivisions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="#2E2E2E"
-                        android:textSize="13sp"/>
+                        <TextView
+                            android:id="@+id/tvActiveClassStudents"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="#E0F2F1"
+                            android:textSize="14sp"
+                            android:fontFamily="sans-serif-medium"/>
 
-                    <TextView
-                        android:id="@+id/tvActiveClassExtra"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="#757575"
-                        android:textSize="12sp"/>
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tvActiveClassDivisions"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#D1C4E9"
+                            android:textSize="13sp"/>
+
+                        <TextView
+                            android:id="@+id/tvActiveClassExtra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="#D1C4E9"
+                            android:alpha="0.9"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/ivActiveIcon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_check_circle"
+                        app:tint="#FFFFFF"
+                        android:alpha="0.8"
+                        android:contentDescription="Active Class"/>
+                </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- RecyclerView Class List -->
@@ -369,6 +389,20 @@
                 app:cornerRadius="12dp"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- FAB: Promote Students -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabPromoteStudents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="92dp"
+        android:text="Promote Students"
+        app:icon="@drawable/ic_students"
+        app:backgroundTint="#5A4FCF"
+        android:textColor="@color/white"
+        app:iconTint="@color/white"/>
 
     <!-- FAB: Add Class -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

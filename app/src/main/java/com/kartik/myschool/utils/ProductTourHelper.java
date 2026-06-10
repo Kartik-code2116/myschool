@@ -471,8 +471,12 @@ public class ProductTourHelper {
                         m ? "६. सर्व वर्गांची यादी 📋" : "6. All Classes List 📋",
                         m ? "शाळेतील सर्व वर्गांची यादी येथे दिसते. वर्गावर टॅप केल्यास तो सक्रिय होतो."
                           : "All classes in the school are listed here. Tap a class to make it active."));
+                s.add(new TourStep(R.id.fabPromoteStudents,
+                        m ? "७. विद्यार्थी वर्गोन्नती 🎓" : "7. Promote Students 🎓",
+                        m ? "नवीन शैक्षणिक वर्षात किंवा तुकडीमध्ये एकाच वेळी अनेक विद्यार्थ्यांची वर्गोन्नती किंवा बदली करण्यासाठी येथे टॅप करा."
+                          : "Tap here to batch promote or transfer students into a new academic year or division."));
                 s.add(new TourStep(R.id.fabAddClass,
-                        m ? "७. नवीन वर्ग जोडा +" : "7. Add New Class +",
+                        m ? "८. नवीन वर्ग जोडा +" : "8. Add New Class +",
                         m ? "'+' FAB दाबून नवीन वर्ग व तुकडी (उदा. ५-A) तयार करा. लगेच यादीत दिसेल."
                           : "Tap '+' to create a new class and division (e.g. Class 5-A). It appears instantly."));
                 break;
@@ -659,6 +663,41 @@ public class ProductTourHelper {
             // ════════════════════════════════════════════════════════════
             // Fallback
             // ════════════════════════════════════════════════════════════
+            case "promote_students":
+                s.add(new TourStep(0,
+                        m ? "🎓 विद्यार्थी वर्गोन्नती आणि बदली" : "🎓 Student Promotion & Transfer",
+                        m ? "येथे तुम्ही विद्यार्थ्यांना पुढील वर्गात वर्गोन्नती देऊ शकता किंवा तुकडी बदलू शकता."
+                          : "Batch promote students into next classes or transfer divisions easily here."));
+                s.add(new TourStep(R.id.spTargetYear,
+                        m ? "१. शैक्षणिक वर्ष निवडा" : "1. Select Target Year",
+                        m ? "विद्यार्थी ज्या नवीन शैक्षणिक वर्षात प्रमोट करायचे आहेत ते वर्ष निवडा."
+                          : "Select the new target academic year for the promotion."));
+                s.add(new TourStep(R.id.btnAddNewYear,
+                        m ? "२. नवीन वर्ष जोडा +" : "2. Add New Year +",
+                        m ? "नवीन वर्ष उपलब्ध नसेल तर येथे क्लिक करून ते वर्ष व सत्रे त्वरित तयार करा."
+                          : "Tap here to register a new academic year and auto-generate its semesters."));
+                s.add(new TourStep(R.id.spTargetClass,
+                        m ? "३. नवीन इयत्ता निवडा" : "3. Select Target Class",
+                        m ? "विद्यार्थ्यांना ज्या नवीन इयत्तेत पाठवायचे आहे ती निवडा (उदा. ७ वरून ८)."
+                          : "Select the target class standard for the students."));
+                s.add(new TourStep(R.id.spTargetDivision,
+                        m ? "४. नवीन तुकडी निवडा" : "4. Select Target Division",
+                        m ? "हवी असणारी नवीन तुकडी निवडा."
+                          : "Select the target division for the students."));
+                s.add(new TourStep(R.id.rgMode,
+                        m ? "५. मोड निवडा (Promote/Transfer)" : "5. Choose Adjustment Mode",
+                        m ? "नवीन वर्षासाठी 'Promote' (कॉपी) आणि चालू वर्षातील तुकडी बदलासाठी 'Transfer' (मूव्ह) निवडा."
+                          : "Choose 'Promote' to copy student documents for a new year, or 'Transfer' to move current pointers."));
+                s.add(new TourStep(R.id.cbSelectAll,
+                        m ? "६. विद्यार्थी निवडा" : "6. Select Students",
+                        m ? "ज्या विद्यार्थ्यांना प्रमोट करायचे आहे त्यांना चेक करा. सर्व निवडण्यासाठी 'Select All' वापरा."
+                          : "Check the checkboxes for students to promote, or check 'Select All'."));
+                s.add(new TourStep(R.id.btnProcessPromotion,
+                        m ? "७. प्रक्रिया पूर्ण करा" : "7. Execute Adjustment",
+                        m ? "निवडलेले विद्यार्थी नवीन वर्गात पाठवण्यासाठी हे बटण दाबा."
+                          : "Press this button to commit the promotion or transfer process."));
+                break;
+
             default:
                 s.add(new TourStep(0,
                         m ? "ℹ️ या पानाबद्दल" : "ℹ️ About This Page",

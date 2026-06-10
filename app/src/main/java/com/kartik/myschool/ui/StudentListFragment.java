@@ -106,11 +106,48 @@ public class StudentListFragment extends Fragment {
 
         if (b.btnMoreOptions != null) {
             b.btnMoreOptions.setOnClickListener(v -> {
+                showStudentContextPopupMenu(v);
+            });
+        }
+    }
+
+    private void showStudentContextPopupMenu(View v) {
+        android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
+        popup.getMenu().add(0, 1, 0, "👥 Promote / Transfer Students");
+        popup.getMenu().add(0, 2, 1, "📤 Export Students (CSV)");
+        popup.getMenu().add(0, 3, 2, "📥 Import Students (CSV)");
+        popup.getMenu().add(0, 4, 3, "🏫 Switch Class / Division");
+        popup.getMenu().add(0, 5, 4, "🌐 App-Wide Main Menu");
+        
+        popup.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == 1) {
+                if (SessionContext.selectedClass == null) {
+                    android.widget.Toast.makeText(requireContext(), "Please select a class first.", android.widget.Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                startActivity(new Intent(requireContext(), com.kartik.myschool.PromoteStudentsActivity.class));
+                return true;
+            } else if (itemId == 2) {
+                exportStudentsToExcel();
+                return true;
+            } else if (itemId == 3) {
+                importStudentsFromExcel();
+                return true;
+            } else if (itemId == 4) {
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) getActivity()).navigateTo(R.id.nav_class_div);
+                }
+                return true;
+            } else if (itemId == 5) {
                 if (getActivity() instanceof HomeActivity) {
                     ((HomeActivity) getActivity()).showHomeMoreMenu(v);
                 }
-            });
-        }
+                return true;
+            }
+            return false;
+        });
+        popup.show();
     }
 
     private void applySessionFilterIfAny() {

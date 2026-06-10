@@ -37,6 +37,7 @@
         <activity android:name=".StudentRegisterActivity"    android:exported="false"/>
         <activity android:name=".StudentProfileActivity"     android:exported="false"/>
         <activity android:name=".StudentEditActivity"        android:exported="false"/>
+        <activity android:name=".PromoteStudentsActivity"    android:exported="false"/>
         <activity android:name=".EnterMarksActivity"         android:exported="false"/>
         <activity android:name=".MarksheetActivity"          android:exported="false"/>
         <activity android:name=".MainActivity"               android:exported="false"/>

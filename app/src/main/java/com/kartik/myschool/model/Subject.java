@@ -29,6 +29,11 @@ public class Subject {
         int akarikMax  = maxMarks / 2;
         int sanklitMax = maxMarks - akarikMax;
 
+        if (isNonAcademic(name)) {
+            akarikMax = maxMarks;
+            sanklitMax = 0;
+        }
+
         this.maxNirikhshan   = akarikMax * 10 / 50;
         this.maxTondiKam     = akarikMax * 10 / 50;
         this.maxPratyakshik  = akarikMax * 10 / 50;
@@ -42,6 +47,14 @@ public class Subject {
         this.maxTondi        = sanklitMax * 10 / 50;
         this.maxPratyakshikB = sanklitMax * 10 / 50;
         this.maxLekhi        = sanklitMax - this.maxTondi - this.maxPratyakshikB;
+    }
+
+    public static boolean isNonAcademic(String subName) {
+        if (subName == null) return false;
+        String s = subName.toLowerCase();
+        return s.contains("art") || s.contains("drawing") || s.contains("कला") 
+            || s.contains("work experience") || s.contains("work exp") || s.contains("कार्यानुभव")
+            || s.contains("physical education") || s.contains("p.e.") || s.contains("शारीरिक") || s.contains("craft");
     }
 
     public static java.util.List<Subject> getDefaultSubjectsForClass(String className) {
