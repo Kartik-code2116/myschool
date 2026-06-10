@@ -342,8 +342,9 @@ public class ExtraMenusFragment extends Fragment {
             });
         }
 
-        // 2. Set save click listener
+        // 2. Set click listeners
         b.btnSaveTeacherInfo.setOnClickListener(v -> saveTeacherInfo());
+        b.btnEditTeacherInfo.setOnClickListener(v -> setTeacherFieldsEditable(true));
     }
 
     private void fetchClassesAndSetup(ClassModel activeClass, String yearId) {
@@ -471,6 +472,25 @@ public class ExtraMenusFragment extends Fragment {
         b.etAsstTeacherName.setText(editingClass.assistantTeacherName != null ? editingClass.assistantTeacherName : "");
         b.etTeacherEmail.setText(editingClass.teacherEmail != null ? editingClass.teacherEmail : "");
         b.etTeacherPhone.setText(editingClass.teacherPhone != null ? editingClass.teacherPhone : "");
+
+        boolean hasTeacher = editingClass.teacherName != null && !editingClass.teacherName.trim().isEmpty();
+        setTeacherFieldsEditable(!hasTeacher);
+    }
+
+    private void setTeacherFieldsEditable(boolean editable) {
+        if (b == null) return;
+        b.etTeacherName.setEnabled(editable);
+        b.etAsstTeacherName.setEnabled(editable);
+        b.etTeacherEmail.setEnabled(editable);
+        b.etTeacherPhone.setEnabled(editable);
+
+        b.etTeacherName.setAlpha(editable ? 1.0f : 0.75f);
+        b.etAsstTeacherName.setAlpha(editable ? 1.0f : 0.75f);
+        b.etTeacherEmail.setAlpha(editable ? 1.0f : 0.75f);
+        b.etTeacherPhone.setAlpha(editable ? 1.0f : 0.75f);
+
+        b.btnSaveTeacherInfo.setVisibility(editable ? View.VISIBLE : View.GONE);
+        b.btnEditTeacherInfo.setVisibility(editable ? View.GONE : View.VISIBLE);
     }
 
     private void saveTeacherInfo() {
@@ -529,6 +549,7 @@ public class ExtraMenusFragment extends Fragment {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         b.btnSaveTeacherInfo.setEnabled(true);
+                        setTeacherFieldsEditable(false);
                         Toast.makeText(getContext(), "Teacher details saved successfully", Toast.LENGTH_SHORT).show();
                     });
                 }
