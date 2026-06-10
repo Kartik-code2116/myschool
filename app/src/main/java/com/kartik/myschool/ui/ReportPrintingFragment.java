@@ -733,7 +733,67 @@ public class ReportPrintingFragment extends Fragment {
                 dialog.dismiss();
             });
             
-            btnDownload.setOnClickListener(v -> downloadOrSharePdfFile(pdfFile));
+            btnDownload.setOnClickListener(v -> {
+                int totalPagesCount = renderer.getPageCount();
+                android.content.SharedPreferences prefs = getContext().getSharedPreferences("myschool_settings_prefs", android.content.Context.MODE_PRIVATE);
+                String lang = prefs.getString("language", "mr");
+                boolean isEn = "en".equals(lang);
+
+                com.google.android.material.bottomsheet.BottomSheetDialog bottomSheet = 
+                        new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
+                android.view.View sheetView = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_print_options, null);
+                
+                // Localization text binding
+                android.widget.TextView tvPrintTitle = sheetView.findViewById(R.id.tvPrintTitle);
+                tvPrintTitle.setText(isEn ? "Print Options" : "प्रिंट पर्याय");
+
+                android.widget.TextView tvPrintAllTitle = sheetView.findViewById(R.id.tvPrintAllTitle);
+                tvPrintAllTitle.setText(isEn ? "Print All Pages" : "सर्व पाने प्रिंट करा");
+                android.widget.TextView tvPrintAllDesc = sheetView.findViewById(R.id.tvPrintAllDesc);
+                tvPrintAllDesc.setText(isEn ? "Directly spools all pages to the printer." : "सर्व पाने थेट प्रिंटरला पाठवते.");
+
+                android.widget.TextView tvPrintBunch5Title = sheetView.findViewById(R.id.tvPrintBunch5Title);
+                tvPrintBunch5Title.setText(isEn ? "Print in sets of 5 (5-5 Bunch)" : "५-५ च्या सेटमध्ये प्रिंट करा (5-5 Bunch)");
+                android.widget.TextView tvPrintBunch5Desc = sheetView.findViewById(R.id.tvPrintBunch5Desc);
+                tvPrintBunch5Desc.setText(isEn ? 
+                        "Displays a secondary dialog listing ranges in sets of 5 pages (e.g. Pages 1 - 5, Pages 6 - 10)." : 
+                        "५-५ पानांच्या श्रेणींची यादी दर्शवणारे दुय्यम डायलॉग उघडतो (उदा. पाने १ - ५, पाने ६ - १०).");
+
+                android.widget.TextView tvPrintBunch10Title = sheetView.findViewById(R.id.tvPrintBunch10Title);
+                tvPrintBunch10Title.setText(isEn ? "Print in sets of 10 (10-10 Bunch)" : "१०-१० च्या सेटमध्ये प्रिंट करा (10-10 Bunch)");
+                android.widget.TextView tvPrintBunch10Desc = sheetView.findViewById(R.id.tvPrintBunch10Desc);
+                tvPrintBunch10Desc.setText(isEn ? 
+                        "Displays a secondary dialog listing ranges in sets of 10 pages (e.g. Pages 1 - 10, Pages 11 - 20)." : 
+                        "१०-१० पानांच्या श्रेणींची यादी दर्शवणारे दुय्यम डायलॉग उघडतो (उदा. पाने १ - १०, पाने ११ - २०).");
+
+                android.widget.TextView tvPrintCustomTitle = sheetView.findViewById(R.id.tvPrintCustomTitle);
+                tvPrintCustomTitle.setText(isEn ? "Custom Page Range" : "सानुकूल पान श्रेणी (Custom Range)");
+                android.widget.TextView tvPrintCustomDesc = sheetView.findViewById(R.id.tvPrintCustomDesc);
+                tvPrintCustomDesc.setText(isEn ? 
+                        "Prompts start and end page fields to enter a custom range of your choosing." : 
+                        "तुमच्या आवडीची सानुकूल श्रेणी प्रविष्ट करण्यासाठी सुरुवातीचे व शेवटचे पान विचारते.");
+
+                // Set up click listeners
+                sheetView.findViewById(R.id.cardPrintAll).setOnClickListener(view -> {
+                    bottomSheet.dismiss();
+                    printPdfFile(pdfFile);
+                });
+                sheetView.findViewById(R.id.cardPrintBunch5).setOnClickListener(view -> {
+                    bottomSheet.dismiss();
+                    showBunchDialog(pdfFile, totalPagesCount, 5, isEn);
+                });
+                sheetView.findViewById(R.id.cardPrintBunch10).setOnClickListener(view -> {
+                    bottomSheet.dismiss();
+                    showBunchDialog(pdfFile, totalPagesCount, 10, isEn);
+                });
+                sheetView.findViewById(R.id.cardPrintCustom).setOnClickListener(view -> {
+                    bottomSheet.dismiss();
+                    showCustomRangeDialog(pdfFile, totalPagesCount, isEn);
+                });
+
+                bottomSheet.setContentView(sheetView);
+                bottomSheet.show();
+            });
             
             Runnable renderPage = () -> {
                 try {
@@ -830,6 +890,135 @@ public class ReportPrintingFragment extends Fragment {
         } catch (Exception e) {
             Toast.makeText(getContext(), R.string.msg_pdf, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void printPdfFile(File file) {
+        if (getContext() == null) return;
+        android.print.PrintManager printManager = (android.print.PrintManager) getContext().getSystemService(android.content.Context.PRINT_SERVICE);
+        if (printManager == null) {
+            Toast.makeText(getContext(), "Print service not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String jobName = getString(R.string.app_name) + " Document";
+        printManager.print(jobName, new android.print.PrintDocumentAdapter() {
+            @Override
+            public void onLayout(android.print.PrintAttributes oldAttributes, android.print.PrintAttributes newAttributes, android.os.CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle metadata) {
+                if (cancellationSignal.isCanceled()) {
+                    callback.onLayoutCancelled();
+                    return;
+                }
+                android.print.PrintDocumentInfo pdi = new android.print.PrintDocumentInfo.Builder(file.getName())
+                        .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .build();
+                callback.onLayoutFinished(pdi, true);
+            }
+
+            @Override
+            public void onWrite(android.print.PageRange[] pages, android.os.ParcelFileDescriptor destination, android.os.CancellationSignal cancellationSignal, WriteResultCallback callback) {
+                java.io.InputStream input = null;
+                java.io.OutputStream output = null;
+                try {
+                    input = new java.io.FileInputStream(file);
+                    output = new java.io.FileOutputStream(destination.getFileDescriptor());
+                    byte[] buf = new byte[16384];
+                    int bytesRead;
+                    while ((bytesRead = input.read(buf)) > 0) {
+                        output.write(buf, 0, bytesRead);
+                    }
+                    callback.onWriteFinished(new android.print.PageRange[]{android.print.PageRange.ALL_PAGES});
+                } catch (Exception e) {
+                    callback.onWriteFailed(e.toString());
+                } finally {
+                    try {
+                        if (input != null) input.close();
+                        if (output != null) output.close();
+                    } catch (Exception ignored) {}
+                }
+            }
+        }, null);
+    }
+
+    private void extractAndPrintPdfPages(File sourceFile, int startPage, int endPage) {
+        try {
+            File tempFile = new File(getContext().getCacheDir(), "print_temp_" + System.currentTimeMillis() + ".pdf");
+            com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+            com.itextpdf.text.pdf.PdfCopy copy = new com.itextpdf.text.pdf.PdfCopy(document, new java.io.FileOutputStream(tempFile));
+            document.open();
+            com.itextpdf.text.pdf.PdfReader reader = new com.itextpdf.text.pdf.PdfReader(sourceFile.getAbsolutePath());
+            for (int i = startPage; i <= endPage; i++) {
+                copy.addPage(copy.getImportedPage(reader, i));
+            }
+            copy.freeReader(reader);
+            reader.close();
+            document.close();
+            
+            printPdfFile(tempFile);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "पान वेगळे करण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showBunchDialog(File pdfFile, int totalPages, int pageSize, boolean isEn) {
+        List<String> options = new ArrayList<>();
+        List<int[]> ranges = new ArrayList<>();
+        
+        int start = 1;
+        while (start <= totalPages) {
+            int end = Math.min(start + pageSize - 1, totalPages);
+            options.add(isEn ? "Print Pages " + start + " - " + end : "पाने " + start + " ते " + end + " प्रिंट करा");
+            ranges.add(new int[]{start, end});
+            start += pageSize;
+        }
+
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle(isEn ? "Select Page Set (" + pageSize + " pages)" : "पानांचा सेट निवडा (" + pageSize + " पाने)")
+                .setItems(options.toArray(new String[0]), (dialogInterface, index) -> {
+                    int[] range = ranges.get(index);
+                    extractAndPrintPdfPages(pdfFile, range[0], range[1]);
+                })
+                .setNegativeButton(isEn ? "Cancel" : "रद्द करा", null)
+                .show();
+    }
+
+    private void showCustomRangeDialog(File pdfFile, int totalPages, boolean isEn) {
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(getContext());
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 10);
+
+        android.widget.EditText etStart = new android.widget.EditText(getContext());
+        etStart.setHint(isEn ? "Start Page (1 to " + totalPages + ")" : "सुरुवातीचे पान (1 ते " + totalPages + ")");
+        etStart.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(etStart);
+
+        android.widget.EditText etEnd = new android.widget.EditText(getContext());
+        etEnd.setHint(isEn ? "End Page (1 to " + totalPages + ")" : "शेवटचे पान (1 ते " + totalPages + ")");
+        etEnd.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(etEnd);
+
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle(isEn ? "Enter Custom Page Range" : "सानुकूल पान श्रेणी प्रविष्ट करा")
+                .setView(layout)
+                .setPositiveButton(isEn ? "Print" : "प्रिंट करा", (dialog, which) -> {
+                    String startStr = etStart.getText().toString().trim();
+                    String endStr = etEnd.getText().toString().trim();
+                    if (startStr.isEmpty() || endStr.isEmpty()) {
+                        Toast.makeText(getContext(), isEn ? "Please enter both page numbers" : "कृपया दोन्ही पानांचे क्रमांक टाका", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    try {
+                        int start = Integer.parseInt(startStr);
+                        int end = Integer.parseInt(endStr);
+                        if (start < 1 || end > totalPages || start > end) {
+                            Toast.makeText(getContext(), isEn ? "Invalid page range" : "अवैध पान श्रेणी", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        extractAndPrintPdfPages(pdfFile, start, end);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(getContext(), isEn ? "Please enter valid numbers" : "कृपया वैध क्रमांक टाका", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(isEn ? "Cancel" : "रद्द करा", null)
+                .show();
     }
 
     @Override
