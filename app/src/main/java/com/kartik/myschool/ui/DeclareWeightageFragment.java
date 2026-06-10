@@ -59,7 +59,7 @@ public class DeclareWeightageFragment extends Fragment {
         if (activeClass != null) {
             classVal = activeClass.className != null ? activeClass.className : "5";
             divVal = activeClass.division != null && !activeClass.division.isEmpty() 
-                    ? activeClass.division : "1";
+                    ? activeClass.division : "-";
         }
         b.tvWeightageHeaderContext.setText("सन : " + yearLabel + " | इयत्ता: " + classVal + " | तुकडी: " + divVal);
     }

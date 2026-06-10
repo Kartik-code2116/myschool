@@ -100,132 +100,566 @@ public class ProductTourHelper {
         List<TourStep> s = new ArrayList<>();
         switch (pageKey != null ? pageKey : "default") {
 
-            // ── Home / Info-Print Setting ──────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 1. Home / Info-Print Setting  (8 steps)
+            // ════════════════════════════════════════════════════════════
             case "info_print":
                 s.add(new TourStep(0,
-                        m ? "माहिती व प्रिंट सेटिंग" : "Info & Print Setting",
-                        m ? "या स्क्रीनवर वर्ष, सत्र व वर्ग सेट करून सेव करा." : "Set the academic year, semester & class on this screen."));
+                        m ? "🏠 मुख्य स्क्रीन" : "🏠 Home Screen",
+                        m ? "येथे वर्ष, सत्र व वर्ग सेट करा. 'वर्गावर जा' दाबल्यास थेट विद्यार्थी यादीत जाल."
+                          : "Set your academic year, semester & class here, then go straight to the student list."));
+                s.add(new TourStep(R.id.tvTeacherNameHeader,
+                        m ? "१. शिक्षकाचे नाव" : "1. Teacher Name",
+                        m ? "आपले नाव व शाळा येथे दिसते. प्रोफाइल स्क्रीनमधून माहिती अद्यतन करा."
+                          : "Your name and school appear here. Update them from the Profile screen."));
                 s.add(new TourStep(R.id.cardYear,
-                        m ? "१. शैक्षणिक वर्ष" : "1. Academic Year",
-                        m ? "येथे वर्ष निवडा. बाण दाबून वर्ष बदलता येते." : "Tap to select the academic year. Use arrows to change it."));
-                s.add(new TourStep(R.id.cardSemester,
-                        m ? "२. सत्र निवडा" : "2. Select Semester",
-                        m ? "पहिले किंवा दुसरे सत्र निवडण्यासाठी स्क्रोल करा." : "Swipe left/right to choose the first or second semester."));
+                        m ? "२. शैक्षणिक वर्ष" : "2. Academic Year",
+                        m ? "◀ ▶ बाण दाबून शैक्षणिक वर्ष बदला. उदा. 2024-25."
+                          : "Tap ◀ ▶ arrows to change the academic year, e.g. 2024-25."));
+                s.add(new TourStep(R.id.panelSemester,
+                        m ? "३. सत्र निवडा" : "3. Select Semester",
+                        m ? "◀ ▶ दाबून पहिले किंवा दुसरे सत्र निवडा."
+                          : "Tap ◀ ▶ to choose between Semester 1 and Semester 2."));
                 s.add(new TourStep(R.id.panelClass,
-                        m ? "३. वर्ग सक्रिय करा" : "3. Activate Class",
-                        m ? "आपला वर्ग निवडण्यासाठी येथे टॅप करा आणि 'ACTIVATE' दाबा." : "Tap to select your class and press Activate to confirm."));
+                        m ? "४. वर्ग सक्रिय करा" : "4. Activate Your Class",
+                        m ? "◀ ▶ दाबून वर्ग बदला. लॉग टिकून राहतो — पुढच्या वेळी आपोआप लोड होईल."
+                          : "Use ◀ ▶ to pick your class. It is remembered for next time."));
                 s.add(new TourStep(R.id.btnGoToClass,
-                        m ? "४. वर्गावर जा" : "4. Go to Class",
-                        m ? "'वर्गावर जा' दाबल्यावर थेट विद्यार्थी यादीत जाल." : "Press 'Go to Class' to open the student list directly."));
+                        m ? "५. वर्गावर जा" : "5. Go to Class",
+                        m ? "हे बटण दाबल्यावर थेट सक्रिय वर्गाच्या विद्यार्थी यादीत जाल."
+                          : "Press this to jump directly to the student list of your active class."));
                 s.add(new TourStep(R.id.btnAllClasses,
-                        m ? "५. सर्व वर्ग" : "5. All Classes",
-                        m ? "शाळेतील सर्व वर्गांची यादी पाहण्यासाठी येथे टॅप करा." : "Tap here to view the full list of all classes in the school."));
+                        m ? "६. सर्व वर्ग" : "6. All Classes",
+                        m ? "शाळेतील प्रत्येक वर्गाची यादी एकत्र पाहण्यासाठी येथे टॅप करा."
+                          : "Tap here to browse every class in the school at once."));
+                s.add(new TourStep(R.id.btnHowToUse,
+                        m ? "७. कसे वापरावे?" : "7. How to Use?",
+                        m ? "ॲप्लिकेशन कसे वापरावे हे व्हिडिओ मार्गदर्शिकेसाठी येथे टॅप करा."
+                          : "Tap here for a video walkthrough on how to use the app."));
                 break;
 
-            // ── Stats Dashboard ────────────────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 2. Stats Dashboard  (4 steps)
+            // ════════════════════════════════════════════════════════════
             case "stats_dashboard":
                 s.add(new TourStep(0,
-                        m ? "सांख्यिकी डॅशबोर्ड" : "Stats Dashboard",
-                        m ? "शाळेची आणि वर्गाची आकडेवारी आलेख स्वरूपात पाहा." : "View graphical school and class statistics here."));
+                        m ? "📊 सांख्यिकी डॅशबोर्ड" : "📊 Stats Dashboard",
+                        m ? "शाळेची व वर्गाची संपूर्ण आकडेवारी एकाच ठिकाणी पाहा."
+                          : "View all school and class statistics in one place."));
+                s.add(new TourStep(R.id.tvHeaderStripInfo,
+                        m ? "१. सक्रिय सत्र माहिती" : "1. Active Session Info",
+                        m ? "कोणत्या वर्ष, सत्र व वर्गासाठी आकडेवारी दाखवत आहे ते येथे दिसते."
+                          : "Shows which year, semester and class the statistics are for."));
                 s.add(new TourStep(R.id.tvTotalStudents,
-                        m ? "१. एकूण विद्यार्थी" : "1. Total Students",
-                        m ? "शाळेतील एकूण नोंदणीकृत विद्यार्थ्यांची संख्या येथे दिसते." : "Shows total enrolled students across all classes in the school."));
+                        m ? "२. एकूण विद्यार्थी" : "2. Total Students",
+                        m ? "शाळेतील सर्व वर्गांमध्ये एकूण किती विद्यार्थी नोंदणीकृत आहेत ते येथे दिसते."
+                          : "Total number of students enrolled across all classes in the school."));
                 s.add(new TourStep(R.id.rvDashboard,
-                        m ? "२. वर्गनिहाय आलेख" : "2. Class-wise Charts",
-                        m ? "प्रत्येक वर्गाचा लिंग गुणोत्तर व जात प्रवर्ग आलेख येथे पहा." : "Tap any class card to view gender ratio & caste distribution charts."));
+                        m ? "३. वर्गनिहाय आलेख" : "3. Class-wise Charts",
+                        m ? "प्रत्येक वर्गाच्या कार्डावर टॅप करा — लिंग व जात प्रवर्ग आलेख दिसेल."
+                          : "Tap any class card to see gender ratio and caste distribution charts."));
                 break;
 
-            // ── Class & Division List ──────────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 3. Class & Division List  (4 steps)
+            // ════════════════════════════════════════════════════════════
             case "class_div":
                 s.add(new TourStep(0,
-                        m ? "वर्ग आणि तुकडी" : "Class & Division Setup",
-                        m ? "शाळेतील सर्व वर्ग व तुकड्या येथे व्यवस्थापित करा." : "Manage all classes and divisions of your school here."));
+                        m ? "🏫 वर्ग व तुकडी" : "🏫 Class & Division",
+                        m ? "शाळेतील सर्व वर्ग आणि तुकड्या येथे व्यवस्थापित करा."
+                          : "Manage all classes and divisions of your school here."));
                 s.add(new TourStep(R.id.tvClassDivYear,
-                        m ? "१. चालू सत्र माहिती" : "1. Current Session",
-                        m ? "सध्या सक्रिय वर्ष व सत्राची माहिती येथे दिसते." : "Displays the currently active academic year and semester."));
+                        m ? "१. चालू शैक्षणिक वर्ष" : "1. Current Academic Year",
+                        m ? "सध्या सक्रिय वर्ष व सत्राची माहिती येथे दिसते."
+                          : "Shows the currently active academic year and semester."));
                 s.add(new TourStep(R.id.rvClassDiv,
                         m ? "२. वर्गांची यादी" : "2. Class List",
-                        m ? "सर्व वर्गांची यादी येथे दिसते. ३-बिंदूंवर क्लिक करून संपादन करा." : "All classes are listed here. Tap 3-dots to edit or delete a class."));
+                        m ? "सर्व वर्ग येथे दिसतात. कार्डाच्या ⋮ बटणावर दाबून संपादन / डिलीट करा."
+                          : "All classes appear here. Tap ⋮ on a card to edit or delete it."));
                 s.add(new TourStep(R.id.fabAddClass,
-                        m ? "३. नवीन वर्ग जोडा" : "3. Add New Class",
-                        m ? "'जोडा' बटण दाबून नवीन वर्ग आणि तुकडी तयार करा." : "Press the '+' button to create a new class and division."));
+                        m ? "३. नवीन वर्ग जोडा +" : "3. Add New Class +",
+                        m ? "'+' FAB दाबून नवीन वर्ग (उदा. ५-A) तयार करा."
+                          : "Tap the '+' button to create a new class, e.g. Class 5-A."));
                 break;
 
-            // ── Student List ───────────────────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 4. Student List  (9 steps)
+            // ════════════════════════════════════════════════════════════
             case "students":
                 s.add(new TourStep(0,
-                        m ? "विद्यार्थ्यांची यादी" : "Student List",
-                        m ? "या पानावर विद्यार्थी जोडा, शोधा आणि व्यवस्थापित करा." : "Add, search and manage all students on this screen."));
+                        m ? "👨‍🎓 विद्यार्थी यादी" : "👨‍🎓 Student List",
+                        m ? "वर्गातील सर्व विद्यार्थी येथे दिसतात. शोध, आयात, निर्यात व जोडणी करा."
+                          : "All students in the class are listed here. Search, import, export and add."));
+                s.add(new TourStep(R.id.tvHeaderSessionInfo,
+                        m ? "१. सत्र माहिती" : "1. Session Info",
+                        m ? "कोणत्या वर्षाची व वर्गाची यादी पाहत आहात ते येथे दिसते."
+                          : "Shows which year and class student list you are viewing."));
                 s.add(new TourStep(R.id.btnHelp,
-                        m ? "१. मदत" : "1. Help",
-                        m ? "प्रश्नचिन्ह दाबल्यास या पानाची संपूर्ण मार्गदर्शिका मिळेल." : "Tap the question mark to view the full guide for this page."));
+                        m ? "२. मदत ?" : "2. Help ?",
+                        m ? "प्रश्नचिन्हावर टॅप केल्यास या पानाची संपूर्ण मार्गदर्शिका व व्हिडिओ मिळेल."
+                          : "Tap '?' to open the complete guide and video for this page."));
                 s.add(new TourStep(R.id.btnExcel,
-                        m ? "२. एक्सेल आयात/निर्यात" : "2. Excel Import / Export",
-                        m ? "एक्सेल चिन्हावर क्लिक करून विद्यार्थी डेटा आयात किंवा निर्यात करा." : "Tap the Excel icon to import or export student data as CSV."));
+                        m ? "३. एक्सेल 📊" : "3. Excel 📊",
+                        m ? "या चिन्हावर टॅप केल्यास CSV आयात किंवा CSV निर्यात पर्याय दिसेल."
+                          : "Tap to choose between importing students from CSV or exporting to CSV."));
                 s.add(new TourStep(R.id.btnIdCard,
-                        m ? "३. आयडी कार्ड" : "3. ID Card",
-                        m ? "विद्यार्थ्यांचे ओळखपत्र तयार करण्यासाठी येथे टॅप करा." : "Tap here to generate student identity cards."));
+                        m ? "४. ओळखपत्र 🪪" : "4. ID Card 🪪",
+                        m ? "वर्गातील सर्व विद्यार्थ्यांचे छापण्यायोग्य ओळखपत्र येथे तयार होते."
+                          : "Generate printable ID cards for all students in the class."));
+                s.add(new TourStep(R.id.btnMoreOptions,
+                        m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
+                        m ? "⋮ मेनूमध्ये: सर्व गुण रीसेट, क्रम बदलणे इत्यादी पर्याय आहेत."
+                          : "⋮ menu has options to reset all marks, reorder students and more."));
                 s.add(new TourStep(R.id.etSearch,
-                        m ? "४. विद्यार्थी शोधा" : "4. Search Students",
-                        m ? "नाव किंवा रोल नंबर टाइप करून विद्यार्थी शोधा." : "Type a name or roll number here to quickly find a student."));
+                        m ? "६. विद्यार्थी शोधा 🔍" : "6. Search Student 🔍",
+                        m ? "नाव किंवा रोल नंबर टाइप केल्यास यादी त्वरित फिल्टर होते."
+                          : "Type a name or roll number — the list filters instantly as you type."));
+                s.add(new TourStep(R.id.rvStudents,
+                        m ? "७. विद्यार्थी कार्ड्स" : "7. Student Cards",
+                        m ? "प्रत्येक कार्डावर टॅप केल्यास विद्यार्थी प्रोफाइल उघडते. दीर्घ-दाब = पर्याय मेनू."
+                          : "Tap a card to open student profile. Long-press for quick options."));
                 s.add(new TourStep(R.id.fabAddStudent,
-                        m ? "५. नवीन विद्यार्थी जोडा" : "5. Add New Student",
-                        m ? "खालील '+' बटण दाबून नवीन विद्यार्थ्याची नोंदणी करा." : "Tap the '+' FAB at the bottom-right to register a new student."));
+                        m ? "८. नवीन विद्यार्थी +" : "8. Add New Student +",
+                        m ? "'+' FAB दाबून नवीन विद्यार्थ्याची नोंदणी फॉर्म उघडा."
+                          : "Tap '+' to open the registration form for a new student."));
                 break;
 
-            // ── Attendance ─────────────────────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 5. Attendance  (6 steps)
+            // ════════════════════════════════════════════════════════════
             case "attendance":
                 s.add(new TourStep(0,
-                        m ? "मासिक हजेरी" : "Monthly Attendance",
-                        m ? "येथे विद्यार्थ्यांची दरमहा हजेरी नोंदवा." : "Record monthly attendance for each student here."));
+                        m ? "📅 मासिक हजेरी" : "📅 Monthly Attendance",
+                        m ? "प्रत्येक महिन्याची विद्यार्थीनिहाय हजेरी येथे नोंदवा व पाहा."
+                          : "Record and view monthly attendance for each student here."));
+                s.add(new TourStep(R.id.tvAttendanceContext,
+                        m ? "१. सत्र व वर्ग माहिती" : "1. Session & Class Info",
+                        m ? "कोणत्या वर्ष, सत्र व वर्गाची हजेरी पाहत आहात ते येथे दिसते."
+                          : "Shows the year, semester and class whose attendance you are viewing."));
                 s.add(new TourStep(R.id.ivActionHelp,
-                        m ? "१. मदत" : "1. Help",
-                        m ? "या चिन्हावर क्लिक केल्यास या पानाची माहिती मिळेल." : "Tap here to view a guide about the Attendance screen."));
+                        m ? "२. मदत ?" : "2. Help ?",
+                        m ? "हजेरी पानाची संपूर्ण मार्गदर्शिका पाहण्यासाठी येथे टॅप करा."
+                          : "Tap to open the complete guide for the Attendance page."));
                 s.add(new TourStep(R.id.ivActionAdd,
-                        m ? "२. हजेरी जोडा" : "2. Add Attendance",
-                        m ? "'जोडा' बटणावर क्लिक करून महिन्याची हजेरी प्रविष्ट करा." : "Tap Add to enter working days and present days for a month."));
+                        m ? "३. हजेरी जोडा +" : "3. Add Attendance +",
+                        m ? "'जोडा' दाबल्यावर महिना निवडा, एकूण दिवस व हजर दिवस प्रविष्ट करा."
+                          : "Tap Add to select a month and enter working days + present days."));
                 s.add(new TourStep(R.id.ivActionReport,
-                        m ? "३. अहवाल पहा" : "3. View Report",
-                        m ? "रिपोर्ट चिन्हावर क्लिक करून सरासरी हजेरी आणि सर्वोत्तम विद्यार्थी पहा." : "Tap the Report icon to view class attendance summary."));
+                        m ? "४. हजेरी अहवाल 📋" : "4. Attendance Report 📋",
+                        m ? "वर्गाची सरासरी हजेरी टक्केवारी व सर्वोत्तम विद्यार्थी येथे पाहा."
+                          : "View class average attendance percentage and top attending students."));
                 s.add(new TourStep(R.id.ivActionMore,
-                        m ? "४. अधिक पर्याय" : "4. More Options",
-                        m ? "३-बिंदू मेनूमधून हजेरी डुप्लिकेट किंवा डिलीट करण्याचे पर्याय मिळतील." : "3-dot menu gives options to duplicate or delete attendance records."));
+                        m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
+                        m ? "⋮ मेनूमध्ये: हजेरी कॉपी करणे, डिलीट करणे इत्यादी पर्याय आहेत."
+                          : "⋮ menu has options to copy attendance to another month or delete."));
                 s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "५. विद्यार्थी यादी" : "5. Student List",
-                        m ? "येथे प्रत्येक विद्यार्थ्याच्या हजेरीचे तपशील दिसतात." : "Scroll through each student's monthly attendance records here."));
+                        m ? "६. विद्यार्थी हजेरी यादी" : "6. Student Attendance List",
+                        m ? "प्रत्येक विद्यार्थ्याचे महिनानिहाय हजर/एकूण दिवस येथे दिसतात. स्क्रोल करा."
+                          : "Each student's present / working days per month are shown here. Scroll to see all."));
                 break;
 
-            // ── Evaluation (Formative / Summative) ────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 6. Formative & Summative Evaluation  (8 steps)
+            // ════════════════════════════════════════════════════════════
             case "formative_summative":
                 s.add(new TourStep(0,
-                        m ? "मूल्यमापन नोंदणी" : "Evaluation Entry",
-                        m ? "विद्यार्थ्यांचे आकारिक व संकलित गुण येथे भरा." : "Enter formative and summative marks for each student here."));
+                        m ? "📝 आकारिक / संकलित मूल्यमापन" : "📝 Formative / Summative Evaluation",
+                        m ? "वर्गातील विद्यार्थ्यांचे आकारिक (FA) व संकलित (SA) मूल्यमापन येथे व्यवस्थापित करा."
+                          : "Manage Formative (FA) and Summative (SA) evaluations for the class."));
+                s.add(new TourStep(R.id.tvHeaderStripInfo,
+                        m ? "१. सत्र व परीक्षा माहिती" : "1. Session & Exam Info",
+                        m ? "कोणत्या वर्ष, सत्र, वर्ग व परीक्षेसाठी गुण नोंदवत आहात ते येथे दिसते."
+                          : "Shows the year, semester, class and exam you are entering marks for."));
                 s.add(new TourStep(R.id.btnHelpSquare,
-                        m ? "१. मदत" : "1. Help",
-                        m ? "प्रश्नचिन्ह बटण दाबल्यास या पानाची माहिती मिळेल." : "Tap the question mark to view help for this evaluation page."));
+                        m ? "२. मदत ?" : "2. Help ?",
+                        m ? "या पानाची संपूर्ण मार्गदर्शिका व प्ले बटण येथे आहे."
+                          : "Tap '?' to open the complete guide and animated tour for this page."));
+                s.add(new TourStep(R.id.btnAddSquare,
+                        m ? "३. मूल्यमापन जोडा +" : "3. Add Evaluation +",
+                        m ? "नवीन FA किंवा SA मूल्यमापन तयार करण्यासाठी '+' दाबा."
+                          : "Tap '+' to create a new Formative or Summative evaluation entry."));
+                s.add(new TourStep(R.id.btnCalcSquare,
+                        m ? "४. कॅल्क्युलेटर 🧮" : "4. Calculator 🧮",
+                        m ? "गुणांची गणना तपासण्यासाठी बिल्ट-इन कॅल्क्युलेटर वापरा."
+                          : "Use the built-in calculator to cross-check and verify marks."));
                 s.add(new TourStep(R.id.btnGridListToggle,
-                        m ? "२. दृश्य बदला" : "2. Toggle View",
-                        m ? "ग्रीड किंवा लिस्ट व्ह्यू निवडण्यासाठी येथे टॅप करा." : "Tap here to switch between grid and list view for students."));
+                        m ? "५. दृश्य बदला 🔄" : "5. Toggle View 🔄",
+                        m ? "ग्रीड दृश्य (अनेक विद्यार्थी एकत्र) किंवा लिस्ट दृश्य निवडा."
+                          : "Switch between Grid view (compact) and List view (detailed)."));
                 s.add(new TourStep(R.id.btnThreeDotMenu,
-                        m ? "३. अधिक पर्याय" : "3. More Options",
-                        m ? "३-बिंदू मेनूमध्ये गुण सेव, रीसेट इत्यादी पर्याय आहेत." : "The 3-dot menu has options to save, reset or configure marks."));
+                        m ? "६. अधिक पर्याय ⋮" : "6. More Options ⋮",
+                        m ? "⋮ मेनूमध्ये: गुण सेव्ह, रीसेट, विद्यार्थी क्रम बदलणे इत्यादी पर्याय आहेत."
+                          : "⋮ menu has save, reset marks and reorder student options."));
+                s.add(new TourStep(R.id.rvEvaluationStudents,
+                        m ? "७. विद्यार्थी मूल्यमापन यादी" : "7. Student Evaluation List",
+                        m ? "प्रत्येक विद्यार्थ्याच्या रांगेत गुण भरा. रंगीत गुण = सेव्ह झाले."
+                          : "Enter marks in each student row. Coloured marks are already saved."));
+                s.add(new TourStep(R.id.swipeRefreshLayout,
+                        m ? "८. खाली ओढून रिफ्रेश करा" : "8. Pull to Refresh",
+                        m ? "यादी खाली ओढल्यास ताज्या डेटाने रिफ्रेश होते."
+                          : "Pull the list down to refresh and reload the latest student data."));
                 break;
 
-            // ── Descriptive Remarks ────────────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 7. Descriptive Remarks List  (6 steps)
+            // ════════════════════════════════════════════════════════════
             case "descriptive":
                 s.add(new TourStep(0,
-                        m ? "वर्णनात्मक नोंदी" : "Descriptive Remarks",
-                        m ? "विद्यार्थ्यांचे वर्तन, आवड व प्रगती शेरे येथे भरा." : "Record student behavioral remarks and special interests here."));
+                        m ? "💬 वर्णनात्मक नोंदी" : "💬 Descriptive Remarks",
+                        m ? "विद्यार्थ्यांचे वर्तन, कौशल्ये व विशेष संपादणूक शेरे येथे नोंदवा."
+                          : "Record student behavior, skills and special achievement remarks."));
+                s.add(new TourStep(R.id.tvHeaderStripInfo,
+                        m ? "१. सत्र व वर्ग माहिती" : "1. Session & Class Info",
+                        m ? "कोणत्या वर्ग व सत्रासाठी शेरे नोंदवत आहात ते येथे दिसते."
+                          : "Shows which class and semester the remarks are being entered for."));
                 s.add(new TourStep(R.id.btnHelpSquare,
-                        m ? "१. मदत" : "1. Help",
-                        m ? "या चिन्हावर क्लिक केल्यास या पानाची माहिती मिळेल." : "Tap here to view help information about this page."));
+                        m ? "२. मदत ?" : "2. Help ?",
+                        m ? "वर्णनात्मक नोंदी पानाची संपूर्ण मार्गदर्शिका येथे मिळेल."
+                          : "Tap '?' for the complete guide on how to use Descriptive Remarks."));
+                s.add(new TourStep(R.id.btnAddSquare,
+                        m ? "३. शेरे जोडा +" : "3. Add Remarks +",
+                        m ? "नवीन शेऱ्याची नोंद करण्यासाठी '+' बटण दाबा."
+                          : "Tap '+' to begin adding a new descriptive remark entry."));
+                s.add(new TourStep(R.id.btnThreeDotMenu,
+                        m ? "४. अधिक पर्याय ⋮" : "4. More Options ⋮",
+                        m ? "⋮ मेनूमध्ये: शेरे डिलीट, 'तो'→'ती' (लिंग बदल), रीसेट पर्याय आहेत."
+                          : "⋮ has delete entries, swap gender (he→she) and reset options."));
+                s.add(new TourStep(R.id.rvDescriptiveStudents,
+                        m ? "५. विद्यार्थी यादी" : "5. Student List",
+                        m ? "प्रत्येक विद्यार्थ्याच्या कार्डावर टॅप केल्यास त्याचे शेरे संपादित होतात."
+                          : "Tap a student card to open and edit their descriptive remarks."));
                 break;
 
-            // ── Fallback / Generic ─────────────────────────────────────
+            // ════════════════════════════════════════════════════════════
+            // 8. Subjects  (4 steps)
+            // ════════════════════════════════════════════════════════════
+            case "subjects":
+                s.add(new TourStep(0,
+                        m ? "📚 विषय व्यवस्थापन" : "📚 Subject Management",
+                        m ? "वर्गात शिकवले जाणारे विषय येथे जोडा, संपादित करा व क्रम लावा."
+                          : "Add, edit and arrange the subjects taught in the active class."));
+                s.add(new TourStep(R.id.tvHeaderLabel,
+                        m ? "१. वर्तमान विषय" : "1. Current Subjects",
+                        m ? "सध्या नोंदणीकृत विषयांची एकूण संख्या व यादी येथे दिसते."
+                          : "Shows the count and list of all subjects currently registered."));
+                s.add(new TourStep(R.id.rvSubjectsList,
+                        m ? "२. विषयांची यादी" : "2. Subjects List",
+                        m ? "विषयाच्या नावावर टॅप करा → तपशील, कमाल गुण व माध्यम संपादित करा."
+                          : "Tap a subject name to edit its details, max marks and medium."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 9. Declare Weightage  (5 steps)
+            // ════════════════════════════════════════════════════════════
+            case "weightage":
+                s.add(new TourStep(0,
+                        m ? "⚖️ गुण भारांश" : "⚖️ Declare Weightage",
+                        m ? "प्रत्येक विषयाचे आकारिक व संकलित उप-घटकांचे भारांश येथे ठरवा."
+                          : "Define the weightage for each subject's formative and summative components."));
+                s.add(new TourStep(R.id.tvWeightageHeaderContext,
+                        m ? "१. सत्र माहिती" : "1. Session Info",
+                        m ? "कोणत्या वर्ष व सत्रासाठी भारांश ठरवत आहात ते येथे स्पष्ट दिसते."
+                          : "Confirms which academic year and semester this weightage applies to."));
+                s.add(new TourStep(R.id.layoutEmptyState,
+                        m ? "२. विषय नाहीत?" : "2. No Subjects?",
+                        m ? "जर विषय जोडलेले नसतील तर हा संदेश दिसेल. आधी विषय जोडा."
+                          : "If no subjects are added, this message appears. Add subjects first."));
+                s.add(new TourStep(R.id.rvWeightageSubjects,
+                        m ? "३. विषयनिहाय भारांश" : "3. Subject Weightage",
+                        m ? "प्रत्येक विषयाच्या पंक्तीत FA व SA उप-घटकांचे कमाल गुण भरा."
+                          : "Fill in the max marks for each FA and SA sub-component per subject."));
+                s.add(new TourStep(R.id.btnSaveWeightage,
+                        m ? "४. भारांश जतन करा 💾" : "4. Save Weightage 💾",
+                        m ? "सर्व भारांश भरल्यावर 'जतन करा' दाबा. एकदाच सेव्ह केल्यास पुरेसे."
+                          : "Press Save after filling all fields. Saving once applies to all students."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 10. School Settings Dashboard  (9 steps)
+            // ════════════════════════════════════════════════════════════
+            case "school_settings":
+                s.add(new TourStep(0,
+                        m ? "🏫 शाळा सेटिंग्ज" : "🏫 School Settings",
+                        m ? "शाळेचे संपूर्ण व्यवस्थापन — माहिती, लिंग, जात, शिक्षक, वर्ग, विषय व दिवस."
+                          : "Full school management — info, gender, caste, teachers, classes, subjects & days."));
+                s.add(new TourStep(R.id.btnDashSchoolInfo,
+                        m ? "१. 🏢 शाळेची माहिती" : "1. 🏢 School Info",
+                        m ? "शाळेचे नाव, युडायस कोड, जिल्हा, पत्ता येथे संपादित करा."
+                          : "Edit school name, UDISE code, district and full address."));
+                s.add(new TourStep(R.id.btnDashGender,
+                        m ? "२. 👫 लिंग सांख्यिकी" : "2. 👫 Gender Stats",
+                        m ? "वर्गातील मुले व मुलींची संख्या आणि गुणोत्तर येथे पाहा."
+                          : "View the count of boys and girls and their ratio in the active class."));
+                s.add(new TourStep(R.id.btnDashCastCategory,
+                        m ? "३. 📊 जात प्रवर्ग" : "3. 📊 Caste Category",
+                        m ? "सर्व जात प्रवर्गांमधील विद्यार्थी संख्येचे वितरण येथे दिसते."
+                          : "See student distribution across all caste categories in the school."));
+                s.add(new TourStep(R.id.btnDashClassTeacher,
+                        m ? "४. 👩‍🏫 वर्ग शिक्षक" : "4. 👩‍🏫 Class Teacher",
+                        m ? "वर्ग शिक्षक, सहाय्यक शिक्षक, ईमेल व फोन येथे नोंदवा."
+                          : "Enter class teacher, assistant teacher, email and phone details."));
+                s.add(new TourStep(R.id.btnDashClasses,
+                        m ? "५. 📋 वर्ग यादी" : "5. 📋 Classes List",
+                        m ? "शाळेतील सर्व वर्गांची यादी व प्रत्येक वर्गातील विद्यार्थी संख्या येथे पाहा."
+                          : "View all classes with their student counts across the whole school."));
+                s.add(new TourStep(R.id.btnDashSubject,
+                        m ? "६. 📖 शेरा बँक" : "6. 📖 Remark Bank",
+                        m ? "प्रत्येक विषयासाठी तयार-वर्णनात्मक शेरा पर्याय येथे व्यवस्थापित करा."
+                          : "Manage the pre-written descriptive remark options for each subject."));
+                s.add(new TourStep(R.id.btnDashDefaultValues,
+                        m ? "७. ⚙️ डिफॉल्ट मूल्ये" : "7. ⚙️ Default Values",
+                        m ? "विद्यार्थी नोंदणीसाठी डिफॉल्ट माध्यम, जात व इतर मूल्ये येथे सेट करा."
+                          : "Set default medium, caste and other values for new student registration."));
+                s.add(new TourStep(R.id.btnDashWorkingDays,
+                        m ? "८. 📆 कामकाजाचे दिवस" : "8. 📆 Working Days",
+                        m ? "जून ते मे प्रत्येक महिन्याचे एकूण कामकाजाचे दिवस येथे सेट करा."
+                          : "Set total working days for each month from June to May."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 11. Print Report / Marksheet  (4 steps)
+            // ════════════════════════════════════════════════════════════
+            case "print_report":
+                s.add(new TourStep(0,
+                        m ? "🖨️ गुणपत्रक अहवाल" : "🖨️ Print Report / Marksheet",
+                        m ? "विद्यार्थ्यांचे अधिकृत प्रगतीपत्रक PDF स्वरूपात येथे तयार व प्रिंट करा."
+                          : "Generate and print official student report cards as PDF here."));
+                s.add(new TourStep(R.id.tvReportPrintingYear,
+                        m ? "१. वर्ष व सत्र" : "1. Year & Semester",
+                        m ? "कोणत्या वर्ष व सत्रासाठी गुणपत्रक तयार होत आहे ते येथे दिसते."
+                          : "Confirms which academic year and semester marksheets are for."));
+                s.add(new TourStep(R.id.rvReportCards,
+                        m ? "२. विद्यार्थी कार्ड्स" : "2. Student Report Cards",
+                        m ? "प्रत्येक विद्यार्थ्याच्या कार्डावर टॅप करा → PDF प्रीव्ह्यू, शेअर, प्रिंट."
+                          : "Tap a student card to preview their PDF, share or send to print."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // ════════════════════════════════════════════════════════════
+            // 12. Teacher Profile  (8 steps)
+            // ════════════════════════════════════════════════════════════
+            case "profile":
+                s.add(new TourStep(0,
+                        m ? "👤 शिक्षकाची प्रोफाइल" : "👤 Teacher Profile",
+                        m ? "आपली प्रोफाइल, शाळेचे युडायस कोड, सक्रिय वर्ग व नवीन वर्ग जोडणी येथे करा."
+                          : "Manage your profile, UDISE code, active class info and add new classes here."));
+                s.add(new TourStep(R.id.cardProfileInfo,
+                        m ? "१. प्रोफाइल कार्ड" : "1. Profile Card",
+                        m ? "आपले नाव, ईमेल, फोन नंबर व शाळेचा युडायस कोड येथे एका नजरेत दिसतो."
+                          : "Your name, email, phone and school UDISE code shown at a glance."));
+                s.add(new TourStep(R.id.btnEditProfile,
+                        m ? "२. प्रोफाइल संपादित करा ✏️" : "2. Edit Profile ✏️",
+                        m ? "नाव, फोन किंवा युडायस कोड बदलण्यासाठी 'संपादित करा' दाबा."
+                          : "Tap Edit to update your name, phone number or UDISE code."));
+                s.add(new TourStep(R.id.tvSummaryUdise,
+                        m ? "३. युडायस कोड" : "3. UDISE Code",
+                        m ? "शाळेचा ११-अंकी युडायस कोड येथे दिसतो. हा कोड अचूक असणे आवश्यक आहे."
+                          : "Your school's 11-digit UDISE code appears here — keep it accurate."));
+                s.add(new TourStep(R.id.cardActiveClassDetail,
+                        m ? "४. सक्रिय वर्ग 🏫" : "4. Active Class 🏫",
+                        m ? "सध्या सक्रिय केलेल्या वर्गाची माहिती — नाव, विद्यार्थी संख्या व तुकडी येथे दिसते."
+                          : "Shows your currently active class — name, student count and division."));
+                s.add(new TourStep(R.id.tvActiveClassStudents,
+                        m ? "५. विद्यार्थी संख्या" : "5. Student Count",
+                        m ? "सक्रिय वर्गातील एकूण नोंदणीकृत विद्यार्थ्यांची संख्या येथे दिसते."
+                          : "Total registered students in the currently active class are shown here."));
+                s.add(new TourStep(R.id.rvProfileClasses,
+                        m ? "६. सर्व वर्गांची यादी 📋" : "6. All Classes List 📋",
+                        m ? "शाळेतील सर्व वर्गांची यादी येथे दिसते. वर्गावर टॅप केल्यास तो सक्रिय होतो."
+                          : "All classes in the school are listed here. Tap a class to make it active."));
+                s.add(new TourStep(R.id.fabAddClass,
+                        m ? "७. नवीन वर्ग जोडा +" : "7. Add New Class +",
+                        m ? "'+' FAB दाबून नवीन वर्ग व तुकडी (उदा. ५-A) तयार करा. लगेच यादीत दिसेल."
+                          : "Tap '+' to create a new class and division (e.g. Class 5-A). It appears instantly."));
+                break;
+
+
+            // ════════════════════════════════════════════════════════════
+            // 13. App Settings  (7 steps)
+            // ════════════════════════════════════════════════════════════
+            case "settings":
+                s.add(new TourStep(0,
+                        m ? "⚙️ सेटिंग्ज" : "⚙️ App Settings",
+                        m ? "भाषा, थीम, बॅकअप, कॅशे व सदस्यता सेटिंग्ज येथे बदला."
+                          : "Change language, theme, backup, cache and subscription settings."));
+                s.add(new TourStep(R.id.cardTheme,
+                        m ? "१. 🌙 थीम" : "1. 🌙 App Theme",
+                        m ? "सिस्टम, लाइट किंवा डार्क थीम निवडा. डार्क थीम डोळ्यांना आरामदायी."
+                          : "Choose System, Light or Dark theme. Dark mode is easier on the eyes."));
+                s.add(new TourStep(R.id.cardLanguage,
+                        m ? "२. 🌐 भाषा" : "2. 🌐 Language",
+                        m ? "मराठी किंवा इंग्रजी — पसंतीची भाषा निवडण्यासाठी येथे टॅप करा."
+                          : "Tap to switch the app language between Marathi and English."));
+                s.add(new TourStep(R.id.cardBackup,
+                        m ? "३. 💾 बॅकअप" : "3. 💾 Backup & Restore",
+                        m ? "डेटा सुरक्षित ठेवण्यासाठी नियमित बॅकअप घ्या. फोन बदलताना उपयुक्त."
+                          : "Take regular backups to keep data safe — especially before changing phones."));
+                s.add(new TourStep(R.id.btnExportBackup,
+                        m ? "४. ⬆️ बॅकअप निर्यात करा" : "4. ⬆️ Export Backup",
+                        m ? "'निर्यात' दाबल्यावर संपूर्ण डेटाचा .zip बॅकअप फाइल तयार होते."
+                          : "Press Export to create a complete .zip backup file of all your data."));
+                s.add(new TourStep(R.id.btnImportBackup,
+                        m ? "५. ⬇️ बॅकअप आयात करा" : "5. ⬇️ Import Backup",
+                        m ? "'आयात' दाबल्यावर जुना बॅकअप निवडा — डेटा पुनर्संचयित होईल."
+                          : "Press Import and select a backup file to restore all your previous data."));
+                s.add(new TourStep(R.id.cardCache,
+                        m ? "६. 🗑️ कॅशे साफ करा" : "6. 🗑️ Clear Cache",
+                        m ? "ॲप्लिकेशन मंद झाल्यास कॅशे साफ करा किंवा सक्रिय सत्र रीसेट करा."
+                          : "If the app feels slow, clear cache or reset the active session here."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 14. Student Profile  (10 steps)
+            // ════════════════════════════════════════════════════════════
+            case "student_profile":
+                s.add(new TourStep(0,
+                        m ? "📋 विद्यार्थी प्रोफाइल" : "📋 Student Profile",
+                        m ? "विद्यार्थ्याची संपूर्ण माहिती — मूलभूत, कुटुंब, बँक, शैक्षणिक."
+                          : "Complete student details — basic, family, bank and academic info."));
+                s.add(new TourStep(R.id.layoutHeaderBanner,
+                        m ? "१. विद्यार्थी बॅनर" : "1. Student Banner",
+                        m ? "विद्यार्थ्याचे नाव, वर्ग व नोंदणी क्रमांक येथे ठळकपणे दिसतो."
+                          : "Student's name, class and registration number shown prominently."));
+                s.add(new TourStep(R.id.ivStudentPhoto,
+                        m ? "२. फोटो 📷" : "2. Photo 📷",
+                        m ? "विद्यार्थ्याच्या फोटोवर टॅप करून नवीन फोटो जोडा किंवा बदला."
+                          : "Tap the photo to add or change the student's profile picture."));
+                s.add(new TourStep(R.id.cardStats,
+                        m ? "३. त्वरित तपशील" : "3. Quick Stats",
+                        m ? "रोल नं., जन्मतारीख, लिंग व जात प्रवर्ग एका नजरेत येथे दिसतात."
+                          : "Roll number, DOB, gender and caste category shown at a glance."));
+                s.add(new TourStep(R.id.btnNavBasic,
+                        m ? "४. मूलभूत माहिती" : "4. Basic Details",
+                        m ? "मूलभूत माहिती — नाव, रोल नं., जन्मतारीख, लिंग, जात पाहण्यासाठी टॅप करा."
+                          : "Tap to view basic info — name, roll no., DOB, gender and caste."));
+                s.add(new TourStep(R.id.btnNavFamily,
+                        m ? "५. कुटुंब माहिती" : "5. Family Details",
+                        m ? "वडील, आई, व्यवसाय, फोन व पत्ता पाहण्यासाठी 'कुटुंब' टॅप करा."
+                          : "Tap Family to view father, mother, occupation, phone and address."));
+                s.add(new TourStep(R.id.btnNavBank,
+                        m ? "६. बँक माहिती" : "6. Bank Details",
+                        m ? "बँक खाते, शाखा, IFSC व UID पाहण्यासाठी 'बँक' टॅप करा."
+                          : "Tap Bank to see account number, branch, IFSC code and UID."));
+                s.add(new TourStep(R.id.btnEditStudent,
+                        m ? "८. माहिती संपादित करा ✏️" : "8. Edit Student ✏️",
+                        m ? "'संपादित करा' दाबून विद्यार्थ्याची कोणतीही माहिती बदला."
+                          : "Press Edit to update any field of this student's profile."));
+                s.add(new TourStep(R.id.btnEnterMarks,
+                        m ? "९. गुण भरा 📝" : "9. Enter Marks 📝",
+                        m ? "या विद्यार्थ्याचे गुण भरण्यासाठी 'गुण भरा' बटण दाबा."
+                          : "Press this to open the marks entry screen for this student."));
+                s.add(new TourStep(R.id.btnViewReport,
+                        m ? "१०. गुणपत्रक 🖨️" : "10. View Marksheet 🖨️",
+                        m ? "PDF गुणपत्रक पाहण्यासाठी, शेअर करण्यासाठी किंवा प्रिंट करण्यासाठी येथे टॅप करा."
+                          : "Tap to preview, share or print this student's PDF marksheet."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 15. Student Add / Edit  (10 steps)
+            // ════════════════════════════════════════════════════════════
+            case "student_edit":
+                s.add(new TourStep(0,
+                        m ? "✏️ विद्यार्थी नोंदणी / संपादन" : "✏️ Student Register / Edit",
+                        m ? "विद्यार्थ्याची नवीन नोंदणी करा किंवा विद्यमान माहिती अद्ययावत करा."
+                          : "Register a new student or update an existing student's details."));
+                s.add(new TourStep(R.id.etName,
+                        m ? "१. विद्यार्थ्याचे नाव *" : "1. Student Name *",
+                        m ? "पूर्ण नाव (आडनाव प्रथम) अचूक टाइप करा. हे अनिवार्य आहे."
+                          : "Type full name (surname first) accurately. This is mandatory."));
+                s.add(new TourStep(R.id.etRoll1,
+                        m ? "२. रोल नंबर (वर्ग)" : "2. Class Roll Number",
+                        m ? "विद्यार्थ्याचा वर्गातील रोल नंबर येथे भरा."
+                          : "Enter the student's roll number within the class."));
+                s.add(new TourStep(R.id.etRegNo,
+                        m ? "३. नोंदणी क्रमांक" : "3. Registration Number",
+                        m ? "शाळेचा अधिकृत नोंदणी / प्रवेश क्रमांक येथे भरा."
+                          : "Enter the official school registration / admission number."));
+                s.add(new TourStep(R.id.etDob,
+                        m ? "४. जन्मतारीख 📅" : "4. Date of Birth 📅",
+                        m ? "जन्मतारीख DD/MM/YYYY स्वरूपात भरा किंवा कॅलेंडरमधून निवडा."
+                          : "Enter DOB in DD/MM/YYYY format or pick from the calendar."));
+                s.add(new TourStep(R.id.etGender,
+                        m ? "५. लिंग ▼" : "5. Gender ▼",
+                        m ? "ड्रॉपडाउनमधून विद्यार्थ्याचे लिंग निवडा — मुलगा / मुलगी / इतर."
+                          : "Select gender from the dropdown — Boy / Girl / Other."));
+                s.add(new TourStep(R.id.etCast,
+                        m ? "६. जात प्रवर्ग ▼" : "6. Caste Category ▼",
+                        m ? "ड्रॉपडाउनमधून जात प्रवर्ग निवडा — सर्वसाधारण / OBC / SC / ST."
+                          : "Select caste category from dropdown — General / OBC / SC / ST."));
+                s.add(new TourStep(R.id.etFatherName,
+                        m ? "७. वडिलांचे नाव" : "7. Father's Name",
+                        m ? "विद्यार्थ्याच्या वडिलांचे पूर्ण नाव येथे भरा."
+                          : "Enter the full name of the student's father here."));
+                s.add(new TourStep(R.id.etMotherName,
+                        m ? "८. आईचे नाव" : "8. Mother's Name",
+                        m ? "विद्यार्थ्याच्या आईचे पूर्ण नाव येथे भरा."
+                          : "Enter the full name of the student's mother here."));
+                s.add(new TourStep(R.id.btnSaveStudent,
+                        m ? "९. विद्यार्थी जतन करा 💾" : "9. Save Student 💾",
+                        m ? "सर्व अनिवार्य माहिती भरल्यावर 'जतन करा' दाबा — डेटा सेव्ह होईल."
+                          : "After filling all required fields, press Save to store student data."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 16. Enter Marks  (6 steps)
+            // ════════════════════════════════════════════════════════════
+            case "enter_marks":
+                s.add(new TourStep(0,
+                        m ? "🎯 गुण प्रविष्टी" : "🎯 Enter Marks",
+                        m ? "विद्यार्थ्याचे विषयनिहाय आकारिक व संकलित गुण या स्क्रीनवर भरा."
+                          : "Enter this student's subject-wise formative and summative marks."));
+                s.add(new TourStep(R.id.cardStudentAvatarMarks,
+                        m ? "१. विद्यार्थी माहिती" : "1. Student Info",
+                        m ? "गुण भरत असलेल्या विद्यार्थ्याचे नाव, रोल नंबर व वर्ग येथे दिसतो."
+                          : "Shows the name, roll number and class of the student you are marking."));
+                s.add(new TourStep(R.id.btnScanMarksheet,
+                        m ? "२. गुणपत्रिका स्कॅन 📸" : "2. Scan Marksheet 📸",
+                        m ? "कागदी गुणपत्रिकेचा फोटो काढा — OCR द्वारे गुण आपोआप भरले जातात."
+                          : "Photograph a printed marksheet — OCR auto-fills all subject marks."));
+                s.add(new TourStep(R.id.cardMarksTable,
+                        m ? "३. गुण तक्ता 📊" : "3. Marks Table 📊",
+                        m ? "प्रत्येक विषयाच्या FA व SA उप-घटकांचे गुण येथे हाताने भरा."
+                          : "Manually enter FA and SA sub-component marks for each subject."));
+                s.add(new TourStep(R.id.cardAttendance,
+                        m ? "४. हजेरी माहिती 📅" : "4. Attendance Info 📅",
+                        m ? "गुणपत्रकावर छापण्यासाठी एकूण कामकाजाचे दिवस व हजर दिवस भरा."
+                          : "Enter total working days and days present — printed on marksheet."));
+                s.add(new TourStep(R.id.btnSaveMarks,
+                        m ? "५. गुण जतन करा 💾" : "5. Save Marks 💾",
+                        m ? "सर्व गुण भरल्यावर 'जतन करा' दाबा. बदल क्लाउडवर सेव्ह होतात."
+                          : "Press Save Marks — all entered data is saved to the cloud."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 17. Enter Descriptive Remarks (per student)  (5 steps)
+            // ════════════════════════════════════════════════════════════
+            case "enter_descriptive":
+                s.add(new TourStep(0,
+                        m ? "💬 विद्यार्थी शेरे" : "💬 Student Descriptive Remarks",
+                        m ? "विद्यार्थ्याचे वर्तन, आवड व कौशल्यांचे शेरे येथे निवडा."
+                          : "Select behavioral remarks and skill notes for this student."));
+                s.add(new TourStep(R.id.cardStudentAvatarMarks,
+                        m ? "१. विद्यार्थी माहिती" : "1. Student Info",
+                        m ? "शेरे नोंदवत असलेल्या विद्यार्थ्याचे नाव, रोल नंबर व वर्ग येथे दिसते."
+                          : "Displays the name, roll number and class of the student being edited."));
+                s.add(new TourStep(R.id.llRemarkRows,
+                        m ? "२. शेरा पर्याय 💭" : "2. Remark Options 💭",
+                        m ? "प्रत्येक विषयासाठी शेरा पर्याय येथे दिसतात. चिप निवडा → शेरा जोडला जातो."
+                          : "Remark chips are shown per subject. Tap a chip to select that remark."));
+                s.add(new TourStep(R.id.btnSaveRemarks,
+                        m ? "३. शेरे जतन करा 💾" : "3. Save Remarks 💾",
+                        m ? "सर्व पसंतीचे शेरे निवडल्यावर 'जतन करा' दाबून क्लाउडवर सेव्ह करा."
+                          : "After selecting all preferred remarks, press Save to store them."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // Fallback
+            // ════════════════════════════════════════════════════════════
             default:
                 s.add(new TourStep(0,
-                        m ? "या पानाबद्दल" : "About This Page",
-                        m ? "या पानावरील माहिती व्यवस्थापित करा." : "Use this page to manage the features shown here."));
+                        m ? "ℹ️ या पानाबद्दल" : "ℹ️ About This Page",
+                        m ? "या पानावरील माहिती व्यवस्थापित करण्यासाठी वरील बटणे वापरा."
+                          : "Use the buttons above to manage the features shown on this page."));
                 break;
         }
         return s;
@@ -511,11 +945,28 @@ public class ProductTourHelper {
 
         /** Actually move spotlight onto the (already scrolled-into-view) target. */
         private void spotlightTarget(View target, boolean firstSpot) {
+            // Guard: if the view is invisible / GONE or not yet laid out, fall back
+            // to the centred no-spotlight tooltip so we never draw a 0-px circle.
+            if (target.getWidth() == 0 || target.getHeight() == 0
+                    || target.getVisibility() != VISIBLE) {
+                spotX = 0; spotY = 0; spotR = 0;
+                centerTooltip();
+                showTooltipAnimated();
+                invalidate();
+                return;
+            }
+
             int[] loc = new int[2];
             target.getLocationInWindow(loc);
             float cx = loc[0] + target.getWidth() / 2f;
             float cy = loc[1] + target.getHeight() / 2f;
-            float r  = Math.max(target.getWidth(), target.getHeight()) / 2f + dp(20);
+            // Use the half-diagonal so the entire view (even wide chip/banner shapes)
+            // fits inside the spotlight circle. Enforce a minimum radius of 56 dp so
+            // tiny views (small chips, icons) are always clearly visible.
+            float halfDiag = (float) Math.sqrt(
+                    (target.getWidth()  / 2.0) * (target.getWidth()  / 2.0) +
+                    (target.getHeight() / 2.0) * (target.getHeight() / 2.0));
+            float r = Math.max(halfDiag + dp(22), dp(56));
 
             if (firstSpot || (spotX == 0 && spotY == 0)) {
                 spotX = cx; spotY = cy; spotR = r;

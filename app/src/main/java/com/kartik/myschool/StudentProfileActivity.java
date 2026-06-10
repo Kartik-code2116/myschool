@@ -122,7 +122,7 @@ public class StudentProfileActivity extends AppCompatActivity {
         b.tvStudentName.setText(name);
 
         String std = val(s.standard);
-        if ("—".equals(std) && s.className != null) {
+        if (("—".equals(std) || "-".equals(std)) && s.className != null) {
             std = extractStandardFromClassName(s.className);
         }
         String div = val(s.division);
@@ -214,7 +214,7 @@ public class StudentProfileActivity extends AppCompatActivity {
     }
 
     private String val(String v) {
-        return v != null && !v.isEmpty() ? v : "—";
+        return v != null && !v.isEmpty() ? v : "-";
     }
 
     private void openMarks() {

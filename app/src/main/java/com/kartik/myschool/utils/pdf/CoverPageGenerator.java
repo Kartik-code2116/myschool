@@ -181,10 +181,10 @@ public class CoverPageGenerator {
 
         // ── 8. INFO CARD ──────────────────────────────────────────────────────
         String yearLabel  = (cls != null && cls.academicYearLabel != null) ? cls.academicYearLabel : "2025-26";
-        String className  = (cls != null && cls.className  != null) ? cls.className  : "—";
-        String division   = (cls != null && cls.division   != null && !cls.division.isEmpty()) ? cls.division : "—";
-        String teacher    = (cls != null && cls.teacherName != null && !cls.teacherName.isEmpty()) ? cls.teacherName : "—";
-        String principal  = (school != null && school.principalName != null && !school.principalName.isEmpty()) ? school.principalName : "—";
+        String className  = (cls != null && cls.className  != null) ? cls.className  : "-";
+        String division   = (cls != null && cls.division   != null && !cls.division.isEmpty()) ? cls.division : "-";
+        String teacher    = (cls != null && cls.teacherName != null && !cls.teacherName.isEmpty()) ? cls.teacherName : "-";
+        String principal  = (school != null && school.principalName != null && !school.principalName.isEmpty()) ? school.principalName : "-";
 
         doc.add(buildInfoCard(yearLabel, className, division, teacher, principal, udise, labelYear, labelClass, labelDiv, labelUdiseCode, labelTeacher, labelPrincipal));
 

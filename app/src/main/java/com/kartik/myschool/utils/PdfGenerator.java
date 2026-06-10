@@ -862,9 +862,9 @@ public class PdfGenerator {
         PdfPTable t = new PdfPTable(new float[]{1f, 2f, 1f, 2f});
         t.setWidthPercentage(100); t.setSpacingAfter(4);
         infoRow4(t, "नाव:", nvl(student.name), "रोल नं.:", nvl(student.rollNo));
-        infoRow4(t, "इयत्ता:", cls != null ? nvl(cls.className) : "—",
-                    "वर्गशिक्षक:", cls != null ? nvl(cls.teacherName) : "—");
-        infoRow4(t, "तुकडी:", cls != null ? nvl(cls.division) : "—",
+        infoRow4(t, "इयत्ता:", cls != null ? nvl(cls.className) : "-",
+                    "वर्गशिक्षक:", cls != null ? nvl(cls.teacherName) : "-");
+        infoRow4(t, "तुकडी:", cls != null ? nvl(cls.division) : "-",
                     "जन्मतारीख:", nvl(student.dob));
         return t;
     }

@@ -25,7 +25,7 @@ public class ClassSetupActivity extends AppCompatActivity {
     private boolean shouldNavigateToSubjects = false;
 
     private static final String[] CLASSES   = {"1","2","3","4","5","6","7","8","9","10","11","12"};
-    private static final String[] DIVISIONS = {"A","B","C","D","E"};
+    private static final String[] DIVISIONS = {"No Division", "A", "B", "C", "D", "E"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,11 @@ public class ClassSetupActivity extends AppCompatActivity {
         if (AppCache.selectedClass != null && getIntent().getBooleanExtra("edit", false)) {
             ClassModel c = AppCache.selectedClass;
             b.actvClass.setText(c.className, false);
-            b.actvDivision.setText(c.division, false);
+            String divVal = c.division;
+            if (TextUtils.isEmpty(divVal) || "-".equals(divVal)) {
+                divVal = "No Division";
+            }
+            b.actvDivision.setText(divVal, false);
             b.etExamName.setText(c.examName);
             b.etYear.setText(String.valueOf(c.year));
         }
@@ -63,6 +67,9 @@ public class ClassSetupActivity extends AppCompatActivity {
     private void saveClass() {
         String className = b.actvClass.getText().toString().trim();
         String division  = b.actvDivision.getText().toString().trim();
+        if (TextUtils.isEmpty(division) || "No Division".equalsIgnoreCase(division)) {
+            division = "-";
+        }
         
         // Auto-populated fields (hidden fields)
         String examName = SessionContext.selectedSemester != null && SessionContext.selectedSemester.name != null 

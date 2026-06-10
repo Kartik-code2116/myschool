@@ -64,7 +64,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         if (SessionContext.selectedClass != null) {
             classVal = SessionContext.selectedClass.className != null ? SessionContext.selectedClass.className : "5";
             divVal = SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty() 
-                    ? SessionContext.selectedClass.division : "1";
+                    ? SessionContext.selectedClass.division : "-";
         }
         b.tvAttendanceContext.setText("सन : " + yearLabel + "  इयत्ता: " + classVal + ", तुकडी: " + divVal);
     }

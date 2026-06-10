@@ -396,7 +396,7 @@ public class StudentListFragment extends Fragment {
         if (SessionContext.selectedClass != null) {
             classVal = SessionContext.selectedClass.className != null ? SessionContext.selectedClass.className : "1";
             divVal = SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty() 
-                    ? SessionContext.selectedClass.division : "1";
+                    ? SessionContext.selectedClass.division : "-";
         }
         
         if (b.tvCustomSubtitle != null) {

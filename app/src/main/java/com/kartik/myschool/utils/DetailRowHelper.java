@@ -22,7 +22,7 @@ public final class DetailRowHelper {
         TextView tvLabel = row.findViewById(R.id.tvDetailLabel);
         TextView tvValue = row.findViewById(R.id.tvDetailValue);
         tvLabel.setText(label);
-        String display = value != null && !value.isEmpty() ? value : "—";
+        String display = value != null && !value.isEmpty() ? value : "-";
         tvValue.setText(display);
         container.addView(row);
         if (showDividerAfter) {

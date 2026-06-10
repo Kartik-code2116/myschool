@@ -104,7 +104,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         // Subtitle dynamic binding
         String clsLabel = activeClass != null ? activeClass.className : "5";
-        String divLabel = activeClass != null ? activeClass.division : "1";
+        String divLabel = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
         b.tvAppSubtitle
                 .setText("Cls: " + clsLabel + "-" + divLabel + " • Sem: " + activeSemesterNumber);
 
@@ -118,7 +118,7 @@ public class DescriptiveEntriesFragment extends Fragment {
     private void setupHeaderStrip() {
         String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         String cls = activeClass != null ? activeClass.className : "5";
-        String div = activeClass != null ? activeClass.division : "1";
+        String div = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
         b.tvHeaderStripInfo
                 .setText("Year: " + yr + " | Cls: " + cls + "-" + div + " | Sem: " + activeSemesterNumber);
 
