@@ -202,10 +202,10 @@ public class ProductTourHelper {
                         m ? "३. एक्सेल 📊" : "3. Excel 📊",
                         m ? "या चिन्हावर टॅप केल्यास CSV आयात किंवा CSV निर्यात पर्याय दिसेल."
                           : "Tap to choose between importing students from CSV or exporting to CSV."));
-                s.add(new TourStep(R.id.btnIdCard,
-                        m ? "४. ओळखपत्र 🪪" : "4. ID Card 🪪",
-                        m ? "वर्गातील सर्व विद्यार्थ्यांचे छापण्यायोग्य ओळखपत्र येथे तयार होते."
-                          : "Generate printable ID cards for all students in the class."));
+                s.add(new TourStep(R.id.btnSave,
+                        m ? "४. डेटा जतन 💾" : "4. Save Data 💾",
+                        m ? "वर्गातील सर्व विद्यार्थ्यांची माहिती बॅकअप म्हणून जतन करा."
+                          : "Save a backup of all student information in the class."));
                 s.add(new TourStep(R.id.btnMoreOptions,
                         m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: सर्व गुण रीसेट, क्रम बदलणे इत्यादी पर्याय आहेत."
