@@ -42,13 +42,54 @@
     <item android:title="@string/txt_school_level">
         <menu>
             <item
-                android:id="@+id/nav_school_info"
-                android:icon="@drawable/ic_home"
-                android:title="@string/txt_school_information" />
+                android:id="@+id/nav_school_level_dropdown"
+                android:icon="@drawable/ic_school"
+                android:title="@string/txt_school_level_info" />
             <item
                 android:id="@+id/nav_gender"
                 android:icon="@drawable/ic_person"
-                android:title="@string/txt_gender" />
+                android:title="@string/txt_gender"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_school_info"
+                android:icon="@drawable/ic_home"
+                android:title="@string/txt_school_information"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_cast_category"
+                android:icon="@drawable/ic_list_bullet"
+                android:title="@string/txt_cast_category"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_class_teacher"
+                android:icon="@drawable/ic_person"
+                android:title="@string/txt_class_teacher"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_classes"
+                android:icon="@drawable/ic_school"
+                android:title="@string/txt_classes"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_subject"
+                android:icon="@drawable/ic_book"
+                android:title="@string/txt_subject"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_default_values"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/txt_default_values"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_working_days"
+                android:icon="@drawable/ic_calendar"
+                android:title="@string/txt_working_days"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_he_she_items"
+                android:icon="@drawable/ic_document"
+                android:title="@string/txt_he_she_items"
+                android:visible="false" />
         </menu>
     </item>
 

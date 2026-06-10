@@ -315,10 +315,13 @@
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="16dp"/>
 
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_standard_1_1_division_33_stude" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_standard_2_1_division_28_stude" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_standard_3_2_divisions_45_stud" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_standard_4_1_division_30_stude" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+                        <!-- Dynamic Classes List Container -->
+                        <LinearLayout
+                            android:id="@+id/llClassesListContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginBottom="16dp"/>
 
                         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_select_profile_tab_in_sidebar" android:textSize="12sp" android:textColor="#888888"/>

@@ -201,6 +201,10 @@ public class ExtraMenusFragment extends Fragment {
 
         // Save Default admission baseline click listener
         b.btnSaveDefaults.setOnClickListener(v -> Toast.makeText(getContext(), R.string.msg_admission_defaults_baseline_se, Toast.LENGTH_SHORT).show());
+
+        if (menuType.equals("classes")) {
+            setupClassesListing();
+        }
     }
 
     private void setupRemarkBankEditor(ClassModel activeClass) {
@@ -729,6 +733,196 @@ public class ExtraMenusFragment extends Fragment {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             return 0;
+        }
+    }
+
+    private void setupClassesListing() {
+        School school = SessionContext.selectedSchool;
+        if (school == null) {
+            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+                @Override
+                public void onSuccess(com.kartik.myschool.model.Teacher t) {
+                    FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<School>() {
+                        @Override
+                        public void onSuccess(School s) {
+                            SessionContext.selectedSchool = s;
+                            AppCache.selectedSchool = s;
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> loadClassesForUdise(s.udiseCode));
+                            }
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            showClassesError("School info not loaded. Please fill UDISE code in profile.");
+                        }
+                    });
+                }
+                @Override
+                public void onError(Exception e) {
+                    showClassesError("Error loading teacher profile: " + e.getMessage());
+                }
+            });
+        } else {
+            loadClassesForUdise(school.udiseCode);
+        }
+    }
+
+    private void showClassesError(String error) {
+        if (!isAdded() || b == null) return;
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                b.llClassesListContainer.removeAllViews();
+                android.widget.TextView tvError = new android.widget.TextView(requireContext());
+                tvError.setText(error);
+                tvError.setTextColor(getResources().getColor(R.color.error));
+                tvError.setTextSize(14);
+                b.llClassesListContainer.addView(tvError);
+            });
+        }
+    }
+
+    private void loadClassesForUdise(String udiseCode) {
+        if (udiseCode == null || udiseCode.isEmpty()) {
+            showClassesError("UDISE Code is empty. Please set it in profile.");
+            return;
+        }
+        
+        b.llClassesListContainer.removeAllViews();
+        android.widget.TextView tvLoading = new android.widget.TextView(requireContext());
+        tvLoading.setText(requireContext().getString(R.string.msg_processing));
+        tvLoading.setTextColor(getResources().getColor(R.color.on_surface_variant));
+        tvLoading.setTextSize(14);
+        tvLoading.setPadding(0, 16, 0, 16);
+        b.llClassesListContainer.addView(tvLoading);
+        
+        FirebaseRepository.get().getClassesForUdiseCode(udiseCode, new FirebaseRepository.OnResult<List<ClassModel>>() {
+            @Override
+            public void onSuccess(List<ClassModel> list) {
+                if (!isAdded() || b == null) return;
+                
+                String currentYearLabel = SessionContext.getYearLabel();
+                List<ClassModel> filtered = new ArrayList<>();
+                for (ClassModel c : list) {
+                    if (currentYearLabel.equals(c.academicYearLabel)) {
+                        filtered.add(c);
+                    }
+                }
+                
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderClassesList(filtered));
+                }
+            }
+            
+            @Override
+            public void onError(Exception e) {
+                showClassesError("Error loading classes: " + e.getMessage());
+            }
+        });
+    }
+
+    private void renderClassesList(List<ClassModel> classes) {
+        if (b == null || !isAdded()) return;
+        b.llClassesListContainer.removeAllViews();
+        
+        if (classes.isEmpty()) {
+            android.widget.TextView tvEmpty = new android.widget.TextView(requireContext());
+            tvEmpty.setText(requireContext().getString(R.string.profile_no_classes));
+            tvEmpty.setTextColor(getResources().getColor(R.color.on_surface_variant));
+            tvEmpty.setTextSize(14);
+            tvEmpty.setPadding(0, 16, 0, 16);
+            b.llClassesListContainer.addView(tvEmpty);
+            return;
+        }
+        
+        float density = getResources().getDisplayMetrics().density;
+        int padding12 = (int) (12 * density);
+        int padding8 = (int) (8 * density);
+        
+        for (ClassModel c : classes) {
+            android.widget.LinearLayout row = new android.widget.LinearLayout(requireContext());
+            row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setPadding(padding12, padding12, padding12, padding12);
+            
+            android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+            gd.setColor(getResources().getColor(R.color.surface_variant));
+            gd.setCornerRadius(12 * density);
+            row.setBackground(gd);
+            
+            android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            lp.setMargins(0, 0, 0, padding12);
+            row.setLayoutParams(lp);
+            
+            // Left circular badge for Class Number
+            android.widget.TextView badge = new android.widget.TextView(requireContext());
+            badge.setText(c.className != null ? c.className : "");
+            badge.setTextSize(16);
+            badge.setTextColor(getResources().getColor(R.color.white));
+            badge.setGravity(android.view.Gravity.CENTER);
+            badge.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            
+            int badgeSize = (int) (36 * density);
+            android.widget.LinearLayout.LayoutParams badgeLp = new android.widget.LinearLayout.LayoutParams(badgeSize, badgeSize);
+            badgeLp.setMarginEnd(padding12);
+            badge.setLayoutParams(badgeLp);
+            
+            android.graphics.drawable.GradientDrawable badgeBg = new android.graphics.drawable.GradientDrawable();
+            badgeBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            badgeBg.setColor(getResources().getColor(R.color.class_number_purple));
+            badge.setBackground(badgeBg);
+            row.addView(badge);
+            
+            // Class and Division + Class Teacher details
+            android.widget.LinearLayout textLayout = new android.widget.LinearLayout(requireContext());
+            textLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+            android.widget.LinearLayout.LayoutParams textLp = new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            textLayout.setLayoutParams(textLp);
+            
+            android.widget.TextView tvClassDiv = new android.widget.TextView(requireContext());
+            String classDivText = requireContext().getString(R.string.class_div_format,
+                    c.className != null ? c.className : "",
+                    c.division != null && !c.division.isEmpty() ? c.division : "-");
+            tvClassDiv.setText(classDivText);
+            tvClassDiv.setTextSize(15);
+            tvClassDiv.setTextColor(getResources().getColor(R.color.on_surface));
+            tvClassDiv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            textLayout.addView(tvClassDiv);
+            
+            android.widget.TextView tvTeacher = new android.widget.TextView(requireContext());
+            String teacherText;
+            if (c.teacherName != null && !c.teacherName.isEmpty()) {
+                teacherText = requireContext().getString(R.string.profile_teacher_line, c.teacherName);
+            } else {
+                teacherText = requireContext().getString(R.string.label_class_teacher) + ": -";
+            }
+            tvTeacher.setText(teacherText);
+            tvTeacher.setTextSize(12);
+            tvTeacher.setTextColor(getResources().getColor(R.color.on_surface_variant));
+            tvTeacher.setPadding(0, 2, 0, 0);
+            textLayout.addView(tvTeacher);
+            
+            row.addView(textLayout);
+            
+            // Right-aligned Active Students Count using localized profile_students_count string
+            android.widget.TextView tvCount = new android.widget.TextView(requireContext());
+            tvCount.setText(requireContext().getString(R.string.profile_students_count, c.studentCount));
+            tvCount.setTextSize(13);
+            tvCount.setTextColor(getResources().getColor(R.color.primary));
+            tvCount.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            tvCount.setGravity(android.view.Gravity.CENTER_VERTICAL | android.view.Gravity.END);
+            
+            android.widget.LinearLayout.LayoutParams countLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            countLp.setMarginStart(padding8);
+            tvCount.setLayoutParams(countLp);
+            row.addView(tvCount);
+            
+            b.llClassesListContainer.addView(row);
         }
     }
 }

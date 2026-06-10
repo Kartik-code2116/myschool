@@ -122,6 +122,7 @@
     <string name="section_about_student">About Student</string>
     <string name="section_class_level">Class Level</string>
     <string name="section_school_level">School Level</string>
+    <string name="txt_school_level_info">School Level Info</string>
     <string name="menu_info_print">Info &amp; Print Setting</string>
     <string name="menu_formative_summative">Formative Summative</string>
     <string name="menu_descriptive_entries">Descriptive Entries</string>

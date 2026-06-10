@@ -27,6 +27,7 @@ public class HomeActivity extends AppCompatActivity {
     private ActivityHomeBinding b;
     private NavController navController;
     private AppBarConfiguration appBarConfig;
+    private boolean isSchoolLevelExpanded = false;
 
     public void openDrawer() {
         if (b != null && b.drawerLayout != null) {
@@ -43,7 +44,8 @@ public class HomeActivity extends AppCompatActivity {
 
         NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navHostFragment);
-        if (navHost == null) return;
+        if (navHost == null)
+            return;
         navController = navHost.getNavController();
 
         Set<Integer> topLevel = new HashSet<>();
@@ -61,6 +63,13 @@ public class HomeActivity extends AppCompatActivity {
         topLevel.add(R.id.nav_extra);
         topLevel.add(R.id.nav_school_info);
         topLevel.add(R.id.nav_gender);
+        topLevel.add(R.id.nav_cast_category);
+        topLevel.add(R.id.nav_class_teacher);
+        topLevel.add(R.id.nav_classes);
+        topLevel.add(R.id.nav_subject);
+        topLevel.add(R.id.nav_default_values);
+        topLevel.add(R.id.nav_working_days);
+        topLevel.add(R.id.nav_he_she_items);
         topLevel.add(R.id.nav_print_report);
         topLevel.add(R.id.nav_dashboard);
 
@@ -73,8 +82,13 @@ public class HomeActivity extends AppCompatActivity {
 
         b.navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
+            if (id == R.id.nav_school_level_dropdown) {
+                toggleSchoolLevelDropdown();
+                return false;
+            }
             boolean handled = navigateToAnimated(id);
-            if (handled) b.drawerLayout.closeDrawer(GravityCompat.START);
+            if (handled)
+                b.drawerLayout.closeDrawer(GravityCompat.START);
             return handled;
         });
 
@@ -87,7 +101,8 @@ public class HomeActivity extends AppCompatActivity {
         b.bottomNav.setOnItemSelectedListener(this::navigateBottomItem);
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination == null) return;
+            if (destination == null)
+                return;
             int id = destination.getId();
             String title = destination.getLabel() != null ? destination.getLabel().toString() : "";
             String subtitle = getString(R.string.subtitle_info_print);
@@ -141,8 +156,12 @@ public class HomeActivity extends AppCompatActivity {
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_print_report) {
                 title = "Report Printing";
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) ? SessionContext.selectedClass.className : "1";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division : "1";
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
+                        ? SessionContext.selectedClass.className
+                        : "1";
+                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null
+                        && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division
+                                : "1";
                 int sem = (SessionContext.selectedSemester != null) ? SessionContext.selectedSemester.number : 1;
                 subtitle = "• Class: " + cls + " • Div: " + div + " • Semester: " + sem;
             } else if (id == R.id.nav_settings) {
@@ -150,8 +169,12 @@ public class HomeActivity extends AppCompatActivity {
                 subtitle = "App Settings & Configurations";
             } else if (id == R.id.nav_dashboard) {
                 title = "Stats Dashboard";
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) ? SessionContext.selectedClass.className : "N/A";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division : "N/A";
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
+                        ? SessionContext.selectedClass.className
+                        : "N/A";
+                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null
+                        && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division
+                                : "N/A";
                 subtitle = "Progress Tracker - Class " + cls + " " + div;
             }
             updateToolbar(title, subtitle);
@@ -179,7 +202,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void handleNavigationIntent(Intent intent) {
-        if (intent == null || navController == null) return;
+        if (intent == null || navController == null)
+            return;
         int dest = intent.getIntExtra("navigate_to", 0);
         if (dest != 0) {
             navigateTo(dest);
@@ -188,7 +212,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private boolean navigateToAnimated(int destId) {
-        if (navController == null) return false;
+        if (navController == null)
+            return false;
         if (navController.getCurrentDestination() != null
                 && navController.getCurrentDestination().getId() == destId) {
             return true;
@@ -200,7 +225,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private boolean navigateBottomItem(android.view.MenuItem item) {
         int id = item.getItemId();
-        if (navController == null) return false;
+        if (navController == null)
+            return false;
         if (navController.getCurrentDestination() != null
                 && navController.getCurrentDestination().getId() == id) {
             return true;
@@ -223,17 +249,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupDrawerHeader() {
         View header = b.navigationView.getHeaderView(0);
-        if (header == null) return;
+        if (header == null)
+            return;
 
         // Apply dynamic system window insets (notch / status bar) as top padding
         ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
             int statusBarTop = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
             v.setPadding(
-                v.getPaddingLeft(),
-                statusBarTop + (int) (16 * v.getResources().getDisplayMetrics().density),
-                v.getPaddingRight(),
-                v.getPaddingBottom()
-            );
+                    v.getPaddingLeft(),
+                    statusBarTop + (int) (16 * v.getResources().getDisplayMetrics().density),
+                    v.getPaddingRight(),
+                    v.getPaddingBottom());
             return insets;
         });
 
@@ -241,7 +267,8 @@ public class HomeActivity extends AppCompatActivity {
         android.widget.TextView tvId = header.findViewById(R.id.tvDrawerTeacherId);
 
         if (tvName != null) {
-            if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.name != null && !SessionContext.selectedSchool.name.isEmpty()) {
+            if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.name != null
+                    && !SessionContext.selectedSchool.name.isEmpty()) {
                 tvName.setText(SessionContext.selectedSchool.name);
             } else {
                 tvName.setText(R.string.msg_cce110);
@@ -249,7 +276,8 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         if (tvId != null) {
-            if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.udiseCode != null && !SessionContext.selectedSchool.udiseCode.isEmpty()) {
+            if (SessionContext.selectedSchool != null && SessionContext.selectedSchool.udiseCode != null
+                    && !SessionContext.selectedSchool.udiseCode.isEmpty()) {
                 tvId.setText(SessionContext.selectedSchool.udiseCode);
             } else {
                 tvId.setText("27251208204");
@@ -259,17 +287,22 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupDrawerActions() {
         View header = b.navigationView.getHeaderView(0);
-        if (header == null) return;
+        if (header == null)
+            return;
 
         // Force quick action content descriptions to bilingual resources
         View btnStats = header.findViewById(R.id.btnDrawerStats);
-        if (btnStats != null) btnStats.setContentDescription(getString(R.string.drawer_stats));
+        if (btnStats != null)
+            btnStats.setContentDescription(getString(R.string.drawer_stats));
         View btnSettings = header.findViewById(R.id.btnDrawerSettings);
-        if (btnSettings != null) btnSettings.setContentDescription(getString(R.string.drawer_settings));
+        if (btnSettings != null)
+            btnSettings.setContentDescription(getString(R.string.drawer_settings));
         View btnPrint = header.findViewById(R.id.btnDrawerPrint);
-        if (btnPrint != null) btnPrint.setContentDescription(getString(R.string.drawer_print));
+        if (btnPrint != null)
+            btnPrint.setContentDescription(getString(R.string.drawer_print));
         View btnProfile = header.findViewById(R.id.btnDrawerProfile);
-        if (btnProfile != null) btnProfile.setContentDescription(getString(R.string.profile_title));
+        if (btnProfile != null)
+            btnProfile.setContentDescription(getString(R.string.profile_title));
 
         header.findViewById(R.id.btnDrawerProfile).setOnClickListener(v -> {
             b.drawerLayout.closeDrawer(GravityCompat.START);
@@ -291,7 +324,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void localizeSidebar() {
         android.view.Menu menu = b.navigationView.getMenu();
-        if (menu == null) return;
+        if (menu == null)
+            return;
 
         // 1. Group 1: About Student
         if (menu.size() > 0) {
@@ -301,13 +335,16 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         android.view.MenuItem itemFormative = menu.findItem(R.id.nav_formative);
-        if (itemFormative != null) itemFormative.setTitle(getString(R.string.menu_formative_summative));
-        
+        if (itemFormative != null)
+            itemFormative.setTitle(getString(R.string.menu_formative_summative));
+
         android.view.MenuItem itemDescriptive = menu.findItem(R.id.nav_descriptive);
-        if (itemDescriptive != null) itemDescriptive.setTitle(getString(R.string.menu_descriptive_entries));
-        
+        if (itemDescriptive != null)
+            itemDescriptive.setTitle(getString(R.string.menu_descriptive_entries));
+
         android.view.MenuItem itemAttendance = menu.findItem(R.id.nav_attendance);
-        if (itemAttendance != null) itemAttendance.setTitle(getString(R.string.menu_attendance));
+        if (itemAttendance != null)
+            itemAttendance.setTitle(getString(R.string.menu_attendance));
 
         // 2. Group 2: Class Level
         if (menu.size() > 1) {
@@ -317,16 +354,20 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         android.view.MenuItem itemStudents = menu.findItem(R.id.nav_students);
-        if (itemStudents != null) itemStudents.setTitle(getString(R.string.menu_student_list));
-        
+        if (itemStudents != null)
+            itemStudents.setTitle(getString(R.string.menu_student_list));
+
         android.view.MenuItem itemSubjects = menu.findItem(R.id.nav_subjects);
-        if (itemSubjects != null) itemSubjects.setTitle(getString(R.string.menu_subjects));
-        
+        if (itemSubjects != null)
+            itemSubjects.setTitle(getString(R.string.menu_subjects));
+
         android.view.MenuItem itemWeightage = menu.findItem(R.id.nav_weightage);
-        if (itemWeightage != null) itemWeightage.setTitle(getString(R.string.menu_declare_weightage));
-        
+        if (itemWeightage != null)
+            itemWeightage.setTitle(getString(R.string.menu_declare_weightage));
+
         android.view.MenuItem itemDropdown = menu.findItem(R.id.nav_dropdown);
-        if (itemDropdown != null) itemDropdown.setTitle(getString(R.string.menu_dropdown_list));
+        if (itemDropdown != null)
+            itemDropdown.setTitle(getString(R.string.menu_dropdown_list));
 
         // 3. Group 3: School Level
         if (menu.size() > 2) {
@@ -335,10 +376,56 @@ public class HomeActivity extends AppCompatActivity {
                 group3.setTitle(getString(R.string.section_school_level));
             }
         }
-        android.view.MenuItem itemSchoolInfo = menu.findItem(R.id.nav_school_info);
-        if (itemSchoolInfo != null) itemSchoolInfo.setTitle(getString(R.string.txt_school_information));
+        android.view.MenuItem itemSchoolLevelDropdown = menu.findItem(R.id.nav_school_level_dropdown);
+        if (itemSchoolLevelDropdown != null) {
+            itemSchoolLevelDropdown
+                    .setTitle(getString(R.string.txt_school_level_info) + (isSchoolLevelExpanded ? " ▴" : " ▾"));
+        }
         android.view.MenuItem itemGender = menu.findItem(R.id.nav_gender);
-        if (itemGender != null) itemGender.setTitle(getString(R.string.txt_gender));
+        if (itemGender != null) {
+            itemGender.setTitle(getString(R.string.txt_gender));
+            itemGender.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemSchoolInfo = menu.findItem(R.id.nav_school_info);
+        if (itemSchoolInfo != null) {
+            itemSchoolInfo.setTitle(getString(R.string.txt_school_information));
+            itemSchoolInfo.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemCast = menu.findItem(R.id.nav_cast_category);
+        if (itemCast != null) {
+            itemCast.setTitle(getString(R.string.txt_cast_category));
+            itemCast.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemTeacher = menu.findItem(R.id.nav_class_teacher);
+        if (itemTeacher != null) {
+            itemTeacher.setTitle(getString(R.string.txt_class_teacher));
+            itemTeacher.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemClasses = menu.findItem(R.id.nav_classes);
+        if (itemClasses != null) {
+            itemClasses.setTitle(getString(R.string.txt_classes));
+            itemClasses.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemSubj = menu.findItem(R.id.nav_subject);
+        if (itemSubj != null) {
+            itemSubj.setTitle(getString(R.string.txt_subject));
+            itemSubj.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemDefaults = menu.findItem(R.id.nav_default_values);
+        if (itemDefaults != null) {
+            itemDefaults.setTitle(getString(R.string.txt_default_values));
+            itemDefaults.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemWorking = menu.findItem(R.id.nav_working_days);
+        if (itemWorking != null) {
+            itemWorking.setTitle(getString(R.string.txt_working_days));
+            itemWorking.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemHeShe = menu.findItem(R.id.nav_he_she_items);
+        if (itemHeShe != null) {
+            itemHeShe.setTitle(getString(R.string.txt_he_she_items));
+            itemHeShe.setVisible(isSchoolLevelExpanded);
+        }
 
         // 4. Group 4: Bottom Action
         if (menu.size() > 3) {
@@ -348,7 +435,26 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         android.view.MenuItem itemPrint = menu.findItem(R.id.nav_print_report);
-        if (itemPrint != null) itemPrint.setTitle(getString(R.string.menu_print_report));
+        if (itemPrint != null)
+            itemPrint.setTitle(getString(R.string.menu_print_report));
+    }
+
+    private void toggleSchoolLevelDropdown() {
+        isSchoolLevelExpanded = !isSchoolLevelExpanded;
+
+        android.transition.TransitionManager.beginDelayedTransition(b.navigationView);
+
+        // Clear and re-inflate menu to force NavigationView to rebuild the adapter and
+        // reflect visibility changes instantly
+        b.navigationView.getMenu().clear();
+        b.navigationView.inflateMenu(R.menu.drawer_menu);
+        localizeSidebar();
+
+        // Restore active item selection highlight
+        if (navController != null && navController.getCurrentDestination() != null) {
+            int currentId = navController.getCurrentDestination().getId();
+            b.navigationView.setCheckedItem(currentId);
+        }
     }
 
     private void loadTeacherInfo() {
@@ -356,23 +462,31 @@ public class HomeActivity extends AppCompatActivity {
             b.tvToolbarSubtitle.setText(AppCache.cachedTeacherName);
         }
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
-            @Override public void onSuccess(Teacher t) {
+            @Override
+            public void onSuccess(Teacher t) {
                 if (t != null && t.name != null) {
                     AppCache.cachedTeacherName = t.name;
                     runOnUiThread(() -> b.tvToolbarSubtitle.setText(t.name));
                 }
             }
-            @Override public void onError(Exception e) {}
+
+            @Override
+            public void onError(Exception e) {
+            }
         });
     }
 
     public void updateToolbar(String title, String subtitle) {
-        if (title != null && !title.isEmpty()) b.tvToolbarTitle.setText(title);
-        if (subtitle != null && !subtitle.isEmpty()) b.tvToolbarSubtitle.setText(subtitle);
+        if (title != null && !title.isEmpty())
+            b.tvToolbarTitle.setText(title);
+        if (subtitle != null && !subtitle.isEmpty())
+            b.tvToolbarSubtitle.setText(subtitle);
     }
 
-    public void showCustomToolbarActions(boolean show, View.OnClickListener onNotificationsClick, View.OnClickListener onMoreClick) {
-        if (b == null) return;
+    public void showCustomToolbarActions(boolean show, View.OnClickListener onNotificationsClick,
+            View.OnClickListener onMoreClick) {
+        if (b == null)
+            return;
         if (show) {
             b.btnToolbarNotifications.setVisibility(View.VISIBLE);
             b.btnToolbarMore.setVisibility(View.VISIBLE);
@@ -382,7 +496,8 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             b.btnToolbarNotifications.setVisibility(View.GONE);
             b.btnToolbarMore.setOnClickListener(this::handleHomeMoreClick);
-            if (navController != null && navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() == R.id.nav_info_print) {
+            if (navController != null && navController.getCurrentDestination() != null
+                    && navController.getCurrentDestination().getId() == R.id.nav_info_print) {
                 b.btnToolbarMore.setVisibility(View.VISIBLE);
             } else {
                 b.btnToolbarMore.setVisibility(View.GONE);
@@ -391,15 +506,20 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    /** Navigate programmatically (e.g., from intent or internal button) — horizontal slide. */
+    /**
+     * Navigate programmatically (e.g., from intent or internal button) — horizontal
+     * slide.
+     */
     public void navigateTo(int destId) {
-        if (navController == null) return;
+        if (navController == null)
+            return;
         navController.navigate(destId, null, UiAnimations.navSlideForward());
     }
 
     /** Navigate from drawer sidebar — scale + fade for premium feel. */
     private void navigateFromDrawer(int destId) {
-        if (navController == null) return;
+        if (navController == null)
+            return;
         navController.navigate(destId, null, UiAnimations.navDrawerOpen());
     }
 
@@ -420,13 +540,13 @@ public class HomeActivity extends AppCompatActivity {
     public void showHomeMoreMenu(View anchor) {
         if (navController != null) {
             androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, anchor);
-            
+
             // Core options
             popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 " + getString(R.string.menu_3dot_home));
             popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 " + getString(R.string.menu_3dot_classes));
             popup.getMenu().add(0, R.id.nav_students, 3, "👥 " + getString(R.string.menu_3dot_students));
             popup.getMenu().add(0, 801, 4, "💬 " + getString(R.string.menu_3dot_message));
-            
+
             // Utility options
             popup.getMenu().add(0, 901, 5, "🌐 " + getString(R.string.menu_3dot_language));
             popup.getMenu().add(0, 902, 6, "⭐ " + getString(R.string.menu_3dot_rate));
@@ -441,8 +561,9 @@ public class HomeActivity extends AppCompatActivity {
                     return true;
                 } else if (id == 901) {
                     // Fully functional bilingual language selector dialog
-                    String[] languages = {"English", "मराठी (Marathi)"};
-                    android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
+                    String[] languages = { "English", "मराठी (Marathi)" };
+                    android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs",
+                            MODE_PRIVATE);
                     String currentLang = prefs.getString("language", "mr");
                     int checkedItem = "mr".equals(currentLang) ? 1 : 0;
 
@@ -486,15 +607,17 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onSuccess(com.kartik.myschool.model.AppConfig config) {
                 pd.dismiss();
-                
+
                 StringBuilder sb = new StringBuilder();
                 sb.append("<h3><b>🧑‍💻 " + config.devName + "</b></h3>");
                 sb.append("<p><b>🤖 Version:</b> " + config.appVersion + "</p>");
                 if (config.devEmail != null && !config.devEmail.trim().isEmpty()) {
-                    sb.append("<p><b>📧 Email:</b> <a href=\"mailto:" + config.devEmail.trim() + "\">" + config.devEmail.trim() + "</a></p>");
+                    sb.append("<p><b>📧 Email:</b> <a href=\"mailto:" + config.devEmail.trim() + "\">"
+                            + config.devEmail.trim() + "</a></p>");
                 }
                 if (config.devWebsite != null && !config.devWebsite.trim().isEmpty()) {
-                    sb.append("<p><b>🌐 Website:</b> <a href=\"" + config.devWebsite.trim() + "\">" + config.devWebsite.trim() + "</a></p>");
+                    sb.append("<p><b>🌐 Website:</b> <a href=\"" + config.devWebsite.trim() + "\">"
+                            + config.devWebsite.trim() + "</a></p>");
                 }
                 if (config.devPhone != null && !config.devPhone.trim().isEmpty()) {
                     sb.append("<p><b>📞 Contact:</b> " + config.devPhone.trim() + "</p>");
@@ -548,7 +671,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onError(Exception e) {
                 pd.dismiss();
-                Toast.makeText(HomeActivity.this, "Failed to load message: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(HomeActivity.this, "Failed to load message: " + e.getMessage(), Toast.LENGTH_LONG)
+                        .show();
             }
         });
     }
@@ -573,7 +697,8 @@ public class HomeActivity extends AppCompatActivity {
     public void changeLanguage(String lang) {
         android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
         String currentLang = prefs.getString("language", "mr");
-        if (currentLang.equals(lang)) return;
+        if (currentLang.equals(lang))
+            return;
 
         prefs.edit().putString("language", lang).apply();
 
@@ -587,7 +712,8 @@ public class HomeActivity extends AppCompatActivity {
 
         Toast.makeText(this, R.string.msg_language_updated, Toast.LENGTH_SHORT).show();
 
-        // Recreate activity to force reinflating components with new resource locale bundle
+        // Recreate activity to force reinflating components with new resource locale
+        // bundle
         recreate();
     }
 }

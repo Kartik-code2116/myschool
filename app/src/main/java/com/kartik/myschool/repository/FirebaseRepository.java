@@ -1271,6 +1271,149 @@ public class FirebaseRepository {
         return (schoolId != null ? schoolId : "default") + "_" + safe;
     }
 
+    public void getClassesForUdiseCode(String udiseCode, OnResult<List<ClassModel>> cb) {
+        if (udiseCode == null || udiseCode.isEmpty()) {
+            cb.onError(new IllegalArgumentException("UDISE code cannot be null or empty"));
+            return;
+        }
+        db.collection(COL_SCHOOLS)
+                .whereEqualTo("udiseCode", udiseCode)
+                .get()
+                .addOnSuccessListener(schoolSnap -> {
+                    List<String> schoolIds = new ArrayList<>();
+                    if (schoolSnap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : schoolSnap.getDocuments()) {
+                            schoolIds.add(doc.getId());
+                        }
+                    }
+                    if (schoolIds.isEmpty()) {
+                        cb.onSuccess(new ArrayList<>());
+                        return;
+                    }
+                    
+                    fetchClassesForSchoolIds(schoolIds, new OnResult<List<ClassModel>>() {
+                        @Override
+                        public void onSuccess(List<ClassModel> classes) {
+                            if (classes.isEmpty()) {
+                                cb.onSuccess(classes);
+                                return;
+                            }
+                            fetchStudentCountsForSchoolIds(schoolIds, new OnResult<java.util.Map<String, Integer>>() {
+                                @Override
+                                public void onSuccess(java.util.Map<String, Integer> counts) {
+                                    for (ClassModel c : classes) {
+                                        c.studentCount = counts.containsKey(c.id) ? counts.get(c.id) : 0;
+                                    }
+                                    Collections.sort(classes, (a, b) -> {
+                                        String nameA = a.className != null ? a.className : "";
+                                        String nameB = b.className != null ? b.className : "";
+                                        int comp = nameA.compareTo(nameB);
+                                        if (comp != 0) return comp;
+                                        String divA = a.division != null ? a.division : "";
+                                        String divB = b.division != null ? b.division : "";
+                                        return divA.compareTo(divB);
+                                    });
+                                    cb.onSuccess(classes);
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    cb.onError(e);
+                                }
+                            });
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            cb.onError(e);
+                        }
+                    });
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    private void fetchClassesForSchoolIds(List<String> schoolIds, OnResult<List<ClassModel>> cb) {
+        List<ClassModel> allClasses = new ArrayList<>();
+        int limit = 30;
+        int size = schoolIds.size();
+        java.util.concurrent.atomic.AtomicInteger pendingQueries = new java.util.concurrent.atomic.AtomicInteger((size + limit - 1) / limit);
+        java.util.concurrent.atomic.AtomicReference<Exception> errorRef = new java.util.concurrent.atomic.AtomicReference<>();
+        
+        for (int i = 0; i < size; i += limit) {
+            List<String> chunk = schoolIds.subList(i, Math.min(i + limit, size));
+            db.collection(COL_CLASSES)
+                    .whereIn("schoolId", chunk)
+                    .get()
+                    .addOnSuccessListener(snap -> {
+                        if (snap != null) {
+                            synchronized (allClasses) {
+                                for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                                    ClassModel c = doc.toObject(ClassModel.class);
+                                    if (c != null) {
+                                        if (c.id == null || c.id.isEmpty()) {
+                                            c.id = doc.getId();
+                                        }
+                                        allClasses.add(c);
+                                    }
+                                }
+                            }
+                        }
+                        if (pendingQueries.decrementAndGet() == 0) {
+                            if (errorRef.get() != null) {
+                                cb.onError(errorRef.get());
+                            } else {
+                                cb.onSuccess(allClasses);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        errorRef.set(e);
+                        if (pendingQueries.decrementAndGet() == 0) {
+                            cb.onError(e);
+                        }
+                    });
+        }
+    }
+
+    private void fetchStudentCountsForSchoolIds(List<String> schoolIds, OnResult<java.util.Map<String, Integer>> cb) {
+        java.util.Map<String, Integer> counts = new java.util.HashMap<>();
+        int limit = 30;
+        int size = schoolIds.size();
+        java.util.concurrent.atomic.AtomicInteger pendingQueries = new java.util.concurrent.atomic.AtomicInteger((size + limit - 1) / limit);
+        java.util.concurrent.atomic.AtomicReference<Exception> errorRef = new java.util.concurrent.atomic.AtomicReference<>();
+        
+        for (int i = 0; i < size; i += limit) {
+            List<String> chunk = schoolIds.subList(i, Math.min(i + limit, size));
+            db.collection(COL_STUDENTS)
+                    .whereIn("schoolId", chunk)
+                    .get()
+                    .addOnSuccessListener(snap -> {
+                        if (snap != null) {
+                            synchronized (counts) {
+                                for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                                    Student s = doc.toObject(Student.class);
+                                    if (s != null && s.classId != null) {
+                                        counts.put(s.classId, counts.getOrDefault(s.classId, 0) + 1);
+                                    }
+                                }
+                            }
+                        }
+                        if (pendingQueries.decrementAndGet() == 0) {
+                            if (errorRef.get() != null) {
+                                cb.onError(errorRef.get());
+                            } else {
+                                cb.onSuccess(counts);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        errorRef.set(e);
+                        if (pendingQueries.decrementAndGet() == 0) {
+                            cb.onError(e);
+                        }
+                    });
+        }
+    }
+
+
     // ---------- Callback interface ----------
     public interface OnResult<T> {
         void onSuccess(T result);
