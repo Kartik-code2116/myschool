@@ -103,6 +103,17 @@
                         android:padding="8dp"
                         android:contentDescription="Save Backup"/>
 
+                    <!-- Stats Dashboard icon -->
+                    <ImageButton
+                        android:id="@+id/btnDashboard"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_chart"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:contentDescription="Stats Dashboard"/>
+
                     <!-- 3-Dot vertical icon -->
                     <ImageButton
                         android:id="@+id/btnMoreOptions"

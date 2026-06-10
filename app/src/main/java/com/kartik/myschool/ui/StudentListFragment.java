@@ -104,6 +104,12 @@ public class StudentListFragment extends Fragment {
             });
         }
 
+        if (b.btnDashboard != null) {
+            b.btnDashboard.setOnClickListener(v -> {
+                androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_dashboard);
+            });
+        }
+
         if (b.btnMoreOptions != null) {
             b.btnMoreOptions.setOnClickListener(v -> {
                 if (getActivity() instanceof HomeActivity) {

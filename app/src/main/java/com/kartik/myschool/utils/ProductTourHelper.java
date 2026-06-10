@@ -158,6 +158,10 @@ public class ProductTourHelper {
                         m ? "३. वर्गनिहाय आलेख" : "3. Class-wise Charts",
                         m ? "प्रत्येक वर्गाच्या कार्डावर टॅप करा — लिंग व जात प्रवर्ग आलेख दिसेल."
                           : "Tap any class card to see gender ratio and caste distribution charts."));
+                s.add(new TourStep(R.id.btnStudentDashboard,
+                        m ? "४. विद्यार्थी प्रगती (टॉगल)" : "4. Student Progress (Toggle)",
+                        m ? "येथे दाबून तुम्ही विषयनिहाय आणि विद्यार्थीनिहाय आकडेवारीमध्ये अदलाबदल करू शकता."
+                          : "Tap here to instantly toggle between subject-wise and student-wise completion progress."));
                 break;
 
             // ════════════════════════════════════════════════════════════

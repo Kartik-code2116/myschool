@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -35,12 +36,18 @@ public class StatsDashboardFragment extends Fragment {
     private TextView tvHeaderStripInfo;
     private TextView tvTotalStudents;
     private RecyclerView rvDashboard;
+    private RecyclerView rvStudentProgress;
     private LinearLayout layoutEmptyState;
     private ProgressBar progressBar;
+    private ImageButton btnStudentDashboard;
     
     private DashboardSubjectAdapter adapter;
+    private StudentProgressDashboardAdapter studentAdapter;
+    
     private ClassModel activeClass;
     private String activeSemesterId;
+    private boolean isShowingStudentProgress = false;
+    private int currentTotalStudents = 0;
 
     @Nullable
     @Override
@@ -50,6 +57,7 @@ public class StatsDashboardFragment extends Fragment {
         tvHeaderStripInfo = v.findViewById(R.id.tvHeaderStripInfo);
         tvTotalStudents = v.findViewById(R.id.tvTotalStudents);
         rvDashboard = v.findViewById(R.id.rvDashboard);
+        rvStudentProgress = v.findViewById(R.id.rvStudentProgress);
         layoutEmptyState = v.findViewById(R.id.layoutEmptyState);
         progressBar = v.findViewById(R.id.progressBar);
 
@@ -57,7 +65,46 @@ public class StatsDashboardFragment extends Fragment {
         adapter = new DashboardSubjectAdapter();
         rvDashboard.setAdapter(adapter);
 
+        rvStudentProgress.setLayoutManager(new LinearLayoutManager(getContext()));
+        studentAdapter = new StudentProgressDashboardAdapter();
+        rvStudentProgress.setAdapter(studentAdapter);
+
+        btnStudentDashboard = v.findViewById(R.id.btnStudentDashboard);
+        if (btnStudentDashboard != null) {
+            btnStudentDashboard.setOnClickListener(view -> {
+                isShowingStudentProgress = !isShowingStudentProgress;
+                updateViewVisibility();
+            });
+        }
+
         return v;
+    }
+
+    private void updateViewVisibility() {
+        if (isShowingStudentProgress) {
+            rvDashboard.setVisibility(View.GONE);
+            
+            rvStudentProgress.setAlpha(0f);
+            rvStudentProgress.setVisibility(View.VISIBLE);
+            rvStudentProgress.animate().alpha(1f).setDuration(300).start();
+            
+            btnStudentDashboard.setImageResource(R.drawable.ic_chart);
+            
+            int subCount = (activeClass != null && activeClass.subjects != null) ? activeClass.subjects.size() : 0;
+            tvTotalStudents.setText(subCount + " Subjects");
+            tvTotalStudents.setVisibility(View.VISIBLE);
+        } else {
+            rvStudentProgress.setVisibility(View.GONE);
+            
+            rvDashboard.setAlpha(0f);
+            rvDashboard.setVisibility(View.VISIBLE);
+            rvDashboard.animate().alpha(1f).setDuration(300).start();
+            
+            btnStudentDashboard.setImageResource(R.drawable.ic_students);
+            
+            tvTotalStudents.setText(currentTotalStudents + " Students");
+            tvTotalStudents.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -78,7 +125,7 @@ public class StatsDashboardFragment extends Fragment {
     private void updateHeader() {
         if (activeClass != null) {
             String semNum = SessionContext.selectedSemester != null ? String.valueOf(SessionContext.selectedSemester.number) : "1";
-            tvHeaderStripInfo.setText("Class " + activeClass.className + " Div " + activeClass.division + " • Semester " + semNum);
+            tvHeaderStripInfo.setText("Semester " + semNum + " Progress");
         } else {
             tvHeaderStripInfo.setText(R.string.msg_dashboard_no_class_selected);
         }
@@ -93,13 +140,21 @@ public class StatsDashboardFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         layoutEmptyState.setVisibility(View.GONE);
         rvDashboard.setVisibility(View.GONE);
+        rvStudentProgress.setVisibility(View.GONE);
 
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
                 final List<Student> finalStudents = (students == null) ? new ArrayList<>() : students;
                 final int totalStudents = finalStudents.size();
-                tvTotalStudents.setText(totalStudents + " Students");
+                currentTotalStudents = totalStudents;
+                
+                if (isShowingStudentProgress) {
+                    int subCount = (activeClass != null && activeClass.subjects != null) ? activeClass.subjects.size() : 0;
+                    tvTotalStudents.setText(subCount + " Subjects");
+                } else {
+                    tvTotalStudents.setText(totalStudents + " Students");
+                }
 
                 if (totalStudents == 0) {
                     progressBar.setVisibility(View.GONE);
@@ -160,8 +215,15 @@ public class StatsDashboardFragment extends Fragment {
             return;
         }
 
-        rvDashboard.setVisibility(View.VISIBLE);
         List<DashboardSubjectAdapter.SubjectStats> statsList = new ArrayList<>();
+        List<StudentProgressDashboardAdapter.StudentProgressStats> studentStatsList = new ArrayList<>();
+        
+        int totalSubjects = activeClass.subjects.size();
+
+        // Initialize student stats
+        for (Student student : students) {
+            studentStatsList.add(new StudentProgressDashboardAdapter.StudentProgressStats(student, totalSubjects));
+        }
 
         for (int i = 0; i < activeClass.subjects.size(); i++) {
             Subject subject = activeClass.subjects.get(i);
@@ -170,21 +232,27 @@ public class StatsDashboardFragment extends Fragment {
             String safeKey = MarksRecord.sanitizeKey(subject.name);
 
             // Calculate progress for students belonging to this class only
-            for (Student student : students) {
+            for (int sIdx = 0; sIdx < students.size(); sIdx++) {
+                Student student = students.get(sIdx);
+                StudentProgressDashboardAdapter.StudentProgressStats stuStat = studentStatsList.get(sIdx);
+                
                 MarksRecord record = marksMap.get(student.id);
                 if (record != null && record.detailedMarks != null) {
                     MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
                     if (detail != null) {
                         if (detail.akarikTotal > 0) {
                             stat.formativeFilled++;
+                            stuStat.formativeFilled++;
                         }
                         if (detail.sanklit > 0) {
                             stat.summativeFilled++;
+                            stuStat.summativeFilled++;
                         }
                         if (detail.remark != null) {
                             String cleanRemark = detail.remark.replace("||", "").replace("null", "").trim();
                             if (!cleanRemark.isEmpty()) {
                                 stat.descriptiveFilled++;
+                                stuStat.descriptiveFilled++;
                             }
                         }
                     }
@@ -195,10 +263,14 @@ public class StatsDashboardFragment extends Fragment {
         }
 
         adapter.setData(statsList);
+        studentAdapter.setData(studentStatsList);
+        
+        updateViewVisibility();
     }
 
     private void showEmptyState() {
         layoutEmptyState.setVisibility(View.VISIBLE);
         rvDashboard.setVisibility(View.GONE);
+        rvStudentProgress.setVisibility(View.GONE);
     }
 }

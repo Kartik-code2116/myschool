@@ -9,6 +9,9 @@
     <string name="nav_reports">अहवाल</string>
     <string name="nav_school_level" translatable="false">शालेय स्तर</string>
     
+    <string name="title_stats_dashboard">आकडेवारी डॅशबोर्ड</string>
+    <string name="subtitle_progress_tracker">प्रगती ट्रॅकर - वर्ग %1$s %2$s</string>
+    
     <string name="login_title">परत स्वागत आहे</string>
     <string name="login_subtitle">तुमच्या शिक्षक खात्यात साइन इन करा</string>
     <string name="btn_login">साइन इन करा</string>

@@ -197,14 +197,14 @@ public class HomeActivity extends AppCompatActivity {
                 title = getString(R.string.drawer_settings);
                 subtitle = "App Settings & Configurations";
             } else if (id == R.id.nav_dashboard) {
-                title = "Stats Dashboard";
+                title = getString(R.string.title_stats_dashboard);
                 String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
                         ? SessionContext.selectedClass.className
                         : "N/A";
                 String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null
                         && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division
                                 : "N/A";
-                subtitle = "Progress Tracker - Class " + cls + " " + div;
+                subtitle = getString(R.string.subtitle_progress_tracker, cls, div);
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
