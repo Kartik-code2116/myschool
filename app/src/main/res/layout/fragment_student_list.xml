@@ -75,7 +75,7 @@
                         android:id="@+id/btnHelp"
                         android:layout_width="38dp"
                         android:layout_height="38dp"
-                        android:src="@drawable/ic_chat"
+                        android:src="@drawable/ic_help_outline"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         app:tint="#5A4FCF"
                         android:padding="8dp"

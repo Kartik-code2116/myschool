@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Product Tour Tooltip View IDs (programmatically created views) -->
+    <item name="tvTourStepCounter"  type="id"/>
+    <item name="tvTourTitle"        type="id"/>
+    <item name="tvTourDescription"  type="id"/>
+    <item name="tvTourSkip"         type="id"/>
+    <item name="tvTourNext"         type="id"/>
+</resources>

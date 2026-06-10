@@ -261,6 +261,21 @@ public class EnterMarksActivity extends AppCompatActivity {
         b.btnSaveMarks.setOnClickListener(v -> saveMarks());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_help_only, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(this, "enter_marks");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     // ── Row builder ────────────────────────────────────────────────────────────
     private void addMarksRow(Subject sub) {
         ItemSubjectMarksRowBinding row = ItemSubjectMarksRowBinding.inflate(

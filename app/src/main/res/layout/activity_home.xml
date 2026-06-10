@@ -97,6 +97,17 @@
                         android:visibility="gone"
                         android:contentDescription="More options"/>
 
+                    <!-- Help Icon -->
+                    <ImageButton
+                        android:id="@+id/btnToolbarHelp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_help_outline"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#5A4FCF"
+                        android:padding="8dp"
+                        android:contentDescription="Help"/>
+
                     <!-- Profile icon -->
                     <ImageView
                         android:id="@+id/ivProfilePic"

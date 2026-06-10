@@ -142,13 +142,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     // ---------- Dialog Flows ----------
 
     private void showHelpDialog() {
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.msg_help_guidelines)
-                .setMessage("१. मासिक उपस्थिती बदल करण्यासाठी प्रत्येक कार्डच्या उजव्या बाजूला असलेल्या तीन-बिंदू मेनूवर क्लिक करा आणि 'बदल करा' निवडा.\n\n"
-                        + "२. एका विद्यार्थ्याची मासिक हजेरी दुसऱ्या विद्यार्थ्यावर जशीच्या तशी कॉपी करण्यासाठी 'डुप्लिकेट' निवडा.\n\n"
-                        + "३. रेकॉर्ड डिलीट करण्यासाठी 'डिलीट करा' वर क्लिक करा.")
-                .setPositiveButton("ठीक आहे", null)
-                .show();
+        com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "attendance");
     }
 
     private void showClassReportDialog() {

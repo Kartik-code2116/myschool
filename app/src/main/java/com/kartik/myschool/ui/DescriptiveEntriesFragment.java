@@ -110,8 +110,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), R.string.msg_descriptive_entries_manual_ope, Toast.LENGTH_SHORT)
-                        .show());
+                v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "descriptive"));
         b.btnAddSquare.setOnClickListener(
                 v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
     }

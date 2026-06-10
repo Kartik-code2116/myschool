@@ -98,6 +98,21 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         b.btnSaveRemarks.setOnClickListener(v -> saveRemarks());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_help_only, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(this, "enter_descriptive");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void loadExistingData() {
         // Layer 1: AppCache — only use if student + class match AND record has an id
         // (id = it was loaded from Firestore, not a locally-constructed object)

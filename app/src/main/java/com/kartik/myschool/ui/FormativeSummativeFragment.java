@@ -121,7 +121,7 @@ public class FormativeSummativeFragment extends Fragment {
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), R.string.msg_evaluation_help_manual_opened, Toast.LENGTH_SHORT).show());
+                v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "formative_summative"));
         b.btnAddSquare.setOnClickListener(
                 v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
         b.btnCalcSquare.setOnClickListener(v -> {

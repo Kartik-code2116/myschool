@@ -84,13 +84,7 @@ public class StudentListFragment extends Fragment {
 
         if (b.btnHelp != null) {
             b.btnHelp.setOnClickListener(v -> {
-                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle(R.string.msg_student_list_help)
-                        .setMessage("१. विद्यार्थ्याचे गुण भरण्यासाठी किंवा उपस्थिती बदलण्यासाठी प्रत्येक विद्यार्थ्याच्या कार्डवरील ३-बिंदू मेनूवर क्लिक करा.\n\n"
-                                + "२. नवीन विद्यार्थी जोडण्यासाठी खाली उजव्या कोपऱ्यातील '+' बटणावर क्लिक करा.\n\n"
-                                + "३. शोध घेण्यासाठी वरील सर्च बारचा वापर करा.")
-                        .setPositiveButton("ठीक आहे", null)
-                        .show();
+                com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "students");
             });
         }
 
@@ -469,7 +463,7 @@ public class StudentListFragment extends Fragment {
 
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("id,name,std,div,roll1,roll2,gender,category,reg,dob,motherName,motherOccupation,motherPhone,fatherName,fatherOccupation,fatherPhone,address,bankAccount,bankBranch,bankIfsc,bankUid,medium,motherTongue,dateOfAdmission,studentIdNumber,uid\n");
+            sb.append("ID,Student Name,Standard,Division,Roll No 1,Roll No 2,Gender,Caste,Registration No,Date of Birth,Mother's Name,Mother's Occupation,Mother's Phone,Father's Name,Father's Occupation,Father's Phone,Address,Account No,Branch,IFSC,Bank UID,Medium,Mother Tongue,Date of Admission,Student Id,UID\n");
 
             for (Student s : filteredStudents) {
                 sb.append(escapeCsv(s.id != null ? s.id : "")).append(",")
@@ -479,7 +473,7 @@ public class StudentListFragment extends Fragment {
                   .append(escapeCsv(s.rollNo != null ? s.rollNo : "")).append(",")
                   .append(escapeCsv(s.rollNo2 != null ? s.rollNo2 : "")).append(",")
                   .append(escapeCsv(s.gender != null ? s.gender : "")).append(",")
-                  .append(getCasteCategoryIndex(s.cast)).append(",")
+                  .append(escapeCsv(s.cast != null ? s.cast : "")).append(",")
                   .append(escapeCsv(s.registrationNo != null ? s.registrationNo : "")).append(",")
                   .append(escapeCsv(s.dob != null ? s.dob : "")).append(",")
                   .append(escapeCsv(s.motherName != null ? s.motherName : "")).append(",")
@@ -599,43 +593,43 @@ public class StudentListFragment extends Fragment {
             for (String[] cells : lines) {
                 Student s = new Student();
                 
-                s.id = getCell(cells, new String[]{"id"}, headerMap, "");
-                s.name = getCell(cells, new String[]{"name"}, headerMap, "");
-                s.standard = getCell(cells, new String[]{"std", "standard"}, headerMap, currentClass.className);
-                s.division = getCell(cells, new String[]{"div", "division"}, headerMap, currentClass.division);
-                s.rollNo = getCell(cells, new String[]{"roll1", "rollno"}, headerMap, "");
-                s.rollNo2 = getCell(cells, new String[]{"roll2", "rollno2"}, headerMap, "");
-                
-                String rawGender = getCell(cells, new String[]{"gender"}, headerMap, "Male");
-                if (rawGender.equalsIgnoreCase("Female") || rawGender.equals("2") || rawGender.equalsIgnoreCase("स्त्री")) {
+                s.id = getCell(cells, new String[]{"id", "ID"}, headerMap, "");
+                s.name = getCell(cells, new String[]{"name", "student name", "student full name", "full name", "नाव", "विद्यार्थ्याचे पूर्ण नाव", "studentname", "fullname"}, headerMap, "");
+                s.standard = getCell(cells, new String[]{"std", "standard", "मानक", "वर्ग", "class", "std/class"}, headerMap, currentClass.className);
+                s.division = getCell(cells, new String[]{"div", "division", "विभाग", "विभागणी"}, headerMap, currentClass.division);
+                s.rollNo = getCell(cells, new String[]{"roll1", "rollno", "roll no", "roll no 1", "roll no. 1", "roll number", "रोल क्रमांक १", "रोल नंबर", "अनुक्रमांक", "rollnumber"}, headerMap, "");
+                s.rollNo2 = getCell(cells, new String[]{"roll2", "rollno2", "roll no 2", "roll no. 2", "रोल क्रमांक २"}, headerMap, "");
+
+                String rawGender = getCell(cells, new String[]{"gender", "sex", "लिंग"}, headerMap, "Male");
+                if (rawGender.equalsIgnoreCase("Female") || rawGender.equals("2") || rawGender.equalsIgnoreCase("स्त्री") || rawGender.equalsIgnoreCase("मुलगी")) {
                     s.gender = "Female";
                 } else {
                     s.gender = "Male";
                 }
 
-                String rawCategory = getCell(cells, new String[]{"category", "cast", "caste"}, headerMap, "Open");
+                String rawCategory = getCell(cells, new String[]{"category", "cast", "caste", "कास्ट", "जात", "वर्गवारी"}, headerMap, "Open");
                 s.cast = getCasteCategoryName(rawCategory);
 
-                s.registrationNo = getCell(cells, new String[]{"reg", "registrationno"}, headerMap, "");
-                s.dob = getCell(cells, new String[]{"dob", "year", "dateofbirth"}, headerMap, "");
-                s.motherName = getCell(cells, new String[]{"mothername"}, headerMap, "");
-                s.motherOccupation = getCell(cells, new String[]{"motheroccupation"}, headerMap, "");
-                s.motherPhone = getCell(cells, new String[]{"motherphone"}, headerMap, "");
-                s.fatherName = getCell(cells, new String[]{"fathername", "fname"}, headerMap, "");
-                s.fatherOccupation = getCell(cells, new String[]{"fatheroccupation", "fwork"}, headerMap, "");
-                s.fatherPhone = getCell(cells, new String[]{"fatherphone", "fphone"}, headerMap, "");
-                s.address = getCell(cells, new String[]{"address"}, headerMap, "");
-                s.bankAccount = getCell(cells, new String[]{"bankaccount"}, headerMap, "");
-                s.bankBranch = getCell(cells, new String[]{"bankbranch"}, headerMap, "");
-                s.bankIfsc = getCell(cells, new String[]{"bankifsc"}, headerMap, "");
-                s.bankUid = getCell(cells, new String[]{"bankuid"}, headerMap, "");
-                s.medium = getCell(cells, new String[]{"medium"}, headerMap, "");
-                s.motherTongue = getCell(cells, new String[]{"mothertongue"}, headerMap, "");
-                s.dateOfAdmission = getCell(cells, new String[]{"dateofadmission", "admissiondate"}, headerMap, "");
-                s.studentIdNumber = getCell(cells, new String[]{"studentidnumber", "studentid"}, headerMap, "");
-                s.uid = getCell(cells, new String[]{"uid", "aadhar"}, headerMap, "");
+                s.registrationNo = getCell(cells, new String[]{"reg", "registrationno", "registration no", "reg no", "नोंदणी क्र", "नोंदणी क्रमांक", "नोंदणी क्र.", "registrationnumber"}, headerMap, "");
+                s.dob = getCell(cells, new String[]{"dob", "year", "dateofbirth", "date of birth", "जन्मतारीख", "जन्म तारीख"}, headerMap, "");
+                s.motherName = getCell(cells, new String[]{"mothername", "mother's name", "mother name", "आईचे नाव", "mother_name"}, headerMap, "");
+                s.motherOccupation = getCell(cells, new String[]{"motheroccupation", "mother's occupation", "mother occupation", "आईचा व्यवसाय"}, headerMap, "");
+                s.motherPhone = getCell(cells, new String[]{"motherphone", "mother's phone", "mother phone", "आईचा फोन"}, headerMap, "");
+                s.fatherName = getCell(cells, new String[]{"fathername", "fname", "father's name", "father name", "वडिलांचे नाव", "fname", "father_name"}, headerMap, "");
+                s.fatherOccupation = getCell(cells, new String[]{"fatheroccupation", "fwork", "father's occupation", "father occupation", "वडिलांचा व्यवसाय", "fwork", "occupation"}, headerMap, "");
+                s.fatherPhone = getCell(cells, new String[]{"fatherphone", "fphone", "father's phone", "father phone", "वडिलांचा फोन", "fphone", "phone"}, headerMap, "");
+                s.address = getCell(cells, new String[]{"address", "home address", "पत्ता"}, headerMap, "");
+                s.bankAccount = getCell(cells, new String[]{"bankaccount", "account no", "account number", "bank account", "bank account no", "खाते क्र", "खाते क्रमांक", "खाते क्र.", "account_no"}, headerMap, "");
+                s.bankBranch = getCell(cells, new String[]{"bankbranch", "branch", "bank branch", "शाखा", "bank_branch"}, headerMap, "");
+                s.bankIfsc = getCell(cells, new String[]{"bankifsc", "ifsc", "ifsc code", "bank ifsc", "ifsc_code"}, headerMap, "");
+                s.bankUid = getCell(cells, new String[]{"bankuid", "bank uid", "बँक uid", "bank_uid"}, headerMap, "");
+                s.medium = getCell(cells, new String[]{"medium", "मध्यम"}, headerMap, "");
+                s.motherTongue = getCell(cells, new String[]{"mothertongue", "mother tongue", "मातृभाषा", "mother_tongue"}, headerMap, "");
+                s.dateOfAdmission = getCell(cells, new String[]{"dateofadmission", "admissiondate", "date of admission", "date_of_admission", "प्रवेशाची तारीख", "प्रवेश तारीख"}, headerMap, "");
+                s.studentIdNumber = getCell(cells, new String[]{"studentidnumber", "studentid", "student id", "student id number", "student_id", "विद्यार्थी आयडी", "विद्यार्थी आयडी क्र"}, headerMap, "");
+                s.uid = getCell(cells, new String[]{"uid", "aadhar", "aadhar no", "aadhar number", "uid", "आधार कार्ड", "आधार नंबर", "आधार क्रमांक"}, headerMap, "");
 
-                s.parentName = s.fatherName != null && !s.fatherName.isEmpty() ? s.fatherName : "";
+                s.parentName = s.fatherName != null && !s.fatherName.isEmpty() ? s.fatherName : (s.motherName != null ? s.motherName : "");
                 
                 s.classId = currentClass.id;
                 s.className = currentClass.className;
@@ -724,6 +718,20 @@ public class StudentListFragment extends Fragment {
                 default: return "Open";
             }
         } catch (NumberFormatException e) {
+            String upper = categoryStr.toUpperCase().trim();
+            if (upper.equals("SC") || upper.contains("SCHEDULED CASTES") || upper.contains("अनुसूचित जाती")) {
+                return "SC (Scheduled Castes)";
+            } else if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES") || upper.contains("अनुसूचित जमाती")) {
+                return "ST (Scheduled Tribes)";
+            } else if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT") || upper.contains("विमुक्त")) {
+                return "VJ (Vimukt Jati)";
+            } else if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("BHATKYA") || upper.contains("भटक्या")) {
+                return "NT (Nomadic Tribes)";
+            } else if (upper.equals("OBC") || upper.contains("OTHER BACKWARD CLASSES") || upper.contains("SBC") || upper.contains("इतर मागास")) {
+                return "OBC (Other Backward Classes)";
+            } else if (upper.equalsIgnoreCase("Open") || upper.equalsIgnoreCase("General") || upper.contains("खुला")) {
+                return "Open";
+            }
             return categoryStr;
         }
     }

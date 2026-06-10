@@ -80,6 +80,35 @@ public class HomeActivity extends AppCompatActivity {
         b.btnMenu.setOnClickListener(v -> b.drawerLayout.openDrawer(GravityCompat.START));
         b.ivProfilePic.setOnClickListener(v -> navigateToAnimated(R.id.nav_profile));
 
+        b.btnToolbarHelp.setOnClickListener(v -> {
+            if (navController != null && navController.getCurrentDestination() != null) {
+                int destId = navController.getCurrentDestination().getId();
+                String pageKey = "default";
+                if (destId == R.id.nav_info_print) {
+                    pageKey = "info_print";
+                } else if (destId == R.id.nav_dashboard) {
+                    pageKey = "stats_dashboard";
+                } else if (destId == R.id.nav_class_div) {
+                    pageKey = "class_div";
+                } else if (destId == R.id.nav_reports || destId == R.id.nav_print_report) {
+                    pageKey = "print_report";
+                } else if (destId == R.id.nav_profile) {
+                    pageKey = "profile";
+                } else if (destId == R.id.nav_subjects) {
+                    pageKey = "subjects";
+                } else if (destId == R.id.nav_weightage) {
+                    pageKey = "weightage";
+                } else if (destId == R.id.nav_settings) {
+                    pageKey = "settings";
+                } else if (destId == R.id.nav_extra) {
+                    pageKey = "school_settings";
+                } else if (destId == R.id.nav_dropdown || destId == R.id.nav_school_info || destId == R.id.nav_gender || destId == R.id.nav_cast_category || destId == R.id.nav_class_teacher || destId == R.id.nav_classes || destId == R.id.nav_subject || destId == R.id.nav_default_values || destId == R.id.nav_working_days || destId == R.id.nav_he_she_items) {
+                    pageKey = "school_settings";
+                }
+                com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(this, pageKey);
+            }
+        });
+
         b.navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_school_level_dropdown) {

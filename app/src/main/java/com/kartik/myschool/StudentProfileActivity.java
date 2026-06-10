@@ -87,6 +87,21 @@ public class StudentProfileActivity extends AppCompatActivity {
         loadStudent();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_help_only, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(this, "student_profile");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void loadStudent() {
         FirebaseRepository.get().getStudent(student.id, new FirebaseRepository.OnResult<Student>() {
             @Override public void onSuccess(Student s) {

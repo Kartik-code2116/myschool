@@ -86,6 +86,21 @@ public class StudentEditActivity extends AppCompatActivity {
         b.btnSaveStudent.setOnClickListener(v -> save());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_help_only, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(this, "student_edit");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void prefillFromSession() {
         if (SessionContext.selectedClass != null) {
             b.etStandard.setText(SessionContext.selectedClass.className);
