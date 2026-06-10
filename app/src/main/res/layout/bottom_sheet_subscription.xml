@@ -44,7 +44,7 @@
                 android:id="@+id/ivUpiQr"
                 android:layout_width="160dp"
                 android:layout_height="160dp"
-                android:src="@drawable/ic_qr_placeholder" /> <!-- Needs a placeholder or actual QR -->
+                android:src="@drawable/app_logo" /> <!-- Needs a placeholder or actual QR -->
             
             <TextView
                 android:id="@+id/tvUpiId"
