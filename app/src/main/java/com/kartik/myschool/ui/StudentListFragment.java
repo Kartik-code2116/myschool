@@ -98,12 +98,6 @@ public class StudentListFragment extends Fragment {
             });
         }
 
-        if (b.btnSave != null) {
-            b.btnSave.setOnClickListener(v -> {
-                showInformationSavedMessage();
-            });
-        }
-
         if (b.btnDashboard != null) {
             b.btnDashboard.setOnClickListener(v -> {
                 androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_dashboard);
@@ -293,6 +287,9 @@ public class StudentListFragment extends Fragment {
         AppCache.selectedStudent = new Student();
         startActivity(new Intent(requireContext(), StudentEditActivity.class)
                 .putExtra("new_student", true));
+        if (getActivity() != null) {
+            getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
     }
 
     private void loadAllStudents() {

@@ -92,17 +92,6 @@
                         android:padding="8dp"
                         android:contentDescription="Excel Export Import"/>
 
-                    <!-- Save Backup icon -->
-                    <ImageButton
-                        android:id="@+id/btnSave"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:src="@drawable/ic_save"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
-                        android:padding="8dp"
-                        android:contentDescription="Save Backup"/>
-
                     <!-- Stats Dashboard icon -->
                     <ImageButton
                         android:id="@+id/btnDashboard"
