@@ -1413,6 +1413,73 @@ public class FirebaseRepository {
         }
     }
 
+    public void getStudentsForUdiseCode(String udiseCode, OnResult<List<Student>> cb) {
+        if (udiseCode == null || udiseCode.isEmpty()) {
+            cb.onError(new IllegalArgumentException("UDISE code cannot be null or empty"));
+            return;
+        }
+        db.collection(COL_SCHOOLS)
+                .whereEqualTo("udiseCode", udiseCode)
+                .get()
+                .addOnSuccessListener(schoolSnap -> {
+                    List<String> schoolIds = new ArrayList<>();
+                    if (schoolSnap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : schoolSnap.getDocuments()) {
+                            schoolIds.add(doc.getId());
+                        }
+                    }
+                    if (schoolIds.isEmpty()) {
+                        cb.onSuccess(new ArrayList<>());
+                        return;
+                    }
+                    
+                    fetchStudentsForSchoolIds(schoolIds, cb);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    private void fetchStudentsForSchoolIds(List<String> schoolIds, OnResult<List<Student>> cb) {
+        List<Student> allStudents = new ArrayList<>();
+        int limit = 30;
+        int size = schoolIds.size();
+        java.util.concurrent.atomic.AtomicInteger pendingQueries = new java.util.concurrent.atomic.AtomicInteger((size + limit - 1) / limit);
+        java.util.concurrent.atomic.AtomicReference<Exception> errorRef = new java.util.concurrent.atomic.AtomicReference<>();
+        
+        for (int i = 0; i < size; i += limit) {
+            List<String> chunk = schoolIds.subList(i, Math.min(i + limit, size));
+            db.collection(COL_STUDENTS)
+                    .whereIn("schoolId", chunk)
+                    .get()
+                    .addOnSuccessListener(snap -> {
+                        if (snap != null) {
+                            synchronized (allStudents) {
+                                for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                                    Student s = doc.toObject(Student.class);
+                                    if (s != null) {
+                                        if (s.id == null || s.id.isEmpty()) {
+                                            s.id = doc.getId();
+                                        }
+                                        allStudents.add(s);
+                                    }
+                                }
+                            }
+                        }
+                        if (pendingQueries.decrementAndGet() == 0) {
+                            if (errorRef.get() != null) {
+                                cb.onError(errorRef.get());
+                            } else {
+                                cb.onSuccess(allStudents);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        errorRef.set(e);
+                        if (pendingQueries.decrementAndGet() == 0) {
+                            cb.onError(e);
+                        }
+                    });
+        }
+    }
 
     // ---------- Callback interface ----------
     public interface OnResult<T> {

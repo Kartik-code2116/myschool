@@ -81,16 +81,16 @@
                         android:padding="8dp"
                         android:contentDescription="Help"/>
 
-                    <!-- Calculator icon -->
+                    <!-- Excel export/import icon -->
                     <ImageButton
-                        android:id="@+id/btnCalc"
+                        android:id="@+id/btnExcel"
                         android:layout_width="38dp"
                         android:layout_height="38dp"
-                        android:src="@drawable/ic_calculator"
+                        android:src="@drawable/ic_excel"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
+                        app:tint="#107C41"
                         android:padding="8dp"
-                        android:contentDescription="Calculator"/>
+                        android:contentDescription="Excel Export Import"/>
 
                     <!-- ID Card icon -->
                     <ImageButton

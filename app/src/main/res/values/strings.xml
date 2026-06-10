@@ -178,6 +178,12 @@
     <string name="profile_std_empty">Std %1$d — not added</string>
     <string name="profile_add_from_home">Add from Home tab</string>
     <string name="profile_students_count">%1$d students</string>
+    <string name="menu_student_evaluation">Evaluation</string>
+    <string name="menu_student_attendance">Attendance</string>
+    <string name="menu_student_edit_info">Edit Info</string>
+    <string name="menu_student_delete">Delete</string>
+    <string name="action_export_students">Export Students</string>
+    <string name="action_import_students">Import Students</string>
     <string name="profile_division_line">Division: %1$s</string>
     <string name="profile_divisions_in_std">All divisions in this std: %1$s</string>
     <string name="profile_class_teachers">Teachers: %1$s · %2$s</string>

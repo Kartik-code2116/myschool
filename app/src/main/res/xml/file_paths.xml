@@ -9,4 +9,7 @@
     <!-- Required to open downloaded files from the public Downloads folder -->
     <external-public-path name="downloads"     path="Download/"/>
     <external-path name="external_downloads"   path="Download/"/>
+    
+    <!-- Required to share files from the internal cache directory (like excel_exports and backups) -->
+    <cache-path name="internal_cache"          path="."/>
 </paths>

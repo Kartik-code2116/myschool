@@ -51,13 +51,13 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_dob">
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDob" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
             </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_gender">
-                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etGender" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                <AutoCompleteTextView android:id="@+id/etGender" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" android:singleLine="true"/>
             </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+            <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_cast">
-                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etCast" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                <AutoCompleteTextView android:id="@+id/etCast" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" android:singleLine="true"/>
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="@string/label_standard">

@@ -131,72 +131,10 @@ public class ExtraMenusFragment extends Fragment {
             if (menuType.equals("working_days")) {
                 setupWorkingDaysEditor(activeClass);
             }
+        }
 
-            // Real-time student statistics for active class (Gender & Cast categories)
-            FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
-                @Override
-                public void onSuccess(List<Student> list) {
-                    int boys = 0;
-                    int girls = 0;
-                    int generalCount = 0;
-                    int obcCount = 0;
-                    int scCount = 0;
-                    int stCount = 0;
-
-                    for (Student s : list) {
-                        // Gender check
-                        if (s.gender != null && s.gender.equalsIgnoreCase("Female")) {
-                            girls++;
-                        } else {
-                            boys++;
-                        }
-
-                        // Cast category check
-                        if (s.cast != null) {
-                            String c = s.cast.toUpperCase();
-                            if (c.contains("OBC")) obcCount++;
-                            else if (c.contains("SC")) scCount++;
-                            else if (c.contains("ST")) stCount++;
-                            else generalCount++;
-                        } else {
-                            generalCount++;
-                        }
-                    }
-
-                    final int finalBoys = boys;
-                    final int finalGirls = girls;
-                    final int finalGen = generalCount;
-                    final int finalObc = obcCount;
-                    final int finalSc = scCount;
-                    final int finalSt = stCount;
-                    final int finalTotal = list.size();
-
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            // Update Gender distribution
-                            b.tvGenderBoysCount.setText(String.valueOf(finalBoys));
-                            b.tvGenderGirlsCount.setText(String.valueOf(finalGirls));
-                            if (finalTotal > 0) {
-                                double boysPercent = (finalBoys * 100.0) / finalTotal;
-                                double girlsPercent = (finalGirls * 100.0) / finalTotal;
-                                b.tvGenderRatio.setText(String.format("Active Class Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent));
-                            } else {
-                                b.tvGenderRatio.setText(R.string.msg_no_students_in_active_class);
-                            }
-
-                            // Update Cast distribution
-                            b.tvCastGeneral.setText("General (Open) : " + finalGen + " students");
-                            b.tvCastObc.setText("OBC Category : " + finalObc + " students");
-                            b.tvCastSc.setText("SC Category : " + finalSc + " students");
-                            b.tvCastSt.setText("ST Category : " + finalSt + " students");
-                            b.tvSchoolInfoTotalStudents.setText("Active class enrollment: " + finalTotal + " students");
-                        });
-                    }
-                }
-
-                @Override
-                public void onError(Exception e) {}
-            });
+        if (menuType.equals("school_info") || menuType.equals("gender") || menuType.equals("cast_category")) {
+            loadSchoolWideStats();
         }
 
         // Save Default admission baseline click listener
@@ -924,5 +862,138 @@ public class ExtraMenusFragment extends Fragment {
             
             b.llClassesListContainer.addView(row);
         }
+    }
+
+    private void loadSchoolWideStats() {
+        School school = SessionContext.selectedSchool;
+        if (school == null) {
+            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+                @Override
+                public void onSuccess(com.kartik.myschool.model.Teacher t) {
+                    FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<School>() {
+                        @Override
+                        public void onSuccess(School s) {
+                            SessionContext.selectedSchool = s;
+                            AppCache.selectedSchool = s;
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> loadSchoolWideStatsForUdise(s.udiseCode));
+                            }
+                        }
+                        @Override
+                        public void onError(Exception e) {}
+                    });
+                }
+                @Override
+                public void onError(Exception e) {}
+            });
+        } else {
+            loadSchoolWideStatsForUdise(school.udiseCode);
+        }
+    }
+
+    private void loadSchoolWideStatsForUdise(String udiseCode) {
+        if (udiseCode == null || udiseCode.isEmpty()) {
+            return;
+        }
+
+        FirebaseRepository.get().getClassesForUdiseCode(udiseCode, new FirebaseRepository.OnResult<List<ClassModel>>() {
+            @Override
+            public void onSuccess(List<ClassModel> classes) {
+                if (!isAdded() || b == null) return;
+                
+                String currentYearLabel = SessionContext.getYearLabel();
+                java.util.Set<String> activeClassIds = new java.util.HashSet<>();
+                for (ClassModel c : classes) {
+                    if (currentYearLabel.equals(c.academicYearLabel)) {
+                        activeClassIds.add(c.id);
+                    }
+                }
+
+                FirebaseRepository.get().getStudentsForUdiseCode(udiseCode, new FirebaseRepository.OnResult<List<Student>>() {
+                    @Override
+                    public void onSuccess(List<Student> students) {
+                        if (!isAdded() || b == null) return;
+
+                        List<Student> activeStudents = new ArrayList<>();
+                        for (Student s : students) {
+                            if (s.classId != null && activeClassIds.contains(s.classId)) {
+                                activeStudents.add(s);
+                            }
+                        }
+
+                        int boys = 0;
+                        int girls = 0;
+                        int generalCount = 0;
+                        int obcCount = 0;
+                        int scCount = 0;
+                        int stCount = 0;
+
+                        for (Student s : activeStudents) {
+                            if (s.gender != null && s.gender.equalsIgnoreCase("Female")) {
+                                girls++;
+                            } else {
+                                boys++;
+                            }
+
+                            if (s.cast != null) {
+                                String c = s.cast.toUpperCase();
+                                if (c.contains("OBC")) obcCount++;
+                                else if (c.contains("SC")) scCount++;
+                                else if (c.contains("ST")) stCount++;
+                                else generalCount++;
+                            } else {
+                                generalCount++;
+                            }
+                        }
+
+                        final int finalBoys = boys;
+                        final int finalGirls = girls;
+                        final int finalGen = generalCount;
+                        final int finalObc = obcCount;
+                        final int finalSc = scCount;
+                        final int finalSt = stCount;
+                        final int finalTotal = activeStudents.size();
+
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                b.tvGenderBoysCount.setText(String.valueOf(finalBoys));
+                                b.tvGenderGirlsCount.setText(String.valueOf(finalGirls));
+                                boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+                                if (finalTotal > 0) {
+                                    double boysPercent = (finalBoys * 100.0) / finalTotal;
+                                    double girlsPercent = (finalGirls * 100.0) / finalTotal;
+                                    String ratioText = isMr 
+                                        ? String.format("शाळा लिंग गुणोत्तर: %.1f%% मुले / %.1f%% मुली", boysPercent, girlsPercent)
+                                        : String.format("School Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent);
+                                    b.tvGenderRatio.setText(ratioText);
+                                } else {
+                                    b.tvGenderRatio.setText(isMr ? "या शैक्षणिक वर्षात विद्यार्थी आढळले नाहीत." : "No students in this academic year.");
+                                }
+
+                                if (isMr) {
+                                    b.tvCastGeneral.setText("सर्वसाधारण (खुला प्रवर्ग) : " + finalGen + " विद्यार्थी");
+                                    b.tvCastObc.setText("इतर मागासवर्ग (OBC) : " + finalObc + " विद्यार्थी");
+                                    b.tvCastSc.setText("अनुसूचित जाती (SC) : " + finalSc + " विद्यार्थी");
+                                    b.tvCastSt.setText("अनुसूचित जमाती (ST) : " + finalSt + " विद्यार्थी");
+                                    b.tvSchoolInfoTotalStudents.setText("शाळा एकूण पटसंख्या: " + finalTotal + " विद्यार्थी");
+                                } else {
+                                    b.tvCastGeneral.setText("General (Open) : " + finalGen + " students");
+                                    b.tvCastObc.setText("OBC Category : " + finalObc + " students");
+                                    b.tvCastSc.setText("SC Category : " + finalSc + " students");
+                                    b.tvCastSt.setText("ST Category : " + finalSt + " students");
+                                    b.tvSchoolInfoTotalStudents.setText("School-wide total enrollment: " + finalTotal + " students");
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {}
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {}
+        });
     }
 }

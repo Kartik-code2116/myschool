@@ -179,6 +179,12 @@
     <string name="profile_std_empty">इयत्ता %1$d — जोडलेले नाही</string>
     <string name="profile_add_from_home">होम टॅबमधून जोडा</string>
     <string name="profile_students_count">%1$d विद्यार्थी</string>
+    <string name="menu_student_evaluation">मूल्यमापन</string>
+    <string name="menu_student_attendance">हजेरी</string>
+    <string name="menu_student_edit_info">माहिती बदला</string>
+    <string name="menu_student_delete">हटवा</string>
+    <string name="action_export_students">विद्यार्थी निर्यात करा (Export)</string>
+    <string name="action_import_students">विद्यार्थी आयात करा (Import)</string>
     <string name="profile_division_line">विभाग: %1$s</string>
     <string name="profile_divisions_in_std">या इयत्तेतील सर्व विभाग: %1$s</string>
     <string name="profile_class_teachers">शिक्षक: %1$s · %2$s</string>

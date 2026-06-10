@@ -14,6 +14,8 @@ import com.kartik.myschool.model.Student;
 import com.kartik.myschool.model.Teacher;
 import com.kartik.myschool.repository.FirebaseRepository;
 import com.google.android.material.textfield.TextInputEditText;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 
 public class StudentEditActivity extends AppCompatActivity {
 
@@ -53,6 +55,34 @@ public class StudentEditActivity extends AppCompatActivity {
             prefillFromSession();
         }
 
+        // Setup dropdown for Gender
+        String[] genderOptions = {
+                getString(R.string.gender_male),
+                getString(R.string.gender_female)
+        };
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                genderOptions
+        );
+        b.etGender.setAdapter(genderAdapter);
+
+        // Setup dropdown for Cast Categories
+        String[] castOptions = {
+                "SC (Scheduled Castes)",
+                "ST (Scheduled Tribes)",
+                "VJ (Vimukt Jati)",
+                "NT (Nomadic Tribes)",
+                "OBC (Other Backward Classes)",
+                "Open"
+        };
+        ArrayAdapter<String> castAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                castOptions
+        );
+        b.etCast.setAdapter(castAdapter);
+
         b.btnSaveStudent.setOnClickListener(v -> save());
     }
 
@@ -69,8 +99,38 @@ public class StudentEditActivity extends AppCompatActivity {
         set(b.etRoll2, s.rollNo2);
         set(b.etRegNo, s.registrationNo);
         set(b.etDob, s.dob);
-        set(b.etGender, s.gender);
-        set(b.etCast, s.cast);
+        if (s.gender != null) {
+            if (s.gender.equalsIgnoreCase("Female")) {
+                b.etGender.setText(getString(R.string.gender_female), false);
+            } else if (s.gender.equalsIgnoreCase("Male")) {
+                b.etGender.setText(getString(R.string.gender_male), false);
+            } else {
+                b.etGender.setText(s.gender, false);
+            }
+        } else {
+            b.etGender.setText("", false);
+        }
+
+        if (s.cast != null) {
+            String normalizedCast = s.cast;
+            String upper = s.cast.toUpperCase().trim();
+            if (upper.equals("SC") || upper.contains("SCHEDULED CASTES")) {
+                normalizedCast = "SC (Scheduled Castes)";
+            } else if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES")) {
+                normalizedCast = "ST (Scheduled Tribes)";
+            } else if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT")) {
+                normalizedCast = "VJ (Vimukt Jati)";
+            } else if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("BHATKYA")) {
+                normalizedCast = "NT (Nomadic Tribes)";
+            } else if (upper.equals("OBC") || upper.contains("OTHER BACKWARD CLASSES") || upper.contains("SBC")) {
+                normalizedCast = "OBC (Other Backward Classes)";
+            } else if (upper.equalsIgnoreCase("Open") || upper.equalsIgnoreCase("General")) {
+                normalizedCast = "Open";
+            }
+            b.etCast.setText(normalizedCast, false);
+        } else {
+            b.etCast.setText("", false);
+        }
         set(b.etStandard, s.standard);
         set(b.etDivision, s.division);
         set(b.etMotherName, s.motherName);
@@ -91,7 +151,7 @@ public class StudentEditActivity extends AppCompatActivity {
         set(b.etUid, s.uid);
     }
 
-    private void set(TextInputEditText et, String v) {
+    private void set(EditText et, String v) {
         if (et != null) et.setText(v != null ? v : "");
     }
 
@@ -108,7 +168,14 @@ public class StudentEditActivity extends AppCompatActivity {
         s.rollNo2 = str(b.etRoll2);
         s.registrationNo = str(b.etRegNo);
         s.dob = str(b.etDob);
-        s.gender = str(b.etGender);
+        String selectedGender = str(b.etGender);
+        if (selectedGender.equals(getString(R.string.gender_female))) {
+            s.gender = "Female";
+        } else if (selectedGender.equals(getString(R.string.gender_male))) {
+            s.gender = "Male";
+        } else {
+            s.gender = selectedGender;
+        }
         s.cast = str(b.etCast);
         s.standard = str(b.etStandard);
         s.division = str(b.etDivision);
@@ -183,7 +250,7 @@ public class StudentEditActivity extends AppCompatActivity {
         });
     }
 
-    private String str(TextInputEditText et) {
+    private String str(EditText et) {
         return et.getText() != null ? et.getText().toString().trim() : "";
     }
 }

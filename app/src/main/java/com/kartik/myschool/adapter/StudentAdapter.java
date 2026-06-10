@@ -100,10 +100,10 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
 
         h.btnOptions.setOnClickListener(v -> {
             android.widget.PopupMenu popup = new android.widget.PopupMenu(v.getContext(), v);
-            popup.getMenu().add(0, 1, 0, "Evaluation");
-            popup.getMenu().add(0, 2, 1, "Attendance");
-            popup.getMenu().add(0, 3, 2, "Edit Info");
-            popup.getMenu().add(0, 4, 3, "Delete");
+            popup.getMenu().add(0, 1, 0, v.getContext().getString(R.string.menu_student_evaluation));
+            popup.getMenu().add(0, 2, 1, v.getContext().getString(R.string.menu_student_attendance));
+            popup.getMenu().add(0, 3, 2, v.getContext().getString(R.string.menu_student_edit_info));
+            popup.getMenu().add(0, 4, 3, v.getContext().getString(R.string.menu_student_delete));
             popup.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == 1) {

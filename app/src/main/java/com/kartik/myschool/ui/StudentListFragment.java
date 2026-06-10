@@ -33,6 +33,7 @@ import com.kartik.myschool.utils.UiAnimations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 public class StudentListFragment extends Fragment {
 
@@ -44,6 +45,13 @@ public class StudentListFragment extends Fragment {
     private List<ClassModel> classes = new ArrayList<>();
     private School selectedSchool = null;
     private ClassModel selectedClass = null;
+
+    private final androidx.activity.result.ActivityResultLauncher<String> csvPickerLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    importStudentsFromCsv(uri);
+                }
+            });
 
     @Nullable
     @Override
@@ -86,9 +94,9 @@ public class StudentListFragment extends Fragment {
             });
         }
 
-        if (b.btnCalc != null) {
-            b.btnCalc.setOnClickListener(v -> {
-                android.widget.Toast.makeText(requireContext(), R.string.msg_empty_26, android.widget.Toast.LENGTH_SHORT).show();
+        if (b.btnExcel != null) {
+            b.btnExcel.setOnClickListener(v -> {
+                showExcelOptionsPopupMenu(v);
             });
         }
 
@@ -432,6 +440,291 @@ public class StudentListFragment extends Fragment {
                 params.bottomMargin = (int) (64 * density);
                 navHost.setLayoutParams(params);
             }
+        }
+    }
+
+    private void showExcelOptionsPopupMenu(View v) {
+        android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
+        popup.getMenu().add(0, 1, 0, R.string.action_export_students);
+        popup.getMenu().add(0, 2, 1, R.string.action_import_students);
+        popup.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == 1) {
+                exportStudentsToExcel();
+                return true;
+            } else if (itemId == 2) {
+                importStudentsFromExcel();
+                return true;
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    private void exportStudentsToExcel() {
+        if (filteredStudents.isEmpty()) {
+            android.widget.Toast.makeText(requireContext(), "No students in this class to export.", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("id,name,std,div,roll1,roll2,gender,category,reg,dob,motherName,motherOccupation,motherPhone,fatherName,fatherOccupation,fatherPhone,address,bankAccount,bankBranch,bankIfsc,bankUid,medium,motherTongue,dateOfAdmission,studentIdNumber,uid\n");
+
+            for (Student s : filteredStudents) {
+                sb.append(escapeCsv(s.id != null ? s.id : "")).append(",")
+                  .append(escapeCsv(s.name != null ? s.name : "")).append(",")
+                  .append(escapeCsv(s.standard != null ? s.standard : "")).append(",")
+                  .append(escapeCsv(s.division != null ? s.division : "")).append(",")
+                  .append(escapeCsv(s.rollNo != null ? s.rollNo : "")).append(",")
+                  .append(escapeCsv(s.rollNo2 != null ? s.rollNo2 : "")).append(",")
+                  .append(escapeCsv(s.gender != null ? s.gender : "")).append(",")
+                  .append(getCasteCategoryIndex(s.cast)).append(",")
+                  .append(escapeCsv(s.registrationNo != null ? s.registrationNo : "")).append(",")
+                  .append(escapeCsv(s.dob != null ? s.dob : "")).append(",")
+                  .append(escapeCsv(s.motherName != null ? s.motherName : "")).append(",")
+                  .append(escapeCsv(s.motherOccupation != null ? s.motherOccupation : "")).append(",")
+                  .append(escapeCsv(s.motherPhone != null ? s.motherPhone : "")).append(",")
+                  .append(escapeCsv(s.fatherName != null ? s.fatherName : "")).append(",")
+                  .append(escapeCsv(s.fatherOccupation != null ? s.fatherOccupation : "")).append(",")
+                  .append(escapeCsv(s.fatherPhone != null ? s.fatherPhone : "")).append(",")
+                  .append(escapeCsv(s.address != null ? s.address : "")).append(",")
+                  .append(escapeCsv(s.bankAccount != null ? s.bankAccount : "")).append(",")
+                  .append(escapeCsv(s.bankBranch != null ? s.bankBranch : "")).append(",")
+                  .append(escapeCsv(s.bankIfsc != null ? s.bankIfsc : "")).append(",")
+                  .append(escapeCsv(s.bankUid != null ? s.bankUid : "")).append(",")
+                  .append(escapeCsv(s.medium != null ? s.medium : "")).append(",")
+                  .append(escapeCsv(s.motherTongue != null ? s.motherTongue : "")).append(",")
+                  .append(escapeCsv(s.dateOfAdmission != null ? s.dateOfAdmission : "")).append(",")
+                  .append(escapeCsv(s.studentIdNumber != null ? s.studentIdNumber : "")).append(",")
+                  .append(escapeCsv(s.uid != null ? s.uid : "")).append("\n");
+            }
+
+            File cachePath = new File(requireContext().getCacheDir(), "excel_exports");
+            cachePath.mkdirs();
+            String className = SessionContext.selectedClass != null ? SessionContext.selectedClass.className : "class";
+            String division = SessionContext.selectedClass != null ? SessionContext.selectedClass.division : "div";
+            File file = new File(cachePath, "Student_" + className + "_Std_" + division + ".csv");
+            java.io.FileWriter writer = new java.io.FileWriter(file);
+            writer.write(sb.toString());
+            writer.close();
+
+            android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(requireContext(),
+                    requireContext().getPackageName() + ".fileprovider", file);
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/csv");
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            startActivity(Intent.createChooser(intent, "Export Students"));
+        } catch (Exception e) {
+            android.widget.Toast.makeText(requireContext(), "Export failed: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String escapeCsv(String str) {
+        if (str == null) return "";
+        if (str.contains(",") || str.contains("\"") || str.contains("\n")) {
+            return "\"" + str.replace("\"", "\"\"") + "\"";
+        }
+        return str;
+    }
+
+    private int getCasteCategoryIndex(String caste) {
+        if (caste == null) return 5;
+        String c = caste.toUpperCase().trim();
+        if (c.contains("SC")) return 0;
+        if (c.contains("ST")) return 1;
+        if (c.contains("VJ") || c.contains("विमुक्त")) return 2;
+        if (c.contains("NT") || c.contains("भटक्या")) return 3;
+        if (c.contains("OBC")) return 4;
+        return 5;
+    }
+
+    private void importStudentsFromExcel() {
+        if (SessionContext.selectedClass == null) {
+            android.widget.Toast.makeText(requireContext(), R.string.select_class_first, android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        csvPickerLauncher.launch("*/*");
+    }
+
+    private void importStudentsFromCsv(android.net.Uri uri) {
+        try {
+            java.io.InputStream is = requireContext().getContentResolver().openInputStream(uri);
+            if (is == null) return;
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is));
+            List<String[]> lines = new ArrayList<>();
+            String line;
+            String headerLine = reader.readLine();
+            if (headerLine == null) {
+                android.widget.Toast.makeText(requireContext(), "Empty CSV file.", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            List<String> headers = parseCsvLine(headerLine);
+            java.util.Map<String, Integer> headerMap = new java.util.HashMap<>();
+            for (int i = 0; i < headers.size(); i++) {
+                headerMap.put(headers.get(i).toLowerCase().trim(), i);
+            }
+
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                List<String> cells = parseCsvLine(line);
+                lines.add(cells.toArray(new String[0]));
+            }
+            reader.close();
+            is.close();
+
+            int count = lines.size();
+            if (count == 0) {
+                android.widget.Toast.makeText(requireContext(), "No student records found in CSV.", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            android.app.ProgressDialog pd = new android.app.ProgressDialog(requireContext());
+            pd.setTitle(R.string.msg_restoring_students);
+            pd.setMessage("Saving student records to Firestore...");
+            pd.setCancelable(false);
+            pd.show();
+
+            ClassModel currentClass = SessionContext.selectedClass;
+            School currentSchool = SessionContext.selectedSchool;
+            String teacherUid = FirebaseRepository.get().currentUid();
+
+            java.util.concurrent.atomic.AtomicInteger savedCount = new java.util.concurrent.atomic.AtomicInteger(0);
+            java.util.concurrent.atomic.AtomicInteger failedCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
+            for (String[] cells : lines) {
+                Student s = new Student();
+                
+                s.id = getCell(cells, new String[]{"id"}, headerMap, "");
+                s.name = getCell(cells, new String[]{"name"}, headerMap, "");
+                s.standard = getCell(cells, new String[]{"std", "standard"}, headerMap, currentClass.className);
+                s.division = getCell(cells, new String[]{"div", "division"}, headerMap, currentClass.division);
+                s.rollNo = getCell(cells, new String[]{"roll1", "rollno"}, headerMap, "");
+                s.rollNo2 = getCell(cells, new String[]{"roll2", "rollno2"}, headerMap, "");
+                
+                String rawGender = getCell(cells, new String[]{"gender"}, headerMap, "Male");
+                if (rawGender.equalsIgnoreCase("Female") || rawGender.equals("2") || rawGender.equalsIgnoreCase("स्त्री")) {
+                    s.gender = "Female";
+                } else {
+                    s.gender = "Male";
+                }
+
+                String rawCategory = getCell(cells, new String[]{"category", "cast", "caste"}, headerMap, "Open");
+                s.cast = getCasteCategoryName(rawCategory);
+
+                s.registrationNo = getCell(cells, new String[]{"reg", "registrationno"}, headerMap, "");
+                s.dob = getCell(cells, new String[]{"dob", "year", "dateofbirth"}, headerMap, "");
+                s.motherName = getCell(cells, new String[]{"mothername"}, headerMap, "");
+                s.motherOccupation = getCell(cells, new String[]{"motheroccupation"}, headerMap, "");
+                s.motherPhone = getCell(cells, new String[]{"motherphone"}, headerMap, "");
+                s.fatherName = getCell(cells, new String[]{"fathername", "fname"}, headerMap, "");
+                s.fatherOccupation = getCell(cells, new String[]{"fatheroccupation", "fwork"}, headerMap, "");
+                s.fatherPhone = getCell(cells, new String[]{"fatherphone", "fphone"}, headerMap, "");
+                s.address = getCell(cells, new String[]{"address"}, headerMap, "");
+                s.bankAccount = getCell(cells, new String[]{"bankaccount"}, headerMap, "");
+                s.bankBranch = getCell(cells, new String[]{"bankbranch"}, headerMap, "");
+                s.bankIfsc = getCell(cells, new String[]{"bankifsc"}, headerMap, "");
+                s.bankUid = getCell(cells, new String[]{"bankuid"}, headerMap, "");
+                s.medium = getCell(cells, new String[]{"medium"}, headerMap, "");
+                s.motherTongue = getCell(cells, new String[]{"mothertongue"}, headerMap, "");
+                s.dateOfAdmission = getCell(cells, new String[]{"dateofadmission", "admissiondate"}, headerMap, "");
+                s.studentIdNumber = getCell(cells, new String[]{"studentidnumber", "studentid"}, headerMap, "");
+                s.uid = getCell(cells, new String[]{"uid", "aadhar"}, headerMap, "");
+
+                s.parentName = s.fatherName != null && !s.fatherName.isEmpty() ? s.fatherName : "";
+                
+                s.classId = currentClass.id;
+                s.className = currentClass.className;
+                if (currentSchool != null) {
+                    s.schoolId = currentSchool.id;
+                    s.schoolName = currentSchool.name;
+                }
+                s.teacherId = teacherUid;
+
+                FirebaseRepository.get().saveStudent(s, new FirebaseRepository.OnResult<String>() {
+                    @Override
+                    public void onSuccess(String id) {
+                        int sVal = savedCount.incrementAndGet();
+                        checkImportDone(sVal, failedCount.get(), count, pd);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        int fVal = failedCount.incrementAndGet();
+                        checkImportDone(savedCount.get(), fVal, count, pd);
+                    }
+                });
+            }
+
+        } catch (Exception e) {
+            android.widget.Toast.makeText(requireContext(), "Failed to read CSV: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String getCell(String[] cells, String[] aliases, java.util.Map<String, Integer> headerMap, String fallback) {
+        for (String alias : aliases) {
+            String key = alias.toLowerCase().trim();
+            if (headerMap.containsKey(key)) {
+                int idx = headerMap.get(key);
+                if (idx >= 0 && idx < cells.length) {
+                    return cells[idx];
+                }
+            }
+        }
+        return fallback;
+    }
+
+    private void checkImportDone(int saved, int failed, int total, android.app.ProgressDialog pd) {
+        if (saved + failed == total) {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (pd.isShowing()) pd.dismiss();
+                    android.widget.Toast.makeText(requireContext(),
+                            "Import Complete! Imported: " + saved + ", Failed: " + failed,
+                            android.widget.Toast.LENGTH_LONG).show();
+                    applySessionFilterIfAny();
+                });
+            }
+        }
+    }
+
+    private List<String> parseCsvLine(String line) {
+        List<String> cells = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                cells.add(sb.toString().trim());
+                sb.setLength(0);
+            } else {
+                sb.append(c);
+            }
+        }
+        cells.add(sb.toString().trim());
+        return cells;
+    }
+
+    private String getCasteCategoryName(String categoryStr) {
+        if (categoryStr == null || categoryStr.isEmpty()) return "Open";
+        try {
+            int index = Integer.parseInt(categoryStr.trim());
+            switch (index) {
+                case 0: return "SC (Scheduled Castes)";
+                case 1: return "ST (Scheduled Tribes)";
+                case 2: return "VJ (Vimukt Jati)";
+                case 3: return "NT (Nomadic Tribes)";
+                case 4: return "OBC (Other Backward Classes)";
+                default: return "Open";
+            }
+        } catch (NumberFormatException e) {
+            return categoryStr;
         }
     }
 }
