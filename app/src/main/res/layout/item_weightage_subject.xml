@@ -289,72 +289,80 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Title: Summative (संकलित) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_summative_part_b"
-                android:textColor="#E65100"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Row 5: Tondi & PratyakshikB -->
             <LinearLayout
+                android:id="@+id/layoutSummative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
-                    android:layout_width="0dp"
+                <!-- Title: Summative (संकलित) -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/str_empty_52"
-                    android:layout_marginEnd="6dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTondiMax"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:textSize="12sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:text="@string/txt_summative_part_b"
+                    android:textColor="#E65100"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/str_empty_53"
-                    android:layout_marginStart="6dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPratyakshikBMax"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:textSize="12sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <!-- Row 6: Lekhi -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                <!-- Row 5: Tondi & PratyakshikB -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/str_empty_54">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etLekhiMax"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/str_empty_52"
+                        android:layout_marginEnd="6dp">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etTondiMax"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:textSize="12sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/str_empty_53"
+                        android:layout_marginStart="6dp">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPratyakshikBMax"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:textSize="12sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Row 6: Lekhi -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:textSize="12sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:hint="@string/str_empty_54">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etLekhiMax"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:textSize="12sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

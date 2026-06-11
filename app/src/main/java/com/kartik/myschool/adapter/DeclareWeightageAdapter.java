@@ -75,6 +75,25 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
         // Initial breakdown set
         updateBreakdownText(b, subject.maxMarks);
 
+        // Hide summative fields for specific subjects
+        String sName = subject.name != null ? subject.name.toLowerCase() : "";
+        boolean isFormativeOnly = sName.contains("drawing") || sName.contains("कला") ||
+                                  sName.contains("work experi") || sName.contains("कार्यानुभव") ||
+                                  sName.contains("physical") || sName.contains("शारीरिक");
+                                  
+        if (isFormativeOnly) {
+            b.layoutSummative.setVisibility(View.GONE);
+            // Force summative fields to 0
+            subject.maxTondi = 0;
+            subject.maxPratyakshikB = 0;
+            subject.maxLekhi = 0;
+            b.etTondiMax.setText("0");
+            b.etPratyakshikBMax.setText("0");
+            b.etLekhiMax.setText("0");
+        } else {
+            b.layoutSummative.setVisibility(View.VISIBLE);
+        }
+
         // ── Main total watch ──────────────────────────────────────────────────
         b.etMaxMarks.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -88,9 +107,15 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
                     subject.maxMarks = val;
                     updateBreakdownText(b, val);
                     
+                    boolean isFormativeOnly = subject.name != null && (
+                            subject.name.toLowerCase().contains("drawing") || subject.name.contains("कला") ||
+                            subject.name.toLowerCase().contains("work experi") || subject.name.contains("कार्यानुभव") ||
+                            subject.name.toLowerCase().contains("physical") || subject.name.contains("शारीरिक")
+                    );
+
                     // Auto-scale defaults for sub-fields
-                    int akarikMax  = val / 2;
-                    int sanklitMax = val - akarikMax;
+                    int akarikMax = isFormativeOnly ? val : val / 2;
+                    int sanklitMax = isFormativeOnly ? 0 : val - akarikMax;
 
                     subject.maxNirikhshan   = akarikMax * 10 / 50;
                     subject.maxTondiKam     = akarikMax * 10 / 50;

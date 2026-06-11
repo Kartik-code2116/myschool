@@ -28,6 +28,7 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
 
     public interface OnItemClickListener {
         void onItemClick(ReportTemplate template, int position);
+        void onSettingsClick(ReportTemplate template, int position);
     }
 
     private final List<ReportTemplate> items = new ArrayList<>();
@@ -120,6 +121,13 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         b.btnReportAction.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item, position);
         });
+
+        // Add settings gear click handler
+        if (b.btnReportSettings != null) {
+            b.btnReportSettings.setOnClickListener(v -> {
+                if (listener != null) listener.onSettingsClick(item, position);
+            });
+        }
 
         // Card-pop animation: scales from 92% with a bounce overshoot as items scroll into view
         UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);

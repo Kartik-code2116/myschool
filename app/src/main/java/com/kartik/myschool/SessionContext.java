@@ -239,6 +239,7 @@ public final class SessionContext {
                         s.maxLekhi = obj.optInt("maxLekhi", 0);
                         selectedClass.subjects.add(s);
                     }
+                    com.kartik.myschool.model.Subject.sortSubjects(selectedClass.subjects);
                 } catch (org.json.JSONException e) {
                     android.util.Log.e("SessionContext", "Error deserializing subjects", e);
                 }

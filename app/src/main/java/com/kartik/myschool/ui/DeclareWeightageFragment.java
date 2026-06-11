@@ -29,7 +29,8 @@ public class DeclareWeightageFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         b = FragmentDeclareWeightageBinding.inflate(inflater, container, false);
         return b.getRoot();
     }
@@ -42,12 +43,27 @@ public class DeclareWeightageFragment extends Fragment {
 
         setupRecyclerView();
         displayHeaderInfo();
-        loadActiveSubjects();
+
+        // Defer heavy UI rendering so the sidebar can close smoothly
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (isAdded()) {
+                loadActiveSubjects();
+            }
+        }, 350);
+
         setupActions();
     }
 
     private void setupRecyclerView() {
         b.rvWeightageSubjects.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Add layout animation to list items
+        if (getContext() != null) {
+            android.view.animation.LayoutAnimationController animation = android.view.animation.AnimationUtils
+                    .loadLayoutAnimation(getContext(), R.anim.layout_fade_in_slide_up);
+            b.rvWeightageSubjects.setLayoutAnimation(animation);
+        }
+
         adapter = new DeclareWeightageAdapter();
         b.rvWeightageSubjects.setAdapter(adapter);
     }
@@ -58,10 +74,11 @@ public class DeclareWeightageFragment extends Fragment {
         String divVal = "1";
         if (activeClass != null) {
             classVal = activeClass.className != null ? activeClass.className : "5";
-            divVal = activeClass.division != null && !activeClass.division.isEmpty() 
-                    ? activeClass.division : "-";
+            divVal = activeClass.division != null && !activeClass.division.isEmpty()
+                    ? activeClass.division
+                    : "-";
         }
-        b.tvWeightageHeaderContext.setText("सन : " + yearLabel + " | इयत्ता: " + classVal + " | तुकडी: " + divVal);
+        b.tvWeightageHeaderContext.setText("Year: " + yearLabel + " | Cls: " + classVal + "-" + divVal);
     }
 
     private void loadActiveSubjects() {
@@ -97,10 +114,12 @@ public class DeclareWeightageFragment extends Fragment {
     }
 
     private void saveWeightage() {
-        if (activeClass == null) return;
+        if (activeClass == null)
+            return;
 
         List<Subject> updatedSubjects = adapter.getSubjectsList();
-        if (updatedSubjects == null) return;
+        if (updatedSubjects == null)
+            return;
 
         // Perform validation to ensure weightage makes sense (at least > 0)
         for (Subject s : updatedSubjects) {
@@ -133,6 +152,5 @@ public class DeclareWeightageFragment extends Fragment {
             }
         });
     }
-
 
 }

@@ -136,5 +136,34 @@ public class Subject {
 
         return list;
     }
+
+    public static void sortSubjects(java.util.List<Subject> subjects) {
+        if (subjects == null || subjects.isEmpty()) return;
+        
+        java.util.List<String> order = java.util.Arrays.asList(
+            "Marathi",
+            "Hindi",
+            "English",
+            "Mathematics",
+            "Science",
+            "Science / EVS",
+            "Soc. Science",
+            "Drawing",
+            "Work Experience",
+            "Physical Education",
+            "Special Development",
+            "Personality Development",
+            "Information & Comm. Technology (ICT)",
+            "Water Security & Environment Studies"
+        );
+        
+        subjects.sort((s1, s2) -> {
+            int i1 = order.indexOf(s1.name);
+            int i2 = order.indexOf(s2.name);
+            if (i1 == -1) i1 = 999;
+            if (i2 == -1) i2 = 999;
+            return Integer.compare(i1, i2);
+        });
+    }
 }
 

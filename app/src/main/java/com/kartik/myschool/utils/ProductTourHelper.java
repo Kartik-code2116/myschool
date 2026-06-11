@@ -364,16 +364,12 @@ public class ProductTourHelper {
                         m ? "१. सत्र माहिती" : "1. Session Info",
                         m ? "कोणत्या वर्ष व सत्रासाठी भारांश ठरवत आहात ते येथे स्पष्ट दिसते."
                           : "Confirms which academic year and semester this weightage applies to."));
-                s.add(new TourStep(R.id.layoutEmptyState,
-                        m ? "२. विषय नाहीत?" : "2. No Subjects?",
-                        m ? "जर विषय जोडलेले नसतील तर हा संदेश दिसेल. आधी विषय जोडा."
-                          : "If no subjects are added, this message appears. Add subjects first."));
                 s.add(new TourStep(R.id.rvWeightageSubjects,
-                        m ? "३. विषयनिहाय भारांश" : "3. Subject Weightage",
+                        m ? "२. विषयनिहाय भारांश" : "2. Subject Weightage",
                         m ? "प्रत्येक विषयाच्या पंक्तीत FA व SA उप-घटकांचे कमाल गुण भरा."
                           : "Fill in the max marks for each FA and SA sub-component per subject."));
                 s.add(new TourStep(R.id.btnSaveWeightage,
-                        m ? "४. भारांश जतन करा 💾" : "4. Save Weightage 💾",
+                        m ? "३. भारांश जतन करा 💾" : "3. Save Weightage 💾",
                         m ? "सर्व भारांश भरल्यावर 'जतन करा' दाबा. एकदाच सेव्ह केल्यास पुरेसे."
                           : "Press Save after filling all fields. Saving once applies to all students."));
                 break;

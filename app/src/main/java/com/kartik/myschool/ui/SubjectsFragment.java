@@ -78,6 +78,9 @@ public class SubjectsFragment extends Fragment {
                     selectedClass.subjects.remove(match);
                 }
             }
+            
+            // Ensure subjects are always saved and displayed in predefined order
+            Subject.sortSubjects(selectedClass.subjects);
 
             // FIX: Save to SharedPrefs IMMEDIATELY (before Firestore returns) so
             // EnterMarksActivity always reads fresh subjects even if user navigates fast.

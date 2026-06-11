@@ -58,7 +58,17 @@ public class ReportPrintingFragment extends Fragment {
     private void setupRecyclerView() {
         b.rvReportCards.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
         adapter = new ReportPrintingAdapter(getContext());
-        adapter.setOnItemClickListener((template, position) -> handleReportSelection(position));
+        adapter.setOnItemClickListener(new ReportPrintingAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ReportPrintingAdapter.ReportTemplate template, int position) {
+                handleReportSelection(position);
+            }
+
+            @Override
+            public void onSettingsClick(ReportPrintingAdapter.ReportTemplate template, int position) {
+                showReportSettingsDialog(false, position, getString(template.titleResId));
+            }
+        });
         b.rvReportCards.setAdapter(adapter);
     }
 
@@ -1021,6 +1031,105 @@ public class ReportPrintingFragment extends Fragment {
                 .show();
     }
 
+    private void showReportSettingsDialog(boolean isGlobal, int reportIndex, String title) {
+        if (getContext() == null) return;
+        
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
+        View sheet = LayoutInflater.from(getContext()).inflate(R.layout.dialog_report_settings, null);
+        
+        android.widget.TextView tvSubtitle = sheet.findViewById(R.id.tvSettingsSubtitle);
+        tvSubtitle.setText(title);
+
+        android.content.SharedPreferences prefs = getContext().getSharedPreferences("report_margins", android.content.Context.MODE_PRIVATE);
+        String prefix = isGlobal ? "global_" : "report_" + reportIndex + "_";
+
+        // Helper to load int with fallback
+        java.util.function.Function<String, Integer> loadInt = (keySuffix) -> {
+            int val = prefs.getInt(prefix + keySuffix, -1);
+            if (val == -1 && !isGlobal) {
+                val = prefs.getInt("global_" + keySuffix, -1); // fallback to global
+            }
+            return val;
+        };
+
+        // UI elements
+        com.google.android.material.textfield.TextInputEditText etPageNumber = sheet.findViewById(R.id.etPageNumber);
+        com.google.android.material.textfield.TextInputEditText etTopMargin = sheet.findViewById(R.id.etTopMargin);
+        com.google.android.material.textfield.TextInputEditText etBottomMargin = sheet.findViewById(R.id.etBottomMargin);
+        com.google.android.material.textfield.TextInputEditText etLeftMargin = sheet.findViewById(R.id.etLeftMargin);
+        com.google.android.material.textfield.TextInputEditText etRightMargin = sheet.findViewById(R.id.etRightMargin);
+
+        Runnable loadValuesForPage = () -> {
+            String pageStr = etPageNumber.getText().toString().trim();
+            if (pageStr.isEmpty()) return;
+            
+            String pPrefix = "p" + pageStr + "_";
+            
+            // Default heuristics based on page number (like the old screenshot defaults)
+            int defaultTop = 4; int defaultLeft = 9; int defaultRight = 4; int defaultBottom = 4;
+            if (pageStr.equals("2")) { defaultTop = 5; defaultLeft = 10; defaultRight = 5; defaultBottom = 5; }
+            if (pageStr.equals("3")) { defaultTop = 6; defaultLeft = 11; defaultRight = 6; defaultBottom = 6; }
+            
+            etTopMargin.setText(String.valueOf(loadInt.apply(pPrefix + "top") != -1 ? loadInt.apply(pPrefix + "top") : defaultTop));
+            etLeftMargin.setText(String.valueOf(loadInt.apply(pPrefix + "left") != -1 ? loadInt.apply(pPrefix + "left") : defaultLeft));
+            etRightMargin.setText(String.valueOf(loadInt.apply(pPrefix + "right") != -1 ? loadInt.apply(pPrefix + "right") : defaultRight));
+            etBottomMargin.setText(String.valueOf(loadInt.apply(pPrefix + "bottom") != -1 ? loadInt.apply(pPrefix + "bottom") : defaultBottom));
+        };
+
+        // Initial load for Page 1
+        loadValuesForPage.run();
+
+        // Listen for page number changes to dynamically load margins
+        etPageNumber.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(android.text.Editable s) {
+                loadValuesForPage.run();
+            }
+        });
+
+        // Reset action (clears specifically for the currently typed page)
+        sheet.findViewById(R.id.btnResetAll).setOnClickListener(v -> {
+            String pageStr = etPageNumber.getText().toString().trim();
+            if (pageStr.isEmpty()) return;
+            
+            int defaultTop = 4; int defaultLeft = 9; int defaultRight = 4; int defaultBottom = 4;
+            if (pageStr.equals("2")) { defaultTop = 5; defaultLeft = 10; defaultRight = 5; defaultBottom = 5; }
+            if (pageStr.equals("3")) { defaultTop = 6; defaultLeft = 11; defaultRight = 6; defaultBottom = 6; }
+            
+            etTopMargin.setText(String.valueOf(defaultTop));
+            etLeftMargin.setText(String.valueOf(defaultLeft));
+            etRightMargin.setText(String.valueOf(defaultRight));
+            etBottomMargin.setText(String.valueOf(defaultBottom));
+        });
+
+        // Save action
+        sheet.findViewById(R.id.btnSaveSetting).setOnClickListener(v -> {
+            String pageStr = etPageNumber.getText().toString().trim();
+            if (pageStr.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter a valid Page Number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            String pPrefix = "p" + pageStr + "_";
+            android.content.SharedPreferences.Editor editor = prefs.edit();
+            try {
+                editor.putInt(prefix + pPrefix + "top", Integer.parseInt(etTopMargin.getText().toString()));
+                editor.putInt(prefix + pPrefix + "left", Integer.parseInt(etLeftMargin.getText().toString()));
+                editor.putInt(prefix + pPrefix + "right", Integer.parseInt(etRightMargin.getText().toString()));
+                editor.putInt(prefix + pPrefix + "bottom", Integer.parseInt(etBottomMargin.getText().toString()));
+                
+                editor.apply();
+                Toast.makeText(getContext(), "Page " + pageStr + " margins saved!", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Please enter valid numbers", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.setContentView(sheet);
+        dialog.show();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -1035,7 +1144,11 @@ public class ReportPrintingFragment extends Fragment {
                         popup.getMenu().add("Select Margins");
                         popup.getMenu().add("Unicode Settings");
                         popup.setOnMenuItemClickListener(menuItem -> {
-                            Toast.makeText(getContext(), menuItem.getTitle() + " clicked", Toast.LENGTH_SHORT).show();
+                            if (menuItem.getTitle().equals("Select Margins")) {
+                                showReportSettingsDialog(true, -1, "All Reports (Global)");
+                            } else {
+                                Toast.makeText(getContext(), menuItem.getTitle() + " clicked", Toast.LENGTH_SHORT).show();
+                            }
                             return true;
                         });
                         popup.show();

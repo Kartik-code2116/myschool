@@ -88,8 +88,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_marginStart="12dp">
+
+            <ImageButton
+                android:id="@+id/btnReportSettings"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_settings"
+                android:padding="12dp"
+                app:tint="#888888" />
 
             <ImageButton
                 android:id="@+id/btnReportAction"
