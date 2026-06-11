@@ -52,11 +52,11 @@ public class ResultSheetGenerator {
     }
 
     public static void generateResultSheet(Context ctx,
-                                           School school,
-                                           ClassModel cls,
-                                           List<Student> students,
-                                           Map<String, MarksRecord> marksMap,
-                                           PdfGenerator.PdfCallback cb) {
+            School school,
+            ClassModel cls,
+            List<Student> students,
+            Map<String, MarksRecord> marksMap,
+            PdfGenerator.PdfCallback cb) {
         new Thread(() -> {
             try {
                 PdfGenerator.ensureFonts(ctx);
@@ -86,7 +86,8 @@ public class ResultSheetGenerator {
                     }
                 }
 
-                // Chunk students to fit on pages if needed, but PdfPTable handles automatic pagination.
+                // Chunk students to fit on pages if needed, but PdfPTable handles automatic
+                // pagination.
                 // However, we want to repeat headers on new pages.
                 addPageContent(doc, ctx, school, cls, students, marksMap, acaSubs, nonAcaSubs, maxTotal);
 
@@ -99,8 +100,8 @@ public class ResultSheetGenerator {
     }
 
     private static void addPageContent(Document doc, Context ctx, School school, ClassModel cls,
-                                       List<Student> students, Map<String, MarksRecord> marksMap,
-                                       List<Subject> acaSubs, List<Subject> nonAcaSubs, int maxTotal) throws Exception {
+            List<Student> students, Map<String, MarksRecord> marksMap,
+            List<Subject> acaSubs, List<Subject> nonAcaSubs, int maxTotal) throws Exception {
 
         // ── 1. Titles ─────────────────────────────────────────────────────────
         PdfPTable titleTbl = new PdfPTable(1);
@@ -110,12 +111,14 @@ public class ResultSheetGenerator {
         c1.setBorder(Rectangle.NO_BORDER);
         c1.setHorizontalAlignment(Element.ALIGN_CENTER);
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "● निकालपत्रक ●", "● RESULT SHEET ●"), 16, true, android.graphics.Color.rgb(C_PINK.getRed(), C_PINK.getGreen(), C_PINK.getBlue()));
+            com.itextpdf.text.Image img = MarathiText.renderLine(
+                    PdfLocalizer.get(ctx, "● निकालपत्रक ●", "● RESULT SHEET ●"), 16, true,
+                    android.graphics.Color.rgb(C_PINK.getRed(), C_PINK.getGreen(), C_PINK.getBlue()));
             img.setAlignment(com.itextpdf.text.Image.MIDDLE);
             c1.addElement(img);
         } catch (Exception e) {
             Font pinkFont = sMarathiBase != null ? new Font(sMarathiBase, 16, Font.BOLD, C_PINK)
-                                                 : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_PINK);
+                    : new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD, C_PINK);
             c1.setPhrase(new Phrase(PdfLocalizer.get(ctx, "● निकालपत्रक ●", "● RESULT SHEET ●"), pinkFont));
         }
         titleTbl.addCell(c1);
@@ -126,29 +129,34 @@ public class ResultSheetGenerator {
         c2.setHorizontalAlignment(Element.ALIGN_CENTER);
         c2.setPaddingBottom(10);
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine(PdfLocalizer.get(ctx, "वार्षिक परीक्षा ", "Annual Examination ") + className, 10, true, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img = MarathiText.renderLine(
+                    PdfLocalizer.get(ctx, "वार्षिक परीक्षा ", "Annual Examination ") + className, 10, true,
+                    android.graphics.Color.BLACK);
             img.setAlignment(com.itextpdf.text.Image.MIDDLE);
             c2.addElement(img);
         } catch (Exception e) {
-            c2.setPhrase(new Phrase(PdfLocalizer.get(ctx, "वार्षिक परीक्षा ", "Annual Examination ") + className, fSmallBold));
+            c2.setPhrase(new Phrase(PdfLocalizer.get(ctx, "वार्षिक परीक्षा ", "Annual Examination ") + className,
+                    fSmallBold));
         }
         titleTbl.addCell(c2);
 
         doc.add(titleTbl);
 
         // ── 2. Header Info ────────────────────────────────────────────────────
-        PdfPTable hdr = new PdfPTable(new float[]{3f, 1.5f});
+        PdfPTable hdr = new PdfPTable(new float[] { 3f, 1.5f });
         hdr.setWidthPercentage(100);
 
-        String schoolName = PdfLocalizer.get(ctx, "शाळेचे नाव : ", "School Name: ") + nvl(school != null ? school.name : "");
-        String udiseText  = PdfLocalizer.get(ctx, "युडायस : ", "UDISE : ") + nvl(school != null ? school.udiseCode : "");
-        String clsDiv     = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : "-");
-        String yearText   = PdfLocalizer.get(ctx, "सन : ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
+        String schoolName = PdfLocalizer.get(ctx, "शाळेचे नाव : ", "School Name: ")
+                + nvl(school != null ? school.name : "");
+        String udiseText = PdfLocalizer.get(ctx, "युडायस : ", "UDISE : ") + nvl(school != null ? school.udiseCode : "");
+        String clsDiv = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className
+                + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + nvl(cls != null ? cls.division : "-");
+        String yearText = PdfLocalizer.get(ctx, "सन : ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
 
         addHdrCell(hdr, schoolName, Element.ALIGN_LEFT);
-        addHdrCell(hdr, udiseText,  Element.ALIGN_RIGHT);
-        addHdrCell(hdr, clsDiv,     Element.ALIGN_LEFT);
-        addHdrCell(hdr, yearText,   Element.ALIGN_RIGHT);
+        addHdrCell(hdr, udiseText, Element.ALIGN_RIGHT);
+        addHdrCell(hdr, clsDiv, Element.ALIGN_LEFT);
+        addHdrCell(hdr, yearText, Element.ALIGN_RIGHT);
 
         hdr.setSpacingAfter(8);
         doc.add(hdr);
@@ -179,18 +187,19 @@ public class ResultSheetGenerator {
         // ── 4. Table Headers (Row 1) ──────────────────────────────────────────
         addTh(tbl, PdfLocalizer.get(ctx, "अ.नं.", "Sr.No."), 1, 2);
         addTh(tbl, PdfLocalizer.get(ctx, "नाव", "Student Name"), 1, 2);
-        addTh(tbl, PdfLocalizer.get(ctx, "हजर दिन", "Attendance"), 1, 2);
-        
+        addWrappedTh(tbl, PdfLocalizer.get(ctx, "हजर दिन", "Attendance"), 1, 2, 25f);
+
         for (Subject sub : acaSubs) {
             addTh(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 3, 1);
         }
         for (Subject sub : nonAcaSubs) {
-            addTh(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 1, 1);
+            com.kartik.myschool.utils.pdf.GunapattrakGenerator.cellVerticalSpan(tbl, ctx,
+                    PdfLocalizer.translateSubject(ctx, sub.name), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
         }
-        
-        addTh(tbl, PdfLocalizer.get(ctx, "एकूण ", "Total ") + maxTotal, 1, 2);
-        addTh(tbl, PdfLocalizer.get(ctx, "शेकडा गुण", "Percentage"), 1, 2);
-        addTh(tbl, PdfLocalizer.get(ctx, "शेरा", "Remark"), 1, 2);
+
+        addWrappedTh(tbl, PdfLocalizer.get(ctx, "एकूण ", "Total ") + maxTotal, 1, 2, 30f);
+        addWrappedTh(tbl, PdfLocalizer.get(ctx, "शेकडा गुण", "Percentage"), 1, 2, 30f);
+        addWrappedTh(tbl, PdfLocalizer.get(ctx, "शेरा", "Remark"), 1, 2, 32f);
 
         // ── 5. Table Headers (Row 2) ──────────────────────────────────────────
         for (int i = 0; i < acaSubs.size(); i++) {
@@ -207,12 +216,12 @@ public class ResultSheetGenerator {
             int rowIdx = 1;
             for (Student student : students) {
                 MarksRecord rec = marksMap != null ? marksMap.get(student.id) : null;
-                
+
                 int totalObtained = 0;
                 boolean hasFailed = false;
 
                 addTd(tbl, String.valueOf(rowIdx++), Element.ALIGN_CENTER);
-                addTd(tbl, nvl(student.name),        Element.ALIGN_LEFT);
+                addTd(tbl, nvl(student.name), Element.ALIGN_LEFT);
                 addTd(tbl, rec != null ? String.valueOf(rec.presentDays) : "-", Element.ALIGN_CENTER);
 
                 // Academic Subjects
@@ -220,14 +229,15 @@ public class ResultSheetGenerator {
                     MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
                     int obt = d != null ? d.grandTotal : 0;
                     totalObtained += obt;
-                    
+
                     int minPass = sub.maxMarks > 0 ? (int) Math.ceil(sub.maxMarks * 0.35) : 18;
                     boolean passed = obt >= minPass;
-                    if (!passed) hasFailed = true;
+                    if (!passed)
+                        hasFailed = true;
 
                     addTd(tbl, String.valueOf(obt), Element.ALIGN_CENTER);
-                    addTd(tbl, "-",                 Element.ALIGN_CENTER); // ग्रेस
-                    addTd(tbl, passed ? "P" : "F",  Element.ALIGN_CENTER); // शेरा
+                    addTd(tbl, "-", Element.ALIGN_CENTER); // ग्रेस
+                    addTd(tbl, passed ? "P" : "F", Element.ALIGN_CENTER); // शेरा
                 }
 
                 // Non-Academic Subjects
@@ -238,15 +248,18 @@ public class ResultSheetGenerator {
                 }
 
                 // Totals
-                String percStr = maxTotal > 0 ? String.format(java.util.Locale.US, "%.1f", (totalObtained * 100.0f) / maxTotal) : "0.0";
-                String passResult = hasFailed ? PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail") : PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass");
+                String percStr = maxTotal > 0
+                        ? String.format(java.util.Locale.US, "%.1f", (totalObtained * 100.0f) / maxTotal)
+                        : "0.0";
+                String passResult = hasFailed ? PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail")
+                        : PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass");
 
                 addTd(tbl, String.valueOf(totalObtained), Element.ALIGN_CENTER);
-                addTd(tbl, percStr,                       Element.ALIGN_CENTER);
-                addTd(tbl, passResult,                    Element.ALIGN_CENTER);
+                addTd(tbl, percStr, Element.ALIGN_CENTER);
+                addTd(tbl, passResult, Element.ALIGN_CENTER);
             }
         }
-        
+
         doc.add(tbl);
     }
 
@@ -259,7 +272,8 @@ public class ResultSheetGenerator {
         c.setPaddingBottom(4);
         try {
             com.itextpdf.text.Image img = MarathiText.renderLine(text, 10, true, android.graphics.Color.BLACK);
-            img.setAlignment(align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT : com.itextpdf.text.Image.RIGHT);
+            img.setAlignment(
+                    align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT : com.itextpdf.text.Image.RIGHT);
             c.addElement(img);
         } catch (Exception e) {
             c.setPhrase(new Phrase(text, fSmallBold));
@@ -271,14 +285,36 @@ public class ResultSheetGenerator {
         MarathiText.cell(tbl, text, 9, true, C_HEADER_BG, C_DARK, colspan, rowspan, Element.ALIGN_CENTER);
     }
 
+    private static void addWrappedTh(PdfPTable tbl, String text, int colspan, int rowspan, float widthPt) {
+        PdfPCell c = new PdfPCell();
+        c.setBackgroundColor(C_HEADER_BG);
+        c.setBorderColor(com.kartik.myschool.utils.PdfGenerator.C_BORDER);
+        c.setBorderWidth(0.5f);
+        c.setColspan(colspan);
+        c.setRowspan(rowspan);
+        c.setHorizontalAlignment(Element.ALIGN_CENTER);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setPadding(2f);
+        try {
+            com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText.renderMultiLine(text, 9, true, android.graphics.Color.BLACK, widthPt);
+            img.setAlignment(com.itextpdf.text.Image.MIDDLE);
+            c.addElement(img);
+        } catch (Exception e) {
+            c.setPhrase(new Phrase(text, fSmallBold));
+        }
+        tbl.addCell(c);
+    }
+
     private static void addTd(PdfPTable tbl, String text, int align) {
         MarathiText.cell(tbl, text, 9, false, null, C_DARK, 1, 1, align);
     }
 
     private static boolean isNonAcademic(String sub) {
-        if (sub == null) return false;
+        if (sub == null)
+            return false;
         String s = sub.trim().toLowerCase();
         return s.contains("कला") || s.contains("कार्यानुभव") || s.contains("शा.शि.") || s.contains("शारीरिक")
-            || s.contains("art") || s.contains("work experience") || s.contains("p.e.") || s.contains("physical education") || s.contains("craft");
+                || s.contains("art") || s.contains("work experience") || s.contains("p.e.")
+                || s.contains("physical education") || s.contains("craft");
     }
 }

@@ -309,7 +309,7 @@ public class PdfGenerator {
 
                 // Row 1
                 cellHorizontalImageSpan(tbl, ctx, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-                cellHorizontalImageSpan(tbl, ctx, "तपशील", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+                cellHorizontalImageSpan(tbl, ctx, com.kartik.myschool.utils.pdf.PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
                 for (int i = 0; i < numSubjects; i++) {
                     cellVerticalSpan(tbl, ctx, PdfLocalizer.translateSubject(ctx, subjects.get(i).name), fSmallBold,
                             C_HEADER_BG, C_DARK, 2, 1);

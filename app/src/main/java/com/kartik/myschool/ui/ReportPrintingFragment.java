@@ -131,10 +131,25 @@ public class ReportPrintingFragment extends Fragment {
         });
     }
 
+    private boolean isFifthOrEighthClass() {
+        if (SessionContext.selectedClass == null || SessionContext.selectedClass.className == null) return false;
+        String name = SessionContext.selectedClass.className.trim();
+        return name.equals("5") || name.equals("8") || 
+               name.equalsIgnoreCase("V") || name.equalsIgnoreCase("VIII") || 
+               name.equals("५") || name.equals("८");
+    }
+
     private void handleReportSelection(int position) {
         if (SessionContext.selectedClass == null) {
             Toast.makeText(getContext(), R.string.msg_empty_10, Toast.LENGTH_LONG).show();
             return;
+        }
+
+        if (position == 11 || position == 12) {
+            if (!isFifthOrEighthClass()) {
+                Toast.makeText(getContext(), "हा रिपोर्ट फक्त इयत्ता ५ वी किंवा ८ वी साठी उपलब्ध आहे.", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         ensureSemestersThen(() -> {
@@ -612,6 +627,9 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private File generateReportPositionSync(int position, Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map) throws Exception {
+        if ((position == 11 || position == 12) && !isFifthOrEighthClass()) {
+            return null;
+        }
         com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = position;
         CountDownLatch latch = new CountDownLatch(1);
         final File[] result = new File[1];

@@ -270,6 +270,28 @@ public class GunapattrakGenerator {
             cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Summative empty
 
         List<Subject> subjects = cls.subjects;
+        int nonAcaCount = 0;
+        int studentTotalSum = 0;
+        int studentTotalMax = 0;
+        if (subjects != null) {
+            for (Subject sub : subjects) {
+                int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+                boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
+                if (isNonAcademic) {
+                    nonAcaCount++;
+                } else {
+                    studentTotalMax += sub.maxMarks;
+                    MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
+                    if (d != null) {
+                        studentTotalSum += d.grandTotal;
+                    }
+                }
+            }
+        }
+        String percentageStr = studentTotalMax > 0 ? String.format(java.util.Locale.US, "%.1f %%", (studentTotalSum * 100.0) / studentTotalMax) : "";
+        String overallGrade = studentTotalMax > 0 ? com.kartik.myschool.utils.GradeCalculator.getGrade((studentTotalSum * 100.0) / studentTotalMax) : "";
+        int nonAcaPrinted = 0;
+
         boolean alt = false;
         for (int i = 0; i < (subjects != null ? subjects.size() : 0); i++) {
             Subject sub = subjects.get(i);
@@ -301,8 +323,19 @@ public class GunapattrakGenerator {
                 cellSpan(tbl, str(d.akarikTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
                 if (isNonAcademic) {
-                    cellSpan(tbl, " ", fSmall, bg, C_DARK, 4, 2, Element.ALIGN_CENTER); // Merge summative columns and
-                                                                                        // both rows
+                    if (nonAcaPrinted == 0) {
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "एकूण गुण", "Total Marks"), 11f, true, bg, C_DARK, 3, 2, Element.ALIGN_CENTER);
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, String.valueOf(studentTotalSum), 12f, true, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    } else if (nonAcaPrinted == 1) {
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "शे.गुण", "Percentage"), 11f, true, bg, C_DARK, 3, 2, Element.ALIGN_CENTER);
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, percentageStr, 12f, true, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    } else if (nonAcaPrinted == 2) {
+                        String gradeText = PdfLocalizer.get(ctx, "सर्वसाधारण श्रेणी", "Overall Grade") + " - " + overallGrade;
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, gradeText, 11f, true, bg, C_DARK, 4, 2, Element.ALIGN_CENTER);
+                    } else {
+                        cellSpan(tbl, " ", fSmallBold, bg, C_DARK, 4, 2, Element.ALIGN_CENTER);
+                    }
+                    nonAcaPrinted++;
                 } else {
                     cellSpan(tbl, strZero(d.tondi), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     cellSpan(tbl, strZero(d.pratyakshikB), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
@@ -320,7 +353,19 @@ public class GunapattrakGenerator {
                 for (int k = 0; k < 9; k++)
                     cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
                 if (isNonAcademic) {
-                    cellSpan(tbl, " ", fSmall, bg, C_DARK, 4, 2, Element.ALIGN_CENTER);
+                    if (nonAcaPrinted == 0) {
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "एकूण गुण", "Total Marks"), 11f, true, bg, C_DARK, 3, 2, Element.ALIGN_CENTER);
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, String.valueOf(studentTotalSum), 12f, true, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    } else if (nonAcaPrinted == 1) {
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "शे.गुण", "Percentage"), 11f, true, bg, C_DARK, 3, 2, Element.ALIGN_CENTER);
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, percentageStr, 12f, true, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    } else if (nonAcaPrinted == 2) {
+                        String gradeText = PdfLocalizer.get(ctx, "सर्वसाधारण श्रेणी", "Overall Grade") + " - " + overallGrade;
+                        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, gradeText, 11f, true, bg, C_DARK, 4, 2, Element.ALIGN_CENTER);
+                    } else {
+                        cellSpan(tbl, " ", fSmallBold, bg, C_DARK, 4, 2, Element.ALIGN_CENTER);
+                    }
+                    nonAcaPrinted++;
                 } else {
                     for (int k = 0; k < 4; k++)
                         cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);

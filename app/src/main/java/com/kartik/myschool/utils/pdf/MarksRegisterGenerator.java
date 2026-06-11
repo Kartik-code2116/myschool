@@ -44,7 +44,7 @@ public class MarksRegisterGenerator {
     // 19 data columns (matches Gunapattrak column layout)
     private static final float[] COL_WIDTHS = {
             0.45f, // अ.नं
-            1.6f,  // तपशील (name)
+            1.6f,  // विद्यार्थ्याचे नाव (name)
             // Formative (9):
             0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.6f,
             // Summative (4):
@@ -143,13 +143,13 @@ public class MarksRegisterGenerator {
         tbl.setSpacingBefore(3);
 
         // ── Header row 1: group spans ─────────────────────────────────────────
-        // अ.नं (rowspan 3), तपशील (rowspan 3),
+        // अ.नं (rowspan 3), विद्यार्थ्याचे नाव (rowspan 3),
         // आकारिक (अ) colspan 9, संकलित (ब) colspan 4,
         // अ+ब (rowspan 3), श्रे.गुण (rowspan 3), श्रेणी (rowspan 3)
-        cellSpan(tbl, PdfLocalizer.get(ctx, "अ. नं", "Sr.No."),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-        cellSpan(tbl, PdfLocalizer.get(ctx, "तपशील", "Details"),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-        cellSpan(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"),  fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"),  fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "अ. नं", "Sr.No."),   9, true, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"),   9, true, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"),  9, true, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
+        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"),  9, true, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ+ब", "A+B"),     fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रे.गुण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
