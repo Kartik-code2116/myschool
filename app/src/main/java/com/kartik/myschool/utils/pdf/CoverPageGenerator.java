@@ -83,47 +83,27 @@ public class CoverPageGenerator {
         // ══════════════════════════════════════════════════════════════════════
         if (writer != null) {
             PdfContentByte cb = writer.getDirectContentUnder();
-            drawBackground(cb, pageW, pageH);
+            drawBackground(cb, pageW, pageH, ctx);
         }
 
         // ══════════════════════════════════════════════════════════════════════
         // CONTENT — We use a 0-margin page and simulate margin via table padding
         // ══════════════════════════════════════════════════════════════════════
 
-        // ── 1. TOP HEADER BAND spacer (the band is drawn in background) ──────
-        addSpacer(doc, 58);   // center of circle is H-130; with top margin of 36, spacer of 58 puts logo top at H-94
+        // ── 1. TOP HEADER BAND spacer & LOGO SPACE ────────────────────────────
+        addSpacer(doc, 98);
 
-        // ── 2. LOGO ───────────────────────────────────────────────────────────
-        PdfPTable logoRow = new PdfPTable(1);
-        logoRow.setWidthPercentage(100);
-        PdfPCell logoCell = new PdfPCell();
-        logoCell.setBorder(Rectangle.NO_BORDER);
-        logoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        logoCell.setPaddingBottom(4);
-        try {
-            android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat
-                    .getDrawable(ctx, com.kartik.myschool.R.drawable.app_logo);
-            if (d != null) {
-                int w = Math.max(d.getIntrinsicWidth(),  1);
-                int h = Math.max(d.getIntrinsicHeight(), 1);
-                android.graphics.Bitmap bmp = android.graphics.Bitmap
-                        .createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
-                android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
-                d.setBounds(0, 0, w, h);
-                d.draw(canvas);
-                java.io.ByteArrayOutputStream bs = new java.io.ByteArrayOutputStream();
-                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bs);
-                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(bs.toByteArray());
-                img.scaleToFit(72, 72);
-                img.setAlignment(Element.ALIGN_CENTER);
-                logoCell.addElement(img);
-            }
-        } catch (Exception ignored) {}
-        logoRow.addCell(logoCell);
-        doc.add(logoRow);
+        // Invisible placeholder table to preserve the exact height of the original logo (72 + padding)
+        PdfPTable spacerRow = new PdfPTable(1);
+        spacerRow.setWidthPercentage(100);
+        PdfPCell spacerCell = new PdfPCell();
+        spacerCell.setBorder(Rectangle.NO_BORDER);
+        spacerCell.setMinimumHeight(82f); // 72 logo + 6 top padding + 4 bottom padding
+        spacerRow.addCell(spacerCell);
+        doc.add(spacerRow);
 
-        // Spacer to maintain exact flow height of original layout (220 - 58 - 72 = 90)
-        addSpacer(doc, 90);
+        addSpacer(doc, 100);
+
 
         android.content.SharedPreferences prefs = ctx.getSharedPreferences("myschool_settings_prefs", Context.MODE_PRIVATE);
         String lang = prefs.getString("language", "mr");
@@ -143,8 +123,13 @@ public class CoverPageGenerator {
         String labelPrincipal = isEn ? "Headmaster" : "मुख्याध्यापक";
 
         // ── 3. GOVT. LABEL ────────────────────────────────────────────────────
-        addCentred(doc, labelGovtSchool,
-                mkFont(11, Font.BOLD, C_GREY_TEXT), 2, 0);
+        if (isEn) {
+            addCentred(doc, labelGovtSchool,
+                    mkFont(13, Font.BOLD, C_GREY_TEXT), 2, 0);
+        } else {
+            addMarathiCentred(doc, labelGovtSchool,
+                    13, true, android.graphics.Color.rgb(90, 90, 100), 2, 0);
+        }
 
         // ── 4. SCHOOL NAME (rendered via MarathiText for correct Devanagari) ───
         String schoolName = (school != null && school.name != null && !school.name.isEmpty())
@@ -201,7 +186,7 @@ public class CoverPageGenerator {
     // ══════════════════════════════════════════════════════════════════════════
     // BACKGROUND ARTWORK
     // ══════════════════════════════════════════════════════════════════════════
-    private static void drawBackground(PdfContentByte cb, float W, float H) {
+    private static void drawBackground(PdfContentByte cb, float W, float H, Context ctx) {
         // ── Full-page pale fill ───────────────────────────────────────────────
         cb.saveState();
         cb.setColorFill(new BaseColor(245, 245, 255));
@@ -239,11 +224,11 @@ public class CoverPageGenerator {
         drawCircle(cb, 30, H - 30, 55, new BaseColor(255, 255, 255, 14));
         drawCircle(cb, 60, H - 15, 30, new BaseColor(255, 255, 255, 10));
 
-        // ── White logo circle background (centred at x=W/2, y=H-130) ─────────
+        // ── White logo circle background (centred at x=W/2, y=H-150) ─────────
         cb.saveState();
         cb.setColorFill(C_WHITE);
         float cx = W / 2f;
-        float cy = H - 130;
+        float cy = H - 150;
         cb.circle(cx, cy, 46);
         cb.fill();
         cb.restoreState();
@@ -255,6 +240,38 @@ public class CoverPageGenerator {
         cb.circle(cx, cy, 48);
         cb.stroke();
         cb.restoreState();
+
+        // ── App Logo perfectly centered in the circle ─────────────────────────
+        try {
+            android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat
+                    .getDrawable(ctx, com.kartik.myschool.R.drawable.app_logo);
+            if (d != null) {
+                // Use a decent resolution for the bitmap
+                int size = Math.max(Math.max(d.getIntrinsicWidth(), d.getIntrinsicHeight()), 200);
+                android.graphics.Bitmap bmp = android.graphics.Bitmap
+                        .createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+                d.setBounds(0, 0, size, size);
+                d.draw(canvas);
+                
+                java.io.ByteArrayOutputStream bs = new java.io.ByteArrayOutputStream();
+                bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, bs);
+                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(bs.toByteArray());
+                
+                // Scale image to fill the background circle (radius 46 -> diameter 92)
+                float imgSize = 92f;
+                img.scaleToFit(imgSize, imgSize);
+                img.setAbsolutePosition(cx - (imgSize / 2f), cy - (imgSize / 2f));
+                
+                // Use PDF vector clipping for perfectly smooth circular edges
+                cb.saveState();
+                cb.circle(cx, cy, 46); // Clip to the exact size of the white circle
+                cb.clip();
+                cb.newPath();
+                cb.addImage(img);
+                cb.restoreState();
+            }
+        } catch (Exception ignored) {}
 
         // ── Bottom footer band ────────────────────────────────────────────────
         cb.saveState();

@@ -48,8 +48,7 @@ public class IndexPageGenerator {
     }
 
     public static void addIndexPageContent(Document doc, Context ctx, School school, ClassModel cls, List<Student> students) throws Exception {
-        // School Header
-        doc.add(buildSchoolHeader(ctx, school, cls));
+        // School Header removed as requested
 
         // Title: render Marathi through Android shaping so matras/conjuncts display correctly in PDF.
         PdfGenerator.addMarathiParagraph(
