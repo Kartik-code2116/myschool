@@ -180,7 +180,9 @@ public class PdfGenerator {
                 else rName = "Personality";
                 File out = new File(outDir(ctx), "Bulk_" + rName + "_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 
                 boolean isFirst = true;
@@ -223,7 +225,9 @@ public class PdfGenerator {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "GradeChart_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(15, 15, 30, 30); // Narrow margins for 20 columns
                 
@@ -334,7 +338,9 @@ public class PdfGenerator {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Pragati_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4.rotate());
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(15, 15, 15, 15);
 
@@ -694,7 +700,9 @@ public class PdfGenerator {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Personality_" + safeRoll(student) + "_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(30, 30, 30, 30);
                 addPersonalityContent(doc, ctx, school, cls, student, sem1, sem2);
@@ -715,7 +723,9 @@ public class PdfGenerator {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "CombinedReport_" + safeRoll(student) + "_" + ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(30, 30, 30, 30);
 

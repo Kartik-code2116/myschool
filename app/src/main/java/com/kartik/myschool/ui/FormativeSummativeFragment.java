@@ -115,13 +115,16 @@ public class FormativeSummativeFragment extends Fragment {
 
         // Subtitle dynamic binding
         String clsLabel = activeClass != null ? activeClass.className : "5";
-        String divLabel = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
+        String divLabel = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty()
+                ? activeClass.division
+                : "-";
         b.tvAppSubtitle
                 .setText("Cls: " + clsLabel + "-" + divLabel + " • Sem: " + activeSemesterNumber);
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
-                v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "formative_summative"));
+                v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(),
+                        "formative_summative"));
         b.btnAddSquare.setOnClickListener(
                 v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
         b.btnCalcSquare.setOnClickListener(v -> {
@@ -134,7 +137,9 @@ public class FormativeSummativeFragment extends Fragment {
     private void setupHeaderStrip() {
         String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         String cls = activeClass != null ? activeClass.className : "5";
-        String div = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
+        String div = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty()
+                ? activeClass.division
+                : "-";
         b.tvHeaderStripInfo
                 .setText("Year: " + yr + " | Cls: " + cls + "-" + div + " | Sem: " + activeSemesterNumber);
 
@@ -175,7 +180,8 @@ public class FormativeSummativeFragment extends Fragment {
                 b.tvEmptyState
                         .setText(R.string.msg_no_subjects_configured_ngo_to);
             }
-            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+            if (swipeRefresh != null)
+                swipeRefresh.setRefreshing(false);
             return;
         }
 
@@ -196,7 +202,8 @@ public class FormativeSummativeFragment extends Fragment {
             // Render instantly from cache and hide progress
             if (b != null)
                 b.progressLoading.setVisibility(View.GONE);
-            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+            if (swipeRefresh != null)
+                swipeRefresh.setRefreshing(false);
             adapter.setData(cachedList, cachedMarks);
         }
 
@@ -217,9 +224,10 @@ public class FormativeSummativeFragment extends Fragment {
 
                                 // Merge network results with the fresh cache based on updatedAt
                                 // ONLY if the cache belongs to the same semester we are currently fetching!
-                                if (AppCache.cachedMarksMap != null 
+                                if (AppCache.cachedMarksMap != null
                                         && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)
-                                        && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
+                                        && java.util.Objects.equals(activeClass.id,
+                                                AppCache.cachedClassIdForStudents)) {
                                     for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
                                         String sId = entry.getKey();
                                         MarksRecord cachedRecord = entry.getValue();
@@ -241,7 +249,8 @@ public class FormativeSummativeFragment extends Fragment {
 
                                 if (isAdded() && b != null) {
                                     b.progressLoading.setVisibility(View.GONE);
-                                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+                                    if (swipeRefresh != null)
+                                        swipeRefresh.setRefreshing(false);
                                     if (finalList.isEmpty()) {
                                         b.tvEmptyState.setVisibility(View.VISIBLE);
                                     } else {
@@ -253,11 +262,13 @@ public class FormativeSummativeFragment extends Fragment {
 
                             @Override
                             public void onError(Exception e) {
-                                String errMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error";
+                                String errMsg = (e != null && e.getMessage() != null) ? e.getMessage()
+                                        : "Unknown error";
                                 Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + errMsg, e);
                                 if (isAdded() && b != null) {
                                     b.progressLoading.setVisibility(View.GONE);
-                                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+                                    if (swipeRefresh != null)
+                                        swipeRefresh.setRefreshing(false);
                                     // FIX: only fallback to empty marks when there is truly no
                                     // previously-cached data. Never wipe marks just because of a
                                     // transient network error on resume.
@@ -279,7 +290,8 @@ public class FormativeSummativeFragment extends Fragment {
             public void onError(Exception e) {
                 if (isAdded() && b != null) {
                     b.progressLoading.setVisibility(View.GONE);
-                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+                    if (swipeRefresh != null)
+                        swipeRefresh.setRefreshing(false);
                     // Only show network error toast if cache is fully empty
                     if (AppCache.cachedStudents == null
                             || activeClass == null
@@ -356,9 +368,9 @@ public class FormativeSummativeFragment extends Fragment {
                     AppCache.marksJustSavedRecord);
 
             // Consume the flags so next unrelated resume doesn’t re-patch
-            AppCache.marksJustSaved          = false;
+            AppCache.marksJustSaved = false;
             AppCache.marksJustSavedStudentId = null;
-            AppCache.marksJustSavedRecord    = null;
+            AppCache.marksJustSavedRecord = null;
 
             // Clear selectedMarks so it doesn't bleed into other students
             AppCache.selectedMarks = null;
@@ -419,8 +431,10 @@ public class FormativeSummativeFragment extends Fragment {
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
-        /** Instantly updates one student's card without a full list reload.
-         *  Called by onResume() immediately after returning from EnterMarksActivity. */
+        /**
+         * Instantly updates one student's card without a full list reload.
+         * Called by onResume() immediately after returning from EnterMarksActivity.
+         */
         public void patchStudentMarks(String studentId, MarksRecord record) {
             // Update the adapter's marks map
             marksMap.put(studentId, record);
@@ -477,8 +491,25 @@ public class FormativeSummativeFragment extends Fragment {
 
             public void bind(Student s, int index) {
                 binding.tvStudentName.setText(index + ". " + s.name);
-                binding.btnStudentMore.setOnClickListener(
-                        v -> Toast.makeText(itemView.getContext(), "Options for " + s.name, Toast.LENGTH_SHORT).show());
+                binding.btnStudentMore.setOnClickListener(v -> {
+                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
+                            itemView.getContext(), v);
+                    popup.getMenu().add(0, 1, 0, "Enter Marks");
+                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
+                    popup.getMenu().add(0, 2, 2, "Quick View Info");
+                    popup.setOnMenuItemClickListener(item -> {
+                        if (item.getItemId() == 1) {
+                            openMarksEntry(s);
+                            return true;
+                        } else if (item.getItemId() == 3) {
+                            Toast.makeText(itemView.getContext(), "Please select a specific subject's menu to edit its box", Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
+                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        return true;
+                    });
+                    popup.show();
+                });
 
                 MarksRecord marks = marksMap.get(s.id);
 
@@ -488,7 +519,8 @@ public class FormativeSummativeFragment extends Fragment {
                     for (Subject sub : activeClass.subjects) {
                         MarksRecord.SubjectMarksDetail detail = marks.detailedMarks
                                 .get(MarksRecord.sanitizeKey(sub.name));
-                        if (detail != null && detail.grade != null && !detail.grade.isEmpty() && hasEnteredMarks(detail)) {
+                        if (detail != null && detail.grade != null && !detail.grade.isEmpty()
+                                && hasEnteredMarks(detail)) {
                             gradesToDisplay.add(detail.grade);
                         }
                     }
@@ -529,11 +561,12 @@ public class FormativeSummativeFragment extends Fragment {
 
                 if (activeClass.subjects != null) {
                     int subjectCount = activeClass.subjects.size();
-                    
+
                     // Check if existing views are of the wrong type, and remove if so
                     if (binding.layoutSubjectsHorizontal.getChildCount() > 0) {
                         View firstChild = binding.layoutSubjectsHorizontal.getChildAt(0);
-                        boolean isCurrentCompact = firstChild.getTag() instanceof ItemEvaluationSubjectCardCompactBinding;
+                        boolean isCurrentCompact = firstChild
+                                .getTag() instanceof ItemEvaluationSubjectCardCompactBinding;
                         if (isGridView != isCurrentCompact) {
                             binding.layoutSubjectsHorizontal.removeAllViews();
                         }
@@ -543,8 +576,9 @@ public class FormativeSummativeFragment extends Fragment {
                     LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
                     while (binding.layoutSubjectsHorizontal.getChildCount() < subjectCount) {
                         if (isGridView) {
-                            ItemEvaluationSubjectCardCompactBinding cardB = ItemEvaluationSubjectCardCompactBinding.inflate(inflater, binding.layoutSubjectsHorizontal, false);
-                            
+                            ItemEvaluationSubjectCardCompactBinding cardB = ItemEvaluationSubjectCardCompactBinding
+                                    .inflate(inflater, binding.layoutSubjectsHorizontal, false);
+
                             // Set compact card layout width once
                             android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
                                     (int) (186 * density),
@@ -552,21 +586,23 @@ public class FormativeSummativeFragment extends Fragment {
                             int margin = (int) (6 * density);
                             param.setMargins(margin, margin, margin, margin);
                             cardB.getRoot().setLayoutParams(param);
-                            
+
                             View cardView = cardB.getRoot();
                             cardView.setTag(cardB);
                             binding.layoutSubjectsHorizontal.addView(cardView);
                         } else {
-                            ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(inflater, binding.layoutSubjectsHorizontal, false);
-                            
-                            // Set consistent layout width and margins for horizontal scrolling (300dp to fit table)
+                            ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(inflater,
+                                    binding.layoutSubjectsHorizontal, false);
+
+                            // Set consistent layout width and margins for horizontal scrolling (300dp to
+                            // fit table)
                             android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
                                     (int) (300 * density),
                                     android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                             int margin = (int) (6 * density);
                             param.setMargins(margin, margin, margin, margin);
                             cardB.getRoot().setLayoutParams(param);
-                            
+
                             View cardView = cardB.getRoot();
                             cardView.setTag(cardB);
                             binding.layoutSubjectsHorizontal.addView(cardView);
@@ -575,7 +611,8 @@ public class FormativeSummativeFragment extends Fragment {
 
                     // Remove extra views
                     while (binding.layoutSubjectsHorizontal.getChildCount() > subjectCount) {
-                        binding.layoutSubjectsHorizontal.removeViewAt(binding.layoutSubjectsHorizontal.getChildCount() - 1);
+                        binding.layoutSubjectsHorizontal
+                                .removeViewAt(binding.layoutSubjectsHorizontal.getChildCount() - 1);
                     }
 
                     // Bind data
@@ -583,10 +620,12 @@ public class FormativeSummativeFragment extends Fragment {
                         Subject sub = activeClass.subjects.get(i);
                         View cardView = binding.layoutSubjectsHorizontal.getChildAt(i);
                         if (isGridView) {
-                            ItemEvaluationSubjectCardCompactBinding cardB = (ItemEvaluationSubjectCardCompactBinding) cardView.getTag();
+                            ItemEvaluationSubjectCardCompactBinding cardB = (ItemEvaluationSubjectCardCompactBinding) cardView
+                                    .getTag();
                             bindSubjectCardCompact(cardB, s, sub, i + 1, marks);
                         } else {
-                            ItemEvaluationSubjectCardBinding cardB = (ItemEvaluationSubjectCardBinding) cardView.getTag();
+                            ItemEvaluationSubjectCardBinding cardB = (ItemEvaluationSubjectCardBinding) cardView
+                                    .getTag();
                             bindSubjectCard(cardB, s, sub, i + 1, marks);
                         }
                     }
@@ -602,13 +641,13 @@ public class FormativeSummativeFragment extends Fragment {
                 float density = itemView.getResources().getDisplayMetrics().density;
                 tv.setPadding((int) (8 * density), (int) (3 * density), (int) (8 * density), (int) (3 * density));
                 tv.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
-                
+
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 lp.setMarginEnd((int) (6 * density));
                 tv.setLayoutParams(lp);
-                
+
                 return tv;
             }
 
@@ -655,7 +694,8 @@ public class FormativeSummativeFragment extends Fragment {
                 return String.valueOf(val);
             }
 
-            private void bindSubjectCard(ItemEvaluationSubjectCardBinding cardB, Student student, Subject sub, int number, MarksRecord record) {
+            private void bindSubjectCard(ItemEvaluationSubjectCardBinding cardB, Student student, Subject sub,
+                    int number, MarksRecord record) {
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
                 // Default table values
@@ -769,7 +809,8 @@ public class FormativeSummativeFragment extends Fragment {
                 cardB.getRoot().setOnClickListener(v -> openSingleSubjectMarks(student, sub));
             }
 
-            private void bindSubjectCardCompact(ItemEvaluationSubjectCardCompactBinding cardB, Student student, Subject sub, int number, MarksRecord record) {
+            private void bindSubjectCardCompact(ItemEvaluationSubjectCardCompactBinding cardB, Student student,
+                    Subject sub, int number, MarksRecord record) {
                 cardB.tvSubjectName.setText(number + ". " + sub.name);
 
                 // Default table values

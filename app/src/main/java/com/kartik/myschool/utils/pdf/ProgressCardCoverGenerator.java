@@ -109,7 +109,9 @@ public class ProgressCardCoverGenerator {
                         "ProgressCard_" + PdfGenerator.ts() + ".pdf");
 
                 Document doc = new Document(PageSize.A4.rotate());
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(0, 0, 0, 0);
 

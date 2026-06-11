@@ -53,6 +53,8 @@ public class CoverPageGenerator {
                         "CoverPage_" + PdfGenerator.safeRoll(student) + "_" + PdfGenerator.ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
                 PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(0, 0, 0, 0);
                 addCoverPageContent(doc, ctx, school, cls, student, writer);

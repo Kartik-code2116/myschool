@@ -227,6 +227,7 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private void triggerIndividualGenerator(Student student, MarksRecord s1, MarksRecord s2, int reportPosition) {
+        com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = reportPosition;
         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
             @Override
             public void onSuccess(File pdfFile) {
@@ -276,6 +277,7 @@ public class ReportPrintingFragment extends Fragment {
             return;
         }
         
+        com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = reportPosition;
         Toast.makeText(getContext(), R.string.msg_empty_15, Toast.LENGTH_LONG).show();
         
         String classId = SessionContext.selectedClass.id;
@@ -348,6 +350,8 @@ public class ReportPrintingFragment extends Fragment {
             Toast.makeText(getContext(), R.string.msg_empty_11, Toast.LENGTH_SHORT).show();
             return;
         }
+        
+        com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = reportPosition;
         
         if (reportPosition == 0) {
             Toast.makeText(getContext(), R.string.msg_empty_19, Toast.LENGTH_SHORT).show();
@@ -560,6 +564,7 @@ public class ReportPrintingFragment extends Fragment {
             return;
         }
 
+        com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = -1; // Use global margins for master report
         android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
         pd.setMessage("सर्व 18 रिपोर्ट तयार होत आहेत. कृपया प्रतीक्षा करा (यास काही मिनिटे लागू शकतात)...");
         pd.setCancelable(false);
@@ -607,6 +612,7 @@ public class ReportPrintingFragment extends Fragment {
     }
 
     private File generateReportPositionSync(int position, Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map) throws Exception {
+        com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = position;
         CountDownLatch latch = new CountDownLatch(1);
         final File[] result = new File[1];
         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {

@@ -41,7 +41,9 @@ public class GunapattrakGenerator {
                 PdfGenerator.ensureFonts(ctx);
                 File out = new File(PdfGenerator.outDir(ctx), "Gunapattrak_" + PdfGenerator.safeRoll(student) + "_" + PdfGenerator.ts() + ".pdf");
                 Document doc = new Document(PageSize.A4);
-                PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
                 doc.setMargins(30, 30, 30, 30);
                 addGunapattrakContent(doc, ctx, school, cls, student, sem1, sem2);

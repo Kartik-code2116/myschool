@@ -65,6 +65,8 @@ public class ResultSheetGenerator {
 
                 Document doc = new Document(PageSize.A4.rotate());
                 PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 writer.setPageEvent(new BorderEvent());
                 doc.open();
                 doc.setMargins(30, 30, 40, 40);
