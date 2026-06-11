@@ -29,6 +29,7 @@ import android.widget.TextView;
 import androidx.annotation.IdRes;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.ScrollView;
 
@@ -82,11 +83,23 @@ public class ProductTourHelper {
 
     public static class TourStep {
         @IdRes public final int targetViewId;   // 0 = no spotlight (full-card intro step)
+        public final int targetChildIndex;      // >=0 for RecyclerView child targeting
+        @IdRes public final int targetChildViewId; // 0 = target the whole child, else target this ID inside the child
         public final String title;
         public final String description;
 
         public TourStep(int targetViewId, String title, String description) {
+            this(targetViewId, -1, 0, title, description);
+        }
+
+        public TourStep(int targetViewId, int targetChildIndex, String title, String description) {
+            this(targetViewId, targetChildIndex, 0, title, description);
+        }
+
+        public TourStep(int targetViewId, int targetChildIndex, int targetChildViewId, String title, String description) {
             this.targetViewId = targetViewId;
+            this.targetChildIndex = targetChildIndex;
+            this.targetChildViewId = targetChildViewId;
             this.title = title;
             this.description = description;
         }
@@ -428,10 +441,68 @@ public class ProductTourHelper {
                         m ? "१. वर्ष व सत्र" : "1. Year & Semester",
                         m ? "कोणत्या वर्ष व सत्रासाठी गुणपत्रक तयार होत आहे ते येथे दिसते."
                           : "Confirms which academic year and semester marksheets are for."));
-                s.add(new TourStep(R.id.rvReportCards,
-                        m ? "२. विद्यार्थी कार्ड्स" : "2. Student Report Cards",
-                        m ? "प्रत्येक विद्यार्थ्याच्या कार्डावर टॅप करा → PDF प्रीव्ह्यू, शेअर, प्रिंट."
-                          : "Tap a student card to preview their PDF, share or send to print."));
+                s.add(new TourStep(R.id.rvReportCards, 0, R.id.btnReportSettings,
+                        m ? "⚙️ सेटिंग चिन्ह" : "⚙️ Settings Icon",
+                        m ? "काही अहवालांसाठी येथे टॅप करून अतिरिक्त माहिती भरता येते (उदा. शेरे, तारखा)." 
+                          : "Tap here for reports that require additional settings or custom text."));
+                s.add(new TourStep(R.id.rvReportCards, 0, R.id.btnReportAction,
+                        m ? "🖨️ प्रिंट चिन्ह" : "🖨️ Print Icon",
+                        m ? "हा अहवाल त्वरित PDF स्वरूपात तयार करण्यासाठी येथे टॅप करा." 
+                          : "Tap this print icon to instantly generate the PDF for this report."));
+                s.add(new TourStep(R.id.rvReportCards, 0,
+                        m ? "अहवाल १: १. मुखपृष्ठ" : "Report 1: 1. Cover Page",
+                        m ? "नोंदवहीचे आकर्षक मुखपृष्ठ" : "Attractive cover page of register"));
+                s.add(new TourStep(R.id.rvReportCards, 1,
+                        m ? "अहवाल २: २. अनुक्रमणिका" : "Report 2: 2. Index",
+                        m ? "सत्र एक वा दोन अनुसार अनुक्रमणिका" : "Index according to semester 1 or 2"));
+                s.add(new TourStep(R.id.rvReportCards, 2,
+                        m ? "अहवाल ३: ३. गुणनोंदी" : "Report 3: 3. Marks Register",
+                        m ? "तंत्रे व श्रेणीसहित आकारिक-संकलित गुणनोंदी" : "Formative-Summative marks register with tools & grades"));
+                s.add(new TourStep(R.id.rvReportCards, 3,
+                        m ? "अहवाल ४: ४. वर्णनात्मक नोंदी" : "Report 4: 4. Descriptive Entries",
+                        m ? "सत्रानुसार विद्यार्थ्यांच्या वर्णनात्मक नोंदी" : "Semester-wise descriptive remarks of students"));
+                s.add(new TourStep(R.id.rvReportCards, 4,
+                        m ? "अहवाल ५: ५. श्रेणी तक्का" : "Report 5: 5. Grade Table",
+                        m ? "सत्र व विषयनुसार गुण व श्रेणी तक्का" : "Marks & grade table according to semester and subject"));
+                s.add(new TourStep(R.id.rvReportCards, 5,
+                        m ? "अहवाल ६: ६. सर्वसामावेशक निकाल" : "Report 6: 6. Comprehensive Result",
+                        m ? "आकारिक-संकलित गण श्रेणीयुक्त" : "Formative-Summative total grade sheet"));
+                s.add(new TourStep(R.id.rvReportCards, 6,
+                        m ? "अहवाल ७: ७. श्रेणी तक्का" : "Report 7: 7. Roster Grade Table",
+                        m ? "सत्र, वर्गवार मुले-मुली श्रेणी तक्का" : "Semester and class-wide boys-girls grade table"));
+                s.add(new TourStep(R.id.rvReportCards, 7,
+                        m ? "अहवाल ८: ८. गुण-श्रेणीयुक्त निकालपत्रक" : "Report 8: 8. Marks-Grade Ledger",
+                        m ? "विषयवार एकूण गुण व श्रेणीयुक्त" : "Subject-wise total marks & grades sheet"));
+                s.add(new TourStep(R.id.rvReportCards, 8,
+                        m ? "अहवाल ९: ९. प्रगतीपत्रक मुखपृष्ठ" : "Report 9: 9. Progress Card Cover",
+                        m ? "A4 साईज कलरफुल प्रगतीपत्रक" : "A4 size colorful progress card cover"));
+                s.add(new TourStep(R.id.rvReportCards, 9,
+                        m ? "अहवाल १०: १०. प्रगतीपत्रक पृष्ठ" : "Report 10: 10. Progress Card Inner",
+                        m ? "A4 साईज प्रगतीपत्रक आतील पृष्ठ" : "A4 size progress card inner page"));
+                s.add(new TourStep(R.id.rvReportCards, 10,
+                        m ? "अहवाल ११: ११. उपयुक्त रिपोर्ट" : "Report 11: 11. Useful Reports",
+                        m ? "विषयवार गुणतक्के" : "Subject-wise marks tables"));
+                s.add(new TourStep(R.id.rvReportCards, 11,
+                        m ? "अहवाल १२: १२. पाचवी आठवी गुणपत्रक" : "Report 12: 12. 5th & 8th Marksheet",
+                        m ? "इयत्ता पाचवी / आठवी गुणपत्रक" : "5th / 8th standard marksheet"));
+                s.add(new TourStep(R.id.rvReportCards, 12,
+                        m ? "अहवाल १३: १३. पाचवी आठवी वार्षिक तक्के" : "Report 13: 13. 5th & 8th Annual Tables",
+                        m ? "इयत्ता पाचवी / आठवी गुणतक्का" : "5th / 8th standard annual tables"));
+                s.add(new TourStep(R.id.rvReportCards, 13,
+                        m ? "अहवाल १४: १४. प्रगतीपत्रक मुखपृष्ठ" : "Report 14: 14. Progress Card Cover",
+                        m ? "A4 साईज कलरफुल प्रगतीपत्रक" : "A4 size colorful progress card cover"));
+                s.add(new TourStep(R.id.rvReportCards, 14,
+                        m ? "अहवाल १५: १५. वार्षिक निकालपत्रक" : "Report 15: 15. Annual Result Ledger",
+                        m ? "सत्र व विषयनुसार गुण व श्रेणी तक्का" : "Marks & grade table according to semester and subject"));
+                s.add(new TourStep(R.id.rvReportCards, 15,
+                        m ? "अहवाल १६: १६. वार्षिक निकालपत्रक" : "Report 16: 16. Annual Marksheet",
+                        m ? "दोन्ही सत्र एकत्र सर्वसमावेशीत तक्ता" : "Both semesters combined comprehensive table"));
+                s.add(new TourStep(R.id.rvReportCards, 16,
+                        m ? "अहवाल १७: १७. जात श्रेणी तक्ता" : "Report 17: 17. Caste Grade Table",
+                        m ? "सत्र, वर्गवार, जातवार मुले-मुली श्रेणी तक्ता." : "Semester, Class-wise, Caste-wise Boys-Girls Grade Table."));
+                s.add(new TourStep(R.id.rvReportCards, 17,
+                        m ? "अहवाल १८: १८. प्रगतीपत्रक मुखपृष्ठ" : "Report 18: 18. Progress Card Cover",
+                        m ? "A4 प्रथम सत्र प्रगतीपत्रक" : "A4 First Semester Progress Card"));
                 break;
 
             // ════════════════════════════════════════════════════════════
@@ -908,8 +979,26 @@ public class ProductTourHelper {
             if (step.targetViewId != 0) {
                 View target = findTargetView(step.targetViewId);
                 if (target != null) {
-                    // Scroll the target into view first, then spotlight it
-                    scrollToReveal(target, () -> spotlightTarget(target, index == 0));
+                    if (target instanceof RecyclerView && step.targetChildIndex >= 0) {
+                        RecyclerView rv = (RecyclerView) target;
+                        rv.smoothScrollToPosition(step.targetChildIndex);
+                        postDelayed(() -> {
+                            View child = rv.getLayoutManager() != null ? rv.getLayoutManager().findViewByPosition(step.targetChildIndex) : null;
+                            if (child != null) {
+                                if (step.targetChildViewId != 0) {
+                                    View innerTarget = child.findViewById(step.targetChildViewId);
+                                    spotlightTarget(innerTarget != null ? innerTarget : child, index == 0);
+                                } else {
+                                    spotlightTarget(child, index == 0);
+                                }
+                            } else {
+                                spotlightTarget(rv, index == 0);
+                            }
+                        }, 400);
+                    } else {
+                        // Scroll the target into view first, then spotlight it
+                        scrollToReveal(target, () -> spotlightTarget(target, index == 0));
+                    }
                 } else {
                     // Target not found — show centred tooltip without spotlight
                     spotX = 0; spotY = 0; spotR = 0;

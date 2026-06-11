@@ -95,6 +95,71 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         b.btnCancel.setOnClickListener(v -> dismiss());
         b.btnBack.setOnClickListener(v -> dismiss());
         b.dialogRoot.setOnClickListener(v -> dismiss());
+        
+        b.btnMoreOptions.setOnClickListener(v -> {
+            androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(requireContext(), v);
+            popup.getMenu().add(0, 1, 0, "Change to Male (उदा. करतो)");
+            popup.getMenu().add(0, 2, 0, "Change to Female (उदा. करते)");
+            popup.setOnMenuItemClickListener(item -> {
+                applyGenderToSelectedRemarks(item.getItemId() == 1);
+                return true;
+            });
+            popup.show();
+        });
+    }
+
+    private void applyGenderToSelectedRemarks(boolean isMale) {
+        if (selectedRemarks.isEmpty() && bankOptions.isEmpty()) return;
+        
+        List<String> newSelection = new ArrayList<>();
+        List<String> newBankOptions = new ArrayList<>();
+        
+        for (String remark : selectedRemarks) {
+            newSelection.add(applyGenderReplacement(remark, isMale));
+        }
+        
+        for (String option : bankOptions) {
+            newBankOptions.add(applyGenderReplacement(option, isMale));
+        }
+        
+        selectedRemarks.clear();
+        selectedRemarks.addAll(newSelection);
+        
+        bankOptions.clear();
+        bankOptions.addAll(newBankOptions);
+        
+        String customRemark = b.etCustomRemark.getText() != null ? b.etCustomRemark.getText().toString() : "";
+        if (!customRemark.trim().isEmpty()) {
+            b.etCustomRemark.setText(applyGenderReplacement(customRemark, isMale));
+        }
+        
+        renderSelection();
+    }
+
+    private String applyGenderReplacement(String text, boolean isMale) {
+        String[] roots = {
+            "कर", "दे", "घे", "शिक", "वाच", "लिहि", "बोल", "सांग", "सोडव", 
+            "दाखव", "ओळख", "वापर", "जप", "जोपास", "वाढव", "मांड", "ऐक", 
+            "निवड", "रेखाट", "रंगव", "खेळ", "धाव", "हो", "जिंक", "राह", 
+            "ठेव", "पाड", "विचार", "आवड", "चाल", "पाह", "ये", "जा", "खा", 
+            "पि", "झोप", "उठ", "बस", "म्हण", "वाग", "अस"
+        };
+        String rootPattern = String.join("|", roots);
+        String updated = text;
+
+        if (isMale) {
+            updated = updated.replaceAll("(?<![\\p{L}])(" + rootPattern + ")ते(?![\\p{L}])", "$1तो");
+            updated = updated.replaceAll("(?<![\\p{L}])ती(?![\\p{L}])", "तो");
+            // Still support the slash format just in case
+            updated = updated.replaceAll("([^\\s/]+?)\\s*तो\\s*/\\s*([^\\s/]+?)\\s*ते", "$1तो");
+        } else {
+            updated = updated.replaceAll("(?<![\\p{L}])(" + rootPattern + ")तो(?![\\p{L}])", "$1ते");
+            updated = updated.replaceAll("(?<![\\p{L}])तो(?![\\p{L}])", "ती");
+            // Still support the slash format just in case
+            updated = updated.replaceAll("([^\\s/]+?)\\s*तो\\s*/\\s*([^\\s/]+?)\\s*ते", "$2ते");
+        }
+        
+        return updated;
     }
 
     @Override
@@ -272,16 +337,15 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
                 TextView tv = holder.itemView.findViewById(R.id.tvRemarkText);
                 CheckBox cb = holder.itemView.findViewById(R.id.cbRemark);
                 
-                String fullText = item.getFullText();
                 tv.setText(item.text);
-                cb.setChecked(selected.contains(fullText));
+                cb.setChecked(selected.contains(item.text));
                 
                 holder.itemView.setOnClickListener(v -> {
-                    if (selected.contains(fullText)) {
-                        selected.remove(fullText);
+                    if (selected.contains(item.text)) {
+                        selected.remove(item.text);
                         cb.setChecked(false);
                     } else {
-                        selected.add(fullText);
+                        selected.add(item.text);
                         cb.setChecked(true);
                     }
                     if (onChange != null) onChange.run();

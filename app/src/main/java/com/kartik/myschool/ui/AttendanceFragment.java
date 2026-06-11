@@ -80,13 +80,11 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         // Chat/Help Icon click
         b.ivActionHelp.setOnClickListener(v -> showHelpDialog());
 
-        // Add Icon click (Friendly instructions dialog)
+        // Add Icon click navigates to students list
         b.ivActionAdd.setOnClickListener(v -> {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(R.string.msg_new_attendance)
-                    .setMessage("नवीन हजेरी जोडण्यासाठी संबंधित विद्यार्थ्याच्या कार्डवरील उजव्या ३-बिंदू चिन्हावर क्लिक करा आणि 'बदल करा' (Edit) पर्याय निवडा.")
-                    .setPositiveButton("ठीक आहे", null)
-                    .show();
+            if (getActivity() instanceof HomeActivity) {
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
+            }
         });
 
         // Calculator/Report Icon click

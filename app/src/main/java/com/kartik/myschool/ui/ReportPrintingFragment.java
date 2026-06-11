@@ -76,6 +76,16 @@ public class ReportPrintingFragment extends Fragment {
         String yearLabel = SessionContext.getYearLabel();
         String classLabel = SessionContext.selectedClass != null ? SessionContext.selectedClass.getDisplayName() : "None";
         b.tvReportPrintingYear.setText("Year: " + yearLabel + " | Class: " + classLabel);
+        
+        b.btnHelpSquare.setOnClickListener(v -> {
+            com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "print_report");
+        });
+        
+        b.btnWatchSquare.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                com.kartik.myschool.utils.ProductTourHelper.startTour(getActivity(), "print_report");
+            }
+        });
     }
 
     private void loadClassStudents() {

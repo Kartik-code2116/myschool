@@ -111,8 +111,11 @@ public class DescriptiveEntriesFragment extends Fragment {
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
                 v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "descriptive"));
-        b.btnAddSquare.setOnClickListener(
-                v -> Toast.makeText(requireContext(), R.string.msg_add_student_clicked, Toast.LENGTH_SHORT).show());
+        b.btnAddSquare.setOnClickListener(v -> {
+            if (getActivity() instanceof HomeActivity) {
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
+            }
+        });
     }
 
     private void setupHeaderStrip() {
@@ -544,7 +547,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                         itemView.getContext(), anchor);
                 popup.getMenu().add(0, 1, 0, "Edit remark");
                 popup.getMenu().add(0, 2, 1, "Delete remark");
-                popup.getMenu().add(0, 3, 2, "Gender change sentence");
+                popup.getMenu().add(0, 3, 2, "Change to Male (सर्व विषय)");
+                popup.getMenu().add(0, 4, 3, "Change to Female (सर्व विषय)");
                 popup.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == 1) {
                         openMarksEntry(student);
@@ -554,8 +558,15 @@ public class DescriptiveEntriesFragment extends Fragment {
                         confirmDeleteRemarks(student);
                         return true;
                     }
-                    applyGenderRemarkChange(student);
-                    return true;
+                    if (item.getItemId() == 3) {
+                        applyGenderRemarkChange(student, false);
+                        return true;
+                    }
+                    if (item.getItemId() == 4) {
+                        applyGenderRemarkChange(student, true);
+                        return true;
+                    }
+                    return false;
                 });
                 popup.show();
             }
@@ -593,7 +604,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                 saveStudentRemarkRecord(student, record, "Remarks deleted.");
             }
 
-            private void applyGenderRemarkChange(Student student) {
+            private void applyGenderRemarkChange(Student student, boolean female) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
                     Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
@@ -601,7 +612,6 @@ public class DescriptiveEntriesFragment extends Fragment {
                     return;
                 }
 
-                boolean female = isFemaleStudent(student);
                 boolean changed = false;
                 for (MarksRecord.SubjectMarksDetail detail : record.detailedMarks.values()) {
                     if (detail == null || detail.remark == null || detail.remark.trim().isEmpty()) {
@@ -634,20 +644,27 @@ public class DescriptiveEntriesFragment extends Fragment {
             }
 
             private String adjustRemarkGender(String remark, boolean female) {
-                String result = remark;
-                String[][] femalePairs = {
-                        { "\u092f\u0947\u0924\u094b", "\u092f\u0947\u0924\u0947" },
-                        { "\u0935\u093e\u0917\u0924\u094b", "\u0935\u093e\u0917\u0924\u0947" },
-                        { "\u0915\u0930\u0924\u094b", "\u0915\u0930\u0924\u0947" },
-                        { "\u0918\u0947\u0924\u094b", "\u0918\u0947\u0924\u0947" },
-                        { "\u0926\u0947\u0924\u094b", "\u0926\u0947\u0924\u0947" },
-                        { "\u092c\u094b\u0932\u0924\u094b", "\u092c\u094b\u0932\u0924\u0947" },
-                        { "\u0905\u0938\u0924\u094b", "\u0905\u0938\u0924\u0947" }
+                String[] roots = {
+                    "कर", "दे", "घे", "शिक", "वाच", "लिहि", "बोल", "सांग", "सोडव", 
+                    "दाखव", "ओळख", "वापर", "जप", "जोपास", "वाढव", "मांड", "ऐक", 
+                    "निवड", "रेखाट", "रंगव", "खेळ", "धाव", "हो", "जिंक", "राह", 
+                    "ठेव", "पाड", "विचार", "आवड", "चाल", "पाह", "ये", "जा", "खा", 
+                    "पि", "झोप", "उठ", "बस", "म्हण", "वाग", "अस"
                 };
-                for (String[] pair : femalePairs) {
-                    result = female ? result.replace(pair[0], pair[1]) : result.replace(pair[1], pair[0]);
+                String rootPattern = String.join("|", roots);
+                String updated = remark;
+
+                if (!female) {
+                    updated = updated.replaceAll("(?<![\\p{L}])(" + rootPattern + ")ते(?![\\p{L}])", "$1तो");
+                    updated = updated.replaceAll("(?<![\\p{L}])ती(?![\\p{L}])", "तो");
+                    updated = updated.replaceAll("([^\\s/]+?)\\s*तो\\s*/\\s*([^\\s/]+?)\\s*ते", "$1तो");
+                } else {
+                    updated = updated.replaceAll("(?<![\\p{L}])(" + rootPattern + ")तो(?![\\p{L}])", "$1ते");
+                    updated = updated.replaceAll("(?<![\\p{L}])तो(?![\\p{L}])", "ती");
+                    updated = updated.replaceAll("([^\\s/]+?)\\s*तो\\s*/\\s*([^\\s/]+?)\\s*ते", "$2ते");
                 }
-                return result;
+                
+                return updated;
             }
 
             private void saveStudentRemarkRecord(Student student, MarksRecord record, String successMessage) {
