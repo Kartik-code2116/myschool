@@ -261,14 +261,20 @@ public class ProgressCardCoverGenerator {
 
         // Month rows
         boolean alt = false;
-        String[] months = getMonths(ctx);
-        for (String month : months) {
+        String[] displayMonths = getMonths(ctx);
+        String[] lookupKeys = {
+            "जून", "जुलै", "ऑगस्ट", "सप्टें", "ऑक्टो",
+            "नोव्हे", "डिसें", "जाने", "फेब्रु", "मार्च", "एप्रिल", "मे"
+        };
+        for (int i = 0; i < displayMonths.length; i++) {
+            String displayMonth = displayMonths[i];
+            String lookupKey = lookupKeys[i];
             BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
 
             // Parse attendance: "present/total" or just "present"
             int workingDays = 0, presentDays = 0;
             if (student.monthlyAttendance != null) {
-                String att = student.monthlyAttendance.get(month);
+                String att = student.monthlyAttendance.get(lookupKey);
                 if (att != null && att.contains("/")) {
                     String[] parts = att.split("/");
                     try { presentDays = Integer.parseInt(parts[0].trim()); } catch (Exception ignored) {}
@@ -281,7 +287,7 @@ public class ProgressCardCoverGenerator {
             String wdStr = workingDays > 0 ? String.valueOf(workingDays) : "";
             String pdStr = presentDays > 0 ? String.valueOf(presentDays) : "";
 
-            cellSpan(attTbl, month, fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+            cellSpan(attTbl, displayMonth, fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
             cellSpan(attTbl, wdStr,  fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
             cellSpan(attTbl, pdStr,  fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
             // 3 blank signature columns

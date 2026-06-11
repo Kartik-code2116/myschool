@@ -147,13 +147,13 @@ public class IndexPageGenerator {
         cell.setHorizontalAlignment(align);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         try {
-            com.itextpdf.text.Image img = MarathiText.renderLine(text, 10f, true, android.graphics.Color.BLACK);
+            com.itextpdf.text.Image img = MarathiText.renderLine(text, 14f, true, android.graphics.Color.BLACK);
             img.setAlignment(align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT
                     : align == Element.ALIGN_RIGHT ? com.itextpdf.text.Image.RIGHT
                     : com.itextpdf.text.Image.MIDDLE);
             cell.addElement(img);
         } catch (Exception e) {
-            cell.setPhrase(new Phrase(text, fBold));
+            cell.setPhrase(new Phrase(text, new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD)));
         }
         return cell;
     }

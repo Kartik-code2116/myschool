@@ -140,13 +140,14 @@ public class RosterGradeTableGenerator {
         PdfPCell hC = new PdfPCell();
         hC.setBorder(Rectangle.NO_BORDER);
         hC.setHorizontalAlignment(Element.ALIGN_CENTER);
+        hC.setVerticalAlignment(Element.ALIGN_MIDDLE);
         try {
-            com.itextpdf.text.Image semImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(semText, 11, true,
+            com.itextpdf.text.Image semImg = com.kartik.myschool.utils.pdf.MarathiText.renderLine(semText, 14, true,
                     android.graphics.Color.BLACK);
             semImg.setAlignment(Element.ALIGN_CENTER);
             hC.addElement(semImg);
         } catch (Exception e) {
-            hC.addElement(new Phrase(semText, fSmallBold));
+            hC.addElement(new Phrase(semText, new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 14, com.itextpdf.text.Font.BOLD)));
         }
 
         PdfPCell hR = new PdfPCell();
