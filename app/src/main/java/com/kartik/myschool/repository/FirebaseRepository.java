@@ -1385,6 +1385,30 @@ public class FirebaseRepository {
         }
     }
 
+    // ---------- Global Subjects ----------
+    public void getGlobalSubjects(OnResult<List<com.kartik.myschool.model.Subject>> cb) {
+        db.collection("global_subjects").get()
+                .addOnSuccessListener(snap -> {
+                    List<com.kartik.myschool.model.Subject> list = new ArrayList<>();
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            try {
+                                String name = doc.getString("name");
+                                Long maxMarksLong = doc.getLong("maxMarks");
+                                int maxMarks = maxMarksLong != null ? maxMarksLong.intValue() : 100;
+                                if (name != null && !name.trim().isEmpty()) {
+                                    list.add(new com.kartik.myschool.model.Subject(name.trim(), maxMarks));
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    cb.onSuccess(list);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
     // ---------- Callback interface ----------
     public interface OnResult<T> {
         void onSuccess(T result);

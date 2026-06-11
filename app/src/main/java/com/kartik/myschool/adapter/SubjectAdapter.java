@@ -57,6 +57,10 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         items.clear();
         if (list != null) items.addAll(list);
         
+        updateActiveSubjects(activeList);
+    }
+
+    public void updateActiveSubjects(List<Subject> activeList) {
         activeSubjectNames.clear();
         if (activeList != null) {
             for (Subject s : activeList) {

@@ -21,9 +21,16 @@ import com.kartik.myschool.model.Subject;
 import com.kartik.myschool.repository.FirebaseRepository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import android.widget.TextView;
+import android.widget.CheckBox;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class SubjectRemarkEntryDialog extends DialogFragment {
 
@@ -163,24 +170,129 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
             int semesterNumber = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
             bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
         }
-        String[] labels = bankOptions.toArray(new String[0]);
-        boolean[] checked = new boolean[labels.length];
-        for (int i = 0; i < labels.length; i++) {
-            checked[i] = selectedRemarks.contains(labels[i]);
+
+        BottomSheetDialog sheet = new BottomSheetDialog(requireContext());
+        View sheetView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_categorized_remarks, null);
+        
+        RecyclerView rv = sheetView.findViewById(R.id.rvRemarks);
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        
+        List<Object> items = new ArrayList<>();
+        Map<String, List<String>> categorized = new LinkedHashMap<>();
+        List<String> uncategorized = new ArrayList<>();
+        
+        for (String option : bankOptions) {
+            if (option.startsWith("[") && option.contains("]")) {
+                int endBracket = option.indexOf("]");
+                String cat = option.substring(1, endBracket).trim();
+                String text = option.substring(endBracket + 1).trim();
+                if (!categorized.containsKey(cat)) {
+                    categorized.put(cat, new ArrayList<>());
+                }
+                categorized.get(cat).add(text);
+            } else {
+                uncategorized.add(option);
+            }
+        }
+        
+        for (Map.Entry<String, List<String>> entry : categorized.entrySet()) {
+            items.add(new CategoryHeader(entry.getKey()));
+            for (String val : entry.getValue()) {
+                items.add(new RemarkItem(val, entry.getKey()));
+            }
+        }
+        if (!uncategorized.isEmpty()) {
+            items.add(new CategoryHeader("Other"));
+            for (String val : uncategorized) {
+                items.add(new RemarkItem(val, null));
+            }
         }
 
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Choose remarks")
-                .setMultiChoiceItems(labels, checked, (dialog, which, isChecked) -> {
-                    if (isChecked) {
-                        selectedRemarks.add(labels[which]);
+        CategorizedRemarkAdapter adapter = new CategorizedRemarkAdapter(items, selectedRemarks, () -> {
+            renderSelection();
+        });
+        rv.setAdapter(adapter);
+
+        sheet.setContentView(sheetView);
+        sheet.show();
+    }
+
+    private static class CategoryHeader {
+        String title;
+        CategoryHeader(String title) { this.title = title; }
+    }
+
+    private static class RemarkItem {
+        String text;
+        String category;
+        RemarkItem(String text, String category) { this.text = text; this.category = category; }
+        String getFullText() {
+            return category != null ? "[" + category + "] " + text : text;
+        }
+    }
+
+    private static class CategorizedRemarkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private static final int TYPE_HEADER = 0;
+        private static final int TYPE_ITEM = 1;
+        private List<Object> items;
+        private LinkedHashSet<String> selected;
+        private Runnable onChange;
+
+        CategorizedRemarkAdapter(List<Object> items, LinkedHashSet<String> selected, Runnable onChange) {
+            this.items = items;
+            this.selected = selected;
+            this.onChange = onChange;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return items.get(position) instanceof CategoryHeader ? TYPE_HEADER : TYPE_ITEM;
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            if (viewType == TYPE_HEADER) {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_remark_category_header, parent, false);
+                return new RecyclerView.ViewHolder(v) {};
+            } else {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_selectable_remark, parent, false);
+                return new RecyclerView.ViewHolder(v) {};
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            if (getItemViewType(position) == TYPE_HEADER) {
+                CategoryHeader header = (CategoryHeader) items.get(position);
+                TextView tv = holder.itemView.findViewById(R.id.tvCategoryName);
+                tv.setText(header.title);
+            } else {
+                RemarkItem item = (RemarkItem) items.get(position);
+                TextView tv = holder.itemView.findViewById(R.id.tvRemarkText);
+                CheckBox cb = holder.itemView.findViewById(R.id.cbRemark);
+                
+                String fullText = item.getFullText();
+                tv.setText(item.text);
+                cb.setChecked(selected.contains(fullText));
+                
+                holder.itemView.setOnClickListener(v -> {
+                    if (selected.contains(fullText)) {
+                        selected.remove(fullText);
+                        cb.setChecked(false);
                     } else {
-                        selectedRemarks.remove(labels[which]);
+                        selected.add(fullText);
+                        cb.setChecked(true);
                     }
-                })
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Done", (dialog, which) -> renderSelection())
-                .show();
+                    if (onChange != null) onChange.run();
+                });
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
     }
 
     private void renderSelection() {

@@ -39,13 +39,45 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             b.etSubjectNameLong.setText("First Language: " + name);
         }
 
-        // Split or default formative and summative values based on academic vs activities
-        if (category != null && (category.equalsIgnoreCase("Activities") || category.equalsIgnoreCase("Personality"))) {
-            b.etFormativeEval.setText("100");
-            b.etSummativeEval.setText("0");
-        } else {
-            b.etFormativeEval.setText("70");
-            b.etSummativeEval.setText("30");
+        // Determine CURRENT formative and summative values
+        boolean foundCustom = false;
+        if (com.kartik.myschool.SessionContext.selectedClass != null && com.kartik.myschool.SessionContext.selectedClass.subjects != null) {
+            for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
+                if (s.name != null && s.name.equalsIgnoreCase(name)) {
+                    int fe = s.maxNirikhshan + s.maxTondiKam + s.maxPratyakshik + s.maxUpkram + s.maxPrakalp + s.maxChachani + s.maxSwadhyay + s.maxItar;
+                    int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
+                    b.etFormativeEval.setText(String.valueOf(fe));
+                    b.etSummativeEval.setText(String.valueOf(se));
+                    foundCustom = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!foundCustom) {
+            String detailsFe = getIntent().getStringExtra("details_left_1");
+            String detailsSe = getIntent().getStringExtra("details_left_2");
+            
+            try {
+                if (detailsFe != null && detailsFe.contains("FE:")) {
+                    b.etFormativeEval.setText(detailsFe.replace("FE:", "").trim());
+                } else if (category != null && (category.equalsIgnoreCase("Activities") || category.equalsIgnoreCase("Personality"))) {
+                    b.etFormativeEval.setText("100");
+                } else {
+                    b.etFormativeEval.setText("50");
+                }
+                
+                if (detailsSe != null && detailsSe.contains("SE:")) {
+                    b.etSummativeEval.setText(detailsSe.replace("SE:", "").trim());
+                } else if (category != null && (category.equalsIgnoreCase("Activities") || category.equalsIgnoreCase("Personality"))) {
+                    b.etSummativeEval.setText("0");
+                } else {
+                    b.etSummativeEval.setText("50");
+                }
+            } catch (Exception e) {
+                b.etFormativeEval.setText("50");
+                b.etSummativeEval.setText("50");
+            }
         }
 
         b.etDropdownNotes.setText(R.string.msg_i_1);
@@ -76,8 +108,53 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             }
             b.tilSubjectNameRegular.setError(null);
 
-            Toast.makeText(this, "Subject " + updatedName + " updated successfully!", Toast.LENGTH_SHORT).show();
-            finish();
+            int formative = 0;
+            int summative = 0;
+            try { formative = Integer.parseInt(b.etFormativeEval.getText().toString().trim()); } catch(Exception ignored){}
+            try { summative = Integer.parseInt(b.etSummativeEval.getText().toString().trim()); } catch(Exception ignored){}
+
+            // Update in SessionContext
+            if (com.kartik.myschool.SessionContext.selectedClass != null && com.kartik.myschool.SessionContext.selectedClass.subjects != null) {
+                for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
+                    if (s.name != null && s.name.equalsIgnoreCase(name)) { // compare with original name
+                        s.name = updatedName;
+                        s.maxMarks = formative + summative;
+
+                        // Re-scale sub-fields based on new formative (akarik) and summative (sanklit) totals
+                        s.maxNirikhshan   = formative * 10 / 50;
+                        s.maxTondiKam     = formative * 10 / 50;
+                        s.maxPratyakshik  = formative * 10 / 50;
+                        s.maxUpkram       = formative * 5  / 50;
+                        s.maxPrakalp      = formative * 5  / 50;
+                        s.maxChachani     = formative * 5  / 50;
+                        s.maxSwadhyay     = formative * 5  / 50;
+                        s.maxItar         = formative - s.maxNirikhshan - s.maxTondiKam - s.maxPratyakshik
+                                - s.maxUpkram - s.maxPrakalp - s.maxChachani - s.maxSwadhyay;
+
+                        s.maxTondi        = summative * 10 / 50;
+                        s.maxPratyakshikB = summative * 10 / 50;
+                        s.maxLekhi        = summative - s.maxTondi - s.maxPratyakshikB;
+                        break;
+                    }
+                }
+                
+                // Save to local cache and Firestore
+                com.kartik.myschool.SessionContext.save(this);
+                com.kartik.myschool.AppCache.selectedClass = com.kartik.myschool.SessionContext.selectedClass;
+                com.kartik.myschool.repository.FirebaseRepository.get().saveClass(com.kartik.myschool.SessionContext.selectedClass, new com.kartik.myschool.repository.FirebaseRepository.OnResult<String>() {
+                    @Override public void onSuccess(String result) {
+                        Toast.makeText(SubjectUpdateActivity.this, "Subject " + updatedName + " updated successfully!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                    @Override public void onError(Exception e) {
+                        Toast.makeText(SubjectUpdateActivity.this, "Error saving: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Subject " + updatedName + " updated locally!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         });
     }
 }

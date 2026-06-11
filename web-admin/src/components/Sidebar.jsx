@@ -33,6 +33,10 @@ export default function Sidebar() {
           <span className="nav-icon">U</span>
           <span>Users</span>
         </NavLink>
+        <NavLink to="/admin/subjects" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+          <span className="nav-icon">📚</span>
+          <span>Subjects</span>
+        </NavLink>
         <NavLink to="/admin/remarks" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
           <span className="nav-icon">R</span>
           <span>Remarks</span>

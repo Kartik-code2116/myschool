@@ -74,10 +74,52 @@ export default function AdminRemarks() {
   
   const [remarks, setRemarks] = useState([]);
   const [newRemarkText, setNewRemarkText] = useState('');
+  const [remarkCategory, setRemarkCategory] = useState('उत्कृष्ट');
   
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  
+  const [draggedItemIndex, setDraggedItemIndex] = useState(null);
+
+  const handleDragStart = (index) => {
+    setDraggedItemIndex(index);
+  };
+
+  const handleDragEnter = (index) => {
+    if (draggedItemIndex === null) return;
+    if (draggedItemIndex === index) return;
+
+    const newRemarks = [...remarks];
+    let draggedItem = newRemarks[draggedItemIndex];
+    let targetItem = newRemarks[index];
+    
+    // Find what category we are dragging over
+    let targetCat = 'Other';
+    if (targetItem.startsWith('[') && targetItem.includes(']')) {
+       targetCat = targetItem.substring(1, targetItem.indexOf(']')).trim();
+    }
+    
+    // Find the pure text of the item being dragged
+    let draggedText = draggedItem;
+    if (draggedItem.startsWith('[') && draggedItem.includes(']')) {
+       draggedText = draggedItem.substring(draggedItem.indexOf(']') + 1).trim();
+    }
+    
+    // Apply the new category tag to the dragged item
+    let updatedDraggedItem = targetCat === 'Other' ? draggedText : `[${targetCat}] ${draggedText}`;
+    
+    // Perform the swap
+    newRemarks.splice(draggedItemIndex, 1);
+    newRemarks.splice(index, 0, updatedDraggedItem);
+    
+    setDraggedItemIndex(index);
+    setRemarks(newRemarks);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItemIndex(null);
+  };
 
   const getDocId = () => {
     const safe = selectedSubject ? selectedSubject.replace(/[^a-zA-Z0-9\u0900-\u097F]/g, '_') : 'general';
@@ -151,11 +193,17 @@ export default function AdminRemarks() {
     e.preventDefault();
     const txt = newRemarkText.trim();
     if (!txt) return;
-    if (remarks.includes(txt)) {
+    
+    let finalTxt = txt;
+    if (remarkCategory !== 'Other') {
+      finalTxt = `[${remarkCategory}] ${txt}`;
+    }
+    
+    if (remarks.includes(finalTxt)) {
       setMessage({ text: 'This remark already exists.', type: 'error' });
       return;
     }
-    setRemarks([...remarks, txt]);
+    setRemarks([...remarks, finalTxt]);
     setNewRemarkText('');
     setMessage({ text: '', type: '' });
   };
@@ -229,8 +277,19 @@ export default function AdminRemarks() {
           )}
 
           <form onSubmit={addRemark} className="add-remark-form">
+            <select 
+              value={remarkCategory} 
+              onChange={(e) => setRemarkCategory(e.target.value)}
+              disabled={loading}
+              className="category-select"
+            >
+              <option value="उत्कृष्ट">उत्कृष्ट</option>
+              <option value="चांगली प्रगती">चांगली प्रगती</option>
+              <option value="समाधानकारक">समाधानकारक</option>
+              <option value="Other">Other / None</option>
+            </select>
             <input 
-              type="text" 
+              type="text"
               placeholder="Enter a new descriptive remark..." 
               value={newRemarkText}
               onChange={(e) => setNewRemarkText(e.target.value)}
@@ -248,19 +307,64 @@ export default function AdminRemarks() {
               {remarks.length === 0 ? (
                 <div className="empty-state">No remarks configured for this selection.</div>
               ) : (
-                remarks.map((remark, index) => (
-                  <div key={index} className="remark-item">
-                    <span className="remark-text">{remark}</span>
-                    <button 
-                      type="button" 
-                      className="btn-delete-remark"
-                      onClick={() => removeRemark(index)}
-                      title="Remove"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))
+                (() => {
+                  const categorized = {
+                    'उत्कृष्ट': [],
+                    'चांगली प्रगती': [],
+                    'समाधानकारक': [],
+                    'Other': []
+                  };
+                  
+                  remarks.forEach((remark, index) => {
+                    let cat = 'Other';
+                    let text = remark;
+                    if (remark.startsWith('[') && remark.includes(']')) {
+                      const end = remark.indexOf(']');
+                      cat = remark.substring(1, end).trim();
+                      text = remark.substring(end + 1).trim();
+                      if (!categorized[cat]) categorized[cat] = [];
+                    }
+                    categorized[cat].push({ text, originalIndex: index });
+                  });
+
+                  return Object.entries(categorized).map(([catName, items]) => {
+                    if (items.length === 0) return null;
+                    return (
+                      <div key={catName} className="category-group" style={{ marginBottom: '16px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', color: 'var(--primary-color)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>{catName}</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {items.map((item) => {
+                            const index = item.originalIndex;
+                            return (
+                              <div 
+                                key={index} 
+                                className={`remark-item ${draggedItemIndex === index ? 'dragging' : ''}`}
+                                draggable
+                                onDragStart={() => handleDragStart(index)}
+                                onDragEnter={() => handleDragEnter(index)}
+                                onDragEnd={handleDragEnd}
+                                onDragOver={(e) => e.preventDefault()}
+                              >
+                                <div className="remark-content">
+                                  <span className="drag-handle" title="Drag to reorder">↕️</span>
+                                  <span className="remark-text">{item.text}</span>
+                                </div>
+                                <button 
+                                  type="button" 
+                                  className="btn-delete-remark"
+                                  onClick={() => removeRemark(index)}
+                                  title="Remove"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()
               )}
             </div>
           )}

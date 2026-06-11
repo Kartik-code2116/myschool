@@ -12,6 +12,7 @@ import LandingPage from './pages/LandingPage';
 import AppRedirect from './pages/AppRedirect';
 import Subscriptions from './pages/Subscriptions';
 import AdminRemarks from './pages/AdminRemarks';
+import AdminSubjects from './pages/AdminSubjects';
 
 const getInitialTheme = () => {
   const savedTheme = localStorage.getItem('myschool-theme');
@@ -106,6 +107,7 @@ export default function App() {
           <Route path="subscriptions" element={<Subscriptions />} />
           <Route path="users" element={<UsersList />} />
           <Route path="users/:id" element={<UserDetail />} />
+          <Route path="subjects" element={<AdminSubjects />} />
           <Route path="remarks" element={<AdminRemarks />} />
           <Route path="profile" element={<AdminProfile />} />
         </Route>
