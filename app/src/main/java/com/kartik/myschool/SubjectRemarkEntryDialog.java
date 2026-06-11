@@ -124,7 +124,12 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
     private void loadRemarkBank() {
         String schoolId = classModel.schoolId != null ? classModel.schoolId
                 : SessionContext.selectedSchool != null ? SessionContext.selectedSchool.id : null;
-        List<String> cached = AppCache.cachedRemarkBank.get(subjectName);
+        
+        String className = classModel.className != null ? classModel.className : "5";
+        int semesterNumber = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.number : 1;
+        
+        String cacheKey = className + "_sem_" + semesterNumber + "_" + subjectName;
+        List<String> cached = AppCache.cachedRemarkBank.get(cacheKey);
         if (cached != null && !cached.isEmpty()) {
             bankOptions.clear();
             bankOptions.addAll(cached);
@@ -132,14 +137,14 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
             return;
         }
 
-        FirebaseRepository.get().getRemarkBank(schoolId, subjectName,
+        FirebaseRepository.get().getRemarkBank(schoolId, className, semesterNumber, subjectName,
                 new FirebaseRepository.OnResult<List<String>>() {
                     @Override
                     public void onSuccess(List<String> options) {
                         bankOptions.clear();
                         if (options != null) {
                             bankOptions.addAll(options);
-                            AppCache.cachedRemarkBank.put(subjectName, new ArrayList<>(options));
+                            AppCache.cachedRemarkBank.put(cacheKey, new ArrayList<>(options));
                         }
                         renderSelection();
                     }
@@ -147,7 +152,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
                     @Override
                     public void onError(Exception e) {
                         bankOptions.clear();
-                        bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName));
+                        bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
                         renderSelection();
                     }
                 });
@@ -155,7 +160,8 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
 
     private void showRemarkDialog() {
         if (bankOptions.isEmpty()) {
-            bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName));
+            int semesterNumber = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
+            bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
         }
         String[] labels = bankOptions.toArray(new String[0]);
         boolean[] checked = new boolean[labels.length];

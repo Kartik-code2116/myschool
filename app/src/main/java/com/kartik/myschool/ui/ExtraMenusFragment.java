@@ -181,6 +181,10 @@ public class ExtraMenusFragment extends Fragment {
 
     private void loadRemarkBankOptions() {
         String schoolId = getActiveSchoolId();
+        ClassModel activeClass = SessionContext.selectedClass;
+        String className = activeClass != null && activeClass.className != null ? activeClass.className : "5";
+        int semesterNumber = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.number : 1;
+
         List<String> cached = AppCache.cachedRemarkBank.get(selectedRemarkBankSubject);
         if (cached != null && !cached.isEmpty()) {
             remarkBankOptions.clear();
@@ -189,7 +193,7 @@ public class ExtraMenusFragment extends Fragment {
             return;
         }
 
-        FirebaseRepository.get().getRemarkBank(schoolId, selectedRemarkBankSubject,
+        FirebaseRepository.get().getRemarkBank(schoolId, className, semesterNumber, selectedRemarkBankSubject,
                 new FirebaseRepository.OnResult<List<String>>() {
                     @Override
                     public void onSuccess(List<String> options) {
@@ -206,7 +210,7 @@ public class ExtraMenusFragment extends Fragment {
                     public void onError(Exception e) {
                         if (!isAdded()) return;
                         remarkBankOptions.clear();
-                        remarkBankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(selectedRemarkBankSubject));
+                        remarkBankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(selectedRemarkBankSubject, semesterNumber));
                         renderRemarkBankOptions();
                     }
                 });

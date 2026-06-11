@@ -1,0 +1,229 @@
+.admin-remarks-page {
+  width: min(100%, 1240px);
+  margin: 0 auto;
+  padding: 38px 32px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-kicker {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary-color);
+  margin-bottom: -16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.page-header h1 {
+  margin-bottom: 8px;
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+}
+
+.remarks-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .remarks-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.selectors-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.selectors-panel h3 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-group select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--control-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 15px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.selectors-info {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.selectors-info p {
+  margin: 0 0 0.25rem 0;
+}
+
+.selectors-info code {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.message-banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.message-banner.success {
+  background: rgba(46, 204, 113, 0.1);
+  color: #27ae60;
+  border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.message-banner.error {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.message-banner.info {
+  background: rgba(52, 152, 219, 0.1);
+  color: #2980b9;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.add-remark-form {
+  display: flex;
+  gap: 12px;
+}
+
+.add-remark-form input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--control-color);
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.add-remark-form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.add-remark-form button {
+  white-space: nowrap;
+}
+
+.remarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.remark-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.remark-item:hover {
+  border-color: var(--border-color);
+  background: var(--surface-color);
+}
+
+.remark-text {
+  font-size: 15px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.btn-delete-remark {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  line-height: 1;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 820px) {
+  .admin-remarks-page {
+    padding: 28px 16px 44px;
+  }
+}
+
+.btn-delete-remark:hover {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}

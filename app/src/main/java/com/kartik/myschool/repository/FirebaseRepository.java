@@ -1100,11 +1100,10 @@ public class FirebaseRepository {
      * Fetches remark options for a given subject from Firestore.
      * Falls back to RemarkBank.defaultOptionsFor(subjectName) when no doc exists.
      */
-    public void getRemarkBank(String schoolId, String subjectName,
+    public void getRemarkBank(String schoolId, String className, int semesterNumber, String subjectName,
                               OnResult<java.util.List<String>> cb) {
-        String docId = makeRemarkBankId(schoolId, subjectName);
-        db.collection(COL_REMARK_BANKS).document(docId)
-                .get()
+        String customDocId = makeRemarkBankId(schoolId, subjectName);
+        db.collection(COL_REMARK_BANKS).document(customDocId).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         com.kartik.myschool.model.RemarkBank bank =
@@ -1114,13 +1113,37 @@ public class FirebaseRepository {
                             return;
                         }
                     }
-                    // No custom bank → return defaults
-                    cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName));
+                    // Try class+semester specific default
+                    String classSemDocId = makeClassSemRemarkBankId(className, semesterNumber, subjectName);
+                    db.collection(COL_REMARK_BANKS).document(classSemDocId).get()
+                            .addOnSuccessListener(doc2 -> {
+                                if (doc2.exists()) {
+                                    com.kartik.myschool.model.RemarkBank bank2 =
+                                            doc2.toObject(com.kartik.myschool.model.RemarkBank.class);
+                                    if (bank2 != null && bank2.options != null && !bank2.options.isEmpty()) {
+                                        cb.onSuccess(bank2.options);
+                                        return;
+                                    }
+                                }
+                                // Try legacy default
+                                String legacyDocId = makeRemarkBankId("default", subjectName);
+                                db.collection(COL_REMARK_BANKS).document(legacyDocId).get()
+                                        .addOnSuccessListener(doc3 -> {
+                                            if (doc3.exists()) {
+                                                com.kartik.myschool.model.RemarkBank bank3 =
+                                                        doc3.toObject(com.kartik.myschool.model.RemarkBank.class);
+                                                if (bank3 != null && bank3.options != null && !bank3.options.isEmpty()) {
+                                                    cb.onSuccess(bank3.options);
+                                                    return;
+                                                }
+                                            }
+                                            cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
+                                        })
+                                        .addOnFailureListener(e -> cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber)));
+                            })
+                            .addOnFailureListener(e -> cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber)));
                 })
-                .addOnFailureListener(e -> {
-                    // On network error also fall back to defaults
-                    cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName));
-                });
+                .addOnFailureListener(e -> cb.onSuccess(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber)));
     }
 
     /**
@@ -1143,6 +1166,13 @@ public class FirebaseRepository {
                 ? subjectName.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
                 : "general";
         return (schoolId != null ? schoolId : "default") + "_" + safe;
+    }
+
+    private String makeClassSemRemarkBankId(String className, int semesterNumber, String subjectName) {
+        String safe = subjectName != null
+                ? subjectName.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
+                : "general";
+        return "default_" + className + "_sem_" + semesterNumber + "_" + safe;
     }
 
     public void getClassesForUdiseCode(String udiseCode, OnResult<List<ClassModel>> cb) {
