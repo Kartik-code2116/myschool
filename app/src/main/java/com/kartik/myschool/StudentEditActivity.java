@@ -155,6 +155,7 @@ public class StudentEditActivity extends AppCompatActivity {
         set(b.etFatherOccupation, s.fatherOccupation);
         set(b.etFatherPhone, s.fatherPhone);
         set(b.etAddress, s.address);
+        set(b.etBankName, s.bankName);
         set(b.etBankAccount, s.bankAccount);
         set(b.etBankBranch, s.bankBranch);
         set(b.etBankIfsc, s.bankIfsc);
@@ -201,6 +202,7 @@ public class StudentEditActivity extends AppCompatActivity {
         s.fatherOccupation = str(b.etFatherOccupation);
         s.fatherPhone = str(b.etFatherPhone);
         s.address = str(b.etAddress);
+        s.bankName = str(b.etBankName);
         s.bankAccount = str(b.etBankAccount);
         s.bankBranch = str(b.etBankBranch);
         s.bankIfsc = str(b.etBankIfsc);

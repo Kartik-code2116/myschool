@@ -363,6 +363,33 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void getAllSemestersForTeacher(OnResult<List<Semester>> cb) {
+        String uid = currentUid();
+        if (uid == null) {
+            cb.onError(new IllegalStateException("User not authenticated"));
+            return;
+        }
+        db.collection(COL_SEMESTERS)
+                .whereEqualTo("teacherId", uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<Semester> list = new ArrayList<>();
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            Semester sem = doc.toObject(Semester.class);
+                            if (sem != null) {
+                                if (sem.id == null || sem.id.isEmpty()) {
+                                    sem.id = doc.getId();
+                                }
+                                list.add(sem);
+                            }
+                        }
+                    }
+                    cb.onSuccess(list);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
     /** Seed default year + semesters when teacher has none. */
     public void ensureDefaultYearAndSemesters(OnResult<AcademicYear> cb) {
         getAcademicYears(new OnResult<List<AcademicYear>>() {
@@ -499,6 +526,22 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void getAllClassesForTeacher(OnResult<List<ClassModel>> cb) {
+        String uid = currentUid();
+        if (uid == null) {
+            cb.onError(new IllegalStateException("User not authenticated"));
+            return;
+        }
+        db.collection(COL_CLASSES)
+                .whereEqualTo("teacherId", uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<ClassModel> classes = snap != null ? snap.toObjects(ClassModel.class) : new ArrayList<>();
+                    cb.onSuccess(classes);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
     // ---------- Student ----------
     public void saveStudent(Student s, OnResult<String> cb) {
         String uid = currentUid();
@@ -533,6 +576,7 @@ public class FirebaseRepository {
                 })
                 .addOnFailureListener(cb::onError);
     }
+
 
     // Bug #3 fix: removed .orderBy("rollNo") to avoid requiring a composite Firestore index.
     // Sorting is now done in memory, consistent with other methods.
@@ -779,6 +823,19 @@ public class FirebaseRepository {
                 .whereEqualTo("classId", classId)
                 .get()
                 // Bug #6 fix: return empty list instead of null
+                .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(MarksRecord.class) : new ArrayList<>()))
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getAllMarksForTeacher(OnResult<List<MarksRecord>> cb) {
+        String uid = currentUid();
+        if (uid == null) {
+            cb.onError(new IllegalStateException("User not authenticated"));
+            return;
+        }
+        db.collection(COL_MARKS)
+                .whereEqualTo("teacherId", uid)
+                .get()
                 .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(MarksRecord.class) : new ArrayList<>()))
                 .addOnFailureListener(cb::onError);
     }

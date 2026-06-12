@@ -239,6 +239,7 @@
     <string name="no_marks_yet">No marks entered yet</string>
     <string name="basic_info">Basic Information</string>
     <string name="academic_info">Academic Information</string>
+    <string name="label_bank_name">Bank Name</string>
     <string name="label_reg_no">Registration No</string>
     <string name="label_standard">Standard</string>
     <string name="action_profile">Profile</string>
@@ -458,8 +459,8 @@
     <string name="txt_choose_your_preferred_language">Choose your preferred language for MySchool</string>
     <string name="txt_english">English</string>
     <string name="str_empty_14">मराठी</string>
-    <string name="txt_student_backup_amp_restore">Student Backup &amp;amp; Restore / डेटा व्यवस्थापन</string>
-    <string name="txt_export_class_students_data_or">Export class students data or restore from a JSON backup file</string>
+    <string name="txt_student_backup_amp_restore">Full Account Backup &amp; Restore / डेटा व्यवस्थापन</string>
+    <string name="txt_export_class_students_data_or">Export full account data or restore from a JSON backup file</string>
     <string name="txt_backup">Backup / निर्यात</string>
     <string name="txt_restore">Restore / आयात</string>
     <string name="txt_app_utilities_amp_cache">App Utilities &amp;amp; Cache / उपयुक्त सुविधा</string>

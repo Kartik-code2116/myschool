@@ -186,7 +186,11 @@
                         android:fontFamily="sans-serif-black"/>
 
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
-                        android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_account_no">
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_bank_name">
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankName" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_account_no">
                         <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankAccount" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"

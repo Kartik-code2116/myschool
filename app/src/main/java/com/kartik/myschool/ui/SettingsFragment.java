@@ -45,7 +45,11 @@ public class SettingsFragment extends Fragment {
     private final androidx.activity.result.ActivityResultLauncher<String> filePickerLauncher =
             registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
-                    importStudents(uri);
+                    com.kartik.myschool.utils.BackupRestoreHelper.importFullAccount(requireContext(), uri, () -> {
+                        if (getActivity() instanceof HomeActivity) {
+                            ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
+                        }
+                    });
                 }
             });
 
@@ -103,7 +107,7 @@ public class SettingsFragment extends Fragment {
         b.btnLangEn.setOnClickListener(v -> { UiAnimations.pulse(b.btnLangEn); selectLanguage("en"); });
         b.btnLangMr.setOnClickListener(v -> { UiAnimations.pulse(b.btnLangMr); selectLanguage("mr"); });
 
-        b.btnExportBackup.setOnClickListener(v -> { UiAnimations.pulse(b.btnExportBackup); exportStudents(); });
+        b.btnExportBackup.setOnClickListener(v -> { UiAnimations.pulse(b.btnExportBackup); com.kartik.myschool.utils.BackupRestoreHelper.exportFullAccount(requireContext()); });
         b.btnImportBackup.setOnClickListener(v -> { UiAnimations.pulse(b.btnImportBackup); filePickerLauncher.launch("application/json"); });
 
         b.btnResetSession.setOnClickListener(v -> { UiAnimations.pulse(b.btnResetSession); resetSession(); });
@@ -166,206 +170,9 @@ public class SettingsFragment extends Fragment {
         requireActivity().recreate();
     }
 
-    // ── Student Database Export ──────────────────────────────────────────────
-    private void exportStudents() {
-        if (SessionContext.selectedClass == null) {
-            Toast.makeText(requireContext(), R.string.select_class_first, Toast.LENGTH_SHORT).show();
-            return;
-        }
+    // ── Full Account Database Export & Restore ──────────────────────────────────────────────
+    // Handled by com.kartik.myschool.utils.BackupRestoreHelper
 
-        FirebaseRepository.get().getStudentsForClass(SessionContext.selectedClass.id, new FirebaseRepository.OnResult<List<Student>>() {
-            @Override
-            public void onSuccess(List<Student> list) {
-                if (list == null || list.isEmpty()) {
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), R.string.msg_no_students_to_backup_in_the_a, Toast.LENGTH_SHORT).show()
-                    );
-                    return;
-                }
-
-                try {
-                    JSONArray array = new JSONArray();
-                    for (Student s : list) {
-                        JSONObject obj = new JSONObject();
-                        obj.put("name", s.name);
-                        obj.put("rollNo", s.rollNo);
-                        obj.put("rollNo2", s.rollNo2);
-                        obj.put("registrationNo", s.registrationNo);
-                        obj.put("dob", s.dob);
-                        obj.put("gender", s.gender);
-                        obj.put("cast", s.cast);
-                        obj.put("parentName", s.parentName);
-                        obj.put("motherName", s.motherName);
-                        obj.put("motherOccupation", s.motherOccupation);
-                        obj.put("motherPhone", s.motherPhone);
-                        obj.put("fatherName", s.fatherName);
-                        obj.put("fatherOccupation", s.fatherOccupation);
-                        obj.put("fatherPhone", s.fatherPhone);
-                        obj.put("address", s.address);
-                        obj.put("bankAccount", s.bankAccount);
-                        obj.put("bankBranch", s.bankBranch);
-                        obj.put("bankIfsc", s.bankIfsc);
-                        obj.put("bankUid", s.bankUid);
-                        obj.put("medium", s.medium);
-                        obj.put("motherTongue", s.motherTongue);
-                        obj.put("dateOfAdmission", s.dateOfAdmission);
-                        obj.put("studentIdNumber", s.studentIdNumber);
-                        obj.put("uid", s.uid);
-                        array.put(obj);
-                    }
-
-                    String jsonString = array.toString(4);
-
-                    // Write to local cache path
-                    File cachePath = new File(requireContext().getCacheDir(), "backups");
-                    cachePath.mkdirs();
-                    File file = new File(cachePath, "students_backup_" + SessionContext.selectedClass.className + "_" + SessionContext.selectedClass.division + ".json");
-                    FileWriter writer = new FileWriter(file);
-                    writer.write(jsonString);
-                    writer.close();
-
-                    // Generate sharable Uri via FileProvider
-                    android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(requireContext(),
-                            requireContext().getPackageName() + ".fileprovider", file);
-
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("application/json");
-                    intent.putExtra(Intent.EXTRA_STREAM, uri);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                    requireActivity().runOnUiThread(() ->
-                            startActivity(Intent.createChooser(intent, "Share Student Backup"))
-                    );
-
-                } catch (Exception e) {
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Backup failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Error fetching students: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
-            }
-        });
-    }
-
-    // ── Student Database Restore ─────────────────────────────────────────────
-    private void importStudents(android.net.Uri uri) {
-        if (SessionContext.selectedClass == null) {
-            Toast.makeText(requireContext(), R.string.select_class_first, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            InputStream is = requireContext().getContentResolver().openInputStream(uri);
-            if (is == null) return;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            reader.close();
-            is.close();
-
-            JSONArray array = new JSONArray(sb.toString());
-            int count = array.length();
-            if (count == 0) {
-                Toast.makeText(requireContext(), R.string.msg_backup_file_is_empty, Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            android.app.ProgressDialog pd = new android.app.ProgressDialog(requireContext());
-            pd.setTitle(R.string.msg_restoring_students);
-            pd.setMessage("Saving student records to Firestore...");
-            pd.setCancelable(false);
-            pd.show();
-
-            ClassModel currentClass = SessionContext.selectedClass;
-            School currentSchool = SessionContext.selectedSchool;
-            String teacherUid = FirebaseRepository.get().currentUid();
-
-            AtomicInteger savedCount = new AtomicInteger(0);
-            AtomicInteger failedCount = new AtomicInteger(0);
-
-            for (int i = 0; i < count; i++) {
-                JSONObject obj = array.getJSONObject(i);
-                Student s = new Student();
-                s.name = obj.optString("name", "");
-                s.rollNo = obj.optString("rollNo", "");
-                s.rollNo2 = obj.optString("rollNo2", "");
-                s.registrationNo = obj.optString("registrationNo", "");
-                s.dob = obj.optString("dob", "");
-                s.gender = obj.optString("gender", "");
-                s.cast = obj.optString("cast", "");
-                s.parentName = obj.optString("parentName", "");
-                s.motherName = obj.optString("motherName", "");
-                s.motherOccupation = obj.optString("motherOccupation", "");
-                s.motherPhone = obj.optString("motherPhone", "");
-                s.fatherName = obj.optString("fatherName", "");
-                s.fatherOccupation = obj.optString("fatherOccupation", "");
-                s.fatherPhone = obj.optString("fatherPhone", "");
-                s.address = obj.optString("address", "");
-                s.bankAccount = obj.optString("bankAccount", "");
-                s.bankBranch = obj.optString("bankBranch", "");
-                s.bankIfsc = obj.optString("bankIfsc", "");
-                s.bankUid = obj.optString("bankUid", "");
-                s.medium = obj.optString("medium", "");
-                s.motherTongue = obj.optString("motherTongue", "");
-                s.dateOfAdmission = obj.optString("dateOfAdmission", "");
-                s.studentIdNumber = obj.optString("studentIdNumber", "");
-                s.uid = obj.optString("uid", "");
-
-                // Map student strictly to currently active selection parameters
-                s.classId = currentClass.id;
-                s.className = currentClass.className;
-                s.standard = currentClass.className;
-                s.division = currentClass.division;
-                if (currentSchool != null) {
-                    s.schoolId = currentSchool.id;
-                    s.schoolName = currentSchool.name;
-                }
-                s.teacherId = teacherUid;
-
-                FirebaseRepository.get().saveStudent(s, new FirebaseRepository.OnResult<String>() {
-                    @Override
-                    public void onSuccess(String id) {
-                        int sVal = savedCount.incrementAndGet();
-                        checkDone(sVal, failedCount.get(), count, pd);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        int fVal = failedCount.incrementAndGet();
-                        checkDone(savedCount.get(), fVal, count, pd);
-                    }
-                });
-            }
-
-        } catch (Exception e) {
-            Toast.makeText(requireContext(), "Failed to read backup: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void checkDone(int saved, int failed, int total, android.app.ProgressDialog pd) {
-        if (saved + failed == total) {
-            requireActivity().runOnUiThread(() -> {
-                if (pd.isShowing()) pd.dismiss();
-                Toast.makeText(requireContext(),
-                        "Import Complete! Restored: " + saved + ", Failed: " + failed,
-                        Toast.LENGTH_LONG).show();
-
-                // Direct routing to students view to observe imported records
-                if (getActivity() instanceof HomeActivity) {
-                    ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
-                }
-            });
-        }
-    }
 
     // ── Reset & Cache utilities ──────────────────────────────────────────────
     private void resetSession() {

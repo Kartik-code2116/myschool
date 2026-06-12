@@ -35,6 +35,7 @@ public class Student {
     public String address;
 
     // Bank
+    public String bankName;
     public String bankAccount;
     public String bankBranch;
     public String bankIfsc;

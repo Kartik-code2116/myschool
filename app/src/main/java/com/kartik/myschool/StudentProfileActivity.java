@@ -177,6 +177,7 @@ public class StudentProfileActivity extends AppCompatActivity {
         });
 
         DetailRowHelper.fillRows(this, b.llBankDetails, new String[][]{
+                {getString(R.string.label_bank_name), s.bankName},
                 {getString(R.string.label_account_no), s.bankAccount},
                 {getString(R.string.label_branch), s.bankBranch},
                 {getString(R.string.label_ifsc), s.bankIfsc},

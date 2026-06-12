@@ -37,7 +37,7 @@
     <string name="label_tap_to_add_logo">लोगो जोडण्यासाठी टॅप करा</string>
     <string name="label_tap_to_add_photo">फोटो जोडण्यासाठी टॅप करा</string>
 
-    <string name="label_division">विभागणी</string>
+    <string name="label_division">तुकडी</string>
     <string name="label_exam_name">परीक्षेचे नाव (उदा. वार्षिक परीक्षा २०२५)</string>
     <string name="label_academic_year">शैक्षणिक वर्ष (उदा. 2025)</string>
     <string name="label_subjects">विषय</string>
@@ -239,8 +239,9 @@
     <string name="no_marks_yet">अजून मार्क दिलेले नाहीत</string>
     <string name="basic_info">मूलभूत माहिती</string>
     <string name="academic_info">शैक्षणिक माहिती</string>
-    <string name="label_reg_no">नोंदणी क्र</string>
-    <string name="label_standard">मानक</string>
+    <string name="label_bank_name">बँकेचे नाव</string>
+    <string name="label_reg_no">रजिस्टर नंबर</string>
+    <string name="label_standard">वर्ग</string>
     <string name="action_profile">प्रोफाइल</string>
 
     
@@ -458,8 +459,8 @@
     <string name="txt_choose_your_preferred_language">मायस्कूलसाठी तुमची पसंतीची भाषा निवडा</string>
     <string name="txt_english">इंग्रजी</string>
     <string name="str_empty_14">मराठी</string>
-    <string name="txt_student_backup_amp_restore">Student Backup &amp;amp; Restore / डेटा व्यवस्थापन</string>
-    <string name="txt_export_class_students_data_or">वर्ग विद्यार्थ्यांचा डेटा निर्यात करा किंवा JSON बॅकअप फाइलमधून पुनर्संचयित करा</string>
+    <string name="txt_student_backup_amp_restore">Full Account Backup &amp; Restore / संपूर्ण डेटा व्यवस्थापन</string>
+    <string name="txt_export_class_students_data_or">संपूर्ण खात्याचा डेटा निर्यात करा किंवा JSON बॅकअप फाइलमधून पुनर्संचयित करा</string>
     <string name="txt_backup">Backup / निर्यात</string>
     <string name="txt_restore">Restore / आयात</string>
     <string name="txt_app_utilities_amp_cache">App Utilities &amp;amp; Cache / उपयुक्त सुविधा</string>
