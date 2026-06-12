@@ -315,19 +315,19 @@ public class ProgressCardCoverGenerator {
         cellSpan(healthTbl, PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester"),  fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
         cellSpan(healthTbl, PdfLocalizer.get(ctx, "द्वितीय सत्र", "Second Semester"), fSmallBold, C_TEAL, C_WHITE, 1, 1, Element.ALIGN_CENTER);
 
-        // Weight row (not stored in MarksRecord — show dash)
-        String w1 = "-";
-        String w2 = "-";
-        cellSpan(healthTbl, PdfLocalizer.get(ctx, "वजन", "Weight"),  fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_LEFT);
-        cellSpan(healthTbl, w1,     fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(healthTbl, w2,     fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_CENTER);
-
-        // Height row
-        String h1 = "-";
-        String h2 = "-";
-        cellSpan(healthTbl, PdfLocalizer.get(ctx, "उंची", "Height"), fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_LEFT);
-        cellSpan(healthTbl, h1,     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(healthTbl, h2,     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+         // Weight row
+         String w1 = student.weightSem1 != null && !student.weightSem1.isEmpty() ? student.weightSem1 : "-";
+         String w2 = student.weightSem2 != null && !student.weightSem2.isEmpty() ? student.weightSem2 : "-";
+         cellSpan(healthTbl, PdfLocalizer.get(ctx, "वजन", "Weight"),  fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_LEFT);
+         cellSpan(healthTbl, w1,     fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_CENTER);
+         cellSpan(healthTbl, w2,     fSmall, C_WHITE,    C_DARK, 1, 1, Element.ALIGN_CENTER);
+ 
+         // Height row
+         String h1 = student.heightSem1 != null && !student.heightSem1.isEmpty() ? student.heightSem1 : "-";
+         String h2 = student.heightSem2 != null && !student.heightSem2.isEmpty() ? student.heightSem2 : "-";
+         cellSpan(healthTbl, PdfLocalizer.get(ctx, "उंची", "Height"), fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_LEFT);
+         cellSpan(healthTbl, h1,     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+         cellSpan(healthTbl, h2,     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
         panel.addElement(healthTbl);
 
@@ -377,18 +377,26 @@ public class ProgressCardCoverGenerator {
         // Push text down into the yellow area
         panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 30)));
 
-        String udiseLine = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : null) 
-                + PdfLocalizer.get(ctx, "\nजिल्हा परिषद", "\nZilla Parishad");
+        String udiseText = PdfLocalizer.get(ctx, "युडायस क्रमांक: ", "UDISE Code: ") + nvl(school != null ? school.udiseCode : null);
         try {
-            Image udiseImg = marathiImg(ctx, udiseLine, 9, false, C_DARK);
+            Image udiseImg = marathiImg(ctx, udiseText, 10, true, C_DARK);
             udiseImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(udiseImg);
         } catch (Exception e) {}
 
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 8)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 4)));
+
+        String zpText = PdfLocalizer.get(ctx, "जिल्हा परिषद प्राथमिक शाळा", "Zilla Parishad Primary School");
+        try {
+            Image zpImg = marathiImg(ctx, zpText, 14, true, C_DARK);
+            zpImg.setAlignment(Element.ALIGN_CENTER);
+            panel.addElement(zpImg);
+        } catch (Exception e) {}
+
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 6)));
 
         try {
-            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : PdfLocalizer.get(ctx, "शाळेचे नाव", "SCHOOL NAME")), 20, true, C_DARK);
+            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : PdfLocalizer.get(ctx, "शाळेचे नाव", "SCHOOL NAME")), 22, true, C_DARK);
             schoolImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(schoolImg);
         } catch (Exception e) {}

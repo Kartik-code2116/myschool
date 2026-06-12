@@ -101,6 +101,36 @@
                             <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDivision" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                            android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:hint="@string/label_height_sem1">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etHeightSem1" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                            android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:hint="@string/label_weight_sem1">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etWeightSem1" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                            android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:hint="@string/label_height_sem2">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etHeightSem2" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                            android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:hint="@string/label_weight_sem2">
+                            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etWeightSem2" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

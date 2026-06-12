@@ -271,7 +271,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         ItemSubjectMarksRowBinding row = ItemSubjectMarksRowBinding.inflate(
                 LayoutInflater.from(this), b.llMarksRows, false);
 
-        row.tvSubjectName.setText(sub.name);
+        row.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, sub.name));
 
         int maxMarks = sub.maxMarks;
         int nirikhshanMax = sub.maxNirikhshan;

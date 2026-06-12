@@ -227,6 +227,10 @@
     <string name="label_mother_tongue">मातृभाषा</string>
     <string name="label_date_admission">प्रवेशाची तारीख</string>
     <string name="label_student_id">विद्यार्थी आयडी</string>
+    <string name="label_height_sem1">उंची प्रथम सत्र (सेमी)</string>
+    <string name="label_weight_sem1">वजन प्रथम सत्र (किग्रॉ)</string>
+    <string name="label_height_sem2">उंची द्वितीय सत्र (सेमी)</string>
+    <string name="label_weight_sem2">वजन द्वितीय सत्र (किग्रॉ)</string>
     <string name="edit_student">विद्यार्थी संपादित करा</string>
     <string name="student_profile_title">विद्यार्थी</string>
     <string name="student_not_found">विद्यार्थी सापडला नाही</string>

@@ -705,7 +705,7 @@ public class FormativeSummativeFragment extends Fragment {
 
             private void bindSubjectCard(ItemEvaluationSubjectCardBinding cardB, Student student, Subject sub,
                     int number, MarksRecord record) {
-                cardB.tvSubjectName.setText(number + ". " + sub.name);
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), sub.name));
 
                 // Default table values
                 String fe1 = "0", fe2 = "0", fe3 = "0", fe4 = "0", fe5 = "0", fe6 = "0", fe7 = "0", fe8 = "0";
@@ -820,7 +820,7 @@ public class FormativeSummativeFragment extends Fragment {
 
             private void bindSubjectCardCompact(ItemEvaluationSubjectCardCompactBinding cardB, Student student,
                     Subject sub, int number, MarksRecord record) {
-                cardB.tvSubjectName.setText(number + ". " + sub.name);
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), sub.name));
 
                 // Default table values
                 String fet = "0", set = "0", tet = "0";

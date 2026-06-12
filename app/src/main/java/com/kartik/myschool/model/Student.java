@@ -21,6 +21,10 @@ public class Student {
     public String parentName;
     public String photoUrl;
     public boolean marksEntered;
+    public String heightSem1;
+    public String weightSem1;
+    public String heightSem2;
+    public String weightSem2;
 
     // Monthly Attendance: e.g., "जून" -> "20/22"
     public java.util.Map<String, String> monthlyAttendance = new java.util.HashMap<>();

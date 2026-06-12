@@ -64,6 +64,20 @@ public class BothSemDescriptiveGenerator {
         return "";
     }
 
+    private static String remarkContaining(MarksRecord rec, String keyword1, String keyword2) {
+        if (rec == null || rec.detailedMarks == null)
+            return "";
+        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : rec.detailedMarks.entrySet()) {
+            if (e.getKey() != null && e.getValue() != null && e.getValue().remark != null && !e.getValue().remark.trim().isEmpty()) {
+                String safeKey = MarksRecord.sanitizeKey(e.getKey()).toLowerCase();
+                if (safeKey.contains(keyword1) || safeKey.contains(keyword2)) {
+                    return cleanRemark(e.getValue().remark);
+                }
+            }
+        }
+        return "";
+    }
+
     private static String findGrade(MarksRecord rec, String subjectName) {
         if (rec == null || subjectName == null)
             return "-";
@@ -108,12 +122,8 @@ public class BothSemDescriptiveGenerator {
                         if (!isFirst)
                             doc.newPage();
                         isFirst = false;
-                        MarksRecord s1 = (selectedSemNum == 0 || selectedSemNum == 1) && sem1Map != null
-                                ? sem1Map.get(student.id)
-                                : null;
-                        MarksRecord s2 = (selectedSemNum == 0 || selectedSemNum == 2) && sem2Map != null
-                                ? sem2Map.get(student.id)
-                                : null;
+                        MarksRecord s1 = sem1Map != null ? sem1Map.get(student.id) : null;
+                        MarksRecord s2 = sem2Map != null ? sem2Map.get(student.id) : null;
 
                         addStudentPage(doc, ctx, school, cls, student, s1, s2);
                     }
@@ -216,7 +226,23 @@ public class BothSemDescriptiveGenerator {
         addTableHdr(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), C_HDR);
         addTableHdr(tbl, PdfLocalizer.get(ctx, "वर्णनात्मक नोंदी", "Descriptive Remarks"), C_HDR);
 
-        List<Subject> subjects = (cls != null && cls.subjects != null) ? cls.subjects : new java.util.ArrayList<>();
+        List<Subject> allSubjects = (cls != null && cls.subjects != null) ? cls.subjects : new java.util.ArrayList<>();
+        List<Subject> subjects = new java.util.ArrayList<>();
+        for (Subject sub : allSubjects) {
+            String sName = sub.name != null ? sub.name.toLowerCase() : "";
+            if (sName.contains("vishesh") || sName.contains("aavad") || sName.contains("sudharna") || sName.contains("vyaktimatva") ||
+                sName.contains("विशेष") || sName.contains("आवड") || sName.contains("सुधारणा") || sName.contains("व्यक्तिमत्व")) {
+                continue; // Skip pseudo-subjects
+            }
+            subjects.add(sub);
+        }
+
+        int totalSubjects = subjects.size();
+        int span1 = totalSubjects > 0 ? (totalSubjects / 3 + (totalSubjects % 3 > 0 ? 1 : 0)) : 1;
+        int remaining1 = totalSubjects > 0 ? totalSubjects - span1 : 0;
+        int span2 = remaining1 > 0 ? (remaining1 / 2 + (remaining1 % 2 > 0 ? 1 : 0)) : 1;
+        int span3 = remaining1 > 0 ? remaining1 - span2 : 1;
+
         boolean alt = false;
         int rowIdx = 1;
 
@@ -224,12 +250,25 @@ public class BothSemDescriptiveGenerator {
             BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
             alt = !alt;
             String grade = findGrade(rec, sub.name);
-            String remark = findRemark(rec, sub.name);
 
-            addDataCell(tbl, String.valueOf(rowIdx++), fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
+            addDataCell(tbl, String.valueOf(rowIdx), fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
             addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, Element.ALIGN_LEFT, 28f, 77f);
             addDataCell(tbl, grade, fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
-            addRemarkCell(tbl, remark, bg, 28f, 246f);
+
+            if (rowIdx == 1) {
+                String val = remarkContaining(rec, "vishesh", "विशेष");
+                String remark = PdfLocalizer.get(ctx, "विशेष प्रगती : ", "Special Development : ") + val;
+                addRemarkCell(tbl, remark, C_WHITE, 28f * span1, 236f, span1);
+            } else if (rowIdx == 1 + span1 && span2 > 0) {
+                String val = remarkContaining(rec, "aavad", "आवड");
+                String remark = PdfLocalizer.get(ctx, "आवड, छंद : ", "Interest, Hobby : ") + val;
+                addRemarkCell(tbl, remark, C_WHITE, 28f * span2, 236f, span2);
+            } else if (rowIdx == 1 + span1 + span2 && span3 > 0) {
+                String val = remarkContaining(rec, "sudharna", "सुधारणा");
+                String remark = PdfLocalizer.get(ctx, "सुधारणा आवश्यक : ", "Necessary Improvement : ") + val;
+                addRemarkCell(tbl, remark, C_WHITE, 28f * span3, 236f, span3);
+            }
+            rowIdx++;
         }
 
         panel.addElement(tbl);
@@ -310,12 +349,15 @@ public class BothSemDescriptiveGenerator {
      * Remark cell: parses "Title : body" format to show title bold + body normal.
      * Supports delimiters ":", ":\n", or just plain text.
      */
-    private static void addRemarkCell(PdfPTable tbl, String remark, BaseColor bg, float minH, float widthPt) {
+    private static void addRemarkCell(PdfPTable tbl, String remark, BaseColor bg, float minH, float widthPt, int rowspan) {
         PdfPCell c = new PdfPCell();
         c.setBackgroundColor(bg);
         c.setPadding(4);
         c.setMinimumHeight(minH);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        if (rowspan > 1) {
+            c.setRowspan(rowspan);
+        }
 
         if (remark == null || remark.trim().isEmpty()) {
             c.addElement(new Phrase(" ", fSmall));
@@ -331,12 +373,23 @@ public class BothSemDescriptiveGenerator {
                         img1.setAlignment(com.itextpdf.text.Image.LEFT);
                         com.itextpdf.text.Image img2 = com.kartik.myschool.utils.pdf.MarathiText.renderMultiLine(bodyPart, 9f, false, android.graphics.Color.BLACK, widthPt - 8f);
                         img2.setAlignment(com.itextpdf.text.Image.LEFT);
+                        
+                        float maxImg2Height = minH - img1.getScaledHeight() - 10f;
+                        if (maxImg2Height > 10f && img2.getScaledHeight() > maxImg2Height) {
+                            img2.scaleToFit(widthPt - 8f, maxImg2Height);
+                        }
+                        
                         c.addElement(img1);
                         c.addElement(img2);
                     } else {
                         com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText.renderMultiLine(
                                 remark, 9f, false, android.graphics.Color.BLACK, widthPt - 8f);
                         img.setAlignment(com.itextpdf.text.Image.LEFT);
+                        
+                        if (img.getScaledHeight() > minH - 10f) {
+                            img.scaleToFit(widthPt - 8f, minH - 10f);
+                        }
+                        
                         c.addElement(img);
                     }
                 } catch (Exception e) {

@@ -497,9 +497,18 @@ public class DescriptiveEntriesFragment extends Fragment {
                     binding.layoutSubjectsGridContainer.setVisibility(View.VISIBLE);
                     binding.layoutSubjectsGridContainer.removeAllViews();
 
+                    List<Subject> allDescriptiveSubjects = new ArrayList<>();
                     if (activeClass.subjects != null) {
+                        allDescriptiveSubjects.addAll(activeClass.subjects);
+                    }
+                    allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
+                    allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
+                    allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
+                    allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+
+                    if (!allDescriptiveSubjects.isEmpty()) {
                         LinearLayout currentRow = null;
-                        for (int i = 0; i < activeClass.subjects.size(); i++) {
+                        for (int i = 0; i < allDescriptiveSubjects.size(); i++) {
                             if (i % 2 == 0) {
                                 currentRow = new LinearLayout(itemView.getContext());
                                 currentRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -511,7 +520,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                                 binding.layoutSubjectsGridContainer.addView(currentRow);
                             }
 
-                            Subject sub = activeClass.subjects.get(i);
+                            Subject sub = allDescriptiveSubjects.get(i);
                             View cardView = createSubjectCard(s, sub, i + 1, marks);
 
                             // Set layout params for 2-column grid item
@@ -532,7 +541,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
                         // If odd number of subjects, add an empty placeholder view to balance the last
                         // row
-                        if (activeClass.subjects.size() % 2 != 0 && currentRow != null) {
+                        if (allDescriptiveSubjects.size() % 2 != 0 && currentRow != null) {
                             View placeholder = new View(itemView.getContext());
                             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                                     0,
@@ -548,9 +557,18 @@ public class DescriptiveEntriesFragment extends Fragment {
                     binding.layoutSubjectsScroll.setVisibility(View.VISIBLE);
                     binding.layoutSubjectsHorizontal.removeAllViews();
 
+                    List<Subject> allDescriptiveSubjects = new ArrayList<>();
                     if (activeClass.subjects != null) {
-                        for (int i = 0; i < activeClass.subjects.size(); i++) {
-                            Subject sub = activeClass.subjects.get(i);
+                        allDescriptiveSubjects.addAll(activeClass.subjects);
+                    }
+                    allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
+                    allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
+                    allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
+                    allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+
+                    if (!allDescriptiveSubjects.isEmpty()) {
+                        for (int i = 0; i < allDescriptiveSubjects.size(); i++) {
+                            Subject sub = allDescriptiveSubjects.get(i);
                             View cardView = createSubjectCard(s, sub, i + 1, marks);
                             binding.layoutSubjectsHorizontal.addView(cardView);
                         }
@@ -717,7 +735,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                         isGridViewMode ? binding.layoutSubjectsGridContainer : binding.layoutSubjectsHorizontal,
                         false);
 
-                cardB.tvSubjectName.setText(number + ". " + sub.name);
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), sub.name));
 
                 List<String> remarks = new ArrayList<>();
                 MarksRecord.SubjectMarksDetail detail = getSubjectDetail(record, sub, number - 1);

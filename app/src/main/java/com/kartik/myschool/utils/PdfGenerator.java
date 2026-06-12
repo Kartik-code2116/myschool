@@ -156,6 +156,35 @@ public class PdfGenerator {
         }
     }
 
+    public static Phrase createMixedPhrase(String text, Font baseFont) {
+        Phrase phrase = new Phrase();
+        Font englishFont = new Font(Font.FontFamily.HELVETICA, baseFont.getSize(), baseFont.getStyle(), baseFont.getColor());
+        
+        StringBuilder currentText = new StringBuilder();
+        boolean currentIsEnglish = true;
+        
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            boolean isEnglish = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-' || c == '/' || c == ':' || c == '.' || c == ',';
+            if (c == ' ') {
+                isEnglish = currentIsEnglish;
+            }
+            
+            if (i == 0) {
+                currentIsEnglish = isEnglish;
+            } else if (currentIsEnglish != isEnglish) {
+                phrase.add(new com.itextpdf.text.Chunk(currentText.toString(), currentIsEnglish ? englishFont : baseFont));
+                currentText.setLength(0);
+                currentIsEnglish = isEnglish;
+            }
+            currentText.append(c);
+        }
+        if (currentText.length() > 0) {
+            phrase.add(new com.itextpdf.text.Chunk(currentText.toString(), currentIsEnglish ? englishFont : baseFont));
+        }
+        return phrase;
+    }
+
     // ── Output dir ────────────────────────────────────────────────────────────
     public static File outDir(Context ctx) {
         File d = new File(ctx.getExternalFilesDir(null), "myschool_reports");
@@ -268,23 +297,48 @@ public class PdfGenerator {
                 hTbl.setSpacingBefore(10);
                 hTbl.setSpacingAfter(5);
 
-                String udise = "Udise: " + nvl(school.udiseCode) + "\n" + nvl(school.name);
+                String lLine1 = "Udise: " + nvl(school.udiseCode);
+                String lLine2 = nvl(school.name);
                 String term = isSem2
                         ? PdfLocalizer.get(ctx, "\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u0938\u0924\u094d\u0930",
                                 "Second Semester")
                         : PdfLocalizer.get(ctx, "\u092a\u094d\u0930\u0925\u092e \u0938\u0924\u094d\u0930",
                                 "First Semester");
-                String rightTxt = "सन : " + nvl(cls.academicYearLabel) + "\nइयत्ता: " + nvl(cls.className) + ", तुकडी: "
-                        + nvl(cls.division);
+                String rLine1 = "सन : " + nvl(cls.academicYearLabel);
+                String rLine2 = "इयत्ता: " + nvl(cls.className) + ", तुकडी: " + nvl(cls.division);
 
-                PdfPCell cL = new PdfPCell(new Phrase(udise, fSmallBold));
+                PdfPCell cL = new PdfPCell();
                 cL.setBorder(Rectangle.NO_BORDER);
                 cL.setHorizontalAlignment(Element.ALIGN_LEFT);
+                try {
+                    int androidColor = android.graphics.Color.rgb(C_DARK.getRed(), C_DARK.getGreen(), C_DARK.getBlue());
+                    com.itextpdf.text.Image img1 = com.kartik.myschool.utils.pdf.MarathiText.renderLine(lLine1, 9f, true, androidColor);
+                    img1.setAlignment(com.itextpdf.text.Image.LEFT);
+                    com.itextpdf.text.Image img2 = com.kartik.myschool.utils.pdf.MarathiText.renderLine(lLine2, 9f, true, androidColor);
+                    img2.setAlignment(com.itextpdf.text.Image.LEFT);
+                    cL.addElement(img1);
+                    cL.addElement(img2);
+                } catch (Exception e) {
+                    cL.setPhrase(new Phrase(lLine1 + "\n" + lLine2, fSmallBold));
+                }
+
                 PdfPCell cC = noBorderMarathiCell(term, 10f, true, C_DARK, Element.ALIGN_CENTER);
                 cC.setVerticalAlignment(Element.ALIGN_BOTTOM);
-                PdfPCell cR = new PdfPCell(new Phrase(rightTxt, fSmallBold));
+
+                PdfPCell cR = new PdfPCell();
                 cR.setBorder(Rectangle.NO_BORDER);
                 cR.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                try {
+                    int androidColor = android.graphics.Color.rgb(C_DARK.getRed(), C_DARK.getGreen(), C_DARK.getBlue());
+                    com.itextpdf.text.Image img1 = com.kartik.myschool.utils.pdf.MarathiText.renderLine(rLine1, 9f, true, androidColor);
+                    img1.setAlignment(com.itextpdf.text.Image.RIGHT);
+                    com.itextpdf.text.Image img2 = com.kartik.myschool.utils.pdf.MarathiText.renderLine(rLine2, 9f, true, androidColor);
+                    img2.setAlignment(com.itextpdf.text.Image.RIGHT);
+                    cR.addElement(img1);
+                    cR.addElement(img2);
+                } catch (Exception e) {
+                    cR.setPhrase(new Phrase(rLine1 + "\n" + rLine2, fSmallBold));
+                }
 
                 hTbl.addCell(cL);
                 hTbl.addCell(cC);
@@ -298,7 +352,7 @@ public class PdfGenerator {
                 int numCols = 2 + (numSubjects * 2);
                 float[] widths = new float[numCols];
                 widths[0] = 0.5f; // SrNo
-                widths[1] = 1.0f; // Name (reduced from 1.6f for vertical header)
+                widths[1] = 1.6f; // Name (increased to fit horizontal header)
                 for (int i = 0; i < numSubjects; i++) {
                     widths[2 + (i * 2)] = 0.4f; // Marks
                     widths[2 + (i * 2) + 1] = 0.4f; // Grade
@@ -308,8 +362,8 @@ public class PdfGenerator {
                 tbl.setWidthPercentage(100);
 
                 // Row 1
-                cellHorizontalImageSpan(tbl, ctx, "अ.नं", fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
-                cellHorizontalImageSpan(tbl, ctx, com.kartik.myschool.utils.pdf.PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+                com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, "अ.नं", 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, com.kartik.myschool.utils.pdf.PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"), 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
                 for (int i = 0; i < numSubjects; i++) {
                     cellVerticalSpan(tbl, ctx, PdfLocalizer.translateSubject(ctx, subjects.get(i).name), fSmallBold,
                             C_HEADER_BG, C_DARK, 2, 1);
@@ -1224,7 +1278,8 @@ public class PdfGenerator {
             }
         }
         // Fallback: iText font rendering (fine for numbers/ASCII/Latin)
-        c.setPhrase(new Phrase(text, colored(font, textColor)));
+        Font englishFont = new Font(Font.FontFamily.HELVETICA, font.getSize(), font.getStyle(), textColor);
+        c.setPhrase(new Phrase(text, englishFont));
         return c;
     }
 

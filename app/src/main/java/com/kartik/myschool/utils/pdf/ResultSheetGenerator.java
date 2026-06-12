@@ -288,7 +288,7 @@ public class ResultSheetGenerator {
     private static void addWrappedTh(PdfPTable tbl, String text, int colspan, int rowspan, float widthPt) {
         PdfPCell c = new PdfPCell();
         c.setBackgroundColor(C_HEADER_BG);
-        c.setBorderColor(com.kartik.myschool.utils.PdfGenerator.C_BORDER);
+        c.setBorderColor(com.kartik.myschool.utils.PdfGenerator.C_DARK);
         c.setBorderWidth(0.5f);
         c.setColspan(colspan);
         c.setRowspan(rowspan);

@@ -3,6 +3,7 @@ package com.kartik.myschool.utils.pdf;
 import android.content.Context;
 
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -108,8 +109,9 @@ public class ProgressCardPortraitGenerator {
         PdfPTable hdr = new PdfPTable(1);
         hdr.setWidthPercentage(100);
 
-        String udise = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : "");
-        addCenterText(hdr, udise, fSmall);
+        String uLabel = PdfLocalizer.get(ctx, "युडायस क्रमांक: ", "School UDISE: ");
+        String uVal = nvl(school != null ? school.udiseCode : "");
+        addCenterText(hdr, uLabel + uVal, fSmallBold);
         
         String prefix = PdfLocalizer.get(ctx, "जिल्हा परिषद प्राथमिक शाळा ", "Zilla Parishad Primary School ");
         String sName = prefix + nvl(school != null ? school.name : "");
@@ -118,8 +120,9 @@ public class ProgressCardPortraitGenerator {
         String addr = nvl(school != null ? school.address : "");
         addCenterText(hdr, addr, fSmall);
 
-        String year = PdfLocalizer.get(ctx, "सन: ", "Year: ") + nvl(cls != null ? cls.academicYearLabel : "");
-        addCenterText(hdr, year, fSmallBold);
+        String yLabel = PdfLocalizer.get(ctx, "सन: ", "Year: ");
+        String yVal = nvl(cls != null ? cls.academicYearLabel : "");
+        addCenterText(hdr, yLabel + yVal, fSmallBold);
         
         hdr.setSpacingAfter(10);
         doc.add(hdr);
@@ -223,7 +226,8 @@ public class ProgressCardPortraitGenerator {
         attTitle.setSpacingAfter(5);
         doc.add(attTitle);
 
-        PdfPTable attTbl = new PdfPTable(13); // महिना + 12 months
+        float[] attCols = new float[] { 2.2f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
+        PdfPTable attTbl = new PdfPTable(attCols);
         attTbl.setWidthPercentage(95);
         
         // Month headers
@@ -272,7 +276,7 @@ public class ProgressCardPortraitGenerator {
         MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "कामाचे दिवस", "Working Days"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
         for (int i = 0; i < 12; i++) {
             String val = wd[i] > 0 ? String.valueOf(wd[i]) : "";
-            PdfPCell wc = new PdfPCell(new Phrase(val, fSmall));
+            PdfPCell wc = new PdfPCell(new Phrase(val, new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, BaseColor.BLACK)));
             wc.setHorizontalAlignment(Element.ALIGN_CENTER);
             wc.setBorderColor(C_BLUE_BORDER);
             wc.setPaddingTop(5);
@@ -284,7 +288,7 @@ public class ProgressCardPortraitGenerator {
         MarathiText.cell(attTbl, PdfLocalizer.get(ctx, "हजर दिवस", "Present Days"), 9, true, C_GREY_BG, android.graphics.Color.BLACK, 1, 1, Element.ALIGN_CENTER);
         for (int i = 0; i < 12; i++) {
             String val = pd[i] > 0 ? String.valueOf(pd[i]) : (wd[i] > 0 ? "0" : "");
-            PdfPCell pc = new PdfPCell(new Phrase(val, fSmall));
+            PdfPCell pc = new PdfPCell(new Phrase(val, new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, BaseColor.BLACK)));
             pc.setHorizontalAlignment(Element.ALIGN_CENTER);
             pc.setBorderColor(C_BLUE_BORDER);
             pc.setPaddingTop(5);
@@ -297,22 +301,34 @@ public class ProgressCardPortraitGenerator {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+
+
     private static void addCenterText(PdfPTable tbl, String text, Font font) {
+        addCenterText(tbl, text, font, false);
+    }
+
+    private static void addCenterText(PdfPTable tbl, String text, Font font, boolean forceEnglish) {
         PdfPCell c = new PdfPCell();
         c.setBorder(Rectangle.NO_BORDER);
         c.setHorizontalAlignment(Element.ALIGN_CENTER);
         c.setPaddingBottom(4);
-        try {
-            boolean bold = (font == fSmallBold || font == fTitle);
-            int size = (font == fTitle) ? 18 : 10;
-            com.itextpdf.text.Image img = MarathiText.renderLine(text, size, bold, android.graphics.Color.BLACK);
-            img.setAlignment(Element.ALIGN_CENTER);
-            c.addElement(img);
-        } catch (Exception e) {
-            c.setPhrase(new Phrase(text, font));
+        if (forceEnglish) {
+            c.setPhrase(new Phrase(text, new Font(Font.FontFamily.HELVETICA, font.getSize(), font.getStyle(), BaseColor.BLACK)));
+        } else {
+            try {
+                boolean bold = (font == fSmallBold || font == fTitle);
+                int size = (font == fTitle) ? 18 : 10;
+                com.itextpdf.text.Image img = MarathiText.renderLine(text, size, bold, android.graphics.Color.BLACK);
+                img.setAlignment(Element.ALIGN_CENTER);
+                c.addElement(img);
+            } catch (Exception e) {
+                c.setPhrase(new Phrase(text, font));
+            }
         }
         tbl.addCell(c);
     }
+    
+    // addCenterTextSplit removed as it was causing vertical wrapping
 
     private static void addRowFull(PdfPTable tbl, String label, String value) {
         addLabel(tbl, label);
@@ -334,6 +350,8 @@ public class ProgressCardPortraitGenerator {
         empty.setColspan(2);
         tbl.addCell(empty);
     }
+    
+
 
     private static void addLabel(PdfPTable tbl, String text) {
         PdfPCell c = new PdfPCell();
@@ -354,17 +372,10 @@ public class ProgressCardPortraitGenerator {
     }
 
     private static void addValue(PdfPTable tbl, String text, int colspan) {
-        PdfPCell c = new PdfPCell();
+        PdfPCell c = PdfGenerator.rawCell(text, fSmallBold, BaseColor.WHITE, PdfGenerator.C_DARK, Element.ALIGN_LEFT);
         c.setBorder(Rectangle.NO_BORDER);
         c.setColspan(colspan);
-        c.setHorizontalAlignment(Element.ALIGN_LEFT);
         c.setPaddingBottom(6);
-        try {
-            com.itextpdf.text.Image img = MarathiText.renderLine(text, 10, true, android.graphics.Color.BLACK);
-            c.addElement(img);
-        } catch (Exception e) {
-            c.setPhrase(new Phrase(text, fSmallBold));
-        }
         tbl.addCell(c);
     }
 }

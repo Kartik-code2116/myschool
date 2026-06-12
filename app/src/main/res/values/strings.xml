@@ -227,6 +227,10 @@
     <string name="label_mother_tongue">Mother Tongue</string>
     <string name="label_date_admission">Date of Admission</string>
     <string name="label_student_id">Student Id</string>
+    <string name="label_height_sem1">Height Sem 1 (cm)</string>
+    <string name="label_weight_sem1">Weight Sem 1 (kg)</string>
+    <string name="label_height_sem2">Height Sem 2 (cm)</string>
+    <string name="label_weight_sem2">Weight Sem 2 (kg)</string>
     <string name="edit_student">Edit Student</string>
     <string name="student_profile_title">Student</string>
     <string name="student_not_found">Student not found</string>

@@ -163,6 +163,10 @@ public class StudentProfileActivity extends AppCompatActivity {
                 {getString(R.string.label_division), s.division},
                 {getString(R.string.label_school_name), s.schoolName},
                 {getString(R.string.label_class_short), s.className},
+                {getString(R.string.label_height_sem1), s.heightSem1},
+                {getString(R.string.label_weight_sem1), s.weightSem1},
+                {getString(R.string.label_height_sem2), s.heightSem2},
+                {getString(R.string.label_weight_sem2), s.weightSem2},
         });
 
         DetailRowHelper.fillRows(this, b.llFamilyDetails, new String[][]{

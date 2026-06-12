@@ -70,7 +70,7 @@ public class MarathiText {
                              int align) {
         PdfPCell c = new PdfPCell();
         if (bgColor != null) c.setBackgroundColor(bgColor);
-        c.setBorderColor(PdfGenerator.C_BORDER);
+        c.setBorderColor(PdfGenerator.C_DARK);
         c.setBorderWidth(0.5f);
         c.setColspan(colSpan);
         c.setRowspan(rowSpan);
@@ -126,7 +126,7 @@ public class MarathiText {
                                  float widthPt) {
         PdfPCell c = new PdfPCell();
         if (bgColor != null) c.setBackgroundColor(bgColor);
-        c.setBorderColor(PdfGenerator.C_BORDER);
+        c.setBorderColor(PdfGenerator.C_DARK);
         c.setBorderWidth(0.5f);
         c.setColspan(colSpan);
         c.setHorizontalAlignment(Element.ALIGN_LEFT);

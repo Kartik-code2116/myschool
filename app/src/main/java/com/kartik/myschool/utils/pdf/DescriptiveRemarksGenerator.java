@@ -52,7 +52,8 @@ public class DescriptiveRemarksGenerator {
             "सुधारणा आवश्यक",
             "व्यक्तिमत्व गुण विशेष\n(अभिवृत्ती, कल, मूल्ये, स्वभाव गुणविशेष)"
     };
-    private static final String[] EXTRA_KEYS = { "विशेष", "आवड", "सुधारणा", "व्यक्तिमत्व" };
+    private static final String[] EXTRA_KEYS_EN = { "vishesh", "aavad", "sudharna", "vyaktimatva" };
+    private static final String[] EXTRA_KEYS_MR = { "विशेष", "आवड", "सुधारणा", "व्यक्तिमत्व" };
 
     // ── Remark lookup helpers ──────────────────────────────────────────────────
 
@@ -86,16 +87,18 @@ public class DescriptiveRemarksGenerator {
     }
 
     /**
-     * Finds a remark from a record whose key contains `keyword` (used for extra
+     * Finds a remark from a record whose key contains `keyword1` or `keyword2` (used for extra
      * rows).
      */
-    private static String remarkContaining(MarksRecord rec, String keyword) {
+    private static String remarkContaining(MarksRecord rec, String keyword1, String keyword2) {
         if (rec == null || rec.detailedMarks == null)
             return "";
         for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : rec.detailedMarks.entrySet()) {
-            if (e.getKey() != null && e.getKey().contains(keyword) && e.getValue() != null
-                    && e.getValue().remark != null && !e.getValue().remark.trim().isEmpty()) {
-                return cleanRemark(e.getValue().remark);
+            if (e.getKey() != null && e.getValue() != null && e.getValue().remark != null && !e.getValue().remark.trim().isEmpty()) {
+                String safeKey = MarksRecord.sanitizeKey(e.getKey()).toLowerCase();
+                if (safeKey.contains(keyword1) || safeKey.contains(keyword2)) {
+                    return cleanRemark(e.getValue().remark);
+                }
             }
         }
         return "";
@@ -238,6 +241,12 @@ public class DescriptiveRemarksGenerator {
         // Class subjects
         if (cls != null && cls.subjects != null) {
             for (Subject sub : cls.subjects) {
+                String sName = sub.name != null ? sub.name.toLowerCase() : "";
+                if (sName.contains("vishesh") || sName.contains("aavad") || sName.contains("sudharna") || sName.contains("vyaktimatva") ||
+                    sName.contains("विशेष") || sName.contains("आवड") || sName.contains("सुधारणा") || sName.contains("व्यक्तिमत्व")) {
+                    continue; // Skip because they are printed in the fixed rows below
+                }
+
                 BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
                 alt = !alt;
                 String remark = findRemark(rec, sub.name);
@@ -249,10 +258,10 @@ public class DescriptiveRemarksGenerator {
         }
 
         // Extra fixed rows
-        for (int i = 0; i < EXTRA_KEYS.length; i++) {
+        for (int i = 0; i < EXTRA_KEYS_EN.length; i++) {
             BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
             alt = !alt;
-            String remark = remarkContaining(rec, EXTRA_KEYS[i]);
+            String remark = remarkContaining(rec, EXTRA_KEYS_EN[i], EXTRA_KEYS_MR[i]);
 
             String label;
             switch (i) {
@@ -307,7 +316,7 @@ public class DescriptiveRemarksGenerator {
             BaseColor bg, int align, float minH, float widthPt) {
         PdfPCell c = new PdfPCell();
         c.setBackgroundColor(bg);
-        c.setBorderColor(C_BORDER);
+        c.setBorderColor(C_DARK);
         c.setBorderWidth(0.5f);
         c.setHorizontalAlignment(align);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);

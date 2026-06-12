@@ -66,17 +66,17 @@ public class IndexPageGenerator {
         headerTbl.setWidths(new float[]{1.5f, 1f, 1f});
 
         // Row 1
-        PdfPCell c1 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c1 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
         String semText = isSecondSemester()
                 ? PdfLocalizer.get(ctx, "\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u0938\u0924\u094d\u0930", "Second Semester")
                 : PdfLocalizer.get(ctx, "\u092a\u094d\u0930\u0925\u092e \u0938\u0924\u094d\u0930", "First Semester");
         PdfPCell c2 = noBorderTextCell(semText, Element.ALIGN_CENTER);
-        PdfPCell c3 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c3 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
 
         // Row 2
-        PdfPCell c4 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "शाळा: ", "School: ") + (school != null ? nvl(school.name) : ""), fBold)); c4.setBorder(Rectangle.NO_BORDER); c4.setColspan(2);
-        PdfPCell c5 = new PdfPCell(new Phrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + (cls != null ? nvl(cls.className) : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + (cls != null ? nvl(cls.division) : "-"), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c4 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "शाळा: ", "School: ") + (school != null ? nvl(school.name) : ""), fBold)); c4.setBorder(Rectangle.NO_BORDER); c4.setColspan(2);
+        PdfPCell c5 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + (cls != null ? nvl(cls.className) : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + (cls != null ? nvl(cls.division) : "-"), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTbl.addCell(c4); headerTbl.addCell(c5);
         
         headerTbl.setSpacingAfter(15);
@@ -113,11 +113,11 @@ public class IndexPageGenerator {
                 alt = !alt;
                 
                 PdfPCell[] row = new PdfPCell[5];
-                row[0] = new PdfPCell(new Phrase(String.valueOf(i + 1), fNormal));
-                row[1] = new PdfPCell(new Phrase(nvl(s.name), fNormal));
-                row[2] = new PdfPCell(new Phrase(nvl(s.rollNo), fNormal)); // Using rollNo here
-                row[3] = new PdfPCell(new Phrase(nvl(s.dob), fNormal));    // Using dob instead of birthDate property? The previous code used s.dob. Oh wait, it was s.registrationNo and s.dob in original.
-                row[4] = new PdfPCell(new Phrase(String.valueOf(pageNo++), fNormal));
+                row[0] = new PdfPCell(PdfGenerator.createMixedPhrase(String.valueOf(i + 1), fNormal));
+                row[1] = new PdfPCell(PdfGenerator.createMixedPhrase(nvl(s.name), fNormal));
+                row[2] = new PdfPCell(PdfGenerator.createMixedPhrase(nvl(s.rollNo), fNormal)); // Using rollNo here
+                row[3] = new PdfPCell(PdfGenerator.createMixedPhrase(nvl(s.dob), fNormal));    // Using dob instead of birthDate property? The previous code used s.dob. Oh wait, it was s.registrationNo and s.dob in original.
+                row[4] = new PdfPCell(PdfGenerator.createMixedPhrase(String.valueOf(pageNo++), fNormal));
                 
                 for (PdfPCell cell : row) {
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);

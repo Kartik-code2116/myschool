@@ -96,6 +96,24 @@ public class PdfLocalizer {
         if (s.contains("इतिहास")) return isEn ? "History" : "इतिहास";
         if (s.contains("भूगोल")) return isEn ? "Geography" : "भूगोल";
 
+        if (s.contains("urdu") || s.contains("उर्दू")) return isEn ? "Urdu" : "उर्दू";
+        if (s.contains("sanskrit") || s.contains("संस्कृत")) return isEn ? "Sanskrit" : "संस्कृत";
+        if (s.contains("gujarati") || s.contains("गुजराती")) return isEn ? "Gujarati" : "गुजराती";
+        if (s.contains("kannada") || s.contains("कन्नड")) return isEn ? "Kannada" : "कन्नड";
+        if (s.contains("telugu") || s.contains("तेलुगू")) return isEn ? "Telugu" : "तेलुगू";
+        if (s.contains("bengali") || s.contains("बंगाली")) return isEn ? "Bengali" : "बंगाली";
+        if (s.contains("sindhi") || s.contains("सिंधी")) return isEn ? "Sindhi" : "सिंधी";
+        if (s.contains("tamil") || s.contains("तमिळ")) return isEn ? "Tamil" : "तमिळ";
+        if (s.contains("malayalam") || s.contains("मल्याळम")) return isEn ? "Malayalam" : "मल्याळम";
+        if (s.contains("punjabi") || s.contains("पंजाबी")) return isEn ? "Punjabi" : "पंजाबी";
+        if (s.contains("odia") || s.contains("ओडिया")) return isEn ? "Odia" : "ओडिया";
+        if (s.contains("assamese") || s.contains("आसामी")) return isEn ? "Assamese" : "आसामी";
+
+        if (s.contains("vishesh pragati")) return isEn ? "Special Progress" : "विशेष प्रगती";
+        if (s.contains("aavad,chanda,etc") || s.contains("aavad, chanda, etc") || s.contains("aavad,chhand")) return isEn ? "Interests, Hobbies, etc" : "आवड, छंद, इत्यादी";
+        if (s.contains("sudharna aavashyaka") || s.contains("sudharna aavasghyaka")) return isEn ? "Needs Improvement" : "सुधारणा आवश्यक";
+        if (s.contains("vyaktimatva gun vishgesh") || s.contains("vyaktimatva gun vishesh")) return isEn ? "Personality Traits" : "व्यक्तिमत्त्व गुण विशेष";
+
         return subName;
     }
 }

@@ -89,7 +89,14 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
 
         if (classModel.subjects == null)
             classModel.subjects = new ArrayList<>();
-        for (Subject sub : classModel.subjects) {
+            
+        List<Subject> allDescriptiveSubjects = new ArrayList<>(classModel.subjects);
+        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
+        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
+        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
+        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+
+        for (Subject sub : allDescriptiveSubjects) {
             addRemarkRow(sub);
         }
 
@@ -248,7 +255,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     private void addRemarkRow(Subject sub) {
         ItemSubjectRemarkRowBinding row = ItemSubjectRemarkRowBinding.inflate(LayoutInflater.from(this), b.llRemarkRows,
                 false);
-        row.tvSubjectName.setText(sub.name);
+        row.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, sub.name));
 
         // Hide "Select" button as we are showing the choices directly for fast action!
         row.btnAddRemark.setVisibility(View.GONE);
@@ -370,8 +377,15 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     private void fillExistingRemarks(MarksRecord m) {
         if (classModel.subjects == null)
             return;
-        for (int i = 0; i < classModel.subjects.size() && i < remarkRows.size(); i++) {
-            String subName = MarksRecord.sanitizeKey(classModel.subjects.get(i).name);
+            
+        List<Subject> allDescriptiveSubjects = new ArrayList<>(classModel.subjects);
+        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
+        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
+        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
+        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+
+        for (int i = 0; i < allDescriptiveSubjects.size() && i < remarkRows.size(); i++) {
+            String subName = MarksRecord.sanitizeKey(allDescriptiveSubjects.get(i).name);
             ItemSubjectRemarkRowBinding row = remarkRows.get(i);
             resetRemarkRow(row);
 
@@ -488,8 +502,14 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
             m.semesterNumber = "1";
         }
 
-        for (int i = 0; i < classModel.subjects.size() && i < remarkRows.size(); i++) {
-            Subject sub = classModel.subjects.get(i);
+        List<Subject> allDescriptiveSubjects = new ArrayList<>(classModel.subjects);
+        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
+        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
+        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
+        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+
+        for (int i = 0; i < allDescriptiveSubjects.size() && i < remarkRows.size(); i++) {
+            Subject sub = allDescriptiveSubjects.get(i);
             ItemSubjectRemarkRowBinding row = remarkRows.get(i);
 
             String safeKey = MarksRecord.sanitizeKey(sub.name);

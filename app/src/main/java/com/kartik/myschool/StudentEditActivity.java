@@ -148,6 +148,10 @@ public class StudentEditActivity extends AppCompatActivity {
         }
         set(b.etStandard, s.standard);
         set(b.etDivision, s.division);
+        set(b.etHeightSem1, s.heightSem1);
+        set(b.etWeightSem1, s.weightSem1);
+        set(b.etHeightSem2, s.heightSem2);
+        set(b.etWeightSem2, s.weightSem2);
         set(b.etMotherName, s.motherName);
         set(b.etMotherOccupation, s.motherOccupation);
         set(b.etMotherPhone, s.motherPhone);
@@ -195,6 +199,10 @@ public class StudentEditActivity extends AppCompatActivity {
         s.cast = str(b.etCast);
         s.standard = str(b.etStandard);
         s.division = str(b.etDivision);
+        s.heightSem1 = str(b.etHeightSem1);
+        s.weightSem1 = str(b.etWeightSem1);
+        s.heightSem2 = str(b.etHeightSem2);
+        s.weightSem2 = str(b.etWeightSem2);
         s.motherName = str(b.etMotherName);
         s.motherOccupation = str(b.etMotherOccupation);
         s.motherPhone = str(b.etMotherPhone);

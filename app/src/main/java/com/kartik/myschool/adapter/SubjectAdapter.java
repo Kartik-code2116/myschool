@@ -85,7 +85,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
 
         b.tvSubjectCode.setText(item.code);
         b.tvSerialNumber.setText(item.serial);
-        b.tvSubjectName.setText(item.name);
+        b.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(b.getRoot().getContext(), item.name));
         b.tvDetailsLeft1.setText(item.detailsLeft1);
         b.tvDetailsLeft2.setText(item.detailsLeft2);
         b.tvDetailsRight1.setText(item.detailsRight1);
