@@ -253,23 +253,63 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         // Hide "Select" button as we are showing the choices directly for fast action!
         row.btnAddRemark.setVisibility(View.GONE);
         row.tvNoRemarks.setVisibility(View.GONE);
-        row.cgSelectedRemarks.setVisibility(View.VISIBLE);
 
-        // Populate with all standard remarks as choice chips
-        for (String remark : STANDARD_REMARKS) {
-            Chip chip = new Chip(this);
-            chip.setText(remark);
-            chip.setCheckable(true);
-            chip.setChecked(false);
+        // Check if there are category specific remarks
+        java.util.Map<String, java.util.List<String>> categoryRemarks = com.kartik.myschool.utils.DescriptiveRemarksData.getRemarksForClassAndSubject(classModel.className, sub.name);
 
-            styleInteractiveChip(chip, false);
+        row.llCategoriesContainer.setVisibility(View.VISIBLE);
+        if (categoryRemarks != null && !categoryRemarks.isEmpty()) {
+            for (java.util.Map.Entry<String, java.util.List<String>> entry : categoryRemarks.entrySet()) {
+                // Add Category Title
+                android.widget.TextView tvCat = new android.widget.TextView(this);
+                tvCat.setText(entry.getKey());
+                tvCat.setTextSize(14f);
+                tvCat.setTypeface(null, android.graphics.Typeface.BOLD);
+                tvCat.setTextColor(0xFF6C4CCF);
+                tvCat.setPadding(0, (int)(8 * getResources().getDisplayMetrics().density), 0, (int)(4 * getResources().getDisplayMetrics().density));
+                row.llCategoriesContainer.addView(tvCat);
 
-            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                styleInteractiveChip(chip, isChecked);
-                updateSummaryText(row);
-            });
+                // Add ChipGroup
+                com.google.android.material.chip.ChipGroup cg = new com.google.android.material.chip.ChipGroup(this);
+                cg.setChipSpacingHorizontal((int)(8 * getResources().getDisplayMetrics().density));
+                cg.setChipSpacingVertical((int)(8 * getResources().getDisplayMetrics().density));
+                row.llCategoriesContainer.addView(cg);
 
-            row.cgSelectedRemarks.addView(chip);
+                for (String remark : entry.getValue()) {
+                    Chip chip = new Chip(this);
+                    chip.setText(remark);
+                    chip.setCheckable(true);
+                    chip.setChecked(false);
+                    styleInteractiveChip(chip, false);
+                    chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                        styleInteractiveChip(chip, isChecked);
+                        updateSummaryText(row);
+                    });
+                    cg.addView(chip);
+                }
+            }
+        } else {
+            com.google.android.material.chip.ChipGroup cg = new com.google.android.material.chip.ChipGroup(this);
+            cg.setChipSpacingHorizontal((int)(8 * getResources().getDisplayMetrics().density));
+            cg.setChipSpacingVertical((int)(8 * getResources().getDisplayMetrics().density));
+            row.llCategoriesContainer.addView(cg);
+
+            // Populate with all standard remarks as choice chips
+            for (String remark : STANDARD_REMARKS) {
+                Chip chip = new Chip(this);
+                chip.setText(remark);
+                chip.setCheckable(true);
+                chip.setChecked(false);
+
+                styleInteractiveChip(chip, false);
+
+                chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    styleInteractiveChip(chip, isChecked);
+                    updateSummaryText(row);
+                });
+
+                cg.addView(chip);
+            }
         }
 
         b.llRemarkRows.addView(row.getRoot());
@@ -308,17 +348,22 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         }
     }
 
-    private List<String> getSelectedRemarksFromChips(ItemSubjectRemarkRowBinding row) {
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < row.cgSelectedRemarks.getChildCount(); i++) {
-            View child = row.cgSelectedRemarks.getChildAt(i);
+    private void findCheckedChips(android.view.ViewGroup parent, List<String> list) {
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View child = parent.getChildAt(i);
             if (child instanceof Chip) {
-                Chip chip = (Chip) child;
-                if (chip.isChecked()) {
-                    list.add(chip.getText().toString());
+                if (((Chip) child).isChecked()) {
+                    list.add(((Chip) child).getText().toString());
                 }
+            } else if (child instanceof android.view.ViewGroup) {
+                findCheckedChips((android.view.ViewGroup) child, list);
             }
         }
+    }
+
+    private List<String> getSelectedRemarksFromChips(ItemSubjectRemarkRowBinding row) {
+        List<String> list = new ArrayList<>();
+        findCheckedChips(row.llCategoriesContainer, list);
         return list;
     }
 
@@ -344,17 +389,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                         }
                     }
 
-                    for (int c = 0; c < row.cgSelectedRemarks.getChildCount(); c++) {
-                        View child = row.cgSelectedRemarks.getChildAt(c);
-                        if (child instanceof Chip) {
-                            Chip chip = (Chip) child;
-                            String text = chip.getText().toString();
-                            if (remainingRemarks.contains(text)) {
-                                chip.setChecked(true);
-                                remainingRemarks.remove(text);
-                            }
-                        }
-                    }
+                    checkMatchingChips(row.llCategoriesContainer, remainingRemarks);
 
                     // Any remaining remarks are custom! Add them as checked chips.
                     for (String customRemark : remainingRemarks) {
@@ -368,7 +403,19 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                             styleInteractiveChip(chip, isChecked);
                             updateSummaryText(row);
                         });
-                        row.cgSelectedRemarks.addView(chip);
+                        
+                        View firstCg = null;
+                        for (int c = 0; c < row.llCategoriesContainer.getChildCount(); c++) {
+                            if (row.llCategoriesContainer.getChildAt(c) instanceof com.google.android.material.chip.ChipGroup) {
+                                firstCg = row.llCategoriesContainer.getChildAt(c);
+                                break;
+                            }
+                        }
+                        if (firstCg != null) {
+                            ((com.google.android.material.chip.ChipGroup)firstCg).addView(chip);
+                        } else {
+                            row.llCategoriesContainer.addView(chip);
+                        }
                     }
                 }
             }
@@ -376,17 +423,39 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         }
     }
 
+    private void checkMatchingChips(android.view.ViewGroup parent, List<String> remainingRemarks) {
+        for (int c = 0; c < parent.getChildCount(); c++) {
+            View child = parent.getChildAt(c);
+            if (child instanceof Chip) {
+                Chip chip = (Chip) child;
+                String text = chip.getText().toString();
+                if (remainingRemarks.contains(text)) {
+                    chip.setChecked(true);
+                    remainingRemarks.remove(text);
+                }
+            } else if (child instanceof android.view.ViewGroup) {
+                checkMatchingChips((android.view.ViewGroup) child, remainingRemarks);
+            }
+        }
+    }
+
     private void resetRemarkRow(ItemSubjectRemarkRowBinding row) {
-        for (int c = row.cgSelectedRemarks.getChildCount() - 1; c >= 0; c--) {
-            View child = row.cgSelectedRemarks.getChildAt(c);
+        resetChipsRecursively(row.llCategoriesContainer);
+    }
+
+    private void resetChipsRecursively(android.view.ViewGroup parent) {
+        for (int c = parent.getChildCount() - 1; c >= 0; c--) {
+            View child = parent.getChildAt(c);
             if (child instanceof Chip) {
                 Chip chip = (Chip) child;
                 if ("custom_remark".equals(chip.getTag())) {
-                    row.cgSelectedRemarks.removeViewAt(c);
+                    parent.removeViewAt(c);
                 } else {
                     chip.setChecked(false);
                     styleInteractiveChip(chip, false);
                 }
+            } else if (child instanceof android.view.ViewGroup) {
+                resetChipsRecursively((android.view.ViewGroup) child);
             }
         }
     }

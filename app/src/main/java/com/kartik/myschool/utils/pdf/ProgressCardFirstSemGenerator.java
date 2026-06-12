@@ -139,9 +139,10 @@ public class ProgressCardFirstSemGenerator {
         hdr.setWidthPercentage(100);
 
         String udise = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : "");
-        addCenterText(hdr, udise + PdfLocalizer.get(ctx, "\nजिल्हा परिषद", "\nZilla Parishad"), fSmall);
+        addCenterText(hdr, udise, fSmall);
         
-        String sName = nvl(school != null ? school.name : "");
+        String prefix = PdfLocalizer.get(ctx, "जिल्हा परिषद प्राथमिक शाळा ", "Zilla Parishad Primary School ");
+        String sName = prefix + nvl(school != null ? school.name : "");
         addCenterText(hdr, sName, fTitle); // Large bold
 
         String addr = nvl(school != null ? school.address : "");
@@ -247,12 +248,20 @@ public class ProgressCardFirstSemGenerator {
         String[] activeMonths = isEn ? monthsEN : monthsMR;
         
         for (String m : activeMonths) {
-            PdfPCell mc = new PdfPCell(new Phrase(m, fSmallBold));
+            PdfPCell mc = new PdfPCell();
             mc.setHorizontalAlignment(Element.ALIGN_CENTER);
+            mc.setVerticalAlignment(Element.ALIGN_MIDDLE);
             mc.setBackgroundColor(C_WHITE);
             mc.setBorderColor(C_BLUE_BORDER);
             mc.setPaddingTop(5);
             mc.setPaddingBottom(5);
+            try {
+                com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText.renderLine(m, 10, true, android.graphics.Color.BLACK);
+                img.setAlignment(Element.ALIGN_CENTER);
+                mc.addElement(img);
+            } catch (Exception e) {
+                mc.setPhrase(new Phrase(m, fSmallBold));
+            }
             attTbl.addCell(mc);
         }
 
@@ -381,27 +390,25 @@ public class ProgressCardFirstSemGenerator {
             }
             tbl.addCell(c3);
 
-            // REMARK (Rowspan 3)
-            if (i % 3 == 0) {
-                int remIdx = i / 3;
-                String rText = findRemark(bestRemarkRec != null ? bestRemarkRec : rec, remKeys[remIdx]);
-                
-                PdfPCell c4 = new PdfPCell();
-                c4.setRowspan(3);
-                c4.setBorderColor(C_BLUE_BORDER);
-                c4.setVerticalAlignment(Element.ALIGN_TOP);
-                c4.setPadding(8);
-                
-                try {
-                    String combinedText = remLabels[remIdx] + "\n" + (rText != null ? rText : "");
-                    com.itextpdf.text.Image imgM = MarathiText.renderMultiLine(combinedText, 10, false, android.graphics.Color.BLACK, 180f);
+            // REMARK
+            String rText = findRemark(bestRemarkRec != null ? bestRemarkRec : rec, sName);
+            PdfPCell c4 = new PdfPCell();
+            c4.setBorderColor(C_BLUE_BORDER);
+            c4.setVerticalAlignment(Element.ALIGN_TOP);
+            c4.setPadding(6);
+            
+            try {
+                if (rText != null && !rText.isEmpty()) {
+                    com.itextpdf.text.Image imgM = MarathiText.renderMultiLine(rText, 10, false, android.graphics.Color.BLACK, 180f);
                     imgM.setAlignment(Element.ALIGN_LEFT);
                     c4.addElement(imgM);
-                } catch (Exception e) {
-                    c4.setPhrase(new Phrase(remLabels[remIdx] + "\n" + rText, fSmall));
+                } else {
+                    c4.setPhrase(new Phrase("-", fSmall));
                 }
-                tbl.addCell(c4);
+            } catch (Exception e) {
+                c4.setPhrase(new Phrase(rText, fSmall));
             }
+            tbl.addCell(c4);
         }
         panel.addElement(tbl);
 

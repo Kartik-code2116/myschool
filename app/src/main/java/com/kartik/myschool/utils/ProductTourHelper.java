@@ -736,12 +736,8 @@ public class ProductTourHelper {
                         m ? "३. गुण तक्ता 📊" : "3. Marks Table 📊",
                         m ? "प्रत्येक विषयाच्या FA व SA उप-घटकांचे गुण येथे हाताने भरा."
                           : "Manually enter FA and SA sub-component marks for each subject."));
-                s.add(new TourStep(R.id.cardAttendance,
-                        m ? "४. हजेरी माहिती 📅" : "4. Attendance Info 📅",
-                        m ? "गुणपत्रकावर छापण्यासाठी एकूण कामकाजाचे दिवस व हजर दिवस भरा."
-                          : "Enter total working days and days present — printed on marksheet."));
                 s.add(new TourStep(R.id.btnSaveMarks,
-                        m ? "५. गुण जतन करा 💾" : "5. Save Marks 💾",
+                        m ? "४. गुण जतन करा 💾" : "4. Save Marks 💾",
                         m ? "सर्व गुण भरल्यावर 'जतन करा' दाबा. बदल क्लाउडवर सेव्ह होतात."
                           : "Press Save Marks — all entered data is saved to the cloud."));
                 break;

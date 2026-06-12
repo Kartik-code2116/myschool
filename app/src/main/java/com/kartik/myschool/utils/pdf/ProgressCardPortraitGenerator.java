@@ -109,9 +109,10 @@ public class ProgressCardPortraitGenerator {
         hdr.setWidthPercentage(100);
 
         String udise = PdfLocalizer.get(ctx, "School UDISE: ", "School UDISE: ") + nvl(school != null ? school.udiseCode : "");
-        addCenterText(hdr, udise + PdfLocalizer.get(ctx, "\nजिल्हा परिषद", "\nZilla Parishad"), fSmall);
+        addCenterText(hdr, udise, fSmall);
         
-        String sName = nvl(school != null ? school.name : "");
+        String prefix = PdfLocalizer.get(ctx, "जिल्हा परिषद प्राथमिक शाळा ", "Zilla Parishad Primary School ");
+        String sName = prefix + nvl(school != null ? school.name : "");
         addCenterText(hdr, sName, fTitle); // Large bold
 
         String addr = nvl(school != null ? school.address : "");
@@ -234,12 +235,20 @@ public class ProgressCardPortraitGenerator {
         String[] activeMonths = isEn ? monthsEN : monthsMR;
         
         for (String m : activeMonths) {
-            PdfPCell mc = new PdfPCell(new Phrase(m, fSmallBold));
+            PdfPCell mc = new PdfPCell();
             mc.setHorizontalAlignment(Element.ALIGN_CENTER);
+            mc.setVerticalAlignment(Element.ALIGN_MIDDLE);
             mc.setBackgroundColor(C_WHITE);
             mc.setBorderColor(C_BLUE_BORDER);
-            mc.setPaddingTop(6);
-            mc.setPaddingBottom(6);
+            mc.setPaddingTop(5);
+            mc.setPaddingBottom(5);
+            try {
+                com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText.renderLine(m, 10, true, android.graphics.Color.BLACK);
+                img.setAlignment(Element.ALIGN_CENTER);
+                mc.addElement(img);
+            } catch (Exception e) {
+                mc.setPhrase(new Phrase(m, fSmallBold));
+            }
             attTbl.addCell(mc);
         }
 

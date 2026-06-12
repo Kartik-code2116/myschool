@@ -226,10 +226,10 @@ public class BothSemDescriptiveGenerator {
             String grade = findGrade(rec, sub.name);
             String remark = findRemark(rec, sub.name);
 
-            addDataCell(tbl, String.valueOf(rowIdx++), fSmallBold, bg, Element.ALIGN_CENTER, 28f);
-            addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, Element.ALIGN_LEFT, 28f);
-            addDataCell(tbl, grade, fSmallBold, bg, Element.ALIGN_CENTER, 28f);
-            addRemarkCell(tbl, remark, bg, 28f);
+            addDataCell(tbl, String.valueOf(rowIdx++), fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
+            addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, Element.ALIGN_LEFT, 28f, 77f);
+            addDataCell(tbl, grade, fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
+            addRemarkCell(tbl, remark, bg, 28f, 246f);
         }
 
         panel.addElement(tbl);
@@ -242,11 +242,11 @@ public class BothSemDescriptiveGenerator {
         String teacherName = (cls != null && cls.teacherName != null) ? cls.teacherName : "";
         String principalName = (school != null && school.principalName != null) ? school.principalName : "";
 
-        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "शिक्षक स्वाक्षरी\n", "Teacher Signature\n") + teacherName,
+        PdfPCell s1 = rawCell(PdfLocalizer.get(ctx, "शिक्षक स्वाक्षरी : ", "Teacher Signature : ") + teacherName,
                 fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s1.setBorder(Rectangle.NO_BORDER);
         PdfPCell s2 = rawCell(
-                PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\n", "Headmaster Signature\n") + principalName,
+                PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी : ", "Headmaster Signature : ") + principalName,
                 fSmall, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         s2.setBorder(Rectangle.NO_BORDER);
 
@@ -272,11 +272,37 @@ public class BothSemDescriptiveGenerator {
     }
 
     private static void addDataCell(PdfPTable tbl, String text, Font font,
-            BaseColor bg, int align, float minH) {
-        PdfPCell c = rawCell(text != null ? text : "", font, bg, C_DARK, align);
+            BaseColor bg, int align, float minH, float widthPt) {
+        PdfPCell c = new PdfPCell();
+        c.setBackgroundColor(bg);
         c.setPadding(4);
         c.setMinimumHeight(minH);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setHorizontalAlignment(align);
+
+        if (text == null) text = "";
+
+        if (PdfGenerator.containsDevanagari(text) && PdfGenerator.sMarathiTypeface != null) {
+            try {
+                boolean bold = (font.getStyle() & Font.BOLD) != 0;
+                float size = font.getSize() > 0 ? font.getSize() : 9f;
+                com.itextpdf.text.Image img;
+                if (widthPt > 0) {
+                    img = com.kartik.myschool.utils.pdf.MarathiText.renderMultiLine(text, size, bold, android.graphics.Color.BLACK, widthPt - 8f);
+                } else {
+                    img = com.kartik.myschool.utils.pdf.MarathiText.renderLine(text, size, bold, android.graphics.Color.BLACK);
+                }
+                int imgAlign = align == Element.ALIGN_LEFT ? com.itextpdf.text.Image.LEFT :
+                               align == Element.ALIGN_RIGHT ? com.itextpdf.text.Image.RIGHT :
+                               com.itextpdf.text.Image.MIDDLE;
+                img.setAlignment(imgAlign);
+                c.addElement(img);
+            } catch (Exception e) {
+                c.setPhrase(new Phrase(text, PdfGenerator.colored(font, C_DARK)));
+            }
+        } else {
+            c.setPhrase(new Phrase(text, PdfGenerator.colored(font, C_DARK)));
+        }
         tbl.addCell(c);
     }
 
@@ -284,7 +310,7 @@ public class BothSemDescriptiveGenerator {
      * Remark cell: parses "Title : body" format to show title bold + body normal.
      * Supports delimiters ":", ":\n", or just plain text.
      */
-    private static void addRemarkCell(PdfPTable tbl, String remark, BaseColor bg, float minH) {
+    private static void addRemarkCell(PdfPTable tbl, String remark, BaseColor bg, float minH, float widthPt) {
         PdfPCell c = new PdfPCell();
         c.setBackgroundColor(bg);
         c.setPadding(4);
@@ -294,19 +320,41 @@ public class BothSemDescriptiveGenerator {
         if (remark == null || remark.trim().isEmpty()) {
             c.addElement(new Phrase(" ", fSmall));
         } else {
-            // Try to split on first ":" to make the label bold
-            int colonIdx = remark.indexOf(':');
-            if (colonIdx > 0 && colonIdx < remark.length() - 1) {
-                String labelPart = remark.substring(0, colonIdx + 1).trim();
-                String bodyPart = remark.substring(colonIdx + 1).trim();
-
-                com.itextpdf.text.Paragraph para = new com.itextpdf.text.Paragraph();
-                para.add(new Phrase(labelPart + "\n", fSmallBold));
-                if (!bodyPart.isEmpty())
-                    para.add(new Phrase(bodyPart, fSmall));
-                c.addElement(para);
+            if (PdfGenerator.containsDevanagari(remark) && PdfGenerator.sMarathiTypeface != null) {
+                try {
+                    // Try to split on first ":" to make the label bold
+                    int colonIdx = remark.indexOf(':');
+                    if (colonIdx > 0 && colonIdx < remark.length() - 1) {
+                        String labelPart = remark.substring(0, colonIdx + 1).trim();
+                        String bodyPart = remark.substring(colonIdx + 1).trim();
+                        com.itextpdf.text.Image img1 = com.kartik.myschool.utils.pdf.MarathiText.renderLine(labelPart, 9f, true, android.graphics.Color.BLACK);
+                        img1.setAlignment(com.itextpdf.text.Image.LEFT);
+                        com.itextpdf.text.Image img2 = com.kartik.myschool.utils.pdf.MarathiText.renderMultiLine(bodyPart, 9f, false, android.graphics.Color.BLACK, widthPt - 8f);
+                        img2.setAlignment(com.itextpdf.text.Image.LEFT);
+                        c.addElement(img1);
+                        c.addElement(img2);
+                    } else {
+                        com.itextpdf.text.Image img = com.kartik.myschool.utils.pdf.MarathiText.renderMultiLine(
+                                remark, 9f, false, android.graphics.Color.BLACK, widthPt - 8f);
+                        img.setAlignment(com.itextpdf.text.Image.LEFT);
+                        c.addElement(img);
+                    }
+                } catch (Exception e) {
+                    c.addElement(new Phrase(remark, fSmall));
+                }
             } else {
-                c.addElement(new Phrase(remark, fSmall));
+                int colonIdx = remark.indexOf(':');
+                if (colonIdx > 0 && colonIdx < remark.length() - 1) {
+                    String labelPart = remark.substring(0, colonIdx + 1).trim();
+                    String bodyPart = remark.substring(colonIdx + 1).trim();
+                    com.itextpdf.text.Paragraph para = new com.itextpdf.text.Paragraph();
+                    para.add(new Phrase(labelPart + "\n", fSmallBold));
+                    if (!bodyPart.isEmpty())
+                        para.add(new Phrase(bodyPart, fSmall));
+                    c.addElement(para);
+                } else {
+                    c.addElement(new Phrase(remark, fSmall));
+                }
             }
         }
         tbl.addCell(c);

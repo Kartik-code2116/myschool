@@ -233,8 +233,8 @@ public class MarksRegisterGenerator {
                     cellSpan(tbl, str(d.grandTotal),      fSmall,     bg, C_DARK, 1, 1, Element.ALIGN_CENTER); // श्रे.गुण = grandTotal
                     cellSpan(tbl, nvl(normalizeGrade(d.grade != null ? d.grade : "")), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                 } else {
-                    // 17 empty columns
-                    for (int k = 0; k < 17; k++)
+                    // 16 empty columns
+                    for (int k = 0; k < 16; k++)
                         cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
                 }
             }

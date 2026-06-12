@@ -117,10 +117,8 @@ public class HomeActivity extends AppCompatActivity {
                 toggleSchoolLevelDropdown();
                 return false;
             }
-            boolean handled = navigateToAnimated(id);
-            if (handled)
-                b.drawerLayout.closeDrawer(GravityCompat.START);
-            return handled;
+            closeDrawerAndNavigate(id);
+            return true;
         });
 
         b.btnToolbarMore.setOnClickListener(this::handleHomeMoreClick);
@@ -140,6 +138,12 @@ public class HomeActivity extends AppCompatActivity {
             if (id == R.id.nav_edit_attendance) {
                 title = "Upasthiti";
                 subtitle = "";
+            } else if (id == R.id.nav_attendance) {
+                title = getString(R.string.menu_attendance);
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
+                        ? SessionContext.selectedClass.className : "1";
+                int sem = (SessionContext.selectedSemester != null) ? SessionContext.selectedSemester.number : 1;
+                subtitle = "Class: " + cls + " • Sem: " + sem;
             } else if (id == R.id.nav_students) {
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_class_div) {
@@ -224,9 +228,11 @@ public class HomeActivity extends AppCompatActivity {
                 title = "उपस्थिती";
                 b.btnToolbarAdd.setVisibility(View.VISIBLE);
                 b.btnToolbarCalc.setVisibility(View.VISIBLE);
+                b.ivProfilePic.setVisibility(View.GONE);
             } else {
                 b.btnToolbarAdd.setVisibility(View.GONE);
                 b.btnToolbarCalc.setVisibility(View.GONE);
+                b.ivProfilePic.setVisibility(View.VISIBLE);
             }
         });
 
@@ -268,6 +274,18 @@ public class HomeActivity extends AppCompatActivity {
         // Drawer navigation uses scale+fade for a premium feel
         navigateFromDrawer(destId);
         return true;
+    }
+
+    /** Helper to allow the drawer to slide away smoothly BEFORE the main thread locks up for navigation. */
+    private void closeDrawerAndNavigate(int destId) {
+        if (b != null && b.drawerLayout != null) {
+            b.drawerLayout.closeDrawer(GravityCompat.START);
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                navigateToAnimated(destId);
+            }, 250);
+        } else {
+            navigateToAnimated(destId);
+        }
     }
 
     private boolean navigateBottomItem(android.view.MenuItem item) {
@@ -351,22 +369,10 @@ public class HomeActivity extends AppCompatActivity {
         if (btnProfile != null)
             btnProfile.setContentDescription(getString(R.string.profile_title));
 
-        header.findViewById(R.id.btnDrawerProfile).setOnClickListener(v -> {
-            b.drawerLayout.closeDrawer(GravityCompat.START);
-            navigateToAnimated(R.id.nav_profile);
-        });
-        header.findViewById(R.id.btnDrawerSettings).setOnClickListener(v -> {
-            b.drawerLayout.closeDrawer(GravityCompat.START);
-            navigateToAnimated(R.id.nav_settings);
-        });
-        header.findViewById(R.id.btnDrawerPrint).setOnClickListener(v -> {
-            b.drawerLayout.closeDrawer(GravityCompat.START);
-            navigateToAnimated(R.id.nav_print_report);
-        });
-        header.findViewById(R.id.btnDrawerStats).setOnClickListener(v -> {
-            b.drawerLayout.closeDrawer(GravityCompat.START);
-            navigateToAnimated(R.id.nav_dashboard);
-        });
+        header.findViewById(R.id.btnDrawerProfile).setOnClickListener(v -> closeDrawerAndNavigate(R.id.nav_profile));
+        header.findViewById(R.id.btnDrawerSettings).setOnClickListener(v -> closeDrawerAndNavigate(R.id.nav_settings));
+        header.findViewById(R.id.btnDrawerPrint).setOnClickListener(v -> closeDrawerAndNavigate(R.id.nav_print_report));
+        header.findViewById(R.id.btnDrawerStats).setOnClickListener(v -> closeDrawerAndNavigate(R.id.nav_dashboard));
     }
 
     private void localizeSidebar() {

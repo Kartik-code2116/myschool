@@ -234,16 +234,6 @@ public class EnterMarksActivity extends AppCompatActivity {
                             fillExistingMarks(m);
                         } else {
                             Log.d("SAVE_MARKS", "Layer3: No marks in Firestore for student=" + student.id);
-                            if (existingMarks == null) {
-                                // No marks at all — pre-fill attendance
-                                int[] att = calculateAttendanceForSemester();
-                                if (att[1] > 0) {
-                                    if (b.etPresentDays != null)
-                                        b.etPresentDays.setText(String.valueOf(att[0]));
-                                    if (b.etTotalDays != null)
-                                        b.etTotalDays.setText(String.valueOf(att[1]));
-                                }
-                            }
                         }
                     }
 
@@ -484,68 +474,11 @@ public class EnterMarksActivity extends AppCompatActivity {
                 "PASS".equals(result) ? R.color.success : R.color.error, null));
     }
 
-    private int[] calculateAttendanceForSemester() {
-        int present = 0;
-        int total = 0;
-        if (student != null && student.monthlyAttendance != null) {
-            int semNum = 1;
-            if (SessionContext.selectedSemester != null) {
-                semNum = SessionContext.selectedSemester.number;
-            }
-
-            String[] months;
-            if (semNum == 2) {
-                months = new String[] { "डिसें", "जाने", "फेब्रु", "मार्च", "एप्रिल", "मे" };
-            } else {
-                months = new String[] { "जून", "जुलै", "ऑगस्ट", "सप्टें", "ऑक्टो", "नोव्हे" };
-            }
-
-            for (String m : months) {
-                String val = student.monthlyAttendance.get(m);
-                if (val != null && val.contains("/")) {
-                    String[] parts = val.split("/");
-                    if (parts.length == 2) {
-                        try {
-                            present += Integer.parseInt(parts[0].trim());
-                            total += Integer.parseInt(parts[1].trim());
-                        } catch (NumberFormatException ignored) {
-                        }
-                    }
-                }
-            }
-        }
-        return new int[] { present, total };
-    }
 
     // ── Fill existing saved marks back into the form ───────────────────────────
     private void fillExistingMarks(MarksRecord m) {
         if (classModel.subjects == null)
             return;
-
-        if (b.etPresentDays != null) {
-            if (m.totalDays > 0) {
-                b.etPresentDays.setText(String.valueOf(m.presentDays));
-            } else {
-                int[] att = calculateAttendanceForSemester();
-                if (att[1] > 0) {
-                    b.etPresentDays.setText(String.valueOf(att[0]));
-                } else {
-                    b.etPresentDays.setText("");
-                }
-            }
-        }
-        if (b.etTotalDays != null) {
-            if (m.totalDays > 0) {
-                b.etTotalDays.setText(String.valueOf(m.totalDays));
-            } else {
-                int[] att = calculateAttendanceForSemester();
-                if (att[1] > 0) {
-                    b.etTotalDays.setText(String.valueOf(att[1]));
-                } else {
-                    b.etTotalDays.setText("");
-                }
-            }
-        }
 
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
             String subName = MarksRecord.sanitizeKey(classModel.subjects.get(i).name);
@@ -616,16 +549,6 @@ public class EnterMarksActivity extends AppCompatActivity {
         m.subjectMarks.clear();
         m.subjectMax.clear();
         m.detailedMarks.clear();
-
-        // Attendance
-        try {
-            m.presentDays = Integer.parseInt(b.etPresentDays.getText().toString());
-        } catch (Exception ignored) {
-        }
-        try {
-            m.totalDays = Integer.parseInt(b.etTotalDays.getText().toString());
-        } catch (Exception ignored) {
-        }
 
         // Semester
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {

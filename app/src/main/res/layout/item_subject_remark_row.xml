@@ -67,14 +67,12 @@
                 android:insetBottom="0dp"/>
         </LinearLayout>
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/cgSelectedRemarks"
+        <LinearLayout
+            android:id="@+id/llCategoriesContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:singleLine="false"
-            app:chipSpacingVertical="8dp"
-            app:chipSpacingHorizontal="8dp" />
+            android:orientation="vertical"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvNoRemarks"

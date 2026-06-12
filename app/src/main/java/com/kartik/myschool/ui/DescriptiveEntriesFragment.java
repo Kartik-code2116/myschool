@@ -171,118 +171,134 @@ public class DescriptiveEntriesFragment extends Fragment {
         // The cache is cleared selectively (by EnterDescriptiveActivity on save,
         // or by the swipe-to-refresh gesture).
 
-        // 2. Fetch from network in background (stale-while-revalidate):
+        // 2. Fetch from network in parallel to drastically improve load time:
+        final boolean[] fetchesDone = new boolean[2]; // [0] = students, [1] = marks
+        final List<Student>[] studentsResult = new List[]{null};
+        final Map<String, MarksRecord>[] marksResult = new Map[]{null};
+
+        Runnable onBothFetchesDone = () -> {
+            if (!fetchesDone[0] || !fetchesDone[1]) return;
+            
+            List<Student> finalList = studentsResult[0] != null ? studentsResult[0] : new ArrayList<>();
+            Map<String, MarksRecord> finalMarks = marksResult[0] != null ? marksResult[0] : new HashMap<>();
+
+            // Merge network results with the fresh local states based on updatedAt
+            if (adapter != null && adapter.marksMap != null) {
+                for (Map.Entry<String, MarksRecord> entry : adapter.marksMap.entrySet()) {
+                    String sId = entry.getKey();
+                    MarksRecord adapterRecord = entry.getValue();
+                    MarksRecord fetchedRecord = finalMarks.get(sId);
+                    if (adapterRecord != null && (fetchedRecord == null
+                            || adapterRecord.updatedAt >= fetchedRecord.updatedAt)) {
+                        finalMarks.put(sId, adapterRecord);
+                    }
+                }
+            }
+
+            if (AppCache.cachedMarksMap != null
+                    && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
+                    && java.util.Objects.equals(activeSemesterId,
+                            AppCache.cachedSemesterIdForMarks)) {
+                for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
+                    String sId = entry.getKey();
+                    MarksRecord cachedRecord = entry.getValue();
+                    MarksRecord fetchedRecord = finalMarks.get(sId);
+                    if (cachedRecord != null && (fetchedRecord == null
+                            || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
+                        finalMarks.put(sId, cachedRecord);
+                    }
+                }
+            }
+
+            if (AppCache.cachedDescriptiveMarksMap != null
+                    && AppCache.cachedDescriptiveMarksComplete
+                    && java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)
+                    && java.util.Objects.equals(activeSemesterId,
+                            AppCache.cachedDescriptiveSemesterId)) {
+                for (Map.Entry<String, MarksRecord> entry : AppCache.cachedDescriptiveMarksMap
+                        .entrySet()) {
+                    String sId = entry.getKey();
+                    MarksRecord cachedRecord = entry.getValue();
+                    MarksRecord fetchedRecord = finalMarks.get(sId);
+                    if (cachedRecord != null && (fetchedRecord == null
+                            || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
+                        finalMarks.put(sId, cachedRecord);
+                    }
+                }
+            }
+
+            android.util.Log.d("DESCRIPTIVE_DEBUG", "Loaded finalMarks size=" + finalMarks.size()
+                    + " for classId=" + activeClass.id + " sem=" + activeSemesterId);
+            for (Map.Entry<String, MarksRecord> entry : finalMarks.entrySet()) {
+                MarksRecord rec = entry.getValue();
+                if (rec != null && rec.detailedMarks != null) {
+                    for (Map.Entry<String, MarksRecord.SubjectMarksDetail> d : rec.detailedMarks
+                            .entrySet()) {
+                        if (d.getValue() != null && d.getValue().remark != null
+                                && !d.getValue().remark.isEmpty()) {
+                            android.util.Log.d("DESCRIPTIVE_DEBUG", "  student=" + entry.getKey()
+                                    + " subject=" + d.getKey() + " remark=" + d.getValue().remark);
+                        }
+                    }
+                }
+            }
+
+            // Cache the loaded results
+            AppCache.cachedDescriptiveStudents = finalList;
+            AppCache.cachedDescriptiveMarksMap = finalMarks;
+            AppCache.cachedDescriptiveClassId = activeClass.id;
+            AppCache.cachedDescriptiveSemesterId = activeSemesterId;
+            AppCache.cachedDescriptiveMarksComplete = true;
+
+            if (isAdded() && b != null) {
+                adapter.setData(finalList, finalMarks);
+                if (swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
+            }
+        };
+
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
-                if (students == null)
-                    students = new ArrayList<>();
-                List<Student> finalList = students;
-
-                FirebaseRepository.get().getMarksForClassAndSemester(activeClass.id, activeSemesterId,
-                        new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
-                            @Override
-                            public void onSuccess(Map<String, MarksRecord> marksMap) {
-                                Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
-
-                                // Merge network results with the fresh local states based on updatedAt
-                                if (adapter != null && adapter.marksMap != null) {
-                                    for (Map.Entry<String, MarksRecord> entry : adapter.marksMap.entrySet()) {
-                                        String sId = entry.getKey();
-                                        MarksRecord adapterRecord = entry.getValue();
-                                        MarksRecord fetchedRecord = finalMarks.get(sId);
-                                        if (adapterRecord != null && (fetchedRecord == null
-                                                || adapterRecord.updatedAt >= fetchedRecord.updatedAt)) {
-                                            finalMarks.put(sId, adapterRecord);
-                                        }
-                                    }
-                                }
-
-                                if (AppCache.cachedMarksMap != null
-                                        && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
-                                        && java.util.Objects.equals(activeSemesterId,
-                                                AppCache.cachedSemesterIdForMarks)) {
-                                    for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
-                                        String sId = entry.getKey();
-                                        MarksRecord cachedRecord = entry.getValue();
-                                        MarksRecord fetchedRecord = finalMarks.get(sId);
-                                        if (cachedRecord != null && (fetchedRecord == null
-                                                || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
-                                            finalMarks.put(sId, cachedRecord);
-                                        }
-                                    }
-                                }
-
-                                if (AppCache.cachedDescriptiveMarksMap != null
-                                        && AppCache.cachedDescriptiveMarksComplete
-                                        && java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)
-                                        && java.util.Objects.equals(activeSemesterId,
-                                                AppCache.cachedDescriptiveSemesterId)) {
-                                    for (Map.Entry<String, MarksRecord> entry : AppCache.cachedDescriptiveMarksMap
-                                            .entrySet()) {
-                                        String sId = entry.getKey();
-                                        MarksRecord cachedRecord = entry.getValue();
-                                        MarksRecord fetchedRecord = finalMarks.get(sId);
-                                        if (cachedRecord != null && (fetchedRecord == null
-                                                || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
-                                            finalMarks.put(sId, cachedRecord);
-                                        }
-                                    }
-                                }
-
-                                android.util.Log.d("DESCRIPTIVE_DEBUG", "Loaded finalMarks size=" + finalMarks.size()
-                                        + " for classId=" + activeClass.id + " sem=" + activeSemesterId);
-                                for (Map.Entry<String, MarksRecord> entry : finalMarks.entrySet()) {
-                                    MarksRecord rec = entry.getValue();
-                                    if (rec != null && rec.detailedMarks != null) {
-                                        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> d : rec.detailedMarks
-                                                .entrySet()) {
-                                            if (d.getValue() != null && d.getValue().remark != null
-                                                    && !d.getValue().remark.isEmpty()) {
-                                                android.util.Log.d("DESCRIPTIVE_DEBUG", "  student=" + entry.getKey()
-                                                        + " subject=" + d.getKey() + " remark=" + d.getValue().remark);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // Cache the loaded results
-                                AppCache.cachedDescriptiveStudents = finalList;
-                                AppCache.cachedDescriptiveMarksMap = finalMarks;
-                                AppCache.cachedDescriptiveClassId = activeClass.id;
-                                AppCache.cachedDescriptiveSemesterId = activeSemesterId;
-                                AppCache.cachedDescriptiveMarksComplete = true;
-
-                                if (isAdded() && b != null) {
-                                    adapter.setData(finalList, finalMarks);
-                                    if (swipeRefresh != null)
-                                        swipeRefresh.setRefreshing(false);
-                                }
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                if (isAdded() && b != null) {
-                                    if (swipeRefresh != null)
-                                        swipeRefresh.setRefreshing(false);
-                                    if (AppCache.cachedDescriptiveStudents == null || !java.util.Objects
-                                            .equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
-                                        adapter.setData(finalList, new HashMap<>());
-                                    }
-                                }
-                            }
-                        });
+                studentsResult[0] = students;
+                fetchesDone[0] = true;
+                onBothFetchesDone.run();
             }
 
             @Override
             public void onError(Exception e) {
+                studentsResult[0] = new ArrayList<>();
+                fetchesDone[0] = true;
+                onBothFetchesDone.run();
+
                 if (isAdded()) {
-                    if (swipeRefresh != null)
-                        swipeRefresh.setRefreshing(false);
                     if (AppCache.cachedDescriptiveStudents == null
                             || !java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
                         Toast.makeText(requireContext(), "Failed to load students: " + e.getMessage(),
                                 Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        FirebaseRepository.get().getMarksForClassAndSemester(activeClass.id, activeSemesterId, new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+            @Override
+            public void onSuccess(Map<String, MarksRecord> marksMap) {
+                marksResult[0] = marksMap;
+                fetchesDone[1] = true;
+                onBothFetchesDone.run();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                marksResult[0] = new HashMap<>();
+                fetchesDone[1] = true;
+                onBothFetchesDone.run();
+
+                if (isAdded() && b != null) {
+                    if (AppCache.cachedDescriptiveStudents == null || !java.util.Objects
+                            .equals(activeClass.id, AppCache.cachedDescriptiveClassId)) {
+                        // In case marks fetch fails but students succeeded, adapter.setData will be called with empty marks
                     }
                 }
             }

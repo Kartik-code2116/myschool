@@ -92,6 +92,10 @@ public class FormativeSummativeFragment extends Fragment {
         updateLayoutManager();
         adapter = new EvaluationAdapter();
         b.rvEvaluationStudents.setAdapter(adapter);
+
+        // Play smooth layout enter animation
+        com.kartik.myschool.utils.UiAnimations.playLayoutEnter(b.getRoot());
+        com.kartik.myschool.utils.UiAnimations.setupRecyclerAnimations(b.rvEvaluationStudents);
     }
 
     private void updateLayoutManager() {
@@ -195,6 +199,7 @@ public class FormativeSummativeFragment extends Fragment {
         }
 
         // 1. Instant Cache rendering (zero-latency display):
+        boolean renderedFromCache = false;
         if (AppCache.cachedStudents != null
                 && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
                 && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
@@ -207,103 +212,99 @@ public class FormativeSummativeFragment extends Fragment {
                 b.progressLoading.setVisibility(View.GONE);
             if (swipeRefresh != null)
                 swipeRefresh.setRefreshing(false);
-            adapter.setData(cachedList, cachedMarks);
+            
+            renderedFromCache = true;
+            adapter.setData(cachedList, cachedMarks, true); // Reset animation for the first instant render
         }
+        
+        final boolean finalRenderedFromCache = renderedFromCache;
 
-        // 2. Background fetch (always runs to get fresh data):
+        // 2. Background fetch (parallel to cut loading time in half):
+        final boolean[] fetchesDone = new boolean[2]; // [0] = students, [1] = marks
+        final List<Student>[] studentsResult = new List[]{null};
+        final Map<String, MarksRecord>[] marksResult = new Map[]{null};
+
+        Runnable onBothFetchesDone = () -> {
+            if (!fetchesDone[0] || !fetchesDone[1]) return;
+            
+            List<Student> finalList = studentsResult[0] != null ? studentsResult[0] : new ArrayList<>();
+            Map<String, MarksRecord> finalMarks = marksResult[0] != null ? marksResult[0] : new HashMap<>();
+
+            // Merge network results with the fresh cache based on updatedAt
+            if (AppCache.cachedMarksMap != null
+                    && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)
+                    && java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
+                for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
+                    String sId = entry.getKey();
+                    MarksRecord cachedRecord = entry.getValue();
+                    MarksRecord fetchedRecord = finalMarks.get(sId);
+
+                    // If cache has a newer or same record, keep the cache!
+                    if (cachedRecord != null && (fetchedRecord == null
+                            || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
+                        finalMarks.put(sId, cachedRecord);
+                    }
+                }
+            }
+
+            // Update cache
+            AppCache.cachedStudents = finalList;
+            AppCache.cachedMarksMap = finalMarks;
+            AppCache.cachedClassIdForStudents = activeClass.id;
+            AppCache.cachedSemesterIdForMarks = activeSemesterId;
+
+            if (isAdded() && b != null) {
+                b.progressLoading.setVisibility(View.GONE);
+                if (swipeRefresh != null)
+                    swipeRefresh.setRefreshing(false);
+                if (finalList.isEmpty()) {
+                    b.tvEmptyState.setVisibility(View.VISIBLE);
+                } else {
+                    b.tvEmptyState.setVisibility(View.GONE);
+                }
+                
+                // If we already rendered from cache, do NOT reset the animation, so the UI doesn't visually jump/stutter.
+                adapter.setData(finalList, finalMarks, !finalRenderedFromCache);
+            }
+        };
+
         FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> students) {
-                if (students == null)
-                    students = new ArrayList<>();
-                List<Student> finalList = students;
-
-                // Fetch marks map
-                FirebaseRepository.get().getMarksForClassAndSemester(activeClass.id, activeSemesterId,
-                        new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
-                            @Override
-                            public void onSuccess(Map<String, MarksRecord> marksMap) {
-                                Map<String, MarksRecord> finalMarks = marksMap != null ? marksMap : new HashMap<>();
-
-                                // Merge network results with the fresh cache based on updatedAt
-                                // ONLY if the cache belongs to the same semester we are currently fetching!
-                                if (AppCache.cachedMarksMap != null
-                                        && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)
-                                        && java.util.Objects.equals(activeClass.id,
-                                                AppCache.cachedClassIdForStudents)) {
-                                    for (Map.Entry<String, MarksRecord> entry : AppCache.cachedMarksMap.entrySet()) {
-                                        String sId = entry.getKey();
-                                        MarksRecord cachedRecord = entry.getValue();
-                                        MarksRecord fetchedRecord = finalMarks.get(sId);
-
-                                        // If cache has a newer or same record, keep the cache!
-                                        if (cachedRecord != null && (fetchedRecord == null
-                                                || cachedRecord.updatedAt >= fetchedRecord.updatedAt)) {
-                                            finalMarks.put(sId, cachedRecord);
-                                        }
-                                    }
-                                }
-
-                                // Update cache
-                                AppCache.cachedStudents = finalList;
-                                AppCache.cachedMarksMap = finalMarks;
-                                AppCache.cachedClassIdForStudents = activeClass.id;
-                                AppCache.cachedSemesterIdForMarks = activeSemesterId;
-
-                                if (isAdded() && b != null) {
-                                    b.progressLoading.setVisibility(View.GONE);
-                                    if (swipeRefresh != null)
-                                        swipeRefresh.setRefreshing(false);
-                                    if (finalList.isEmpty()) {
-                                        b.tvEmptyState.setVisibility(View.VISIBLE);
-                                    } else {
-                                        b.tvEmptyState.setVisibility(View.GONE);
-                                    }
-                                    adapter.setData(finalList, finalMarks);
-                                }
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                String errMsg = (e != null && e.getMessage() != null) ? e.getMessage()
-                                        : "Unknown error";
-                                Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + errMsg, e);
-                                if (isAdded() && b != null) {
-                                    b.progressLoading.setVisibility(View.GONE);
-                                    if (swipeRefresh != null)
-                                        swipeRefresh.setRefreshing(false);
-                                    // FIX: only fallback to empty marks when there is truly no
-                                    // previously-cached data. Never wipe marks just because of a
-                                    // transient network error on resume.
-                                    boolean hasCachedMarks = AppCache.cachedMarksMap != null
-                                            && activeClass != null
-                                            && java.util.Objects.equals(activeClass.id,
-                                                    AppCache.cachedClassIdForStudents)
-                                            && java.util.Objects.equals(activeSemesterId,
-                                                    AppCache.cachedSemesterIdForMarks);
-                                    if (!hasCachedMarks) {
-                                        adapter.setData(finalList, new HashMap<>());
-                                    }
-                                }
-                            }
-                        });
+                studentsResult[0] = students;
+                fetchesDone[0] = true;
+                onBothFetchesDone.run();
             }
 
             @Override
             public void onError(Exception e) {
+                studentsResult[0] = new ArrayList<>();
+                fetchesDone[0] = true;
+                onBothFetchesDone.run();
+                
                 if (isAdded() && b != null) {
-                    b.progressLoading.setVisibility(View.GONE);
-                    if (swipeRefresh != null)
-                        swipeRefresh.setRefreshing(false);
-                    // Only show network error toast if cache is fully empty
-                    if (AppCache.cachedStudents == null
-                            || activeClass == null
-                            || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
+                    if (AppCache.cachedStudents == null || activeClass == null || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)) {
                         String errMsg = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error";
-                        Toast.makeText(requireContext(), "Failed to load students: " + errMsg,
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Failed to load students: " + errMsg, Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        });
+
+        FirebaseRepository.get().getMarksForClassAndSemester(activeClass.id, activeSemesterId, new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
+            @Override
+            public void onSuccess(Map<String, MarksRecord> marksMap) {
+                marksResult[0] = marksMap;
+                fetchesDone[1] = true;
+                onBothFetchesDone.run();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                marksResult[0] = new HashMap<>();
+                fetchesDone[1] = true;
+                onBothFetchesDone.run();
+                Log.e("FORMATIVE", "getMarksForClassAndSemester failed: " + e.getMessage(), e);
             }
         });
     }
@@ -425,12 +426,16 @@ public class FormativeSummativeFragment extends Fragment {
 
         private final List<Student> students = new ArrayList<>();
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
+        private final int[] lastPosition = new int[] { -1 };
 
-        public void setData(List<Student> list, Map<String, MarksRecord> map) {
+        public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
             students.clear();
             students.addAll(list);
             marksMap.clear();
             marksMap.putAll(map);
+            if (resetAnimation) {
+                lastPosition[0] = -1; // Reset animation on fresh data load
+            }
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
@@ -477,6 +482,7 @@ public class FormativeSummativeFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Student st = students.get(position);
             holder.bind(st, position + 1);
+            com.kartik.myschool.utils.UiAnimations.animateScrollReveal(holder.itemView, position, lastPosition);
         }
 
         @Override

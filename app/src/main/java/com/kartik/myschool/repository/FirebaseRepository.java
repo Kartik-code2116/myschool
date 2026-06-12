@@ -1027,7 +1027,11 @@ public class FirebaseRepository {
     private void mergeRecords(MarksRecord target, MarksRecord source) {
         if (target == null || source == null) return;
         
-        // Merge detailedMarks maps
+        // Target is the NEWER document, Source is the OLDER document.
+        // We only copy data from Source to Target if Target is completely missing it.
+        // This ensures deliberate deletions (e.g., editing a mark to 0) are not overwritten by older duplicate records.
+
+        // Merge detailedMarks maps (only missing subjects)
         if (source.detailedMarks != null) {
             if (target.detailedMarks == null) {
                 target.detailedMarks = new java.util.HashMap<>();
@@ -1037,65 +1041,21 @@ public class FirebaseRepository {
                 MarksRecord.SubjectMarksDetail sourceDetail = entry.getValue();
                 if (sourceDetail == null) continue;
                 
-                MarksRecord.SubjectMarksDetail targetDetail = target.detailedMarks.get(subName);
-                if (targetDetail == null) {
+                if (!target.detailedMarks.containsKey(subName)) {
                     target.detailedMarks.put(subName, sourceDetail);
-                } else {
-                    // Merge subject sub-fields
-                    if (sourceDetail.nirikhshan > 0) targetDetail.nirikhshan = sourceDetail.nirikhshan;
-                    if (sourceDetail.tondiKam > 0) targetDetail.tondiKam = sourceDetail.tondiKam;
-                    if (sourceDetail.pratyakshik > 0) targetDetail.pratyakshik = sourceDetail.pratyakshik;
-                    if (sourceDetail.upkram > 0) targetDetail.upkram = sourceDetail.upkram;
-                    if (sourceDetail.prakalp > 0) targetDetail.prakalp = sourceDetail.prakalp;
-                    if (sourceDetail.chachani > 0) targetDetail.chachani = sourceDetail.chachani;
-                    if (sourceDetail.swadhyay > 0) targetDetail.swadhyay = sourceDetail.swadhyay;
-                    if (sourceDetail.itar > 0) targetDetail.itar = sourceDetail.itar;
-                    if (sourceDetail.akarikTotal > 0) targetDetail.akarikTotal = sourceDetail.akarikTotal;
-                    
-                    if (sourceDetail.tondi > 0) targetDetail.tondi = sourceDetail.tondi;
-                    if (sourceDetail.pratyakshikB > 0) targetDetail.pratyakshikB = sourceDetail.pratyakshikB;
-                    if (sourceDetail.lekhi > 0) targetDetail.lekhi = sourceDetail.lekhi;
-                    if (sourceDetail.sanklit > 0) targetDetail.sanklit = sourceDetail.sanklit;
-                    
-                    if (sourceDetail.grandTotal > 0) targetDetail.grandTotal = sourceDetail.grandTotal;
-                    if (sourceDetail.maxMarks > 0) targetDetail.maxMarks = sourceDetail.maxMarks;
-                    if (sourceDetail.grade != null && !sourceDetail.grade.isEmpty()) targetDetail.grade = sourceDetail.grade;
-                    
-                    // Merge remarks
-                    if (sourceDetail.remark != null && !sourceDetail.remark.trim().isEmpty()) {
-                        if (targetDetail.remark == null || targetDetail.remark.trim().isEmpty()) {
-                            targetDetail.remark = sourceDetail.remark;
-                        } else if (!targetDetail.remark.contains(sourceDetail.remark)) {
-                            // Merge distinct parts
-                            java.util.LinkedHashSet<String> parts = new java.util.LinkedHashSet<>();
-                            for (String p : targetDetail.remark.split("\\|\\|")) {
-                                if (!p.trim().isEmpty()) parts.add(p.trim());
-                            }
-                            for (String p : sourceDetail.remark.split("\\|\\|")) {
-                                if (!p.trim().isEmpty()) parts.add(p.trim());
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            java.util.List<String> list = new java.util.ArrayList<>(parts);
-                            for (int i = 0; i < list.size(); i++) {
-                                sb.append(list.get(i));
-                                if (i < list.size() - 1) sb.append("||");
-                            }
-                            targetDetail.remark = sb.toString();
-                        }
-                    }
                 }
             }
         }
         
         // Merge attendance
-        if (source.presentDays > 0) target.presentDays = source.presentDays;
-        if (source.totalDays > 0) target.totalDays = source.totalDays;
+        if (target.presentDays == 0 && source.presentDays > 0) target.presentDays = source.presentDays;
+        if (target.totalDays == 0 && source.totalDays > 0) target.totalDays = source.totalDays;
         
-        // Merge top-level subjectMarks & subjectMax for legacy/compat compatibility
+        // Merge top-level subjectMarks & subjectMax for legacy compatibility
         if (source.subjectMarks != null) {
             if (target.subjectMarks == null) target.subjectMarks = new java.util.HashMap<>();
             for (java.util.Map.Entry<String, Double> entry : source.subjectMarks.entrySet()) {
-                if (entry.getValue() > 0) {
+                if (!target.subjectMarks.containsKey(entry.getKey())) {
                     target.subjectMarks.put(entry.getKey(), entry.getValue());
                 }
             }
@@ -1103,18 +1063,18 @@ public class FirebaseRepository {
         if (source.subjectMax != null) {
             if (target.subjectMax == null) target.subjectMax = new java.util.HashMap<>();
             for (java.util.Map.Entry<String, Integer> entry : source.subjectMax.entrySet()) {
-                if (entry.getValue() > 0) {
+                if (!target.subjectMax.containsKey(entry.getKey())) {
                     target.subjectMax.put(entry.getKey(), entry.getValue());
                 }
             }
         }
         
         // Merge total marks
-        if (source.totalObtained > 0) target.totalObtained = source.totalObtained;
-        if (source.totalMax > 0) target.totalMax = source.totalMax;
-        if (source.percentage > 0) target.percentage = source.percentage;
-        if (source.grade != null && !source.grade.isEmpty()) target.grade = source.grade;
-        if (source.result != null && !source.result.isEmpty()) target.result = source.result;
+        if (target.totalObtained == 0 && source.totalObtained > 0) target.totalObtained = source.totalObtained;
+        if (target.totalMax == 0 && source.totalMax > 0) target.totalMax = source.totalMax;
+        if (target.percentage == 0 && source.percentage > 0) target.percentage = source.percentage;
+        if ((target.grade == null || target.grade.isEmpty()) && source.grade != null && !source.grade.isEmpty()) target.grade = source.grade;
+        if ((target.result == null || target.result.isEmpty()) && source.result != null && !source.result.isEmpty()) target.result = source.result;
     }
 
     // ---------- Subscriptions ----------
