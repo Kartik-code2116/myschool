@@ -79,7 +79,8 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
         String sName = subject.name != null ? subject.name.toLowerCase() : "";
         boolean isFormativeOnly = sName.contains("drawing") || sName.contains("कला") ||
                                   sName.contains("work experi") || sName.contains("कार्यानुभव") ||
-                                  sName.contains("physical") || sName.contains("शारीरिक");
+                                  sName.contains("physical") || sName.contains("शारीरिक") ||
+                                  sName.contains("personality") || sName.contains("व्यक्तिमत्त्व");
                                   
         if (isFormativeOnly) {
             b.layoutSummative.setVisibility(View.GONE);
@@ -110,7 +111,8 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
                     boolean isFormativeOnly = subject.name != null && (
                             subject.name.toLowerCase().contains("drawing") || subject.name.contains("कला") ||
                             subject.name.toLowerCase().contains("work experi") || subject.name.contains("कार्यानुभव") ||
-                            subject.name.toLowerCase().contains("physical") || subject.name.contains("शारीरिक")
+                            subject.name.toLowerCase().contains("physical") || subject.name.contains("शारीरिक") ||
+                            subject.name.toLowerCase().contains("personality") || subject.name.contains("व्यक्तिमत्त्व")
                     );
 
                     // Auto-scale defaults for sub-fields

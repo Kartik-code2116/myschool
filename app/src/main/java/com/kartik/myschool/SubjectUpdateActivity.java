@@ -118,6 +118,7 @@ public class SubjectUpdateActivity extends AppCompatActivity {
                 for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
                     if (s.name != null && s.name.equalsIgnoreCase(name)) { // compare with original name
                         s.name = updatedName;
+                        s.subjectCode = b.etSubjectCode.getText().toString().trim();
                         s.maxMarks = formative + summative;
 
                         // Re-scale sub-fields based on new formative (akarik) and summative (sanklit) totals

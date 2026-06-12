@@ -2,6 +2,7 @@ package com.kartik.myschool.model;
 
 public class Subject {
     public String name;
+    public String subjectCode;
     public int maxMarks;
 
     // Optional customized sub-field max marks (Formative / आकारिक)

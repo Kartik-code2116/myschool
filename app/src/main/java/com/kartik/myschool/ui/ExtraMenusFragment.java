@@ -56,6 +56,21 @@ public class ExtraMenusFragment extends Fragment {
         loadDynamicData();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ("school_info".equals(menuType)) {
+            // Reload school details in case they were updated
+            School school = SessionContext.selectedSchool;
+            if (school != null && b != null) {
+                if (school.name != null) b.tvSchoolInfoName.setText(getString(R.string.fmt_school_name, school.name));
+                if (school.udiseCode != null) b.tvSchoolInfoUdise.setText(getString(R.string.fmt_school_udise, school.udiseCode));
+                if (school.board != null) b.tvSchoolInfoBoard.setText(getString(R.string.fmt_school_board, school.board));
+                if (school.address != null && !school.address.isEmpty()) b.tvSchoolInfoAddress.setText(getString(R.string.fmt_school_address, school.address));
+            }
+        }
+    }
+
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
         String classDiv = SessionContext.getClassDivLabel();
@@ -603,6 +618,21 @@ public class ExtraMenusFragment extends Fragment {
 
         b.btnEditWorkingDays.setOnClickListener(v -> setWorkingDaysFieldsEditable(true));
 
+        b.btnLoadDefaultWorkingDays.setOnClickListener(v -> {
+            b.etWorkingDaysJun.setText("13");
+            b.etWorkingDaysJul.setText("27");
+            b.etWorkingDaysAug.setText("25");
+            b.etWorkingDaysSep.setText("24");
+            b.etWorkingDaysOct.setText("18");
+            b.etWorkingDaysNov.setText("23");
+            b.etWorkingDaysDec.setText("26");
+            b.etWorkingDaysJan.setText("23");
+            b.etWorkingDaysFeb.setText("24");
+            b.etWorkingDaysMar.setText("27");
+            b.etWorkingDaysApr.setText("18");
+            b.etWorkingDaysMay.setText("");
+        });
+
         b.btnSaveWorkingDays.setOnClickListener(v -> {
             activeClass.monthlyWorkingDays.put("जून", parseVal(b.etWorkingDaysJun));
             activeClass.monthlyWorkingDays.put("जुलै", parseVal(b.etWorkingDaysJul));
@@ -679,6 +709,7 @@ public class ExtraMenusFragment extends Fragment {
             et.setAlpha(editable ? 1.0f : 0.65f);
         }
         b.btnSaveWorkingDays.setVisibility(editable ? View.VISIBLE : View.GONE);
+        b.btnLoadDefaultWorkingDays.setVisibility(editable ? View.VISIBLE : View.GONE);
         b.btnEditWorkingDays.setVisibility(editable ? View.GONE : View.VISIBLE);
     }
 
@@ -926,12 +957,10 @@ public class ExtraMenusFragment extends Fragment {
             public void onSuccess(List<ClassModel> classes) {
                 if (!isAdded() || b == null) return;
                 
-                String currentYearLabel = SessionContext.getYearLabel();
+                ClassModel activeClass = SessionContext.selectedClass;
                 java.util.Set<String> activeClassIds = new java.util.HashSet<>();
-                for (ClassModel c : classes) {
-                    if (currentYearLabel.equals(c.academicYearLabel)) {
-                        activeClassIds.add(c.id);
-                    }
+                if (activeClass != null && activeClass.id != null) {
+                    activeClassIds.add(activeClass.id);
                 }
 
                 FirebaseRepository.get().getStudentsForUdiseCode(udiseCode, new FirebaseRepository.OnResult<List<Student>>() {
@@ -988,11 +1017,11 @@ public class ExtraMenusFragment extends Fragment {
                                     double boysPercent = (finalBoys * 100.0) / finalTotal;
                                     double girlsPercent = (finalGirls * 100.0) / finalTotal;
                                     String ratioText = isMr 
-                                        ? String.format("शाळा लिंग गुणोत्तर: %.1f%% मुले / %.1f%% मुली", boysPercent, girlsPercent)
-                                        : String.format("School Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent);
+                                        ? String.format("वर्ग लिंग गुणोत्तर: %.1f%% मुले / %.1f%% मुली", boysPercent, girlsPercent)
+                                        : String.format("Class Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent);
                                     b.tvGenderRatio.setText(ratioText);
                                 } else {
-                                    b.tvGenderRatio.setText(isMr ? "या शैक्षणिक वर्षात विद्यार्थी आढळले नाहीत." : "No students in this academic year.");
+                                    b.tvGenderRatio.setText(isMr ? "या वर्गात विद्यार्थी आढळले नाहीत." : "No students in this class.");
                                 }
 
                                 if (isMr) {
@@ -1000,13 +1029,13 @@ public class ExtraMenusFragment extends Fragment {
                                     b.tvCastObc.setText("इतर मागासवर्ग (OBC) : " + finalObc + " विद्यार्थी");
                                     b.tvCastSc.setText("अनुसूचित जाती (SC) : " + finalSc + " विद्यार्थी");
                                     b.tvCastSt.setText("अनुसूचित जमाती (ST) : " + finalSt + " विद्यार्थी");
-                                    b.tvSchoolInfoTotalStudents.setText("शाळा एकूण पटसंख्या: " + finalTotal + " विद्यार्थी");
+                                    b.tvSchoolInfoTotalStudents.setText("वर्ग एकूण पटसंख्या: " + finalTotal + " विद्यार्थी");
                                 } else {
                                     b.tvCastGeneral.setText("General (Open) : " + finalGen + " students");
                                     b.tvCastObc.setText("OBC Category : " + finalObc + " students");
                                     b.tvCastSc.setText("SC Category : " + finalSc + " students");
                                     b.tvCastSt.setText("ST Category : " + finalSt + " students");
-                                    b.tvSchoolInfoTotalStudents.setText("School-wide total enrollment: " + finalTotal + " students");
+                                    b.tvSchoolInfoTotalStudents.setText("Class total enrollment: " + finalTotal + " students");
                                 }
                             });
                         }

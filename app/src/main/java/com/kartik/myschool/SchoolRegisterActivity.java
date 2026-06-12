@@ -77,6 +77,10 @@ public class SchoolRegisterActivity extends AppCompatActivity {
         showLoading(true);
         FirebaseRepository.get().saveSchool(s, new FirebaseRepository.OnResult<String>() {
             @Override public void onSuccess(String id) {
+                s.id = id;
+                AppCache.selectedSchool = s;
+                SessionContext.selectedSchool = s;
+                SessionContext.save(SchoolRegisterActivity.this);
                 showLoading(false);
                 Toast.makeText(SchoolRegisterActivity.this, R.string.msg_school_saved, Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);

@@ -253,27 +253,44 @@ public class ProductTourHelper {
                         m ? "१. सत्र व वर्ग माहिती" : "1. Session & Class Info",
                         m ? "कोणत्या वर्ष, सत्र व वर्गाची हजेरी पाहत आहात ते येथे दिसते."
                           : "Shows the year, semester and class whose attendance you are viewing."));
-                s.add(new TourStep(R.id.ivActionHelp,
+                s.add(new TourStep(R.id.btnToolbarHelp,
                         m ? "२. मदत ?" : "2. Help ?",
                         m ? "हजेरी पानाची संपूर्ण मार्गदर्शिका पाहण्यासाठी येथे टॅप करा."
                           : "Tap to open the complete guide for the Attendance page."));
-                s.add(new TourStep(R.id.ivActionAdd,
+                s.add(new TourStep(R.id.btnToolbarAdd,
                         m ? "३. हजेरी जोडा +" : "3. Add Attendance +",
                         m ? "'जोडा' दाबल्यावर महिना निवडा, एकूण दिवस व हजर दिवस प्रविष्ट करा."
                           : "Tap Add to select a month and enter working days + present days."));
-                s.add(new TourStep(R.id.ivActionReport,
+                s.add(new TourStep(R.id.btnToolbarCalc,
                         m ? "४. हजेरी अहवाल 📋" : "4. Attendance Report 📋",
                         m ? "वर्गाची सरासरी हजेरी टक्केवारी व सर्वोत्तम विद्यार्थी येथे पाहा."
                           : "View class average attendance percentage and top attending students."));
-                s.add(new TourStep(R.id.ivActionMore,
+                s.add(new TourStep(R.id.btnToolbarMore,
                         m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: हजेरी कॉपी करणे, डिलीट करणे इत्यादी पर्याय आहेत."
                           : "⋮ menu has options to copy attendance to another month or delete."));
                 s.add(new TourStep(R.id.rvAttendanceStudents,
                         m ? "६. विद्यार्थी हजेरी यादी" : "6. Student Attendance List",
-                        m ? "प्रत्येक विद्यार्थ्याचे महिनानिहाय हजर/एकूण दिवस येथे दिसतात. स्क्रोल करा."
-                          : "Each student's present / working days per month are shown here. Scroll to see all."));
+                        m ? "येथे प्रत्येक विद्यार्थ्याचा हजेरी बॉक्स दिसतो. प्रत्येक बॉक्समध्ये विद्यार्थ्याच्या वार्षिक हजेरीचा संपूर्ण तपशील असतो. खालील स्टेप्समध्ये प्रत्येक भाग समजून घ्या."
+                          : "Each student has their own attendance box here. It shows the full yearly attendance summary. The next steps will explain each part of the box."));
+                s.add(new TourStep(R.id.rvAttendanceStudents,
+                        m ? "७. एकूण हजर दिवस 🟢" : "7. Total Present Days 🟢",
+                        m ? "बॉक्सच्या डाव्या बाजूला मोठा हिरवा आकडा दिसतो.\n\nहा आकडा म्हणजे त्या विद्यार्थ्याचे वर्षभरातील एकूण 'हजर दिवस' (Total Present Days) होय.\n\nजास्त आकडा = जास्त उपस्थिती. 🎉"
+                          : "The large green number on the left side of the box shows the student's Total Present Days for the entire year.\n\nHigher number = Better attendance! 🎉"));
+                s.add(new TourStep(R.id.rvAttendanceStudents,
+                        m ? "८. १२ महिन्यांचा तक्ता 📊" : "8. 12 Months Grid 📊",
+                        m ? "प्रत्येक बॉक्समध्ये जून ते मे पर्यंत १२ महिन्यांचा तक्ता असतो.\n\nप्रत्येक महिन्यात 'हजर / एकूण' (उदा. 24/26) असे लिहिलेले दिसते.\n• पहिला आकडा = त्या महिन्यात हजर दिवस\n• दुसरा आकडा = एकूण कामकाजाचे दिवस\n\nतक्त्यावर स्क्रोल करून सर्व महिने पाहता येतात."
+                          : "Each box contains a 12-month grid from June to May.\n\nEach cell shows 'Present / Total' (e.g. 24/26):\n• First number = Days present that month\n• Second number = Total working days that month\n\nScroll the grid to see all months."));
+                s.add(new TourStep(R.id.rvAttendanceStudents,
+                        m ? "९. हजेरी बदलण्यासाठी बॉक्सवर क्लिक करा ✏️" : "9. Tap Box to Edit Attendance ✏️",
+                        m ? "कोणत्याही विद्यार्थ्याच्या हजेरी बॉक्सवर क्लिक करा.\n\nएक 'हजेरी भरा' पॉप-अप उघडेल. त्यात:\n• प्रत्येक महिन्यासाठी हजर दिवस व एकूण कामकाज दिवस टाका.\n• 'जतन करा' दाबून हजेरी सेव्ह करा.\n\nहे अगदी तशाच पद्धतीने काम करते जसे आकारिक-संकलित गुण भरताना करतात."
+                          : "Tap anywhere on any student's attendance box to open the Edit Attendance popup.\n\nIn the popup:\n• Enter Present Days and Working Days for each month.\n• Tap 'Save' to save the attendance.\n\nThis works exactly like the marks entry popup on the Formative/Summative page."));
+                s.add(new TourStep(R.id.rvAttendanceStudents,
+                        m ? "१०. ⋮ मेन्यू: Duplicate व Delete" : "10. ⋮ Menu: Duplicate & Delete",
+                        m ? "प्रत्येक हजेरी बॉक्सच्या उजव्या कोपऱ्यात (⋮) मेन्यू असतो.\n\n• 'Duplicate' → एका विद्यार्थ्याची हजेरी दुसऱ्या विद्यार्थ्यावर कॉपी करा (उदा. वर्गाची समान हजेरी सर्वांसाठी लावायची असल्यास).\n• 'Delete' → त्या विद्यार्थ्याची सर्व हजेरी नष्ट करा.\n\n⚠️ Delete केल्यावर हजेरी परत येत नाही, काळजी घ्या!"
+                          : "Each attendance box has a ⋮ (3-dots) menu in the top-right corner.\n\n• 'Duplicate' → Copy this student's attendance to another student (useful when multiple students have the same attendance).\n• 'Delete' → Permanently remove all attendance data for this student.\n\n⚠️ Deleted attendance cannot be recovered!"));
                 break;
+
 
             // ════════════════════════════════════════════════════════════
             // 6. Formative & Summative Evaluation  (8 steps)
@@ -356,13 +373,29 @@ public class ProductTourHelper {
                         m ? "वर्गात शिकवले जाणारे विषय येथे जोडा, संपादित करा व क्रम लावा."
                           : "Add, edit and arrange the subjects taught in the active class."));
                 s.add(new TourStep(R.id.tvHeaderLabel,
-                        m ? "१. वर्तमान विषय" : "1. Current Subjects",
-                        m ? "सध्या नोंदणीकृत विषयांची एकूण संख्या व यादी येथे दिसते."
-                          : "Shows the count and list of all subjects currently registered."));
+                        m ? "१. वर्ग आणि सत्र माहिती" : "1. Class & Session Info",
+                        m ? "तुम्ही कोणत्या वर्षासाठी आणि वर्गासाठी विषय व्यवस्थापित करत आहात ते येथे स्पष्ट दिसते."
+                          : "Shows the specific academic year and class you are currently managing subjects for."));
                 s.add(new TourStep(R.id.rvSubjectsList,
                         m ? "२. विषयांची यादी" : "2. Subjects List",
                         m ? "विषयाच्या नावावर टॅप करा → तपशील, कमाल गुण व माध्यम संपादित करा."
                           : "Tap a subject name to edit its details, max marks and medium."));
+                s.add(new TourStep(R.id.rvSubjectsList, 0, R.id.tvSubjectCode,
+                        m ? "३. विषय कोड" : "3. Subject Code",
+                        m ? "कोडचा पहिला भाग इयत्ता (उदा. 101) आणि दुसरा भाग विषय (उदा. 101) दर्शवतो. तुम्ही विषयावर क्लिक करून स्वतःचा कस्टम कोड देखील सेट करू शकता."
+                          : "The first part of the code represents the standard (e.g. 101) and the second part represents the subject (e.g. 101). You can also edit a subject to set your own custom code."));
+                s.add(new TourStep(R.id.rvSubjectsList, 0, R.id.tvDetailsLeft1,
+                        m ? "४. FE व SE गुण" : "4. FE & SE Marks",
+                        m ? "FE (आकारिक) आणि SE (संकलित) मूल्यमापनाचे एकूण कमाल गुण येथे दिसतात."
+                          : "Total max marks for Formative (FE) and Summative (SE) evaluations are shown here."));
+                s.add(new TourStep(R.id.rvSubjectsList, 0, R.id.btnCardMenu,
+                        m ? "५. अधिक पर्याय (३-बिंदू)" : "5. More Options (3-dots)",
+                        m ? "येथे क्लिक करून तुम्ही विषयाचे कमाल गुण आणि अंतर्गत भारांश सविस्तर संपादित करू शकता."
+                          : "Tap here to edit the subject's max marks and internal evaluation weightage in detail."));
+                s.add(new TourStep(R.id.fabAddSubject,
+                        m ? "६. नवीन विषय जोडा +" : "6. Add New Subject +",
+                        m ? "या '+' बटणावर टॅप करून तुम्ही वर्गासाठी कोणताही नवीन किंवा कस्टम विषय जोडू शकता."
+                          : "Tap this '+' button to add any new or custom subject to the class."));
                 break;
 
             // ════════════════════════════════════════════════════════════
@@ -377,12 +410,20 @@ public class ProductTourHelper {
                         m ? "१. सत्र माहिती" : "1. Session Info",
                         m ? "कोणत्या वर्ष व सत्रासाठी भारांश ठरवत आहात ते येथे स्पष्ट दिसते."
                           : "Confirms which academic year and semester this weightage applies to."));
-                s.add(new TourStep(R.id.rvWeightageSubjects,
-                        m ? "२. विषयनिहाय भारांश" : "2. Subject Weightage",
-                        m ? "प्रत्येक विषयाच्या पंक्तीत FA व SA उप-घटकांचे कमाल गुण भरा."
-                          : "Fill in the max marks for each FA and SA sub-component per subject."));
+                s.add(new TourStep(R.id.rvWeightageSubjects, 0, R.id.etMaxMarks,
+                        m ? "२. एकूण कमाल गुण" : "2. Total Max Marks",
+                        m ? "येथे विषयाचे एकूण कमाल गुण भरा. हे बदलल्यास अंतर्गत गुण आपोआप विभागले जातील."
+                          : "Enter the total max marks for the subject here. Internal marks will auto-scale accordingly."));
+                s.add(new TourStep(R.id.rvWeightageSubjects, 0, R.id.layoutHeader,
+                        m ? "३. सविस्तर माहिती उघडा" : "3. Open Details",
+                        m ? "विषयाच्या कार्डावर टॅप केल्यास अंतर्गत गुणांची (उदा. लेखी, तोंडी, प्रकल्प) सविस्तर विभागणी उघडेल."
+                          : "Tap on the subject card to expand and see the detailed breakdown (Written, Oral, Project, etc.)."));
+                s.add(new TourStep(R.id.rvWeightageSubjects, 0, R.id.tvWeightageBreakdown,
+                        m ? "४. गुण विभागणी बेरीज" : "4. Marks Distribution",
+                        m ? "येथे तुम्हाला आकारिक (FA) आणि संकलित (SA) गुणांची एकूण बेरीज नेहमी दिसेल."
+                          : "Here you can always see the total sum of Formative (FA) and Summative (SA) marks."));
                 s.add(new TourStep(R.id.btnSaveWeightage,
-                        m ? "३. भारांश जतन करा 💾" : "3. Save Weightage 💾",
+                        m ? "५. भारांश जतन करा 💾" : "5. Save Weightage 💾",
                         m ? "सर्व भारांश भरल्यावर 'जतन करा' दाबा. एकदाच सेव्ह केल्यास पुरेसे."
                           : "Press Save after filling all fields. Saving once applies to all students."));
                 break;

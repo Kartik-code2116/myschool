@@ -14,6 +14,9 @@ public final class SessionContext {
     public static Semester selectedSemester;
     public static School selectedSchool;
     public static ClassModel selectedClass;
+    public static com.kartik.myschool.model.Student currentStudentForMarks;
+    public static com.kartik.myschool.model.Student currentStudentForAttendance;
+    public static com.kartik.myschool.model.AttendanceRecord currentRecordForAttendance;
 
     private SessionContext() {}
 
@@ -83,6 +86,8 @@ public final class SessionContext {
             editor.putString("school_name", selectedSchool.name);
             editor.putString("school_udise", selectedSchool.udiseCode);
             editor.putString("school_board", selectedSchool.board);
+            editor.putString("school_address", selectedSchool.address);
+            editor.putString("school_principal", selectedSchool.principalName);
         } else {
             editor.remove("school_id");
         }
@@ -194,6 +199,8 @@ public final class SessionContext {
             selectedSchool.name = prefs.getString("school_name", "");
             selectedSchool.udiseCode = prefs.getString("school_udise", "");
             selectedSchool.board = prefs.getString("school_board", "");
+            selectedSchool.address = prefs.getString("school_address", "");
+            selectedSchool.principalName = prefs.getString("school_principal", "");
         }
 
         // Class

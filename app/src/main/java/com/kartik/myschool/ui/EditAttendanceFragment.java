@@ -1,6 +1,5 @@
-package com.kartik.myschool;
+package com.kartik.myschool.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,47 +9,27 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
-import com.kartik.myschool.databinding.DialogEditAttendanceBinding;
+import com.kartik.myschool.R;
+import com.kartik.myschool.SessionContext;
+import com.kartik.myschool.databinding.FragmentEditAttendanceBinding;
 import com.kartik.myschool.model.AttendanceRecord;
 import com.kartik.myschool.model.Student;
 import com.kartik.myschool.repository.FirebaseRepository;
 
 import java.util.HashMap;
 
-public class EditAttendanceDialog extends DialogFragment {
+public class EditAttendanceFragment extends Fragment {
 
-    public interface OnAttendanceSavedListener {
-        void onAttendanceSaved();
-    }
-
-    private DialogEditAttendanceBinding b;
+    private FragmentEditAttendanceBinding b;
     private Student student;
     private AttendanceRecord record;
-    private OnAttendanceSavedListener listener;
-
-    public static EditAttendanceDialog newInstance(Student student, AttendanceRecord record) {
-        EditAttendanceDialog dialog = new EditAttendanceDialog();
-        dialog.student = student;
-        dialog.record = record;
-        return dialog;
-    }
-
-    public void setOnAttendanceSavedListener(OnAttendanceSavedListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(STYLE_NORMAL, R.style.SingleSubjectMarksDialogTheme);
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        b = DialogEditAttendanceBinding.inflate(inflater, container, false);
+        b = FragmentEditAttendanceBinding.inflate(inflater, container, false);
         return b.getRoot();
     }
 
@@ -58,36 +37,30 @@ public class EditAttendanceDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        student = SessionContext.currentStudentForAttendance;
+        record = SessionContext.currentRecordForAttendance;
+
         if (student == null || record == null) {
-            dismiss();
+            goBack();
             return;
         }
 
-        bindHeader();
+        String rollNo = (student.rollNo != null && !student.rollNo.isEmpty()) ? student.rollNo : "N/A";
+        b.tvStudentInfo.setText(rollNo + " - " + student.name);
+
         prepopulateInputs();
 
-        b.btnCancel.setOnClickListener(v -> dismiss());
-        b.btnBack.setOnClickListener(v -> dismiss());
-        b.dialogRoot.setOnClickListener(v -> dismiss());
+        b.btnCancel.setOnClickListener(v -> goBack());
         b.btnSave.setOnClickListener(v -> saveAttendance());
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (getDialog() != null && getDialog().getWindow() != null) {
-            getDialog().getWindow().setSoftInputMode(
-                    android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-            );
+    private void goBack() {
+        if (getActivity() != null) {
+            getActivity().onBackPressed();
         }
     }
 
-    private void bindHeader() {
-        String name = student.name != null ? student.name : "Student";
-        String roll = student.rollNo != null ? student.rollNo : "-";
-        b.tvDialogTitle.setText("मासिक उपस्थिती बदल");
-        b.tvStudentName.setText(name + " (Roll: " + roll + ")");
-    }
+
 
     private void prepopulateInputs() {
         prepopPairWithClass(b.etJunPresent, b.etJunTotal, "जून", record.monthlyData.get("जून"));
@@ -164,10 +137,7 @@ public class EditAttendanceDialog extends DialogFragment {
             public void onSuccess(String id) {
                 showLoading(false);
                 Toast.makeText(getContext(), student.name + " ची उपस्थिती जतन झाली!", Toast.LENGTH_SHORT).show();
-                if (listener != null) {
-                    listener.onAttendanceSaved();
-                }
-                dismiss();
+                goBack();
             }
 
             @Override
@@ -227,6 +197,5 @@ public class EditAttendanceDialog extends DialogFragment {
         b.progress.setVisibility(show ? View.VISIBLE : View.GONE);
         b.btnSave.setEnabled(!show);
         b.btnCancel.setEnabled(!show);
-        b.btnBack.setEnabled(!show);
     }
 }

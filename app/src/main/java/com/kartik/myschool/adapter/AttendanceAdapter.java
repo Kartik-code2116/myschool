@@ -109,6 +109,13 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.VH
             });
             popup.show();
         });
+
+        // Click on the entire card to edit directly
+        b.getRoot().setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEdit(s, finalRecord);
+            }
+        });
     }
 
     private void bindMonthCell(TextView tv, String val) {

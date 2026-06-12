@@ -33,7 +33,7 @@
     <string name="label_udise_code">UDISE कोड</string>
     <string name="label_board">बोर्ड (CBSE/राज्य/ICSE)</string>
     <string name="label_address">शाळेचा पत्ता</string>
-    <string name="label_principal_name">मुख्य नाव</string>
+    <string name="label_principal_name">मुख्यद्यापक नाव</string>
     <string name="label_tap_to_add_logo">लोगो जोडण्यासाठी टॅप करा</string>
     <string name="label_tap_to_add_photo">फोटो जोडण्यासाठी टॅप करा</string>
 
@@ -68,7 +68,7 @@
     <string name="title_enter_marks">गुण प्रविष्ट करा</string>
     <string name="title_marksheet">रिपोर्ट कार्ड</string>
     
-    <string name="btn_save_school">शाळा वाचवा</string>
+    <string name="btn_save_school">शाळेची माहिती जतन करा</string>
     <string name="btn_save_class">वर्ग आणि विषय जतन करा</string>
     <string name="btn_add_subject">विषय जोडा</string>
     <string name="btn_save_student">विद्यार्थी वाचवा</string>
@@ -129,7 +129,7 @@
     <string name="menu_info_print">माहिती आणि मुद्रण सेटिंग</string>
     <string name="menu_formative_summative">आकारिक/संकलित नोंदी</string>
     <string name="menu_descriptive_entries">वर्णनात्मक नोंदी</string>
-    <string name="menu_attendance">मासिक उपस्थिती</string>
+    <string name="menu_attendance">उपस्थिती</string>
     <string name="menu_list_students">वर्ग आणि विभाग</string>
     <string name="menu_student_list">विद्यार्थी यादी</string>
     <string name="menu_subjects">विषय निश्चिती</string>

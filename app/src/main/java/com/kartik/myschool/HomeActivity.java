@@ -98,6 +98,8 @@ public class HomeActivity extends AppCompatActivity {
                     pageKey = "subjects";
                 } else if (destId == R.id.nav_weightage) {
                     pageKey = "weightage";
+                } else if (destId == R.id.nav_attendance) {
+                    pageKey = "attendance";
                 } else if (destId == R.id.nav_settings) {
                     pageKey = "settings";
                 } else if (destId == R.id.nav_extra) {
@@ -135,7 +137,10 @@ public class HomeActivity extends AppCompatActivity {
             int id = destination.getId();
             String title = destination.getLabel() != null ? destination.getLabel().toString() : "";
             String subtitle = getString(R.string.subtitle_info_print);
-            if (id == R.id.nav_students) {
+            if (id == R.id.nav_edit_attendance) {
+                title = "Upasthiti";
+                subtitle = "";
+            } else if (id == R.id.nav_students) {
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_class_div) {
                 subtitle = getString(R.string.subtitle_class_div);
@@ -209,18 +214,31 @@ public class HomeActivity extends AppCompatActivity {
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);
 
-            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_school_info || id == R.id.nav_weightage || id == R.id.nav_extra) {
+            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_school_info || id == R.id.nav_weightage || id == R.id.nav_extra || id == R.id.nav_attendance) {
                 b.btnToolbarMore.setVisibility(View.VISIBLE);
-                b.ivProfilePic.setVisibility(View.VISIBLE);
             } else {
                 b.btnToolbarMore.setVisibility(View.GONE);
-                b.ivProfilePic.setVisibility(View.VISIBLE);
+            }
+
+            if (id == R.id.nav_attendance) {
+                title = "उपस्थिती";
+                b.btnToolbarAdd.setVisibility(View.VISIBLE);
+                b.btnToolbarCalc.setVisibility(View.VISIBLE);
+            } else {
+                b.btnToolbarAdd.setVisibility(View.GONE);
+                b.btnToolbarCalc.setVisibility(View.GONE);
             }
         });
 
         loadTeacherInfo();
         SessionContext.syncFromAppCache();
         handleNavigationIntent(getIntent());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupDrawerHeader();
     }
 
     @Override

@@ -11,16 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kartik.myschool.HomeActivity;
 import com.kartik.myschool.R;
 import com.kartik.myschool.SessionContext;
 import com.kartik.myschool.adapter.AttendanceAdapter;
-import com.kartik.myschool.EditAttendanceDialog;
 import com.kartik.myschool.databinding.FragmentAttendanceBinding;
 import com.kartik.myschool.model.AttendanceRecord;
 import com.kartik.myschool.model.Student;
+import com.kartik.myschool.AttendanceEntryDialog;
 import com.kartik.myschool.repository.FirebaseRepository;
 
 import java.util.ArrayList;
@@ -47,8 +48,28 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
 
         setupRecyclerView();
         displayHeaderInfo();
-        setupToolbarActions();
+        setupActionIcons();
         loadData();
+    }
+
+    private void setupActionIcons() {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity ha = (HomeActivity) getActivity();
+            View btnAdd = ha.findViewById(R.id.btnToolbarAdd);
+            if (btnAdd != null) {
+                btnAdd.setOnClickListener(v -> ha.navigateTo(R.id.nav_students));
+            }
+            View btnCalc = ha.findViewById(R.id.btnToolbarCalc);
+            if (btnCalc != null) {
+                btnCalc.setOnClickListener(v -> showClassReportDialog());
+            }
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        b = null;
     }
 
     private void setupRecyclerView() {
@@ -69,32 +90,6 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         b.tvAttendanceContext.setText("सन : " + yearLabel + "  इयत्ता: " + classVal + ", तुकडी: " + divVal);
     }
 
-    private void setupToolbarActions() {
-        // Menu Hamburger click opens drawer
-        b.ivMenu.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).openDrawer();
-            }
-        });
-
-        // Chat/Help Icon click
-        b.ivActionHelp.setOnClickListener(v -> showHelpDialog());
-
-        // Add Icon click navigates to students list
-        b.ivActionAdd.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
-            }
-        });
-
-        // Calculator/Report Icon click
-        b.ivActionReport.setOnClickListener(v -> showClassReportDialog());
-
-        // More Vertical click
-        b.ivActionMore.setOnClickListener(v -> {
-            Toast.makeText(getContext(), R.string.msg_empty_4, Toast.LENGTH_SHORT).show();
-        });
-    }
 
     private void loadData() {
         if (SessionContext.selectedClass == null) {
@@ -181,9 +176,9 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     }
 
     private void showEditDialog(Student student, AttendanceRecord record) {
-        EditAttendanceDialog dialog = EditAttendanceDialog.newInstance(student, record);
-        dialog.setOnAttendanceSavedListener(this::loadData);
-        dialog.show(getChildFragmentManager(), "EditAttendanceDialog");
+        AttendanceEntryDialog dialog = AttendanceEntryDialog.newInstance(student, record);
+        dialog.setOnAttendanceSavedListener((s, r) -> loadData());
+        dialog.show(getChildFragmentManager(), "AttendanceEntryDialog");
     }
 
     private void showDuplicateDialog(Student srcStudent, AttendanceRecord srcRecord) {
@@ -255,68 +250,5 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
                 .show();
     }
 
-    // ---------- Enforcing screen fullscreen custom Top Bar visibility ----------
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity ha = (HomeActivity) getActivity();
-            View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) {
-                appBar.setVisibility(View.GONE);
-            }
-            View bottomNav = ha.findViewById(R.id.bottomNav);
-            if (bottomNav != null) {
-                bottomNav.setVisibility(View.GONE);
-            }
-            
-            // Fix CoordinatorLayout scrolling behavior offset bug:
-            View navHost = ha.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = 
-                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
-                params.setBehavior(null);
-                params.bottomMargin = 0;
-                navHost.setLayoutParams(params);
-            }
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Restore bottomNav in case onPause() was skipped (e.g., back stack pop)
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity ha = (HomeActivity) getActivity();
-            View bottomNav = ha.findViewById(R.id.bottomNav);
-            if (bottomNav != null) bottomNav.setVisibility(View.VISIBLE);
-            View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) appBar.setVisibility(View.VISIBLE);
-        }
-        b = null;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity ha = (HomeActivity) getActivity();
-            View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) appBar.setVisibility(View.VISIBLE);
-            View bottomNav = ha.findViewById(R.id.bottomNav);
-            if (bottomNav != null) bottomNav.setVisibility(View.VISIBLE);
-
-            // Restore CoordinatorLayout scrolling behavior and margins:
-            View navHost = ha.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost.getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params =
-                        (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost.getLayoutParams();
-                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
-        }
-    }
 }

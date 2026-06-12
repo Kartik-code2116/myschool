@@ -825,12 +825,15 @@ public class FormativeSummativeFragment extends Fragment {
                 // Max values calculations
                 formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik + sub.maxUpkram
                         + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
-                if (formativeMax == 0) {
-                    formativeMax = sub.maxMarks / 2;
-                }
                 summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
-                if (summativeMax == 0) {
-                    summativeMax = sub.maxMarks - (sub.maxMarks / 2);
+
+                if (formativeMax == 0 && summativeMax == 0) {
+                    formativeMax = sub.maxMarks / 2;
+                    summativeMax = sub.maxMarks - formativeMax;
+                    if (com.kartik.myschool.model.Subject.isNonAcademic(sub.name)) {
+                        formativeMax = sub.maxMarks;
+                        summativeMax = 0;
+                    }
                 }
                 totalMax = sub.maxMarks;
 

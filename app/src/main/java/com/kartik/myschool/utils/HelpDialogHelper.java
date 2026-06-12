@@ -111,12 +111,16 @@ public class HelpDialogHelper {
                 title = isMarathi ? "मासिक उपस्थिती :" : "Monthly Attendance :";
                 message = isMarathi
                         ? "❤️ विद्यार्थ्यांची प्रत्येक महिन्याची हजेरी नोंदवा.\n\n"
-                        + "📌 महिना निवडा, एकूण कामकाजाचे दिवस आणि विद्यार्थ्याचे हजर दिवस प्रविष्ट करा.\n\n"
-                        + "📌 ३-बिंदू वर क्लिक करून डुप्लिकेट किंवा डिलीट पर्याय निवडू शकता.\n\n"
+                        + "📌 प्रत्येक विद्यार्थ्याच्या बॉक्समध्ये डावीकडे एकूण 'हजर दिवस' (मोठा हिरवा आकडा) दिसतो.\n\n"
+                        + "📌 बॉक्समधील तक्त्यात प्रत्येक महिन्याचे 'हजर/एकूण' (उदा. 24/26) दिवस दिसतात.\n\n"
+                        + "📌 महिना निवडून हजेरी भरण्यासाठी विद्यार्थ्याच्या बॉक्सवर किंवा '+' चिन्हावर क्लिक करा.\n\n"
+                        + "📌 ३-बिंदू (⋮) वर क्लिक करून डुप्लिकेट किंवा डिलीट पर्याय निवडू शकता.\n\n"
                         + "📌 वर्गाचा एकूण हजेरी अहवाल आणि सर्वाधिक उपस्थिती असलेला विद्यार्थी पाहण्यासाठी रिपोर्ट आयकॉन दाबा."
                         : "❤️ Record student attendance for each month of the academic year.\n\n"
-                        + "📌 Select a month, set total working days, and enter present days for each student.\n\n"
-                        + "📌 Click the 3-dots option to duplicate or delete attendance records.\n\n"
+                        + "📌 Each student box displays the total 'Present Days' (Large Green Number) on the left.\n\n"
+                        + "📌 The grid inside the box shows 'Present/Total' days (e.g., 24/26) for each month.\n\n"
+                        + "📌 Tap on a student's box or the '+' icon to enter attendance for a month.\n\n"
+                        + "📌 Click the 3-dots (⋮) option to duplicate or delete attendance records.\n\n"
                         + "📌 Tap the Report icon to view average class attendance and find best attender.";
                 break;
 
@@ -125,10 +129,12 @@ public class HelpDialogHelper {
                 message = isMarathi
                         ? "❤️ तुमच्या वर्गात शिकवले जाणारे विषय व्यवस्थापित करा.\n\n"
                         + "📌 नवीन विषय जोडा किंवा जुने विषय दुरुस्त/हटवा.\n\n"
-                        + "📌 प्रगतीपत्रकात गुण योग्य रीतीने दिसण्यासाठी कमाल गुण तपासा."
+                        + "📌 प्रगतीपत्रकात गुण योग्य रीतीने दिसण्यासाठी कमाल गुण तपासा.\n\n"
+                        + "📌 कोडचा पहिला भाग इयत्ता (उदा. 101) आणि दुसरा भाग विषय (उदा. 101) दर्शवतो. तुम्ही विषयावर क्लिक करून स्वतःचा कस्टम कोड देखील सेट करू शकता."
                         : "❤️ Manage the subjects assigned to the active class.\n\n"
                         + "📌 Add new subjects, edit subject properties, or remove unused ones.\n\n"
-                        + "📌 Ensure max marks are correctly configured for proper grading.";
+                        + "📌 Ensure max marks are correctly configured for proper grading.\n\n"
+                        + "📌 The first part of the code represents the standard (e.g. 101) and the second part represents the subject (e.g. 101). You can also edit a subject to set your own custom code.";
                 break;
 
             case "weightage":

@@ -64,15 +64,15 @@
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_roll_no">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRoll1" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRoll1" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_roll_no_2">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRoll2" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRoll2" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_reg_no">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRegNo" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRegNo" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_dob">
@@ -139,7 +139,7 @@
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_mother_phone">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:maxLength="10" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_father_name">
@@ -151,7 +151,7 @@
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_father_phone">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etFatherPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etFatherPhone" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:maxLength="10" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_home_address">
@@ -187,23 +187,23 @@
 
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_bank_name">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankName" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankName" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapWords" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_account_no">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankAccount" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankAccount" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLength="20" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_branch">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankBranch" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankBranch" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapWords" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_ifsc">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankIfsc" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankIfsc" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapCharacters" android:maxLength="11" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_uid">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankUid" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBankUid" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLength="12" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -247,11 +247,11 @@
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_student_id">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etStudentId" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etStudentId" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLength="19" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_uid">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etUid" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etUid" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLength="12" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

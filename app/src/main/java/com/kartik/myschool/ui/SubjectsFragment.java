@@ -75,7 +75,9 @@ public class SubjectsFragment extends Fragment {
 
             if (isActive) {
                 if (match == null) {
-                    selectedClass.subjects.add(new Subject(item.name, item.maxMarks));
+                    Subject newSub = new Subject(item.name, item.maxMarks);
+                    newSub.subjectCode = item.code;
+                    selectedClass.subjects.add(newSub);
                 }
             } else {
                 if (match != null) {
@@ -139,16 +141,20 @@ public class SubjectsFragment extends Fragment {
                     int se = active.maxTondi + active.maxPratyakshikB + active.maxLekhi;
                     item.detailsLeft1 = "FE: " + fe;
                     item.detailsLeft2 = se > 0 ? "SE: " + se : "";
+                    if (active.subjectCode != null && !active.subjectCode.isEmpty()) {
+                        item.code = active.subjectCode;
+                    }
                     found = true; break;
                 }
             }
             if (!found) {
                 int nextOrder = predefined.size() + 1;
-                String orderStr = String.format("%02d", nextOrder);
+                String orderStr = String.format(java.util.Locale.US, "%02d", nextOrder);
                 int fe = active.maxNirikhshan + active.maxTondiKam + active.maxPratyakshik + active.maxUpkram + active.maxPrakalp + active.maxChachani + active.maxSwadhyay + active.maxItar;
                 int se = active.maxTondi + active.maxPratyakshikB + active.maxLekhi;
                 String seStr = se > 0 ? "SE: " + se : "";
-                predefined.add(new SubjectAdapter.SubjectItem(active.name, "", orderStr, "Custom", active.maxMarks, "FE: " + fe, seStr, "", "#9C27B0"));
+                String code = (active.subjectCode != null && !active.subjectCode.isEmpty()) ? active.subjectCode : "";
+                predefined.add(new SubjectAdapter.SubjectItem(active.name, code, orderStr, "Custom", active.maxMarks, "FE: " + fe, seStr, "", "#9C27B0"));
             }
         }
         
@@ -173,7 +179,7 @@ public class SubjectsFragment extends Fragment {
                         }
                         if (!exists) {
                             int nextOrder = currentList.size() + 1;
-                            String orderStr = String.format("%02d", nextOrder);
+                            String orderStr = String.format(java.util.Locale.US, "%02d", nextOrder);
                             Subject dummy = new Subject(gSub.name, gSub.maxMarks);
                             int fe = dummy.maxNirikhshan + dummy.maxTondiKam + dummy.maxPratyakshik + dummy.maxUpkram + dummy.maxPrakalp + dummy.maxChachani + dummy.maxSwadhyay + dummy.maxItar;
                             int se = dummy.maxTondi + dummy.maxPratyakshikB + dummy.maxLekhi;
@@ -305,25 +311,41 @@ public class SubjectsFragment extends Fragment {
     }
 
     private List<SubjectAdapter.SubjectItem> getPredefinedSubjects() {
+        int std = 1;
+        if (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) {
+            try {
+                String clean = SessionContext.selectedClass.className.replaceAll("[^0-9]", "");
+                if (!clean.isEmpty()) {
+                    std = Integer.parseInt(clean);
+                    if (std < 1 || std > 10) std = 1;
+                }
+            } catch (Exception ignored) {}
+        }
+        
+        String p1 = String.format(java.util.Locale.US, "1%02d1", std); // Academic e.g. "1011", "1021"
+        String p2 = String.format(java.util.Locale.US, "1%02d2", std); // Activity e.g. "1012"
+        String p3 = String.format(java.util.Locale.US, "1%02d3", std); // Personality e.g. "1013"
+        String p4 = String.format(java.util.Locale.US, "1%02d4", std); // State Board e.g. "1014"
+
         List<SubjectAdapter.SubjectItem> list = new ArrayList<>();
         // ── Academic subjects ──────────────────────────────────────────────────
-        list.add(createItem("Marathi",            "101101", "01", "Academic",    100, "#2196F3"));
-        list.add(createItem("Hindi",              "101102", "02", "Academic",    100, "#2196F3"));
-        list.add(createItem("English",            "101103", "03", "Academic",    100, "#2196F3"));
-        list.add(createItem("Mathematics",        "101104", "04", "Academic",    100, "#2196F3"));
-        list.add(createItem("Science",            "101105", "05", "Academic",    100, "#2196F3"));
-        list.add(createItem("Science / EVS",      "101106", "06", "Academic",    100, "#2196F3"));
-        list.add(createItem("Soc. Science",       "101107", "07", "Academic",    100, "#2196F3"));
+        list.add(createItem("Marathi",            p1 + "01", "01", "Academic",    100, "#2196F3"));
+        list.add(createItem("Hindi",              p1 + "02", "02", "Academic",    100, "#2196F3"));
+        list.add(createItem("English",            p1 + "03", "03", "Academic",    100, "#2196F3"));
+        list.add(createItem("Mathematics",        p1 + "04", "04", "Academic",    100, "#2196F3"));
+        list.add(createItem("Science",            p1 + "05", "05", "Academic",    100, "#2196F3"));
+        list.add(createItem("Science / EVS",      p1 + "06", "06", "Academic",    100, "#2196F3"));
+        list.add(createItem("Soc. Science",       p1 + "07", "07", "Academic",    100, "#2196F3"));
         // ── Activity subjects ──────────────────────────────────────────────────
-        list.add(createItem("Drawing",            "101201", "08", "Activities",  100, "#4CAF50"));
-        list.add(createItem("Work Experience",    "101202", "09", "Activities",  100, "#4CAF50"));
-        list.add(createItem("Physical Education", "101203", "10", "Activities",  100, "#4CAF50"));
+        list.add(createItem("Drawing",            p2 + "01", "08", "Activities",  100, "#4CAF50"));
+        list.add(createItem("Work Experience",    p2 + "02", "09", "Activities",  100, "#4CAF50"));
+        list.add(createItem("Physical Education", p2 + "03", "10", "Activities",  100, "#4CAF50"));
         // ── Personality development ────────────────────────────────────────────
-        list.add(createItem("Special Development","101301", "11", "Personality", 100, "#009688"));
-        list.add(createItem("Personality Development","101302", "12", "Personality", 100, "#009688"));
+        list.add(createItem("Special Development",p3 + "01", "11", "Personality", 100, "#009688"));
+        list.add(createItem("Personality Development",p3 + "02", "12", "Personality", 100, "#009688"));
         // ── State Board Additions ──────────────────────────────────────────────
-        list.add(createItem("Information & Comm. Technology (ICT)", "101401", "13", "State Board", 100, "#FF9800"));
-        list.add(createItem("Water Security & Environment Studies", "101402", "14", "State Board", 100, "#FF9800"));
+        list.add(createItem("Information & Comm. Technology (ICT)", p4 + "01", "13", "State Board", 100, "#FF9800"));
+        list.add(createItem("Water Security & Environment Studies", p4 + "02", "14", "State Board", 100, "#FF9800"));
         return list;
     }
 }
