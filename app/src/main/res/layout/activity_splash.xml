@@ -8,10 +8,10 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/logoCard"
-        android:layout_width="106dp"
-        android:layout_height="106dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="55dp"
+        app:cardCornerRadius="48dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toTopOf="@id/tvAppName"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,10 +19,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="84dp"
-            android:layout_height="92dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:layout_gravity="center"
-            android:src="@drawable/app_logo" />
+            android:src="@drawable/app_logo"
+            android:scaleType="fitCenter" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView

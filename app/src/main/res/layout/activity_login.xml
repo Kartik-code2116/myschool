@@ -16,27 +16,28 @@
         <!-- Top Header Area -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="220dp"
             android:background="@drawable/bg_gradient_primary"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="24dp"
-            android:paddingBottom="40dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="36dp">
 
             <!-- Circular Logo Badge Container -->
             <FrameLayout
                 android:id="@+id/logoContainer"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:background="@drawable/shape_circle_white"
-                android:elevation="6dp"
-                android:padding="16dp">
+                android:elevation="4dp"
+                android:padding="12dp">
 
                 <ImageView
                     android:id="@+id/ivSchoolLogo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/app_logo"
+                    android:scaleType="fitCenter"
                     android:contentDescription="@string/app_name"/>
             </FrameLayout>
 

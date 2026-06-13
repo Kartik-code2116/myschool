@@ -16,10 +16,10 @@
 
         <!-- Large School Logo Frame on Left -->
         <FrameLayout
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:background="@drawable/shape_circle_white"
-            android:padding="12dp">
+            android:padding="8dp">
 
             <ImageView
                 android:layout_width="match_parent"
