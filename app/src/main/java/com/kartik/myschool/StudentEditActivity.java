@@ -83,7 +83,78 @@ public class StudentEditActivity extends AppCompatActivity {
         );
         b.etCast.setAdapter(castAdapter);
 
+        // Setup dropdown for Medium
+        String[] mediumOptions = {
+                getString(R.string.lang_marathi),
+                getString(R.string.lang_english),
+                getString(R.string.lang_semi_english),
+                getString(R.string.lang_hindi),
+                getString(R.string.lang_urdu),
+                getString(R.string.lang_gujarati),
+                getString(R.string.lang_kannada)
+        };
+        ArrayAdapter<String> mediumAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                mediumOptions
+        );
+        b.etMedium.setAdapter(mediumAdapter);
+
+        // Setup dropdown for Mother Tongue
+        String[] motherTongueOptions = {
+                getString(R.string.lang_marathi),
+                getString(R.string.lang_hindi),
+                getString(R.string.lang_english),
+                getString(R.string.lang_urdu),
+                getString(R.string.lang_gujarati),
+                getString(R.string.lang_kannada),
+                getString(R.string.lang_telugu),
+                getString(R.string.lang_tamil),
+                getString(R.string.lang_sindhi),
+                getString(R.string.lang_punjabi),
+                getString(R.string.lang_bengali)
+        };
+        ArrayAdapter<String> motherTongueAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                motherTongueOptions
+        );
+        b.etMotherTongue.setAdapter(motherTongueAdapter);
+
+        b.tilDob.setEndIconOnClickListener(v -> showDatePicker(b.etDob));
+        b.tilDateAdmission.setEndIconOnClickListener(v -> showDatePicker(b.etDateAdmission));
+
         b.btnSaveStudent.setOnClickListener(v -> save());
+    }
+
+    private void showDatePicker(android.widget.EditText et) {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        String currentText = et.getText().toString().trim();
+        if (!android.text.TextUtils.isEmpty(currentText)) {
+            try {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault());
+                java.util.Date parsedDate = sdf.parse(currentText);
+                if (parsedDate != null) {
+                    cal.setTime(parsedDate);
+                }
+            } catch (Exception ignored) {
+                try {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+                    java.util.Date parsedDate = sdf.parse(currentText);
+                    if (parsedDate != null) {
+                        cal.setTime(parsedDate);
+                    }
+                } catch (Exception ignored2) {}
+            }
+        }
+        int year = cal.get(java.util.Calendar.YEAR);
+        int month = cal.get(java.util.Calendar.MONTH);
+        int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
+        android.app.DatePickerDialog picker = new android.app.DatePickerDialog(this, (view, y, m, d) -> {
+            String dateStr = String.format(java.util.Locale.US, "%02d-%02d-%04d", d, m + 1, y);
+            et.setText(dateStr);
+        }, year, month, day);
+        picker.show();
     }
 
     @Override
@@ -146,6 +217,9 @@ public class StudentEditActivity extends AppCompatActivity {
         } else {
             b.etCast.setText("", false);
         }
+        set(b.etBirthPlace, s.birthPlace);
+        set(b.etReligion, s.religion);
+        set(b.etBloodGroup, s.bloodGroup);
         set(b.etStandard, s.standard);
         set(b.etDivision, s.division);
         set(b.etHeightSem1, s.heightSem1);
@@ -164,8 +238,16 @@ public class StudentEditActivity extends AppCompatActivity {
         set(b.etBankBranch, s.bankBranch);
         set(b.etBankIfsc, s.bankIfsc);
         set(b.etBankUid, s.bankUid);
-        set(b.etMedium, s.medium);
-        set(b.etMotherTongue, s.motherTongue);
+        if (s.medium != null) {
+            b.etMedium.setText(s.medium, false);
+        } else {
+            b.etMedium.setText("", false);
+        }
+        if (s.motherTongue != null) {
+            b.etMotherTongue.setText(s.motherTongue, false);
+        } else {
+            b.etMotherTongue.setText("", false);
+        }
         set(b.etDateAdmission, s.dateOfAdmission);
         set(b.etStudentId, s.studentIdNumber);
         set(b.etUid, s.uid);
@@ -197,6 +279,9 @@ public class StudentEditActivity extends AppCompatActivity {
             s.gender = selectedGender;
         }
         s.cast = str(b.etCast);
+        s.birthPlace = str(b.etBirthPlace);
+        s.religion = str(b.etReligion);
+        s.bloodGroup = str(b.etBloodGroup);
         s.standard = str(b.etStandard);
         s.division = str(b.etDivision);
         s.heightSem1 = str(b.etHeightSem1);

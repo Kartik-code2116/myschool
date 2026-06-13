@@ -115,7 +115,7 @@ public class StudentListFragment extends Fragment {
         android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
         popup.getMenu().add(0, 1, 0, "👥 Promote / Transfer Students");
         popup.getMenu().add(0, 2, 1, "📤 Export Students (CSV)");
-        popup.getMenu().add(0, 3, 2, "📥 Import Students (CSV)");
+        popup.getMenu().add(0, 3, 2, "📥 Import Students (Excel / CSV)");
         popup.getMenu().add(0, 4, 3, "🏫 Switch Class / Division");
         popup.getMenu().add(0, 5, 4, "🌐 App-Wide Main Menu");
         
@@ -633,38 +633,27 @@ public class StudentListFragment extends Fragment {
 
     private void importStudentsFromCsv(android.net.Uri uri) {
         try {
-            java.io.InputStream is = requireContext().getContentResolver().openInputStream(uri);
-            if (is == null)
-                return;
-            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is));
-            List<String[]> lines = new ArrayList<>();
-            String line;
-            String headerLine = reader.readLine();
-            if (headerLine == null) {
-                android.widget.Toast.makeText(requireContext(), "Empty CSV file.", android.widget.Toast.LENGTH_SHORT)
-                        .show();
+            List<List<String>> rows;
+            if (isXlsxFile(uri)) {
+                rows = parseXlsx(uri);
+            } else {
+                rows = parseCsv(uri);
+            }
+
+            if (rows == null || rows.isEmpty()) {
+                android.widget.Toast.makeText(requireContext(), "No student records found in file.", android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            List<String> headers = parseCsvLine(headerLine);
+            List<String> headers = rows.get(0);
             java.util.Map<String, Integer> headerMap = new java.util.HashMap<>();
             for (int i = 0; i < headers.size(); i++) {
                 headerMap.put(headers.get(i).toLowerCase().trim(), i);
             }
 
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty())
-                    continue;
-                List<String> cells = parseCsvLine(line);
-                lines.add(cells.toArray(new String[0]));
-            }
-            reader.close();
-            is.close();
-
-            int count = lines.size();
-            if (count == 0) {
-                android.widget.Toast.makeText(requireContext(), "No student records found in CSV.",
-                        android.widget.Toast.LENGTH_SHORT).show();
+            int count = rows.size() - 1;
+            if (count <= 0) {
+                android.widget.Toast.makeText(requireContext(), "No student records found in file.", android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -681,7 +670,9 @@ public class StudentListFragment extends Fragment {
             java.util.concurrent.atomic.AtomicInteger savedCount = new java.util.concurrent.atomic.AtomicInteger(0);
             java.util.concurrent.atomic.AtomicInteger failedCount = new java.util.concurrent.atomic.AtomicInteger(0);
 
-            for (String[] cells : lines) {
+            for (int r = 1; r < rows.size(); r++) {
+                List<String> cellsList = rows.get(r);
+                String[] cells = cellsList.toArray(new String[0]);
                 Student s = new Student();
 
                 s.id = getCell(cells, new String[] { "id", "ID" }, headerMap, "");
@@ -729,7 +720,7 @@ public class StudentListFragment extends Fragment {
                         "वडिलांचा फोन", "fphone", "phone" }, headerMap, "");
                 s.address = getCell(cells, new String[] { "address", "home address", "पत्ता" }, headerMap, "");
                 s.bankAccount = getCell(
-                        cells, new String[] { "bankaccount", "account no", "account number", "bank account",
+                        cells, new String[] { "bankaccount", "account", "account no", "account number", "bank account",
                                 "bank account no", "खाते क्र", "खाते क्रमांक", "खाते क्र.", "account_no" },
                         headerMap, "");
                 s.bankBranch = getCell(cells,
@@ -740,13 +731,20 @@ public class StudentListFragment extends Fragment {
                         "");
                 s.medium = getCell(cells, new String[] { "medium", "मध्यम" }, headerMap, "");
                 s.motherTongue = getCell(cells,
-                        new String[] { "mothertongue", "mother tongue", "मातृभाषा", "mother_tongue" }, headerMap, "");
+                        new String[] { "mothertongue", "tongue", "mother tongue", "मातृभाषा", "mother_tongue" }, headerMap, "");
                 s.dateOfAdmission = getCell(cells, new String[] { "dateofadmission", "admissiondate",
                         "date of admission", "date_of_admission", "प्रवेशाची तारीख", "प्रवेश तारीख" }, headerMap, "");
                 s.studentIdNumber = getCell(cells, new String[] { "studentidnumber", "studentid", "student id",
-                        "student id number", "student_id", "विद्यार्थी आयडी", "विद्यार्थी आयडी क्र" }, headerMap, "");
+                        "student id number", "student_id", "saralid", "saral id", "saral_id", "विद्यार्थी आयडी", "विद्यार्थी आयडी क्र" }, headerMap, "");
                 s.uid = getCell(cells, new String[] { "uid", "aadhar", "aadhar no", "aadhar number", "uid",
                         "आधार कार्ड", "आधार नंबर", "आधार क्रमांक" }, headerMap, "");
+                s.birthPlace = getCell(cells, new String[] { "birthplace", "birth place", "जन्मस्थान", "जन्माचे ठिकाण" }, headerMap, "");
+                s.religion = getCell(cells, new String[] { "religion", "धर्म" }, headerMap, "");
+                s.bloodGroup = getCell(cells, new String[] { "blood", "bloodgroup", "blood group", "रक्तगट" }, headerMap, "");
+                s.heightSem1 = getCell(cells, new String[] { "height1", "heightsem1", "height sem 1", "उंची १", "height_sem_1" }, headerMap, "");
+                s.weightSem1 = getCell(cells, new String[] { "weight1", "weightsem1", "weight sem 1", "वजन १", "weight_sem_1" }, headerMap, "");
+                s.heightSem2 = getCell(cells, new String[] { "height2", "heightsem2", "height sem 2", "उंची २", "height_sem_2" }, headerMap, "");
+                s.weightSem2 = getCell(cells, new String[] { "weight2", "weightsem2", "weight sem 2", "वजन २", "weight_sem_2" }, headerMap, "");
 
                 s.parentName = s.fatherName != null && !s.fatherName.isEmpty() ? s.fatherName
                         : (s.motherName != null ? s.motherName : "");
@@ -773,9 +771,8 @@ public class StudentListFragment extends Fragment {
                     }
                 });
             }
-
         } catch (Exception e) {
-            android.widget.Toast.makeText(requireContext(), "Failed to read CSV: " + e.getMessage(),
+            android.widget.Toast.makeText(requireContext(), "Failed to read file: " + e.getMessage(),
                     android.widget.Toast.LENGTH_LONG).show();
         }
     }
@@ -867,5 +864,164 @@ public class StudentListFragment extends Fragment {
             }
             return categoryStr;
         }
+    }
+
+    private boolean isXlsxFile(android.net.Uri uri) {
+        try (java.io.InputStream is = requireContext().getContentResolver().openInputStream(uri)) {
+            if (is == null) return false;
+            byte[] signature = new byte[4];
+            int read = is.read(signature);
+            if (read == 4) {
+                return signature[0] == 0x50 && signature[1] == 0x4B && signature[2] == 0x03 && signature[3] == 0x04;
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    private List<List<String>> parseCsv(android.net.Uri uri) throws Exception {
+        List<List<String>> rows = new ArrayList<>();
+        try (java.io.InputStream is = requireContext().getContentResolver().openInputStream(uri)) {
+            if (is == null) throw new java.io.IOException("Unable to open input stream");
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is, "UTF-8"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().isEmpty())
+                        continue;
+                    rows.add(parseCsvLine(line));
+                }
+            }
+        }
+        return rows;
+    }
+
+    private List<List<String>> parseXlsx(android.net.Uri uri) throws Exception {
+        List<String> sharedStrings = new ArrayList<>();
+        // Pass 1: Extract shared strings
+        try (java.io.InputStream is = requireContext().getContentResolver().openInputStream(uri)) {
+            if (is == null) throw new java.io.IOException("Unable to open input stream");
+            try (java.util.zip.ZipInputStream zip = new java.util.zip.ZipInputStream(is)) {
+                java.util.zip.ZipEntry entry;
+                while ((entry = zip.getNextEntry()) != null) {
+                    if ("xl/sharedStrings.xml".equals(entry.getName())) {
+                        org.xmlpull.v1.XmlPullParser parser = android.util.Xml.newPullParser();
+                        parser.setInput(zip, "UTF-8");
+                        int eventType = parser.getEventType();
+                        StringBuilder currentString = new StringBuilder();
+                        boolean insideT = false;
+                        while (eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                            String name = parser.getName();
+                            if (eventType == org.xmlpull.v1.XmlPullParser.START_TAG) {
+                                if ("si".equals(name)) {
+                                    currentString.setLength(0);
+                                } else if ("t".equals(name)) {
+                                    insideT = true;
+                                }
+                            } else if (eventType == org.xmlpull.v1.XmlPullParser.TEXT) {
+                                if (insideT) {
+                                    currentString.append(parser.getText());
+                                }
+                            } else if (eventType == org.xmlpull.v1.XmlPullParser.END_TAG) {
+                                if ("t".equals(name)) {
+                                    insideT = false;
+                                } else if ("si".equals(name)) {
+                                    sharedStrings.add(currentString.toString());
+                                }
+                            }
+                            eventType = parser.next();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Pass 2: Extract sheet rows
+        List<List<String>> rows = new ArrayList<>();
+        try (java.io.InputStream is = requireContext().getContentResolver().openInputStream(uri)) {
+            if (is == null) throw new java.io.IOException("Unable to open input stream");
+            try (java.util.zip.ZipInputStream zip = new java.util.zip.ZipInputStream(is)) {
+                java.util.zip.ZipEntry entry;
+                while ((entry = zip.getNextEntry()) != null) {
+                    if ("xl/worksheets/sheet1.xml".equals(entry.getName())) {
+                        org.xmlpull.v1.XmlPullParser parser = android.util.Xml.newPullParser();
+                        parser.setInput(zip, "UTF-8");
+                        int eventType = parser.getEventType();
+                        List<String> currentRow = null;
+                        String cellRef = null;
+                        String cellType = null;
+                        StringBuilder cellValue = new StringBuilder();
+                        boolean insideV = false;
+                        
+                        while (eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                            String name = parser.getName();
+                            if (eventType == org.xmlpull.v1.XmlPullParser.START_TAG) {
+                                if ("row".equals(name)) {
+                                    currentRow = new ArrayList<>();
+                                } else if ("c".equals(name)) {
+                                    cellRef = parser.getAttributeValue(null, "r"); // e.g. "A1"
+                                    cellType = parser.getAttributeValue(null, "t"); // e.g. "s"
+                                    cellValue.setLength(0);
+                                } else if ("v".equals(name) || "t".equals(name)) {
+                                    insideV = true;
+                                }
+                            } else if (eventType == org.xmlpull.v1.XmlPullParser.TEXT) {
+                                if (insideV) {
+                                    cellValue.append(parser.getText());
+                                }
+                            } else if (eventType == org.xmlpull.v1.XmlPullParser.END_TAG) {
+                                if ("v".equals(name) || "t".equals(name)) {
+                                    insideV = false;
+                                } else if ("c".equals(name)) {
+                                    if (currentRow != null && cellRef != null) {
+                                        String colLetter = cellRef.replaceAll("[0-9]", "");
+                                        int colIndex = columnLetterToIndex(colLetter);
+                                        while (currentRow.size() <= colIndex) {
+                                            currentRow.add("");
+                                        }
+                                        String value = cellValue.toString();
+                                        if ("s".equals(cellType)) {
+                                            try {
+                                                int idx = Integer.parseInt(value);
+                                                if (idx >= 0 && idx < sharedStrings.size()) {
+                                                    value = sharedStrings.get(idx);
+                                                }
+                                            } catch (NumberFormatException ignored) {}
+                                        } else {
+                                            // Numeric cell value cleanup
+                                            if (value.contains(".") || value.contains("E") || value.contains("e")) {
+                                                try {
+                                                    double d = Double.parseDouble(value);
+                                                    if (d == (long) d) {
+                                                        value = String.valueOf((long) d);
+                                                    } else {
+                                                        value = String.valueOf(d);
+                                                    }
+                                                } catch (NumberFormatException ignored) {}
+                                            }
+                                        }
+                                        currentRow.set(colIndex, value);
+                                    }
+                                } else if ("row".equals(name)) {
+                                    if (currentRow != null) {
+                                        rows.add(currentRow);
+                                    }
+                                }
+                            }
+                            eventType = parser.next();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return rows;
+    }
+
+    private int columnLetterToIndex(String letter) {
+        int index = 0;
+        for (int i = 0; i < letter.length(); i++) {
+            index = index * 26 + (letter.toUpperCase().charAt(i) - 'A' + 1);
+        }
+        return index - 1;
     }
 }

@@ -181,11 +181,15 @@ public class ProgressCardPortraitGenerator {
         }
 
         addRowFull(det, PdfLocalizer.get(ctx, "नाव", "Name"), ": " + nvl(student.name));
-        addPairEmptyRight(det, PdfLocalizer.get(ctx, "स्टुडंट ID", "Student ID"), ": " + nvl(student.studentIdNumber));
-        addPair(det, PdfLocalizer.get(ctx, "हजेरी क्रमांक", "Roll No."), ": " + nvl(student.rollNo), PdfLocalizer.get(ctx, "रजि.नंबर", "Reg. No."), ": " + nvl(student.registrationNo));
+        addPair(det, PdfLocalizer.get(ctx, "स्टुडंट ID", "Student ID"), ": " + nvl(student.studentIdNumber), PdfLocalizer.get(ctx, "रजि.नंबर", "Reg. No."), ": " + nvl(student.registrationNo));
         addPair(det, PdfLocalizer.get(ctx, "इयत्ता", "Class"), ": " + className, PdfLocalizer.get(ctx, "तुकडी", "Division"), ": " + division);
-        addPair(det, PdfLocalizer.get(ctx, "माध्यम", "Medium"), ": " + nvl(student.medium), PdfLocalizer.get(ctx, "जन्मतारीख", "Date of Birth"), ": " + nvl(student.dob));
+        addPair(det, PdfLocalizer.get(ctx, "हजेरी क्रमांक", "Roll No."), ": " + nvl(student.rollNo), PdfLocalizer.get(ctx, "माध्यम", "Medium"), ": " + nvl(student.medium));
         addPair(det, PdfLocalizer.get(ctx, "मातृभाषा", "Mother Tongue"), ": " + nvl(student.motherTongue), PdfLocalizer.get(ctx, "वय", "Age"), ": " + ageStr);
+        addPair(det, PdfLocalizer.get(ctx, "जन्मतारीख", "Date of Birth"), ": " + nvl(student.dob), PdfLocalizer.get(ctx, "जन्मस्थान", "Birth Place"), ": " + nvl(student.birthPlace));
+        addPair(det, PdfLocalizer.get(ctx, "जात", "Caste"), ": " + nvl(student.cast), PdfLocalizer.get(ctx, "धर्म", "Religion"), ": " + nvl(student.religion));
+        addPair(det, PdfLocalizer.get(ctx, "आधार / UID", "Aadhaar / UID"), ": " + nvl(student.uid), PdfLocalizer.get(ctx, "रक्तगट", "Blood Group"), ": " + nvl(student.bloodGroup));
+        addPair(det, PdfLocalizer.get(ctx, "प्रवेश तारीख", "Date of Adm."), ": " + nvl(student.dateOfAdmission), PdfLocalizer.get(ctx, "खाते क्रमांक", "Account No."), ": " + nvl(student.bankAccount));
+        addPair(det, PdfLocalizer.get(ctx, "शाखा", "Branch"), ": " + nvl(student.bankBranch), PdfLocalizer.get(ctx, "IFSC कोड", "IFSC Code"), ": " + nvl(student.bankIfsc));
         addRowFull(det, PdfLocalizer.get(ctx, "आईचे नाव", "Mother's Name"), ": " + nvl(student.motherName));
         addRowFull(det, PdfLocalizer.get(ctx, "वडिलांचे नाव", "Father's Name"), ": " + nvl(student.fatherName));
         addRowFull(det, PdfLocalizer.get(ctx, "पत्ता", "Address"), ": " + nvl(student.address));

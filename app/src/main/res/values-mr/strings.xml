@@ -47,6 +47,9 @@
     <string name="label_roll_no">रोल नंबर</string>
     <string name="label_dob">जन्मतारीख</string>
     <string name="label_gender">लिंग</string>
+    <string name="label_birthplace">जन्मस्थान</string>
+    <string name="label_religion">धर्म</string>
+    <string name="label_blood_group">रक्तगट</string>
     <string name="label_parent_name">पालक/पालकांचे नाव</string>
     <string name="label_select_school">शाळा निवडा</string>
     <string name="label_select_class">वर्ग निवडा</string>
@@ -71,7 +74,7 @@
     <string name="btn_save_school">शाळेची माहिती जतन करा</string>
     <string name="btn_save_class">वर्ग आणि विषय जतन करा</string>
     <string name="btn_add_subject">विषय जोडा</string>
-    <string name="btn_save_student">विद्यार्थी वाचवा</string>
+    <string name="btn_save_student">माहिती संपादित करा</string>
     <string name="btn_save_marks">मार्क्स सेव्ह करा</string>
     <string name="btn_scan">स्कॅन करा</string>
     <string name="btn_print">छापा</string>
@@ -89,6 +92,19 @@
     
     <string name="gender_male">पुरुष</string>
     <string name="gender_female">स्त्री</string>
+    <!-- Languages / Mediums -->
+    <string name="lang_marathi">मराठी</string>
+    <string name="lang_english">इंग्रजी</string>
+    <string name="lang_semi_english">सेमी-इंग्रजी</string>
+    <string name="lang_hindi">हिंदी</string>
+    <string name="lang_urdu">उर्दू</string>
+    <string name="lang_gujarati">गुजराती</string>
+    <string name="lang_kannada">कन्नड</string>
+    <string name="lang_telugu">तेलगू</string>
+    <string name="lang_tamil">तमिळ</string>
+    <string name="lang_sindhi">सिंधी</string>
+    <string name="lang_punjabi">पंजाबी</string>
+    <string name="lang_bengali">बंगाली</string>
     
     <string name="home_greeting">शुभ दिवस,</string>
     <string name="home_pick_session">वर्ष, सेमिस्टर आणि वर्ग निवडा</string>
@@ -489,7 +505,7 @@
     <string name="txt_1_2">1. मराठी</string>
     <string name="str_empty_15">नोंद प्रविष्ट करा</string>
     <string name="txt_a_1">A-1</string>
-    <string name="txt_formative_evaluation_weightage">आकारिक मूल्यमापन भारमान</string>
+    <string name="txt_formative_evaluation_weightage">आकारिक मूल्यमापन गुणनोंदी</string>
     <string name="str_empty_16">निरी.</string>
     <string name="str_empty_17">तोंडी.</string>
     <string name="str_empty_18">प्रात्य.</string>
@@ -498,7 +514,7 @@
     <string name="str_empty_21">चाच.</string>
     <string name="str_empty_22">स्वा.</string>
     <string name="str_empty_23">इतर</string>
-    <string name="txt_summative_evaluation_weightage">संकलित मूल्यमापन भारमान</string>
+    <string name="txt_summative_evaluation_weightage">संकलित मूल्यमापन गुणनोंदी</string>
     <string name="str_empty_24">लेखी</string>
     <string name="str_empty_25">आका.</string>
     <string name="str_empty_26">संक.</string>

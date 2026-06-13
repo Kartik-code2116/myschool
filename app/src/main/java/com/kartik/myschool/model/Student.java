@@ -52,5 +52,10 @@ public class Student {
     public String studentIdNumber;
     public String uid;
 
+    // Extra Details
+    public String birthPlace;
+    public String religion;
+    public String bloodGroup;
+
     public Student() {}
 }

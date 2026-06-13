@@ -122,15 +122,14 @@ public class SubjectUpdateActivity extends AppCompatActivity {
                         s.maxMarks = formative + summative;
 
                         // Re-scale sub-fields based on new formative (akarik) and summative (sanklit) totals
-                        s.maxNirikhshan   = formative * 10 / 50;
+                        s.maxNirikhshan   = 0;
                         s.maxTondiKam     = formative * 10 / 50;
                         s.maxPratyakshik  = formative * 10 / 50;
-                        s.maxUpkram       = formative * 5  / 50;
-                        s.maxPrakalp      = formative * 5  / 50;
-                        s.maxChachani     = formative * 5  / 50;
-                        s.maxSwadhyay     = formative * 5  / 50;
-                        s.maxItar         = formative - s.maxNirikhshan - s.maxTondiKam - s.maxPratyakshik
-                                - s.maxUpkram - s.maxPrakalp - s.maxChachani - s.maxSwadhyay;
+                        s.maxUpkram       = formative * 10 / 50;
+                        s.maxPrakalp      = 0;
+                        s.maxChachani     = formative * 20 / 50;
+                        s.maxSwadhyay     = 0;
+                        s.maxItar         = 0;
 
                         s.maxTondi        = summative * 10 / 50;
                         s.maxPratyakshikB = summative * 10 / 50;

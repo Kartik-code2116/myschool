@@ -48,6 +48,9 @@
     <string name="label_roll_no">Roll Number</string>
     <string name="label_dob">Date of Birth</string>
     <string name="label_gender">Gender</string>
+    <string name="label_birthplace">Birth Place</string>
+    <string name="label_religion">Religion</string>
+    <string name="label_blood_group">Blood Group</string>
     <string name="label_parent_name">Parent / Guardian Name</string>
     <string name="label_select_school">Select School</string>
     <string name="label_select_class">Select Class</string>
@@ -90,6 +93,19 @@
     <!-- Gender -->
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
+    <!-- Languages / Mediums -->
+    <string name="lang_marathi">Marathi</string>
+    <string name="lang_english">English</string>
+    <string name="lang_semi_english">Semi-English</string>
+    <string name="lang_hindi">Hindi</string>
+    <string name="lang_urdu">Urdu</string>
+    <string name="lang_gujarati">Gujarati</string>
+    <string name="lang_kannada">Kannada</string>
+    <string name="lang_telugu">Telugu</string>
+    <string name="lang_tamil">Tamil</string>
+    <string name="lang_sindhi">Sindhi</string>
+    <string name="lang_punjabi">Punjabi</string>
+    <string name="lang_bengali">Bengali</string>
     <!-- Home -->
     <string name="home_greeting">Good day,</string>
     <string name="home_pick_session">Choose year, semester and class</string>

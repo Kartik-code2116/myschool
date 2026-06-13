@@ -119,15 +119,14 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
                     int akarikMax = isFormativeOnly ? val : val / 2;
                     int sanklitMax = isFormativeOnly ? 0 : val - akarikMax;
 
-                    subject.maxNirikhshan   = akarikMax * 10 / 50;
+                    subject.maxNirikhshan   = 0;
                     subject.maxTondiKam     = akarikMax * 10 / 50;
                     subject.maxPratyakshik  = akarikMax * 10 / 50;
-                    subject.maxUpkram       = akarikMax * 5  / 50;
-                    subject.maxPrakalp      = akarikMax * 5  / 50;
-                    subject.maxChachani     = akarikMax * 5  / 50;
-                    subject.maxSwadhyay     = akarikMax * 5  / 50;
-                    subject.maxItar         = akarikMax - subject.maxNirikhshan - subject.maxTondiKam - subject.maxPratyakshik
-                            - subject.maxUpkram - subject.maxPrakalp - subject.maxChachani - subject.maxSwadhyay;
+                    subject.maxUpkram       = akarikMax * 10 / 50;
+                    subject.maxPrakalp      = 0;
+                    subject.maxChachani     = akarikMax * 20 / 50;
+                    subject.maxSwadhyay     = 0;
+                    subject.maxItar         = 0;
 
                     subject.maxTondi        = sanklitMax * 10 / 50;
                     subject.maxPratyakshikB = sanklitMax * 10 / 50;

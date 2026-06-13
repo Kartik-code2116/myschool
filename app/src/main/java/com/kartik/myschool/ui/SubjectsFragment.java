@@ -332,20 +332,21 @@ public class SubjectsFragment extends Fragment {
         list.add(createItem("Marathi",            p1 + "01", "01", "Academic",    100, "#2196F3"));
         list.add(createItem("Hindi",              p1 + "02", "02", "Academic",    100, "#2196F3"));
         list.add(createItem("English",            p1 + "03", "03", "Academic",    100, "#2196F3"));
-        list.add(createItem("Mathematics",        p1 + "04", "04", "Academic",    100, "#2196F3"));
-        list.add(createItem("Science",            p1 + "05", "05", "Academic",    100, "#2196F3"));
-        list.add(createItem("Science / EVS",      p1 + "06", "06", "Academic",    100, "#2196F3"));
-        list.add(createItem("Soc. Science",       p1 + "07", "07", "Academic",    100, "#2196F3"));
+        list.add(createItem("Sanskrit",           p1 + "04", "04", "Academic",    100, "#2196F3"));
+        list.add(createItem("Mathematics",        p1 + "05", "05", "Academic",    100, "#2196F3"));
+        list.add(createItem("Science",            p1 + "06", "06", "Academic",    100, "#2196F3"));
+        list.add(createItem("History",            p1 + "07", "07", "Academic",    100, "#2196F3"));
+        list.add(createItem("Social Science",     p1 + "08", "08", "Academic",    100, "#2196F3"));
         // ── Activity subjects ──────────────────────────────────────────────────
-        list.add(createItem("Drawing",            p2 + "01", "08", "Activities",  100, "#4CAF50"));
-        list.add(createItem("Work Experience",    p2 + "02", "09", "Activities",  100, "#4CAF50"));
-        list.add(createItem("Physical Education", p2 + "03", "10", "Activities",  100, "#4CAF50"));
+        list.add(createItem("Drawing",            p2 + "01", "09", "Activities",  100, "#4CAF50"));
+        list.add(createItem("Work Experience",    p2 + "02", "10", "Activities",  100, "#4CAF50"));
+        list.add(createItem("Physical Education", p2 + "03", "11", "Activities",  100, "#4CAF50"));
         // ── Personality development ────────────────────────────────────────────
-        list.add(createItem("Special Development",p3 + "01", "11", "Personality", 100, "#009688"));
-        list.add(createItem("Personality Development",p3 + "02", "12", "Personality", 100, "#009688"));
+        list.add(createItem("Special Development",p3 + "01", "12", "Personality", 100, "#009688"));
+        list.add(createItem("Personality Development",p3 + "02", "13", "Personality", 100, "#009688"));
         // ── State Board Additions ──────────────────────────────────────────────
-        list.add(createItem("Information & Comm. Technology (ICT)", p4 + "01", "13", "State Board", 100, "#FF9800"));
-        list.add(createItem("Water Security & Environment Studies", p4 + "02", "14", "State Board", 100, "#FF9800"));
+        list.add(createItem("Information & Comm. Technology (ICT)", p4 + "01", "14", "State Board", 100, "#FF9800"));
+        list.add(createItem("Water Security & Environment Studies", p4 + "02", "15", "State Board", 100, "#FF9800"));
         return list;
     }
 }

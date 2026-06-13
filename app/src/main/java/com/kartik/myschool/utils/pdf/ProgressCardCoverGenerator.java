@@ -427,7 +427,7 @@ public class ProgressCardCoverGenerator {
         } catch (Exception e) {}
 
         // Push student details grid below the yellow area
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 65)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 30)));
 
         buildStudentDetails(panel, ctx, cls, student);
     }
@@ -472,40 +472,58 @@ public class ProgressCardCoverGenerator {
                 PdfLocalizer.get(ctx, "• स्टुडंट ID", "• Student ID"),    ": " + nvl(student.studentIdNumber),
                 PdfLocalizer.get(ctx, "  रजि.नंबर", "  Reg. No."),     ": " + nvl(student.registrationNo));
 
-        // Row 3: हजेरी क्रमांक | (blank for extra spacing)
+        // Row 3: हजेरी क्रमांक | माध्यम
         addDetailPair(det, ctx,
                 PdfLocalizer.get(ctx, "• हजेरी क्रमांक", "• Roll No."), ": " + nvl(student.rollNo),
-                PdfLocalizer.get(ctx, "  रजि.नंबर", "  Reg. No."),      ": " + nvl(student.rollNo2));
+                PdfLocalizer.get(ctx, "  माध्यम", "  Medium"),       ": " + nvl(student.medium));
 
         // Row 4: इयत्ता | तुकडी
         addDetailPair(det, ctx,
                 PdfLocalizer.get(ctx, "• इयत्ता", "• Class"),  ": " + className,
                 PdfLocalizer.get(ctx, "  तुकडी", "  Division"),   ": " + division);
 
-        // Row 5: माध्यम | जन्मतारीख
+        // Row 5: जन्मतारीख | जन्मस्थान
         addDetailPair(det, ctx,
-                PdfLocalizer.get(ctx, "• माध्यम", "• Medium"),     ": " + nvl(student.medium),
-                PdfLocalizer.get(ctx, "  जन्मतारीख", "  Date of Birth"),  ": " + nvl(student.dob));
+                PdfLocalizer.get(ctx, "• जन्मतारीख", "• Date of Birth"),  ": " + nvl(student.dob),
+                PdfLocalizer.get(ctx, "  जन्मस्थान", "  Birth Place"),   ": " + nvl(student.birthPlace));
 
-        // Row 6: मातृभाषा | वय
+        // Row 6: जात | धर्म
+        addDetailPair(det, ctx,
+                PdfLocalizer.get(ctx, "• जात", "• Caste"),          ": " + nvl(student.cast),
+                PdfLocalizer.get(ctx, "  धर्म", "  Religion"),       ": " + nvl(student.religion));
+
+        // Row 7: आधार / UID | रक्तगट
+        addDetailPair(det, ctx,
+                PdfLocalizer.get(ctx, "• आधार / UID", "• Aadhaar / UID"),  ": " + nvl(student.uid),
+                PdfLocalizer.get(ctx, "  रक्तगट", "  Blood Group"),     ": " + nvl(student.bloodGroup));
+
+        // Row 8: प्रवेश तारीख | खाते क्रमांक
+        addDetailPair(det, ctx,
+                PdfLocalizer.get(ctx, "• प्रवेश तारीख", "• Date of Adm."), ": " + nvl(student.dateOfAdmission),
+                PdfLocalizer.get(ctx, "  खाते क्रमांक", "  Account No."),  ": " + nvl(student.bankAccount));
+
+        // Row 9: शाखा | IFSC कोड
+        addDetailPair(det, ctx,
+                PdfLocalizer.get(ctx, "• शाखा", "• Branch"),         ": " + nvl(student.bankBranch),
+                PdfLocalizer.get(ctx, "  IFSC कोड", "  IFSC Code"),    ": " + nvl(student.bankIfsc));
+
+        // Row 10: मातृभाषा | वय
         addDetailPair(det, ctx,
                 PdfLocalizer.get(ctx, "• मातृभाषा", "• Mother Tongue"), ": " + nvl(student.motherTongue),
                 PdfLocalizer.get(ctx, "  वय", "  Age"),        ": " + ageStr);
 
-        // Row 7: आईचे नाव (full)
+        // Row 11: आईचे नाव (full)
         addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• आईचे नाव", "• Mother's Name"), ": " + nvl(student.motherName), 4);
 
-        // Row 8: वडिलांचे नाव (full)
+        // Row 12: वडिलांचे नाव (full)
         addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• वडिलांचे नाव", "• Father's Name"), ": " + nvl(student.fatherName), 4);
 
-        // Row 9: पत्ता (full)
+        // Row 13: पत्ता (full)
         addDetailFull(det, ctx, PdfLocalizer.get(ctx, "• पत्ता", "• Address"), ": " + nvl(student.address), 4);
 
         det.setKeepTogether(true);
         panel.addElement(det);
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
 
     /** Full-width detail row spanning all columns. */
     private static void addDetailFull(PdfPTable tbl, Context ctx, String label, String value, int totalCols) {

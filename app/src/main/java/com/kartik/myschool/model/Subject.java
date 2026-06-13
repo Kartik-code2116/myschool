@@ -35,15 +35,14 @@ public class Subject {
             sanklitMax = 0;
         }
 
-        this.maxNirikhshan   = akarikMax * 10 / 50;
+        this.maxNirikhshan   = 0;
         this.maxTondiKam     = akarikMax * 10 / 50;
         this.maxPratyakshik  = akarikMax * 10 / 50;
-        this.maxUpkram       = akarikMax * 5  / 50;
-        this.maxPrakalp      = akarikMax * 5  / 50;
-        this.maxChachani     = akarikMax * 5  / 50;
-        this.maxSwadhyay     = akarikMax * 5  / 50;
-        this.maxItar         = akarikMax - this.maxNirikhshan - this.maxTondiKam - this.maxPratyakshik
-                - this.maxUpkram - this.maxPrakalp - this.maxChachani - this.maxSwadhyay;
+        this.maxUpkram       = akarikMax * 10 / 50;
+        this.maxPrakalp      = 0;
+        this.maxChachani     = akarikMax * 20 / 50;
+        this.maxSwadhyay     = 0;
+        this.maxItar         = 0;
 
         this.maxTondi        = sanklitMax * 10 / 50;
         this.maxPratyakshikB = sanklitMax * 10 / 50;
@@ -75,7 +74,7 @@ public class Subject {
             list.add(new Subject("Marathi", 100));
             list.add(new Subject("English", 100));
             list.add(new Subject("Mathematics", 100));
-            list.add(new Subject("Science / EVS", 100));
+            list.add(new Subject("Science", 100));
             return list;
         }
 
@@ -90,47 +89,50 @@ public class Subject {
         // 3. English (Third Language) - All standards (1-10)
         list.add(new Subject("English", 100));
 
-        // 4. Mathematics (Semi-English) - All standards (1-10)
+        // 4. Sanskrit - 5th to 10th
+        if (std >= 5) {
+            list.add(new Subject("Sanskrit", 100));
+        }
+
+        // 5. Mathematics (Semi-English) - All standards (1-10)
         list.add(new Subject("Mathematics", 100));
 
-        // 5. Science (Semi-English) - 6th to 10th
-        if (std >= 6) {
-            list.add(new Subject("Science", 100));
-        }
+        // 6. Science - All standards (1-10)
+        list.add(new Subject("Science", 100));
 
-        // 6. Science / EVS (Environmental Studies) - 1st to 5th
-        if (std <= 5) {
-            list.add(new Subject("Science / EVS", 100));
-        }
-
-        // 7. Soc. Science (History/Geography) - 5th to 10th
+        // 7. History - 5th to 10th
         if (std >= 5) {
-            list.add(new Subject("Soc. Science", 100));
+            list.add(new Subject("History", 100));
         }
 
-        // 8. Drawing / Art Education - All standards (1-10)
+        // 8. Social Science - 5th to 10th
+        if (std >= 5) {
+            list.add(new Subject("Social Science", 100));
+        }
+
+        // 9. Drawing / Art Education - All standards (1-10)
         list.add(new Subject("Drawing", 100));
 
-        // 9. Work Experience - All standards (1-10)
+        // 10. Work Experience - All standards (1-10)
         list.add(new Subject("Work Experience", 100));
 
-        // 10. Physical Education / Health - All standards (1-10)
+        // 11. Physical Education / Health - All standards (1-10)
         list.add(new Subject("Physical Education", 100));
 
-        // 11. Personality Development - All standards (1-10)
+        // 12. Personality Development - All standards (1-10)
         list.add(new Subject("Personality Development", 100));
 
-        // 12. Special Development (Scout/Guide, etc.) - 5th to 10th
+        // 13. Special Development (Scout/Guide, etc.) - 5th to 10th
         if (std >= 5) {
             list.add(new Subject("Special Development", 100));
         }
 
-        // 13. Information & Comm. Technology (ICT) - 9th & 10th
+        // 14. Information & Comm. Technology (ICT) - 9th & 10th
         if (std >= 9) {
             list.add(new Subject("Information & Comm. Technology (ICT)", 100));
         }
 
-        // 14. Water Security & Environment Studies - 9th & 10th
+        // 15. Water Security & Environment Studies - 9th & 10th
         if (std >= 9) {
             list.add(new Subject("Water Security & Environment Studies", 100));
         }
@@ -145,10 +147,11 @@ public class Subject {
             "Marathi",
             "Hindi",
             "English",
+            "Sanskrit",
             "Mathematics",
             "Science",
-            "Science / EVS",
-            "Soc. Science",
+            "History",
+            "Social Science",
             "Drawing",
             "Work Experience",
             "Physical Education",

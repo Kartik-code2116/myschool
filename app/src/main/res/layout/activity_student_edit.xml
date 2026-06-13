@@ -74,8 +74,11 @@
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_reg_no">
                         <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRegNo" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
-                        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_dob">
+                    <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilDob"
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:hint="@string/label_dob"
+                        app:endIconDrawable="@drawable/ic_calendar" app:endIconMode="custom">
                         <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDob" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -85,6 +88,18 @@
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_cast">
                         <AutoCompleteTextView android:id="@+id/etCast" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_birthplace">
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBirthPlace" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_religion">
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etReligion" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_blood_group">
+                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBloodGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     
                     <LinearLayout
@@ -263,16 +278,19 @@
                         android:layout_marginBottom="16dp"
                         android:fontFamily="sans-serif-black"/>
 
-                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_medium">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMedium" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <AutoCompleteTextView android:id="@+id/etMedium" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
+                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_mother_tongue">
-                        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etMotherTongue" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
+                        <AutoCompleteTextView android:id="@+id/etMotherTongue" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
-                        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/label_date_admission">
+                    <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilDateAdmission"
+                        style="@style/Widget.Myschool.TextInputLayout"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:hint="@string/label_date_admission"
+                        app:endIconDrawable="@drawable/ic_calendar" app:endIconMode="custom">
                         <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDateAdmission" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Myschool.TextInputLayout"
