@@ -272,7 +272,7 @@
     <string name="menu_3dot_language">Language setting</string>
     <string name="menu_3dot_rate">Rate app</string>
     <string name="menu_3dot_more_apps">More apps</string>
-    <string name="menu_3dot_about">About developers</string>
+    <string name="menu_3dot_about">App Information</string>
     <string name="menu_3dot_message">Admin Message</string>
     <string name="msg_no_admin_message">No new messages from the administrator.</string>
     <string name="msg_checking_messages">Checking messages…</string>

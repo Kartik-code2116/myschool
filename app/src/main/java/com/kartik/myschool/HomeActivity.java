@@ -659,53 +659,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showAboutDeveloperDialog() {
-        android.app.ProgressDialog pd = new android.app.ProgressDialog(this);
-        pd.setMessage(getString(R.string.msg_checking_messages));
-        pd.setCancelable(false);
-        pd.show();
-
-        FirebaseRepository.get().getAppConfig(new FirebaseRepository.OnResult<com.kartik.myschool.model.AppConfig>() {
-            @Override
-            public void onSuccess(com.kartik.myschool.model.AppConfig config) {
-                pd.dismiss();
-
-                StringBuilder sb = new StringBuilder();
-                sb.append("<h3><b>🧑‍💻 " + config.devName + "</b></h3>");
-                sb.append("<p><b>🤖 Version:</b> " + config.appVersion + "</p>");
-                if (config.devEmail != null && !config.devEmail.trim().isEmpty()) {
-                    sb.append("<p><b>📧 Email:</b> <a href=\"mailto:" + config.devEmail.trim() + "\">"
-                            + config.devEmail.trim() + "</a></p>");
-                }
-                if (config.devWebsite != null && !config.devWebsite.trim().isEmpty()) {
-                    sb.append("<p><b>🌐 Website:</b> <a href=\"" + config.devWebsite.trim() + "\">"
-                            + config.devWebsite.trim() + "</a></p>");
-                }
-                if (config.devPhone != null && !config.devPhone.trim().isEmpty()) {
-                    sb.append("<p><b>📞 Contact:</b> " + config.devPhone.trim() + "</p>");
-                }
-                sb.append("<br/>");
-                sb.append("<p><i>" + config.aboutText + "</i></p>");
-
-                android.widget.TextView tv = new android.widget.TextView(HomeActivity.this);
-                int padding = (int) (18 * getResources().getDisplayMetrics().density);
-                tv.setPadding(padding, padding, padding, padding);
-                tv.setText(android.text.Html.fromHtml(sb.toString()));
-                tv.setTextSize(16);
-                tv.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
-
-                new androidx.appcompat.app.AlertDialog.Builder(HomeActivity.this)
-                        .setTitle(R.string.msg_about_developer)
-                        .setView(tv)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                pd.dismiss();
-                Toast.makeText(HomeActivity.this, "Error fetching developer details", Toast.LENGTH_SHORT).show();
-            }
-        });
+        android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://kartik-28deb.web.app/app_info.html"));
+        startActivity(browserIntent);
     }
 
     private void showAdminMessageDialog() {
