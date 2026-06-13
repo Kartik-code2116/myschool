@@ -9,6 +9,16 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
+    <!-- Android 11+ (API 30+) requires declaring intents we want to query -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PICK"/>
+        </intent>
+    </queries>
+
     <application
         android:name=".MySchoolApplication"
         android:allowBackup="true"

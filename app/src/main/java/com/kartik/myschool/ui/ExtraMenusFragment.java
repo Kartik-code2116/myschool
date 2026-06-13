@@ -983,17 +983,20 @@ public class ExtraMenusFragment extends Fragment {
                         int stCount = 0;
 
                         for (Student s : activeStudents) {
-                            if (s.gender != null && s.gender.equalsIgnoreCase("Female")) {
+                            if (s.gender != null && (s.gender.equalsIgnoreCase("Female") 
+                                    || s.gender.equals("2") 
+                                    || s.gender.equalsIgnoreCase("स्त्री") 
+                                    || s.gender.equalsIgnoreCase("मुलगी"))) {
                                 girls++;
                             } else {
                                 boys++;
                             }
 
                             if (s.cast != null) {
-                                String c = s.cast.toUpperCase();
-                                if (c.contains("OBC")) obcCount++;
-                                else if (c.contains("SC")) scCount++;
-                                else if (c.contains("ST")) stCount++;
+                                String c = s.cast.toUpperCase().trim();
+                                if (c.contains("OBC") || c.equals("5")) obcCount++;
+                                else if (c.contains("SC") || c.equals("1") || c.equals("0")) scCount++;
+                                else if (c.contains("ST") || c.equals("2")) stCount++;
                                 else generalCount++;
                             } else {
                                 generalCount++;

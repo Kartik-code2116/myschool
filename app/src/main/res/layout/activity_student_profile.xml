@@ -43,85 +43,111 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!-- Header Background Banner (Light blue/gray, rounded bottom corners) -->
-                <LinearLayout
+                <!-- Header Background Banner with Photo Background -->
+                <FrameLayout
                     android:id="@+id/layoutHeaderBanner"
                     android:layout_width="match_parent"
                     android:layout_height="190dp"
                     android:background="@drawable/bg_profile_header"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:paddingTop="20dp">
+                    android:clipToOutline="true">
 
-                    <TextView
-                        android:id="@+id/tvStudentName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/txt_student_name"
-                        android:textColor="#2E2E2E"
-                        android:textSize="24sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.02"/>
+                    <!-- Background photo ImageView (student photo blurred/scaled) -->
+                    <ImageView
+                        android:id="@+id/ivHeaderBg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/bg_profile_header"
+                        android:contentDescription="Profile background"/>
 
-                    <!-- Standard & Division Subtitle line -->
-                    <TextView
-                        android:id="@+id/tvClassLine"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="#757575"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif"
-                        android:visibility="gone"/>
+                    <!-- Semi-transparent dark overlay for text readability -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#55000000"/>
 
-                    <!-- Pill-shaped Info Badges -->
+                    <!-- Content on top of the background -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingTop="20dp">
 
-                        <!-- Registration Badge Pill -->
+                        <TextView
+                            android:id="@+id/tvStudentName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txt_student_name"
+                            android:textColor="#FFFFFF"
+                            android:textSize="24sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.02"
+                            android:shadowColor="#88000000"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"/>
+
+                        <!-- Standard & Division Subtitle line -->
+                        <TextView
+                            android:id="@+id/tvClassLine"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#DDDDDD"
+                            android:textSize="13sp"
+                            android:fontFamily="sans-serif"
+                            android:visibility="gone"/>
+
+                        <!-- Pill-shaped Info Badges -->
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_info"
+                            android:layout_marginTop="14dp"
                             android:gravity="center"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="7dp">
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/tvTopRegNo"
+                            <!-- Registration Badge Pill -->
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/txt_reg"
-                                android:textColor="#2E2E2E"
-                                android:textSize="13sp"
-                                android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
+                                android:background="@drawable/bg_pill_info"
+                                android:gravity="center"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="7dp">
 
-                        <!-- DOB Badge Pill -->
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:background="@drawable/bg_pill_info"
-                            android:gravity="center"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="7dp">
+                                <TextView
+                                    android:id="@+id/tvTopRegNo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/txt_reg"
+                                    android:textColor="#2E2E2E"
+                                    android:textSize="13sp"
+                                    android:fontFamily="sans-serif-medium"/>
+                            </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/tvTopDob"
+                            <!-- DOB Badge Pill -->
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="—"
-                                android:textColor="#2E2E2E"
-                                android:textSize="13sp"
-                                android:fontFamily="sans-serif-medium"/>
+                                android:layout_marginStart="12dp"
+                                android:background="@drawable/bg_pill_info"
+                                android:gravity="center"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="7dp">
+
+                                <TextView
+                                    android:id="@+id/tvTopDob"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="#2E2E2E"
+                                    android:textSize="13sp"
+                                    android:fontFamily="sans-serif-medium"/>
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
+                </FrameLayout>
 
                 <!-- Circular Avatar (Overlaps the bottom of the header section) -->
                 <com.google.android.material.card.MaterialCardView
@@ -141,9 +167,7 @@
                         android:id="@+id/ivStudentPhoto"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="16dp"
                         android:src="@drawable/ic_person"
-                        app:tint="#8BC34A"
                         android:contentDescription="Student Photo"/>
                 </com.google.android.material.card.MaterialCardView>
             </RelativeLayout>
@@ -553,33 +577,22 @@
                     app:backgroundTint="#8BC34A"
                     android:elevation="2dp"/>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnEnterMarks"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/action_enter_marks"
-                    android:textColor="#8BC34A"
-                    android:fontFamily="sans-serif-bold"
-                    app:strokeColor="#8BC34A"
-                    app:strokeWidth="2dp"
-                    android:minHeight="56dp"
-                    app:cornerRadius="12dp"/>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnViewReport"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:id="@+id/btnSpecialCard"
+                    style="@style/Widget.Myschool.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="@string/view_marksheet"
-                    android:textColor="#8BC34A"
+                    android:text="@string/view_special_card"
+                    android:textColor="#FFFFFF"
                     android:fontFamily="sans-serif-bold"
-                    app:strokeColor="#8BC34A"
-                    app:strokeWidth="2dp"
-                    android:minHeight="56dp"
-                    app:cornerRadius="12dp"/>
+                    app:icon="@drawable/ic_school"
+                    app:iconGravity="textStart"
+                    app:iconTint="#FFFFFF"
+                    app:backgroundTint="#5A4FCF"
+                    android:elevation="2dp"
+                    android:minHeight="56dp"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

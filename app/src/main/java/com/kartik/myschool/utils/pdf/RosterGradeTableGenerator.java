@@ -182,7 +182,8 @@ public class RosterGradeTableGenerator {
                 boolean isFemale = st.gender != null
                         && (st.gender.equalsIgnoreCase("Female")
                                 || st.gender.equalsIgnoreCase("मुलगी")
-                                || st.gender.equalsIgnoreCase("स्त्री"));
+                                || st.gender.equalsIgnoreCase("स्त्री")
+                                || st.gender.equals("2"));
 
                 if (isFemale)
                     totalGirls++;

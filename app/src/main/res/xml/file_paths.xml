@@ -12,4 +12,7 @@
     
     <!-- Required to share files from the internal cache directory (like excel_exports and backups) -->
     <cache-path name="internal_cache"          path="."/>
+    
+    <!-- Required to share files from the external cache directory -->
+    <external-cache-path name="external_cache"  path="."/>
 </paths>

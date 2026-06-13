@@ -146,7 +146,10 @@ public class CasteGradeTableGenerator {
 
         if (students != null) {
             for (Student s : students) {
-                boolean isGirl = s.gender != null && (s.gender.equalsIgnoreCase("Female") || s.gender.equalsIgnoreCase("मुली") || s.gender.equalsIgnoreCase("मुलगी"));
+                boolean isGirl = s.gender != null && (s.gender.equalsIgnoreCase("Female") 
+                        || s.gender.equalsIgnoreCase("मुली") 
+                        || s.gender.equalsIgnoreCase("मुलगी")
+                        || s.gender.equals("2"));
                 int gIdx = isGirl ? 1 : 0;
                 int cIdx = getCasteCategoryIndex(s.cast);
 
@@ -305,11 +308,11 @@ public class CasteGradeTableGenerator {
     private static int getCasteCategoryIndex(String caste) {
         if (caste == null) return 5; // Default: बिगर मागास
         String c = caste.toUpperCase().trim();
-        if (c.contains("SC") || c.contains("अनु.जाती") || c.contains("अनुसुचित जाती")) return 0;
-        if (c.contains("ST") || c.contains("अनु.जमाती") || c.contains("अनुसुचित जमाती")) return 1;
-        if (c.contains("VJ") || c.contains("विमुक्त")) return 2;
-        if (c.contains("NT") || c.contains("भटक्या")) return 3;
-        if (c.contains("OBC") || c.contains("SBC") || c.contains("इतर") || c.contains("मागास")) return 4;
+        if (c.contains("SC") || c.contains("अनु.जाती") || c.contains("अनुसुचित जाती") || c.equals("1") || c.equals("0")) return 0;
+        if (c.contains("ST") || c.contains("अनु.जमाती") || c.contains("अनुसुचित जमाती") || c.equals("2")) return 1;
+        if (c.contains("VJ") || c.contains("विमुक्त") || c.equals("3")) return 2;
+        if (c.contains("NT") || c.contains("भटक्या") || c.equals("4")) return 3;
+        if (c.contains("OBC") || c.contains("SBC") || c.contains("इतर") || c.contains("मागास") || c.equals("5") || c.equals("6")) return 4;
         return 5;
     }
 

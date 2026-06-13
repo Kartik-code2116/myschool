@@ -254,6 +254,7 @@
     <string name="section_academic_ids">Academic &amp; IDs</string>
     <string name="label_bank_uid">Bank UID</string>
     <string name="view_marksheet">View marksheet</string>
+    <string name="view_special_card">See Special Card</string>
     <string name="marks_entered_yes">Marks entered</string>
     <string name="marks_entered_no">Marks pending</string>
     <string name="no_marks_yet">No marks entered yet</string>

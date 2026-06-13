@@ -1426,6 +1426,96 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void uploadStudentPhoto(String studentId, byte[] photoBytes, OnResult<String> cb) {
+        if (studentId == null || photoBytes == null) {
+            cb.onError(new IllegalArgumentException("Arguments cannot be null"));
+            return;
+        }
+        try {
+            com.google.firebase.storage.FirebaseStorage storage = com.google.firebase.storage.FirebaseStorage.getInstance();
+            com.google.firebase.storage.StorageReference ref = storage.getReference().child("students/" + studentId + "/profile.jpg");
+            ref.putBytes(photoBytes)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        ref.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    String downloadUrl = uri.toString();
+                                    updateStudentPhotoUrl(studentId, downloadUrl, cb);
+                                })
+                                .addOnFailureListener(e -> savePhotoAsBase64(studentId, photoBytes, cb));
+                    })
+                    .addOnFailureListener(e -> savePhotoAsBase64(studentId, photoBytes, cb));
+        } catch (Exception e) {
+            savePhotoAsBase64(studentId, photoBytes, cb);
+        }
+    }
+
+    private void savePhotoAsBase64(String studentId, byte[] photoBytes, OnResult<String> cb) {
+        String base64 = "data:image/jpeg;base64," + android.util.Base64.encodeToString(photoBytes, android.util.Base64.NO_WRAP);
+        updateStudentPhotoUrl(studentId, base64, cb);
+    }
+
+    private void updateStudentPhotoUrl(String studentId, String photoUrl, OnResult<String> cb) {
+        db.collection(COL_STUDENTS).document(studentId)
+                .update("photoUrl", photoUrl)
+                .addOnSuccessListener(aVoid -> {
+                    if (cachedStudentsForTeacher != null) {
+                        for (Student s : cachedStudentsForTeacher) {
+                            if (studentId.equals(s.id)) {
+                                s.photoUrl = photoUrl;
+                                break;
+                            }
+                        }
+                    }
+                    if (cachedStudentsForClassMap != null) {
+                        for (java.util.Map.Entry<String, List<Student>> entry : cachedStudentsForClassMap.entrySet()) {
+                            if (entry.getValue() != null) {
+                                for (Student s : entry.getValue()) {
+                                    if (studentId.equals(s.id)) {
+                                        s.photoUrl = photoUrl;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    cb.onSuccess(photoUrl);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void deleteStudentPhoto(String studentId, OnResult<Void> cb) {
+        if (studentId == null) {
+            cb.onError(new IllegalArgumentException("Student ID cannot be null"));
+            return;
+        }
+        db.collection(COL_STUDENTS).document(studentId)
+                .update("photoUrl", "")
+                .addOnSuccessListener(aVoid -> {
+                    if (cachedStudentsForTeacher != null) {
+                        for (Student s : cachedStudentsForTeacher) {
+                            if (studentId.equals(s.id)) {
+                                s.photoUrl = "";
+                                break;
+                            }
+                        }
+                    }
+                    if (cachedStudentsForClassMap != null) {
+                        for (java.util.Map.Entry<String, List<Student>> entry : cachedStudentsForClassMap.entrySet()) {
+                            if (entry.getValue() != null) {
+                                for (Student s : entry.getValue()) {
+                                    if (studentId.equals(s.id)) {
+                                        s.photoUrl = "";
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    cb.onSuccess(null);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
     // ---------- Callback interface ----------
     public interface OnResult<T> {
         void onSuccess(T result);

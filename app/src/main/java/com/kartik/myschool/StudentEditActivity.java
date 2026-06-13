@@ -186,9 +186,9 @@ public class StudentEditActivity extends AppCompatActivity {
         set(b.etRegNo, s.registrationNo);
         set(b.etDob, s.dob);
         if (s.gender != null) {
-            if (s.gender.equalsIgnoreCase("Female")) {
+            if (s.gender.equalsIgnoreCase("Female") || s.gender.equals("2")) {
                 b.etGender.setText(getString(R.string.gender_female), false);
-            } else if (s.gender.equalsIgnoreCase("Male")) {
+            } else if (s.gender.equalsIgnoreCase("Male") || s.gender.equals("1")) {
                 b.etGender.setText(getString(R.string.gender_male), false);
             } else {
                 b.etGender.setText(s.gender, false);
@@ -200,17 +200,17 @@ public class StudentEditActivity extends AppCompatActivity {
         if (s.cast != null) {
             String normalizedCast = s.cast;
             String upper = s.cast.toUpperCase().trim();
-            if (upper.equals("SC") || upper.contains("SCHEDULED CASTES")) {
+            if (upper.equals("SC") || upper.contains("SCHEDULED CASTES") || upper.equals("1") || upper.equals("0")) {
                 normalizedCast = "SC (Scheduled Castes)";
-            } else if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES")) {
+            } else if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES") || upper.equals("2")) {
                 normalizedCast = "ST (Scheduled Tribes)";
-            } else if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT")) {
+            } else if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT") || upper.equals("3")) {
                 normalizedCast = "VJ (Vimukt Jati)";
-            } else if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("BHATKYA")) {
+            } else if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("BHATKYA") || upper.equals("4")) {
                 normalizedCast = "NT (Nomadic Tribes)";
-            } else if (upper.equals("OBC") || upper.contains("OTHER BACKWARD CLASSES") || upper.contains("SBC")) {
+            } else if (upper.equals("OBC") || upper.contains("OTHER BACKWARD CLASSES") || upper.contains("SBC") || upper.equals("5") || upper.equals("6")) {
                 normalizedCast = "OBC (Other Backward Classes)";
-            } else if (upper.equalsIgnoreCase("Open") || upper.equalsIgnoreCase("General")) {
+            } else if (upper.equalsIgnoreCase("Open") || upper.equalsIgnoreCase("General") || upper.equals("7")) {
                 normalizedCast = "Open";
             }
             b.etCast.setText(normalizedCast, false);

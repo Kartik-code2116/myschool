@@ -247,13 +247,14 @@
     <string name="label_weight_sem1">वजन प्रथम सत्र (किग्रॉ)</string>
     <string name="label_height_sem2">उंची द्वितीय सत्र (सेमी)</string>
     <string name="label_weight_sem2">वजन द्वितीय सत्र (किग्रॉ)</string>
-    <string name="edit_student">विद्यार्थी संपादित करा</string>
+    <string name="edit_student">विद्यार्थी माहिती बदला</string>
     <string name="student_profile_title">विद्यार्थी</string>
     <string name="student_not_found">विद्यार्थी सापडला नाही</string>
     <string name="section_basic_info">मूलभूत माहिती</string>
     <string name="section_academic_ids">शैक्षणिक आणि आयडी</string>
     <string name="label_bank_uid">बँक UID</string>
     <string name="view_marksheet">मार्कशीट पहा</string>
+    <string name="view_special_card">विशेष गुणपत्रक कार्ड पहा</string>
     <string name="marks_entered_yes">मार्क्स टाकले</string>
     <string name="marks_entered_no">गुण प्रलंबित</string>
     <string name="no_marks_yet">अजून मार्क दिलेले नाहीत</string>

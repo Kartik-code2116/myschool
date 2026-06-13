@@ -660,14 +660,10 @@ public class ProductTourHelper {
                         m ? "८. माहिती संपादित करा ✏️" : "8. Edit Student ✏️",
                         m ? "'संपादित करा' दाबून विद्यार्थ्याची कोणतीही माहिती बदला."
                           : "Press Edit to update any field of this student's profile."));
-                s.add(new TourStep(R.id.btnEnterMarks,
-                        m ? "९. गुण भरा 📝" : "9. Enter Marks 📝",
-                        m ? "या विद्यार्थ्याचे गुण भरण्यासाठी 'गुण भरा' बटण दाबा."
-                          : "Press this to open the marks entry screen for this student."));
-                s.add(new TourStep(R.id.btnViewReport,
-                        m ? "१०. गुणपत्रक 🖨️" : "10. View Marksheet 🖨️",
-                        m ? "PDF गुणपत्रक पाहण्यासाठी, शेअर करण्यासाठी किंवा प्रिंट करण्यासाठी येथे टॅप करा."
-                          : "Tap to preview, share or print this student's PDF marksheet."));
+                s.add(new TourStep(R.id.btnSpecialCard,
+                        m ? "९. विशेष प्रगती पत्रक 📄" : "9. Special Progress Card 📄",
+                        m ? "विशेष आणि अत्यंत आकर्षक डिझाईन असलेले प्रगती पत्रक PDF स्वरूपात तयार व डाऊनलोड करण्यासाठी येथे टॅप करा."
+                          : "Tap to generate and view a beautifully styled personalized special progress card PDF."));
                 break;
 
             // ════════════════════════════════════════════════════════════

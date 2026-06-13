@@ -81,18 +81,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         h.tvTag2.setText(divDisplay);
 
         // Photo / Avatar binding
-        if (s.photoUrl != null && !s.photoUrl.isEmpty()) {
-            Glide.with(h.ivPhoto).load(s.photoUrl).centerCrop().into(h.ivPhoto);
-        } else {
-            boolean isFemale = s.gender != null && (s.gender.equalsIgnoreCase("Female") 
-                    || s.gender.equalsIgnoreCase("स्त्री") 
-                    || s.gender.equalsIgnoreCase("मुलगी"));
-            if (isFemale) {
-                h.ivPhoto.setImageResource(R.drawable.ic_girl_avatar);
-            } else {
-                h.ivPhoto.setImageResource(R.drawable.ic_boy_avatar);
-            }
-        }
+        bindPhoto(h, s);
 
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(s, pos);
@@ -125,6 +114,45 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         });
         // Scroll-reveal animation: slides up + fades in as new items appear
         UiAnimations.animateScrollReveal(h.itemView, pos, lastAnimatedPos);
+    }
+
+    private void bindPhoto(VH h, Student s) {
+        if (s.photoUrl != null && !s.photoUrl.isEmpty()) {
+            h.ivPhoto.setPadding(0, 0, 0, 0);
+            h.ivPhoto.setImageTintList(null);
+            if (s.photoUrl.startsWith("data:image")) {
+                try {
+                    String base64Data = s.photoUrl.substring(s.photoUrl.indexOf(",") + 1);
+                    byte[] decodedString = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
+                    android.graphics.Bitmap decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    h.ivPhoto.setImageBitmap(decodedByte);
+                } catch (Exception e) {
+                    bindPlaceholder(h, s);
+                }
+            } else {
+                Glide.with(h.ivPhoto.getContext())
+                        .load(s.photoUrl)
+                        .centerCrop()
+                        .placeholder(getPlaceholderRes(s))
+                        .into(h.ivPhoto);
+            }
+        } else {
+            bindPlaceholder(h, s);
+        }
+    }
+
+    private int getPlaceholderRes(Student s) {
+        boolean isFemale = s.gender != null && (s.gender.equalsIgnoreCase("Female") 
+                || s.gender.equalsIgnoreCase("स्त्री") 
+                || s.gender.equalsIgnoreCase("मुलगी")
+                || s.gender.equals("2"));
+        return isFemale ? R.drawable.ic_girl_avatar : R.drawable.ic_boy_avatar;
+    }
+
+    private void bindPlaceholder(VH h, Student s) {
+        h.ivPhoto.setImageResource(getPlaceholderRes(s));
+        h.ivPhoto.setPadding(0, 0, 0, 0);
+        h.ivPhoto.setImageTintList(null);
     }
 
     @Override

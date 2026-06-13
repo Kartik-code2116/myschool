@@ -832,15 +832,19 @@ public class StudentListFragment extends Fragment {
             int index = Integer.parseInt(categoryStr.trim());
             switch (index) {
                 case 0:
-                    return "SC (Scheduled Castes)";
                 case 1:
-                    return "ST (Scheduled Tribes)";
+                    return "SC (Scheduled Castes)";
                 case 2:
-                    return "VJ (Vimukt Jati)";
+                    return "ST (Scheduled Tribes)";
                 case 3:
-                    return "NT (Nomadic Tribes)";
+                    return "VJ (Vimukt Jati)";
                 case 4:
+                    return "NT (Nomadic Tribes)";
+                case 5:
                     return "OBC (Other Backward Classes)";
+                case 6:
+                    return "SBC (Special Backward Class)";
+                case 7:
                 default:
                     return "Open";
             }

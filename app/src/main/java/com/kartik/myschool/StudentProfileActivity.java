@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -25,6 +26,11 @@ public class StudentProfileActivity extends AppCompatActivity {
 
     private ActivityStudentProfileBinding b;
     private Student student;
+    private ImageView dialogPhotoPreview;
+    private android.graphics.Bitmap currentPhotoBitmap;
+    private Uri tempCameraUri;
+    private static final int REQ_CODE_CAMERA = 1001;
+    private static final int REQ_CODE_GALLERY = 1002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +57,9 @@ public class StudentProfileActivity extends AppCompatActivity {
             startActivity(new Intent(this, StudentEditActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
-        b.btnEnterMarks.setOnClickListener(v -> {
-            UiAnimations.pulse(b.btnEnterMarks);
-            openMarks();
-        });
-        b.btnViewReport.setOnClickListener(v -> {
-            UiAnimations.pulse(b.btnViewReport);
-            openReport();
+        b.btnSpecialCard.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnSpecialCard);
+            openSpecialCard();
         });
 
         // Set quick scroll section navigation click listeners with scale pulse feedback
@@ -84,6 +86,10 @@ public class StudentProfileActivity extends AppCompatActivity {
                 b.btnNavBasic, b.btnNavFamily, b.btnNavBank, b.btnNavAcademic,
                 b.cardBasic, b.cardFamily, b.cardBank, b.cardAcademic
         );
+        b.ivStudentPhoto.setOnClickListener(v -> {
+            UiAnimations.pulse(b.ivStudentPhoto);
+            showPhotoEditDialog();
+        });
         loadStudent();
     }
 
@@ -135,20 +141,13 @@ public class StudentProfileActivity extends AppCompatActivity {
         // Bind the 4-column green statistic card values
         b.tvTopRollNo.setText(val(s.rollNo));
         b.tvTopRollNo2.setText(val(s.rollNo2));
-        b.tvTopGender.setText(val(s.gender));
-        b.tvTopCast.setText(val(s.cast));
+        b.tvTopGender.setText(getDisplayGender(s.gender));
+        b.tvTopCast.setText(getDisplayCast(s.cast));
 
-        // Dynamically bind custom monoline outline avatars based on gender
-        if (s.gender != null) {
-            String g = s.gender.toLowerCase().trim();
-            if (g.contains("female") || g.contains("स्त्री") || g.contains("मुलगी")) {
-                b.ivStudentPhoto.setImageResource(R.drawable.ic_girl_avatar);
-            } else {
-                b.ivStudentPhoto.setImageResource(R.drawable.ic_boy_avatar);
-            }
-        } else {
-            b.ivStudentPhoto.setImageResource(R.drawable.ic_boy_avatar);
-        }
+        // Load student photo or avatar placeholder
+        loadStudentPhoto(s, b.ivStudentPhoto);
+        // Load student photo into header banner background (blurred/scaled behind name)
+        loadHeaderBannerPhoto(s);
 
         bindMarksChip(s);
 
@@ -157,8 +156,8 @@ public class StudentProfileActivity extends AppCompatActivity {
                 {getString(R.string.label_roll_no_2), s.rollNo2},
                 {getString(R.string.label_reg_no), s.registrationNo},
                 {getString(R.string.label_dob), s.dob},
-                {getString(R.string.label_gender), s.gender},
-                {getString(R.string.label_cast), s.cast},
+                {getString(R.string.label_gender), getDisplayGender(s.gender)},
+                {getString(R.string.label_cast), getDisplayCast(s.cast)},
                 {getString(R.string.label_birthplace), s.birthPlace},
                 {getString(R.string.label_religion), s.religion},
                 {getString(R.string.label_blood_group), s.bloodGroup},
@@ -223,6 +222,93 @@ public class StudentProfileActivity extends AppCompatActivity {
 
     private String val(String v) {
         return v != null && !v.isEmpty() ? v : "-";
+    }
+
+    private String getDisplayGender(String gender) {
+        if (gender == null || gender.isEmpty()) return "—";
+        String g = gender.trim().toLowerCase();
+        if (g.equals("1") || g.equals("male") || g.equals("boy") || g.equals("पुरुष") || g.equals("मुलगा")) {
+            return "M";
+        }
+        if (g.equals("2") || g.equals("female") || g.equals("girl") || g.equals("स्त्री") || g.equals("मुलगी")) {
+            return "F";
+        }
+        if (!gender.trim().isEmpty()) {
+            return gender.trim().substring(0, Math.min(gender.trim().length(), 1)).toUpperCase();
+        }
+        return "—";
+    }
+
+    private String getDisplayCast(String cast) {
+        if (cast == null || cast.isEmpty()) return "—";
+        String trim = cast.trim();
+        if (trim.equals("0") || trim.equals("1") || trim.equalsIgnoreCase("SC")) {
+            return "SC";
+        }
+        if (trim.equals("2") || trim.equalsIgnoreCase("ST")) {
+            return "ST";
+        }
+        if (trim.equals("3") || trim.equalsIgnoreCase("VJ")) {
+            return "VJ";
+        }
+        if (trim.equals("4") || trim.equalsIgnoreCase("NT")) {
+            return "NT";
+        }
+        if (trim.equals("5") || trim.equalsIgnoreCase("OBC")) {
+            return "OBC";
+        }
+        if (trim.equals("6") || trim.equalsIgnoreCase("SBC")) {
+            return "SBC";
+        }
+        if (trim.equals("7") || trim.equalsIgnoreCase("Open")) {
+            return "Open";
+        }
+        return getShortCast(cast);
+    }
+
+    private String getShortCast(String cast) {
+        if (cast == null || cast.isEmpty()) return "—";
+        String trim = cast.trim();
+        if (trim.equals("0") || trim.equals("1")) return "SC";
+        if (trim.equals("2")) return "ST";
+        if (trim.equals("3")) return "VJ";
+        if (trim.equals("4")) return "NT";
+        if (trim.equals("5")) return "OBC";
+        if (trim.equals("6")) return "SBC";
+        if (trim.equals("7")) return "Open";
+
+        String upper = trim.toUpperCase();
+        if (upper.equals("SC") || upper.contains("SCHEDULED CASTES") || upper.contains("SCHEDULED CASTE") || upper.contains("अनुसूचित जाती") || upper.contains("अनु. जाती")) {
+            return "SC";
+        }
+        if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES") || upper.contains("SCHEDULED TRIBE") || upper.contains("अनुसूचित जमाती") || upper.contains("अनु. जमाती")) {
+            return "ST";
+        }
+        if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT") || upper.contains("विमुक्त")) {
+            return "VJ";
+        }
+        if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("NOMADIC TRIBE") || upper.contains("BHATKYA") || upper.contains("भटक्या") || upper.contains("भ.ज.")) {
+            return "NT";
+        }
+        if (upper.equals("OBC") || upper.contains("OTHER BACKWARD") || upper.contains("इतर मागास") || upper.contains("इ.मा.व.")) {
+            return "OBC";
+        }
+        if (upper.equals("SBC") || upper.contains("SPECIAL BACKWARD") || upper.contains("विशेष मागास") || upper.contains("वि.मा.प्र.")) {
+            return "SBC";
+        }
+        if (upper.equals("OPEN") || upper.contains("GENERAL") || upper.contains("खुला")) {
+            return "Open";
+        }
+        if (cast.contains("(")) {
+            String before = cast.substring(0, cast.indexOf("(")).trim();
+            if (!before.isEmpty()) {
+                return before;
+            }
+        }
+        if (cast.length() > 6) {
+            return cast.substring(0, 6).trim();
+        }
+        return cast;
     }
 
     private void openMarks() {
@@ -394,6 +480,52 @@ public class StudentProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onError(Exception e) {
                                     runOnUiThread(() -> {
+                                        Toast.makeText(StudentProfileActivity.this, "त्रुटी आढळli: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    });
+                                }
+                            });
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "द्वितीया सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        }
+                    });
+                }
+                @Override
+                public void onError(Exception e) {
+                    runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "प्रथम सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            });
+        });
+    }
+
+    private void openSpecialCard() {
+        loadPrerequisitesThen(() -> {
+            Toast.makeText(this, student.name + " चे विशेष प्रगती पत्रक तयार होत आहे...", Toast.LENGTH_SHORT).show();
+            String classId = (AppCache.selectedClass != null && AppCache.selectedClass.id != null) 
+                             ? AppCache.selectedClass.id : student.classId;
+            String[] sids = getSemesterIds();
+            FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[0], new FirebaseRepository.OnResult<MarksRecord>() {
+                @Override
+                public void onSuccess(MarksRecord s1) {
+                    FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[1], new FirebaseRepository.OnResult<MarksRecord>() {
+                        @Override
+                        public void onSuccess(MarksRecord s2) {
+                            if (s1 == null && s2 == null) {
+                                runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, R.string.no_marks_yet, Toast.LENGTH_SHORT).show());
+                                return;
+                            }
+                            com.kartik.myschool.utils.pdf.StudentSpecialCardGenerator.generateSpecialCard(StudentProfileActivity.this, SessionContext.selectedSchool, AppCache.selectedClass, student, s1, s2, new PdfGenerator.PdfCallback() {
+                                @Override
+                                public void onSuccess(File pdfFile) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(StudentProfileActivity.this, R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
+                                        openPdfFile(pdfFile);
+                                    });
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    runOnUiThread(() -> {
                                         Toast.makeText(StudentProfileActivity.this, "त्रुटी आढळली: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                     });
                                 }
@@ -448,6 +580,277 @@ public class StudentProfileActivity extends AppCompatActivity {
         if (AppCache.selectedStudent != null && AppCache.selectedStudent.id != null) {
             student = AppCache.selectedStudent;
             loadStudent();
+        }
+    }
+
+    private void loadStudentPhoto(Student s, ImageView iv) {
+        if (s.photoUrl != null && !s.photoUrl.isEmpty()) {
+            iv.setPadding(0, 0, 0, 0);
+            iv.setImageTintList(null);
+            if (s.photoUrl.startsWith("data:image")) {
+                try {
+                    String base64Data = s.photoUrl.substring(s.photoUrl.indexOf(",") + 1);
+                    byte[] decodedString = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
+                    android.graphics.Bitmap decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    iv.setImageBitmap(decodedByte);
+                } catch (Exception e) {
+                    loadPlaceholderPhoto(s, iv);
+                }
+            } else {
+                com.bumptech.glide.Glide.with(this)
+                        .load(s.photoUrl)
+                        .centerCrop()
+                        .placeholder(getPlaceholderRes(s))
+                        .into(iv);
+            }
+        } else {
+            loadPlaceholderPhoto(s, iv);
+        }
+    }
+
+    /**
+     * Loads the student photo into the header banner background ImageView (ivHeaderBg).
+     * If the student has a photo, it is loaded full-bleed; otherwise the default drawable is used.
+     */
+    private void loadHeaderBannerPhoto(Student s) {
+        if (b.ivHeaderBg == null) return;
+        if (s.photoUrl != null && !s.photoUrl.isEmpty()) {
+            if (s.photoUrl.startsWith("data:image")) {
+                try {
+                    String base64Data = s.photoUrl.substring(s.photoUrl.indexOf(",") + 1);
+                    byte[] decoded = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
+                    android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+                    b.ivHeaderBg.setImageBitmap(bmp);
+                    b.ivHeaderBg.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+                } catch (Exception e) {
+                    b.ivHeaderBg.setImageResource(R.drawable.bg_profile_header);
+                }
+            } else {
+                com.bumptech.glide.Glide.with(this)
+                        .load(s.photoUrl)
+                        .centerCrop()
+                        .placeholder(R.drawable.bg_profile_header)
+                        .into(b.ivHeaderBg);
+            }
+        } else {
+            // No photo selected — show plain color (FrameLayout background shows through)
+            b.ivHeaderBg.setImageDrawable(null);
+        }
+    }
+
+    private int getPlaceholderRes(Student s) {
+        if (s.gender != null) {
+            String g = s.gender.toLowerCase().trim();
+            if (g.contains("female") || g.contains("स्त्री") || g.contains("मुलगी")
+                    || g.equals("2") || g.equals("f")) {
+                return R.drawable.ic_girl_avatar;
+            }
+        }
+        return R.drawable.ic_boy_avatar;
+    }
+
+    private void loadPlaceholderPhoto(Student s, ImageView iv) {
+        iv.setImageResource(getPlaceholderRes(s));
+        iv.setPadding(0, 0, 0, 0);
+        iv.setImageTintList(null);
+    }
+
+    private void showPhotoEditDialog() {
+        android.view.View view = getLayoutInflater().inflate(R.layout.dialog_photo_edit, null);
+        dialogPhotoPreview = view.findViewById(R.id.ivPhotoPreview);
+        android.widget.ImageButton btnCamera = view.findViewById(R.id.btnCamera);
+        android.widget.ImageButton btnCrop = view.findViewById(R.id.btnCrop);
+        android.widget.ImageButton btnDelete = view.findViewById(R.id.btnDelete);
+        android.widget.ImageButton btnRotate = view.findViewById(R.id.btnRotate);
+        android.widget.ImageButton btnSave = view.findViewById(R.id.btnSave);
+
+        loadStudentPhoto(student, dialogPhotoPreview);
+
+        try {
+            android.graphics.drawable.Drawable drawable = b.ivStudentPhoto.getDrawable();
+            if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                currentPhotoBitmap = ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
+            } else {
+                currentPhotoBitmap = null;
+            }
+        } catch (Exception e) {
+            currentPhotoBitmap = null;
+        }
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder builder = 
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setView(view);
+
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnCamera.setOnClickListener(v -> {
+            String[] options = {"कॅमेरा (Camera)", "गॅलरी (Gallery)"};
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("फोटोचा स्त्रोत निवडा (Choose Photo Source)")
+                    .setItems(options, (dialogInterface, which) -> {
+                        if (which == 0) {
+                            launchCamera();
+                        } else {
+                            launchGallery();
+                        }
+                    })
+                    .show();
+        });
+
+        btnCrop.setOnClickListener(v -> {
+            if (currentPhotoBitmap != null) {
+                int width = currentPhotoBitmap.getWidth();
+                int height = currentPhotoBitmap.getHeight();
+                int newWidth = Math.min(width, height);
+                int cropW = (width - newWidth) / 2;
+                int cropH = (height - newWidth) / 2;
+                currentPhotoBitmap = android.graphics.Bitmap.createBitmap(currentPhotoBitmap, cropW, cropH, newWidth, newWidth);
+                dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
+                Toast.makeText(this, "फोटो क्रॉप केला", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "क्रॉप करण्यासाठी आधी फोटो निवडा", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnDelete.setOnClickListener(v -> {
+            currentPhotoBitmap = null;
+            dialogPhotoPreview.setImageResource(getPlaceholderRes(student));
+            Toast.makeText(this, "फोटो काढला (डिफॉल्ट अवतार दर्शविला जाईल)", Toast.LENGTH_SHORT).show();
+        });
+
+        btnRotate.setOnClickListener(v -> {
+            if (currentPhotoBitmap != null) {
+                android.graphics.Matrix matrix = new android.graphics.Matrix();
+                matrix.postRotate(90);
+                currentPhotoBitmap = android.graphics.Bitmap.createBitmap(currentPhotoBitmap, 0, 0, currentPhotoBitmap.getWidth(), currentPhotoBitmap.getHeight(), matrix, true);
+                dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
+            } else {
+                Toast.makeText(this, "फिरवण्यासाठी आधी फोटो निवडा", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnSave.setOnClickListener(v -> {
+            if (currentPhotoBitmap == null) {
+                Toast.makeText(this, "फोटो काढून टाकत आहे...", Toast.LENGTH_SHORT).show();
+                FirebaseRepository.get().deleteStudentPhoto(student.id, new FirebaseRepository.OnResult<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        student.photoUrl = "";
+                        loadStudentPhoto(student, b.ivStudentPhoto);
+                        Toast.makeText(StudentProfileActivity.this, "फोटो यशस्वीरीत्या काढला", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                android.graphics.Bitmap scaled = android.graphics.Bitmap.createScaledBitmap(currentPhotoBitmap, 300, 300, true);
+                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, baos);
+                byte[] bytes = baos.toByteArray();
+
+                Toast.makeText(this, "फोटो अपलोड होत आहे...", Toast.LENGTH_SHORT).show();
+                FirebaseRepository.get().uploadStudentPhoto(student.id, bytes, new FirebaseRepository.OnResult<String>() {
+                    @Override
+                    public void onSuccess(String url) {
+                        student.photoUrl = url;
+                        loadStudentPhoto(student, b.ivStudentPhoto);
+                        Toast.makeText(StudentProfileActivity.this, "फोटो यशस्वीरीत्या जतन केला", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void launchCamera() {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            androidx.core.app.ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.CAMERA}, 100);
+            return;
+        }
+        try {
+            Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            // Verify that a camera app can handle the intent
+            if (intent.resolveActivity(getPackageManager()) == null) {
+                Toast.makeText(this, "कॅमेरा ऍप आढळले नाही", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            java.io.File tempFile = new java.io.File(getExternalCacheDir(), "temp_profile.jpg");
+            tempCameraUri = androidx.core.content.FileProvider.getUriForFile(
+                    this, getPackageName() + ".fileprovider", tempFile);
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, tempCameraUri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            startActivityForResult(intent, REQ_CODE_CAMERA);
+        } catch (Exception e) {
+            Toast.makeText(this, "कॅमेरा सुरू करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQ_CODE_GALLERY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQ_CODE_CAMERA) {
+                try {
+                    android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeStream(
+                            getContentResolver().openInputStream(tempCameraUri));
+                    if (bitmap != null) {
+                        currentPhotoBitmap = bitmap;
+                        if (dialogPhotoPreview != null) {
+                            dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
+                        }
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(this, "फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == REQ_CODE_GALLERY) {
+                if (data != null && data.getData() != null) {
+                    try {
+                        android.graphics.Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(
+                                getContentResolver(), data.getData());
+                        if (bitmap != null) {
+                            currentPhotoBitmap = bitmap;
+                            if (dialogPhotoPreview != null) {
+                                dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
+                            }
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(this, "फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                // Camera permission granted – re-launch camera
+                launchCamera();
+            } else {
+                Toast.makeText(this, "कॅमेरा वापरण्यासाठी परवानगी द्या", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
