@@ -19,6 +19,7 @@
 
             <!-- Context Header Card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvContextHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -56,6 +57,7 @@
 
             <!-- Unified Content Card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvUnifiedContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/surface"
@@ -346,49 +348,11 @@
                         android:orientation="vertical"
                         android:visibility="gone">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="6dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="Select Subject"
-                            android:textColor="@color/primary"
-                            android:textSize="12sp" />
-
-                        <Spinner
-                            android:id="@+id/spRemarkBankSubject"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="12dp"
-                            android:background="@drawable/bg_spinner_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="Remark Options (Tap to remove)"
-                            android:textColor="@color/on_surface_variant"
-                            android:textSize="12sp" />
-
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/cgRemarkBankOptions"
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvSchoolSubjectsList"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            app:chipSpacingHorizontal="8dp"
-                            app:chipSpacingVertical="8dp"
-                            app:singleLine="false" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnAddRemarkBankOption"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Add remark option"
-                            app:cornerRadius="8dp"
-                            app:icon="@drawable/ic_add_circle" />
+                            android:nestedScrollingEnabled="false"/>
                     </LinearLayout>
 
                     <!-- 7. DEFAULT VALUES -->
@@ -793,6 +757,50 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Subject Selection Page Style Layout (only visible for Subject menuType) -->
+            <LinearLayout
+                android:id="@+id/llSubjectSelectionStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Header Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="0dp">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+                        
+                        <TextView
+                            android:id="@+id/tvSubjectHeaderLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="#333333"
+                            android:textSize="15sp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Full Width Subjects List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvSchoolSubjectsListFull"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="80dp"/>
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -207,14 +207,17 @@ public class FormativeSummativeFragment extends Fragment {
             Map<String, MarksRecord> cachedMarks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap
                     : new HashMap<>();
 
-            // Render instantly from cache and hide progress
-            if (b != null)
-                b.progressLoading.setVisibility(View.GONE);
-            if (swipeRefresh != null)
-                swipeRefresh.setRefreshing(false);
-            
+            // Render instantly from cache after a brief delay to let slide animation start smoothly
             renderedFromCache = true;
-            adapter.setData(cachedList, cachedMarks, true); // Reset animation for the first instant render
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (isAdded() && b != null) {
+                    if (b != null)
+                        b.progressLoading.setVisibility(View.GONE);
+                    if (swipeRefresh != null)
+                        swipeRefresh.setRefreshing(false);
+                    adapter.setData(cachedList, cachedMarks, true); // Reset animation for the first instant render
+                }
+            }, 200);
         }
         
         final boolean finalRenderedFromCache = renderedFromCache;
@@ -385,6 +388,7 @@ public class FormativeSummativeFragment extends Fragment {
         boolean semesterChanged = !java.util.Objects.equals(activeSemesterId, lastLoadedSemesterId);
 
         if (isFirstLoad || classChanged || semesterChanged) {
+            b.progressLoading.setVisibility(View.VISIBLE);
             loadEvaluationData();
         }
     }
@@ -427,26 +431,42 @@ public class FormativeSummativeFragment extends Fragment {
         private final List<Student> students = new ArrayList<>();
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
         private final int[] lastPosition = new int[] { -1 };
+        private final RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
 
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
-            students.clear();
-            students.addAll(list);
-            marksMap.clear();
-            marksMap.putAll(map);
-            if (resetAnimation) {
-                lastPosition[0] = -1; // Reset animation on fresh data load
-            }
-            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
+            final List<Student> oldStudents = new ArrayList<>(this.students);
+            final List<Student> newStudents = new ArrayList<>(list);
+            final Map<String, MarksRecord> newMarks = new HashMap<>(map);
+
+            androidx.recyclerview.widget.DiffUtil.DiffResult result = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() { return oldStudents.size(); }
+                @Override
+                public int getNewListSize() { return newStudents.size(); }
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return java.util.Objects.equals(oldStudents.get(oldItemPosition).id, newStudents.get(newItemPosition).id);
+                }
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    return false;
+                }
+            });
+
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                this.students.clear();
+                this.students.addAll(newStudents);
+                this.marksMap.clear();
+                this.marksMap.putAll(newMarks);
+                if (resetAnimation) {
+                    lastPosition[0] = -1;
+                }
+                result.dispatchUpdatesTo(this);
+            });
         }
 
-        /**
-         * Instantly updates one student's card without a full list reload.
-         * Called by onResume() immediately after returning from EnterMarksActivity.
-         */
         public void patchStudentMarks(String studentId, MarksRecord record) {
-            // Update the adapter's marks map
             marksMap.put(studentId, record);
-            // Also update the marks AppCache so future renders are correct
             if (AppCache.cachedMarksMap == null
                     || !java.util.Objects.equals(activeClass.id, AppCache.cachedClassIdForStudents)
                     || !java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
@@ -455,18 +475,14 @@ public class FormativeSummativeFragment extends Fragment {
                 AppCache.cachedSemesterIdForMarks = activeSemesterId;
             }
             AppCache.cachedMarksMap.put(studentId, record);
-            // Notify only the changed item for a smooth, flicker-free update
             for (int i = 0; i < students.size(); i++) {
                 if (java.util.Objects.equals(studentId, students.get(i).id)) {
                     final int pos = i;
                     new android.os.Handler(android.os.Looper.getMainLooper())
                             .post(() -> notifyItemChanged(pos));
-                    android.util.Log.d("FORMATIVE_SUMMATIVE",
-                            "patchStudentMarks: notified pos=" + pos + " student=" + studentId);
                     return;
                 }
             }
-            // Student not in list yet — do a full refresh
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
@@ -496,6 +512,8 @@ public class FormativeSummativeFragment extends Fragment {
             public ViewHolder(ItemEvaluationStudentBlockBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
+                binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
             }
 
             public void bind(Student s, int index) {
@@ -522,7 +540,6 @@ public class FormativeSummativeFragment extends Fragment {
 
                 MarksRecord marks = marksMap.get(s.id);
 
-                // Build Grade Chips Row using View Recycling
                 List<String> gradesToDisplay = new ArrayList<>();
                 if (marks != null && marks.detailedMarks != null && activeClass.subjects != null) {
                     for (Subject sub : activeClass.subjects) {
@@ -547,7 +564,6 @@ public class FormativeSummativeFragment extends Fragment {
                     bindGradeChip(tv, gradesToDisplay.get(i));
                 }
 
-                // Adjust card margins depending on layout mode
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) binding.getRoot().getLayoutParams();
                 float density = itemView.getResources().getDisplayMetrics().density;
                 if (isGridView) {
@@ -561,85 +577,20 @@ public class FormativeSummativeFragment extends Fragment {
                 }
                 binding.getRoot().setLayoutParams(lp);
 
-                // Show/hide grade chips under student name
                 binding.layoutGradeChips.setVisibility(isGridView ? View.GONE : View.VISIBLE);
-
-                // Build Subject Cards depending on layout mode using View Recycling
-                binding.scrollSubjects.setVisibility(View.VISIBLE);
+                binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);
                 binding.layoutSummaryGrid.setVisibility(View.GONE);
 
                 if (activeClass.subjects != null) {
-                    int subjectCount = activeClass.subjects.size();
-
-                    // Check if existing views are of the wrong type, and remove if so
-                    if (binding.layoutSubjectsHorizontal.getChildCount() > 0) {
-                        View firstChild = binding.layoutSubjectsHorizontal.getChildAt(0);
-                        boolean isCurrentCompact = firstChild
-                                .getTag() instanceof ItemEvaluationSubjectCardCompactBinding;
-                        if (isGridView != isCurrentCompact) {
-                            binding.layoutSubjectsHorizontal.removeAllViews();
-                        }
-                    }
-
-                    // Add needed views
-                    LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
-                    while (binding.layoutSubjectsHorizontal.getChildCount() < subjectCount) {
-                        if (isGridView) {
-                            ItemEvaluationSubjectCardCompactBinding cardB = ItemEvaluationSubjectCardCompactBinding
-                                    .inflate(inflater, binding.layoutSubjectsHorizontal, false);
-
-                            // Set compact card layout width once
-                            android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
-                                    (int) (186 * density),
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-                            int margin = (int) (6 * density);
-                            param.setMargins(margin, margin, margin, margin);
-                            cardB.getRoot().setLayoutParams(param);
-
-                            View cardView = cardB.getRoot();
-                            cardView.setTag(cardB);
-                            binding.layoutSubjectsHorizontal.addView(cardView);
-                        } else {
-                            ItemEvaluationSubjectCardBinding cardB = ItemEvaluationSubjectCardBinding.inflate(inflater,
-                                    binding.layoutSubjectsHorizontal, false);
-
-                            // Set consistent layout width and margins for horizontal scrolling (300dp to
-                            // fit table)
-                            android.widget.LinearLayout.LayoutParams param = new android.widget.LinearLayout.LayoutParams(
-                                    (int) (300 * density),
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-                            int margin = (int) (6 * density);
-                            param.setMargins(margin, margin, margin, margin);
-                            cardB.getRoot().setLayoutParams(param);
-
-                            View cardView = cardB.getRoot();
-                            cardView.setTag(cardB);
-                            binding.layoutSubjectsHorizontal.addView(cardView);
-                        }
-                    }
-
-                    // Remove extra views
-                    while (binding.layoutSubjectsHorizontal.getChildCount() > subjectCount) {
-                        binding.layoutSubjectsHorizontal
-                                .removeViewAt(binding.layoutSubjectsHorizontal.getChildCount() - 1);
-                    }
-
-                    // Bind data
-                    for (int i = 0; i < subjectCount; i++) {
-                        Subject sub = activeClass.subjects.get(i);
-                        View cardView = binding.layoutSubjectsHorizontal.getChildAt(i);
-                        if (isGridView) {
-                            ItemEvaluationSubjectCardCompactBinding cardB = (ItemEvaluationSubjectCardCompactBinding) cardView
-                                    .getTag();
-                            bindSubjectCardCompact(cardB, s, sub, i + 1, marks);
-                        } else {
-                            ItemEvaluationSubjectCardBinding cardB = (ItemEvaluationSubjectCardBinding) cardView
-                                    .getTag();
-                            bindSubjectCard(cardB, s, sub, i + 1, marks);
-                        }
+                    SubjectInnerAdapter innerAdapter = (SubjectInnerAdapter) binding.rvSubjectsHorizontal.getAdapter();
+                    if (innerAdapter == null || innerAdapter.isGridView() != isGridView) {
+                        innerAdapter = new SubjectInnerAdapter(s, activeClass.subjects, marks, isGridView, this);
+                        binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
+                    } else {
+                        innerAdapter.updateData(s, activeClass.subjects, marks);
                     }
                 } else {
-                    binding.layoutSubjectsHorizontal.removeAllViews();
+                    binding.rvSubjectsHorizontal.setAdapter(null);
                 }
             }
 
@@ -650,275 +601,48 @@ public class FormativeSummativeFragment extends Fragment {
                 float density = itemView.getResources().getDisplayMetrics().density;
                 tv.setPadding((int) (8 * density), (int) (3 * density), (int) (8 * density), (int) (3 * density));
                 tv.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
-
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 lp.setMarginEnd((int) (6 * density));
                 tv.setLayoutParams(lp);
-
                 return tv;
             }
 
             private void bindGradeChip(TextView tv, String grade) {
                 tv.setText(grade);
                 float density = itemView.getResources().getDisplayMetrics().density;
-
                 int textColor = 0xFF6C4CCF;
                 int borderColor = 0xFFE1D5FF;
                 int bgColor = 0xFFF3EEFF;
 
                 if (grade.startsWith("A-1") || grade.startsWith("अ-1")) {
-                    textColor = 0xFF6C4CCF;
-                    borderColor = 0xFFD7C4FF;
-                    bgColor = 0xFFF3EEFF;
+                    textColor = 0xFF6C4CCF; borderColor = 0xFFD7C4FF; bgColor = 0xFFF3EEFF;
                 } else if (grade.startsWith("A-2") || grade.startsWith("अ-2")) {
-                    textColor = 0xFF00A5CF;
-                    borderColor = 0xFFB2E7F5;
-                    bgColor = 0xFFE0F7FA;
+                    textColor = 0xFF00A5CF; borderColor = 0xFFB2E7F5; bgColor = 0xFFE0F7FA;
                 } else if (grade.startsWith("B-1") || grade.startsWith("ब-1")) {
-                    textColor = 0xFF2E7D32;
-                    borderColor = 0xFFC8E6C9;
-                    bgColor = 0xFFE8F5E9;
+                    textColor = 0xFF2E7D32; borderColor = 0xFFC8E6C9; bgColor = 0xFFE8F5E9;
                 } else if (grade.startsWith("B-2") || grade.startsWith("ब-2")) {
-                    textColor = 0xFF9E9D24;
-                    borderColor = 0xFFF0F4C3;
-                    bgColor = 0xFFF9FBE7;
+                    textColor = 0xFF9E9D24; borderColor = 0xFFF0F4C3; bgColor = 0xFFF9FBE7;
                 } else {
-                    textColor = 0xFFE65100;
-                    borderColor = 0xFFFFE0B2;
-                    bgColor = 0xFFFFF3E0;
+                    textColor = 0xFFE65100; borderColor = 0xFFFFE0B2; bgColor = 0xFFFFF3E0;
                 }
 
                 tv.setTextColor(textColor);
-
-                GradientDrawable gd = new GradientDrawable();
+                android.graphics.drawable.Drawable background = tv.getBackground();
+                GradientDrawable gd;
+                if (background instanceof GradientDrawable) {
+                    gd = (GradientDrawable) background;
+                } else {
+                    gd = new GradientDrawable();
+                    tv.setBackground(gd);
+                }
                 gd.setColor(bgColor);
                 gd.setCornerRadius(6 * density);
                 gd.setStroke((int) (1 * density), borderColor);
-                tv.setBackground(gd);
             }
 
-            private String formatVal(int val) {
-                return String.valueOf(val);
-            }
-
-            private void bindSubjectCard(ItemEvaluationSubjectCardBinding cardB, Student student, Subject sub,
-                    int number, MarksRecord record) {
-                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), sub.name));
-
-                // Default table values
-                String fe1 = "0", fe2 = "0", fe3 = "0", fe4 = "0", fe5 = "0", fe6 = "0", fe7 = "0", fe8 = "0";
-                String se1 = "0", se2 = "0", se3 = "0";
-                String fet = "0", set = "0", tet = "0";
-                String gradeVal = "—";
-                boolean hasMarks = false;
-
-                String safeKey = MarksRecord.sanitizeKey(sub.name);
-                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
-                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
-                    if (d != null && hasEnteredMarks(d)) {
-                        hasMarks = true;
-                        fe1 = formatVal(d.nirikhshan);
-                        fe2 = formatVal(d.tondiKam);
-                        fe3 = formatVal(d.pratyakshik);
-                        fe4 = formatVal(d.upkram);
-                        fe5 = formatVal(d.prakalp);
-                        fe6 = formatVal(d.chachani);
-                        fe7 = formatVal(d.swadhyay);
-                        fe8 = formatVal(d.itar);
-
-                        se1 = formatVal(d.tondi);
-                        se2 = formatVal(d.pratyakshikB);
-                        se3 = formatVal(d.lekhi);
-
-                        fet = formatVal(d.akarikTotal);
-                        set = formatVal(d.sanklit);
-                        tet = formatVal(d.grandTotal);
-                        if (d.grade != null && !d.grade.isEmpty()) {
-                            gradeVal = d.grade;
-                        }
-                    }
-                }
-
-                // Set table text views
-                cardB.tvFE1.setText(fe1);
-                cardB.tvFE2.setText(fe2);
-                cardB.tvFE3.setText(fe3);
-                cardB.tvFE4.setText(fe4);
-                cardB.tvFE5.setText(fe5);
-                cardB.tvFE6.setText(fe6);
-                cardB.tvFE7.setText(fe7);
-                cardB.tvFE8.setText(fe8);
-
-                cardB.tvSE1.setText(se1);
-                cardB.tvSE2.setText(se2);
-                cardB.tvSE3.setText(se3);
-
-                cardB.tvFET.setText(fet);
-                cardB.tvSET.setText(set);
-                cardB.tvTET.setText(tet);
-
-                // Tint card border orange to signal "needs entry" if no marks are entered yet
-                if (hasMarks) {
-                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
-                            .setStrokeColor(0xFFE0E0E0);
-                } else {
-                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
-                            .setStrokeColor(0xFFFFB74D);
-                }
-
-                // Style dynamic Grade Chip in header
-                float density = itemView.getResources().getDisplayMetrics().density;
-                int gradeColor = 0xFF90A4AE; // gray
-                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1"))
-                    gradeColor = 0xFF6C4CCF;
-                else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2"))
-                    gradeColor = 0xFF00A5CF;
-                else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1"))
-                    gradeColor = 0xFF2E7D32;
-                else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2"))
-                    gradeColor = 0xFF9E9D24;
-                else if (!gradeVal.equals("—"))
-                    gradeColor = 0xFFE65100;
-
-                cardB.tvHeaderGrade.setText(gradeVal);
-                if (gradeVal.equals("—")) {
-                    cardB.tvHeaderGrade.setVisibility(View.GONE);
-                } else {
-                    cardB.tvHeaderGrade.setVisibility(View.VISIBLE);
-                    android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
-                    gd.setColor(gradeColor);
-                    gd.setCornerRadius(6 * density);
-                    cardB.tvHeaderGrade.setBackground(gd);
-                }
-
-                // Setup 3-dot popup menu
-                cardB.btnSubjectMore.setOnClickListener(v -> {
-                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
-                            itemView.getContext(), v);
-                    popup.getMenu().add(0, 1, 0, "Enter Marks");
-                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
-                    popup.getMenu().add(0, 2, 2, "Quick View Info");
-                    popup.setOnMenuItemClickListener(item -> {
-                        if (item.getItemId() == 1) {
-                            openMarksEntry(student);
-                            return true;
-                        } else if (item.getItemId() == 3) {
-                            openSingleSubjectMarks(student, sub);
-                            return true;
-                        }
-                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
-                        return true;
-                    });
-                    popup.show();
-                });
-
-                // Click on the entire subject card opens the single subject dialog!
-                cardB.getRoot().setOnClickListener(v -> openSingleSubjectMarks(student, sub));
-            }
-
-            private void bindSubjectCardCompact(ItemEvaluationSubjectCardCompactBinding cardB, Student student,
-                    Subject sub, int number, MarksRecord record) {
-                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), sub.name));
-
-                // Default table values
-                String fet = "0", set = "0", tet = "0";
-                int formativeMax = 0, summativeMax = 0, totalMax = 0;
-                String gradeVal = "—";
-                boolean hasMarks = false;
-
-                // Max values calculations
-                formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik + sub.maxUpkram
-                        + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
-                summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
-
-                if (formativeMax == 0 && summativeMax == 0) {
-                    formativeMax = sub.maxMarks / 2;
-                    summativeMax = sub.maxMarks - formativeMax;
-                    if (com.kartik.myschool.model.Subject.isNonAcademic(sub.name)) {
-                        formativeMax = sub.maxMarks;
-                        summativeMax = 0;
-                    }
-                }
-                totalMax = sub.maxMarks;
-
-                String safeKey = MarksRecord.sanitizeKey(sub.name);
-                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
-                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
-                    if (d != null && hasEnteredMarks(d)) {
-                        hasMarks = true;
-                        fet = formatVal(d.akarikTotal);
-                        set = formatVal(d.sanklit);
-                        tet = formatVal(d.grandTotal);
-                        if (d.grade != null && !d.grade.isEmpty()) {
-                            gradeVal = d.grade;
-                        }
-                    }
-                }
-
-                // Set table values (Obtained)
-                cardB.tvFETObtained.setText(fet);
-                cardB.tvSETObtained.setText(set);
-                cardB.tvTETObtained.setText(tet);
-
-                // Set table values (Max)
-                cardB.tvFETMax.setText(String.valueOf(formativeMax));
-                cardB.tvSETMax.setText(String.valueOf(summativeMax));
-                cardB.tvTETMax.setText(String.valueOf(totalMax));
-
-                // Style grade cell
-                cardB.tvGrade.setText(gradeVal);
-
-                int gradeColor = 0xFF90A4AE; // gray
-                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) {
-                    gradeColor = 0xFF6C4CCF;
-                } else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) {
-                    gradeColor = 0xFF00A5CF;
-                } else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1")) {
-                    gradeColor = 0xFF2E7D32;
-                } else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) {
-                    gradeColor = 0xFF9E9D24;
-                } else if (!gradeVal.equals("—")) {
-                    gradeColor = 0xFFE53935; // Crimson/Red for E-2 or lower
-                }
-                cardB.tvGrade.setBackgroundColor(gradeColor);
-
-                // Tint card border orange to signal "needs entry" if no marks are entered yet
-                if (hasMarks) {
-                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
-                            .setStrokeColor(0xFFE0E0E0);
-                } else {
-                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot())
-                            .setStrokeColor(0xFFFFB74D);
-                }
-
-                // Setup 3-dot popup menu
-                cardB.btnSubjectMore.setOnClickListener(v -> {
-                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
-                            itemView.getContext(), v);
-                    popup.getMenu().add(0, 1, 0, "Enter Marks");
-                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
-                    popup.getMenu().add(0, 2, 2, "Quick View Info");
-                    popup.setOnMenuItemClickListener(item -> {
-                        if (item.getItemId() == 1) {
-                            openMarksEntry(student);
-                            return true;
-                        } else if (item.getItemId() == 3) {
-                            openSingleSubjectMarks(student, sub);
-                            return true;
-                        }
-                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
-                        return true;
-                    });
-                    popup.show();
-                });
-
-                // Click on entire subject card opens the single subject dialog!
-                cardB.getRoot().setOnClickListener(v -> openSingleSubjectMarks(student, sub));
-            }
-
-            private void openSingleSubjectMarks(Student student, Subject subject) {
+            public void openSingleSubjectMarks(Student student, Subject subject) {
                 MarksRecord record = marksMap.get(student.id);
                 ClassModel freshClass = SessionContext.selectedClass != null
                         ? SessionContext.selectedClass
@@ -934,29 +658,262 @@ public class FormativeSummativeFragment extends Fragment {
 
             private void openMarksEntry(Student student) {
                 AppCache.selectedStudent = student;
-                // FIX: Always use SessionContext.selectedClass (reflects latest subject
-                // toggles).
-                // activeClass may be a stale local copy from when the fragment was created.
-                // SessionContext.selectedClass is always kept up-to-date by SubjectsFragment.
                 ClassModel freshClass = SessionContext.selectedClass != null
                         ? SessionContext.selectedClass
                         : activeClass;
                 AppCache.selectedClass = freshClass;
-                // Also keep activeClass in sync so the fragment header stays correct
                 activeClass = freshClass;
                 AppCache.selectedMarks = marksMap.get(student.id);
                 Intent intent = new Intent(itemView.getContext(), EnterMarksActivity.class);
                 itemView.getContext().startActivity(intent);
             }
+        }
+    }
 
-            private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
-                if (detail == null)
-                    return false;
-                boolean hasField = detail.nirikhshan > 0 || detail.tondiKam > 0 || detail.pratyakshik > 0
-                        || detail.upkram > 0 || detail.prakalp > 0 || detail.chachani > 0
-                        || detail.swadhyay > 0 || detail.itar > 0 || detail.tondi > 0
-                        || detail.pratyakshikB > 0 || detail.lekhi > 0;
-                return hasField && detail.grandTotal > 0;
+    public static boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
+        if (detail == null) return false;
+        boolean hasField = detail.nirikhshan > 0 || detail.tondiKam > 0 || detail.pratyakshik > 0
+                || detail.upkram > 0 || detail.prakalp > 0 || detail.chachani > 0
+                || detail.swadhyay > 0 || detail.itar > 0 || detail.tondi > 0
+                || detail.pratyakshikB > 0 || detail.lekhi > 0;
+        return hasField && detail.grandTotal > 0;
+    }
+
+    private static class SubjectInnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private Student student;
+        private List<Subject> subjects;
+        private MarksRecord marks;
+        private final boolean isGridView;
+        private final EvaluationAdapter.ViewHolder parentHolder;
+
+        public SubjectInnerAdapter(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridView, EvaluationAdapter.ViewHolder parentHolder) {
+            this.student = student;
+            this.subjects = subjects;
+            this.marks = marks;
+            this.isGridView = isGridView;
+            this.parentHolder = parentHolder;
+        }
+
+        public boolean isGridView() { return isGridView; }
+
+        public void updateData(Student student, List<Subject> subjects, MarksRecord marks) {
+            this.student = student;
+            this.subjects = subjects;
+            this.marks = marks;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return isGridView ? 1 : 0;
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            float density = parent.getResources().getDisplayMetrics().density;
+            if (viewType == 1) {
+                ItemEvaluationSubjectCardCompactBinding binding = ItemEvaluationSubjectCardCompactBinding.inflate(inflater, parent, false);
+                RecyclerView.LayoutParams param = new RecyclerView.LayoutParams((int) (186 * density), RecyclerView.LayoutParams.WRAP_CONTENT);
+                int margin = (int) (6 * density);
+                param.setMargins(margin, margin, margin, margin);
+                binding.getRoot().setLayoutParams(param);
+                return new CompactViewHolder(binding);
+            } else {
+                ItemEvaluationSubjectCardBinding binding = ItemEvaluationSubjectCardBinding.inflate(inflater, parent, false);
+                RecyclerView.LayoutParams param = new RecyclerView.LayoutParams((int) (300 * density), RecyclerView.LayoutParams.WRAP_CONTENT);
+                int margin = (int) (6 * density);
+                param.setMargins(margin, margin, margin, margin);
+                binding.getRoot().setLayoutParams(param);
+                return new NormalViewHolder(binding);
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            Subject sub = subjects.get(position);
+            if (holder instanceof CompactViewHolder) {
+                ((CompactViewHolder) holder).bind(student, sub, position + 1, marks, parentHolder);
+            } else if (holder instanceof NormalViewHolder) {
+                ((NormalViewHolder) holder).bind(student, sub, position + 1, marks, parentHolder);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return subjects != null ? subjects.size() : 0;
+        }
+
+        class NormalViewHolder extends RecyclerView.ViewHolder {
+            ItemEvaluationSubjectCardBinding cardB;
+            public NormalViewHolder(ItemEvaluationSubjectCardBinding binding) {
+                super(binding.getRoot());
+                this.cardB = binding;
+            }
+            public void bind(Student student, Subject sub, int number, MarksRecord record, EvaluationAdapter.ViewHolder parentHolder) {
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub.name));
+                String fe1 = "0", fe2 = "0", fe3 = "0", fe4 = "0", fe5 = "0", fe6 = "0", fe7 = "0", fe8 = "0";
+                String se1 = "0", se2 = "0", se3 = "0", fet = "0", set = "0", tet = "0", gradeVal = "—";
+                boolean hasMarks = false;
+
+                String safeKey = MarksRecord.sanitizeKey(sub.name);
+                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
+                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
+                    if (d != null && hasEnteredMarks(d)) {
+                        hasMarks = true;
+                        fe1 = String.valueOf(d.nirikhshan); fe2 = String.valueOf(d.tondiKam);
+                        fe3 = String.valueOf(d.pratyakshik); fe4 = String.valueOf(d.upkram);
+                        fe5 = String.valueOf(d.prakalp); fe6 = String.valueOf(d.chachani);
+                        fe7 = String.valueOf(d.swadhyay); fe8 = String.valueOf(d.itar);
+                        se1 = String.valueOf(d.tondi); se2 = String.valueOf(d.pratyakshikB); se3 = String.valueOf(d.lekhi);
+                        fet = String.valueOf(d.akarikTotal); set = String.valueOf(d.sanklit); tet = String.valueOf(d.grandTotal);
+                        if (d.grade != null && !d.grade.isEmpty()) gradeVal = d.grade;
+                    }
+                }
+
+                cardB.tvFE1.setText(fe1); cardB.tvFE2.setText(fe2); cardB.tvFE3.setText(fe3); cardB.tvFE4.setText(fe4);
+                cardB.tvFE5.setText(fe5); cardB.tvFE6.setText(fe6); cardB.tvFE7.setText(fe7); cardB.tvFE8.setText(fe8);
+                cardB.tvSE1.setText(se1); cardB.tvSE2.setText(se2); cardB.tvSE3.setText(se3);
+                cardB.tvFET.setText(fet); cardB.tvSET.setText(set); cardB.tvTET.setText(tet);
+
+                if (hasMarks) {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot()).setStrokeColor(0xFFE0E0E0);
+                } else {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot()).setStrokeColor(0xFFFFB74D);
+                }
+
+                float density = itemView.getResources().getDisplayMetrics().density;
+                int gradeColor = 0xFF90A4AE;
+                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) gradeColor = 0xFF6C4CCF;
+                else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) gradeColor = 0xFF00A5CF;
+                else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1")) gradeColor = 0xFF2E7D32;
+                else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) gradeColor = 0xFF9E9D24;
+                else if (!gradeVal.equals("—")) gradeColor = 0xFFE65100;
+
+                cardB.tvHeaderGrade.setText(gradeVal);
+                if (gradeVal.equals("—")) {
+                    cardB.tvHeaderGrade.setVisibility(View.GONE);
+                } else {
+                    cardB.tvHeaderGrade.setVisibility(View.VISIBLE);
+                    android.graphics.drawable.Drawable background = cardB.tvHeaderGrade.getBackground();
+                    GradientDrawable gd;
+                    if (background instanceof GradientDrawable) {
+                        gd = (GradientDrawable) background;
+                    } else {
+                        gd = new GradientDrawable();
+                        cardB.tvHeaderGrade.setBackground(gd);
+                    }
+                    gd.setColor(gradeColor);
+                    gd.setCornerRadius(6 * density);
+                }
+
+                cardB.btnSubjectMore.setOnClickListener(v -> {
+                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(itemView.getContext(), v);
+                    popup.getMenu().add(0, 1, 0, "Enter Marks");
+                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
+                    popup.getMenu().add(0, 2, 2, "Quick View Info");
+                    popup.setOnMenuItemClickListener(item -> {
+                        if (item.getItemId() == 1) {
+                            // Using reflection-like or direct call if we make openMarksEntry package-private
+                            try {
+                                java.lang.reflect.Method m = parentHolder.getClass().getDeclaredMethod("openMarksEntry", Student.class);
+                                m.setAccessible(true);
+                                m.invoke(parentHolder, student);
+                            } catch (Exception e) {}
+                            return true;
+                        } else if (item.getItemId() == 3) {
+                            parentHolder.openSingleSubjectMarks(student, sub);
+                            return true;
+                        }
+                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        return true;
+                    });
+                    popup.show();
+                });
+
+                cardB.getRoot().setOnClickListener(v -> parentHolder.openSingleSubjectMarks(student, sub));
+            }
+        }
+
+        class CompactViewHolder extends RecyclerView.ViewHolder {
+            ItemEvaluationSubjectCardCompactBinding cardB;
+            public CompactViewHolder(ItemEvaluationSubjectCardCompactBinding binding) {
+                super(binding.getRoot());
+                this.cardB = binding;
+            }
+            public void bind(Student student, Subject sub, int number, MarksRecord record, EvaluationAdapter.ViewHolder parentHolder) {
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub.name));
+
+                String fet = "0", set = "0", tet = "0", gradeVal = "—";
+                int formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik + sub.maxUpkram + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
+                int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+                boolean hasMarks = false;
+
+                if (formativeMax == 0 && summativeMax == 0) {
+                    formativeMax = sub.maxMarks / 2;
+                    summativeMax = sub.maxMarks - formativeMax;
+                    if (com.kartik.myschool.model.Subject.isNonAcademic(sub.name)) {
+                        formativeMax = sub.maxMarks;
+                        summativeMax = 0;
+                    }
+                }
+                int totalMax = sub.maxMarks;
+
+                String safeKey = MarksRecord.sanitizeKey(sub.name);
+                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
+                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
+                    if (d != null && hasEnteredMarks(d)) {
+                        hasMarks = true;
+                        fet = String.valueOf(d.akarikTotal);
+                        set = String.valueOf(d.sanklit);
+                        tet = String.valueOf(d.grandTotal);
+                        if (d.grade != null && !d.grade.isEmpty()) gradeVal = d.grade;
+                    }
+                }
+
+                cardB.tvFETObtained.setText(fet); cardB.tvSETObtained.setText(set); cardB.tvTETObtained.setText(tet);
+                cardB.tvFETMax.setText(String.valueOf(formativeMax)); cardB.tvSETMax.setText(String.valueOf(summativeMax)); cardB.tvTETMax.setText(String.valueOf(totalMax));
+                cardB.tvGrade.setText(gradeVal);
+
+                int gradeColor = 0xFF90A4AE;
+                if (gradeVal.startsWith("A-1") || gradeVal.startsWith("अ-1")) gradeColor = 0xFF6C4CCF;
+                else if (gradeVal.startsWith("A-2") || gradeVal.startsWith("अ-2")) gradeColor = 0xFF00A5CF;
+                else if (gradeVal.startsWith("B-1") || gradeVal.startsWith("ब-1")) gradeColor = 0xFF2E7D32;
+                else if (gradeVal.startsWith("B-2") || gradeVal.startsWith("ब-2")) gradeColor = 0xFF9E9D24;
+                else if (!gradeVal.equals("—")) gradeColor = 0xFFE53935;
+                cardB.tvGrade.setBackgroundColor(gradeColor);
+
+                if (hasMarks) {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot()).setStrokeColor(0xFFE0E0E0);
+                } else {
+                    ((com.google.android.material.card.MaterialCardView) cardB.getRoot()).setStrokeColor(0xFFFFB74D);
+                }
+
+                cardB.btnSubjectMore.setOnClickListener(v -> {
+                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(itemView.getContext(), v);
+                    popup.getMenu().add(0, 1, 0, "Enter Marks");
+                    popup.getMenu().add(0, 3, 1, "Edit Marks of Box");
+                    popup.getMenu().add(0, 2, 2, "Quick View Info");
+                    popup.setOnMenuItemClickListener(item -> {
+                        if (item.getItemId() == 1) {
+                            try {
+                                java.lang.reflect.Method m = parentHolder.getClass().getDeclaredMethod("openMarksEntry", Student.class);
+                                m.setAccessible(true);
+                                m.invoke(parentHolder, student);
+                            } catch (Exception e) {}
+                            return true;
+                        } else if (item.getItemId() == 3) {
+                            parentHolder.openSingleSubjectMarks(student, sub);
+                            return true;
+                        }
+                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        return true;
+                    });
+                    popup.show();
+                });
+
+                cardB.getRoot().setOnClickListener(v -> parentHolder.openSingleSubjectMarks(student, sub));
             }
         }
     }

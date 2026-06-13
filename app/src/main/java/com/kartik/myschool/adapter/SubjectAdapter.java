@@ -95,6 +95,8 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         b.tvSubjectName.setTextColor(color);
 
         // Toggle state
+        b.tvIsApplicableLabel.setVisibility(View.VISIBLE);
+        b.switchApplicable.setVisibility(View.VISIBLE);
         boolean isActive = activeSubjectNames.contains(item.name);
         
         // Prevent trigger during binding

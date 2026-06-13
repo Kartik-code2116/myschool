@@ -47,6 +47,8 @@ public class DescriptiveEntriesFragment extends Fragment {
     private int activeSemesterNumber = 1;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
     private boolean isGridViewMode = false;
+    private String lastLoadedClassId = null;
+    private String lastLoadedSemesterId = null;
 
     @Nullable
     @Override
@@ -85,6 +87,10 @@ public class DescriptiveEntriesFragment extends Fragment {
         b.rvDescriptiveStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new DescriptiveAdapter();
         b.rvDescriptiveStudents.setAdapter(adapter);
+
+        // Play smooth layout enter animation
+        com.kartik.myschool.utils.UiAnimations.playLayoutEnter(b.getRoot());
+        com.kartik.myschool.utils.UiAnimations.setupRecyclerAnimations(b.rvDescriptiveStudents);
     }
 
     private void setupCustomAppBar() {
@@ -144,11 +150,15 @@ public class DescriptiveEntriesFragment extends Fragment {
             return;
         }
 
+        lastLoadedClassId = activeClass.id;
+        lastLoadedSemesterId = activeSemesterId;
+
         // Initialize subjects list if null
         if (activeClass.subjects == null) {
             activeClass.subjects = new ArrayList<>();
         }
 
+        boolean renderedFromCache = false;
         // 1. Instant Cache rendering (zero-latency display):
         if (AppCache.cachedDescriptiveStudents != null
                 && AppCache.cachedDescriptiveMarksComplete
@@ -159,11 +169,18 @@ public class DescriptiveEntriesFragment extends Fragment {
                     ? AppCache.cachedDescriptiveMarksMap
                     : new HashMap<>();
 
-            // Render instantly!
-            adapter.setData(cachedList, cachedMarks);
-            if (swipeRefresh != null)
-                swipeRefresh.setRefreshing(false);
+            // Render instantly from cache after a brief delay to let slide animation start smoothly
+            renderedFromCache = true;
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (isAdded() && b != null) {
+                    adapter.setData(cachedList, cachedMarks, true);
+                    if (swipeRefresh != null)
+                        swipeRefresh.setRefreshing(false);
+                }
+            }, 200);
         }
+
+        final boolean finalRenderedFromCache = renderedFromCache;
 
         // ★ FIX: Do NOT clear repo marks cache here.
         // Clearing on every resume wipes data that was just saved or loaded,
@@ -251,7 +268,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             AppCache.cachedDescriptiveMarksComplete = true;
 
             if (isAdded() && b != null) {
-                adapter.setData(finalList, finalMarks);
+                adapter.setData(finalList, finalMarks, !finalRenderedFromCache);
                 if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
@@ -374,7 +391,13 @@ public class DescriptiveEntriesFragment extends Fragment {
             AppCache.selectedMarks = null;
         }
 
-        loadDescriptiveData();
+        boolean isFirstLoad = lastLoadedClassId == null || lastLoadedSemesterId == null;
+        boolean classChanged = activeClass != null && !java.util.Objects.equals(activeClass.id, lastLoadedClassId);
+        boolean semesterChanged = !java.util.Objects.equals(activeSemesterId, lastLoadedSemesterId);
+
+        if (isFirstLoad || classChanged || semesterChanged) {
+            loadDescriptiveData();
+        }
     }
 
     @Override
@@ -414,24 +437,43 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         private final List<Student> students = new ArrayList<>();
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
+        private final int[] lastPosition = new int[] { -1 };
+        private final RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
 
-        public void setData(List<Student> list, Map<String, MarksRecord> map) {
-            students.clear();
-            students.addAll(list);
-            marksMap.clear();
-            marksMap.putAll(map);
-            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
+        public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
+            final List<Student> oldStudents = new ArrayList<>(this.students);
+            final List<Student> newStudents = new ArrayList<>(list);
+            final Map<String, MarksRecord> newMarks = new HashMap<>(map);
+
+            androidx.recyclerview.widget.DiffUtil.DiffResult result = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() { return oldStudents.size(); }
+                @Override
+                public int getNewListSize() { return newStudents.size(); }
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return java.util.Objects.equals(oldStudents.get(oldItemPosition).id, newStudents.get(newItemPosition).id);
+                }
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    return false;
+                }
+            });
+
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                this.students.clear();
+                this.students.addAll(newStudents);
+                this.marksMap.clear();
+                this.marksMap.putAll(newMarks);
+                if (resetAnimation) {
+                    lastPosition[0] = -1;
+                }
+                result.dispatchUpdatesTo(this);
+            });
         }
 
-        /**
-         * Instantly updates one student's card without a full list reload.
-         * Called by onResume() immediately after returning from
-         * EnterDescriptiveActivity.
-         */
         public void patchStudentMarks(String studentId, MarksRecord record) {
-            // Update the adapter's marks map
             marksMap.put(studentId, record);
-            // Also update the descriptive AppCache so future renders are correct
             if (AppCache.cachedDescriptiveMarksMap == null
                     || !java.util.Objects.equals(activeClass.id, AppCache.cachedDescriptiveClassId)
                     || !java.util.Objects.equals(activeSemesterId, AppCache.cachedDescriptiveSemesterId)) {
@@ -441,18 +483,14 @@ public class DescriptiveEntriesFragment extends Fragment {
                 AppCache.cachedDescriptiveMarksComplete = true;
             }
             AppCache.cachedDescriptiveMarksMap.put(studentId, record);
-            // Notify only the changed item for a smooth, flicker-free update
             for (int i = 0; i < students.size(); i++) {
                 if (java.util.Objects.equals(studentId, students.get(i).id)) {
                     final int pos = i;
                     new android.os.Handler(android.os.Looper.getMainLooper())
                             .post(() -> notifyItemChanged(pos));
-                    android.util.Log.d("DESCRIPTIVE",
-                            "patchStudentMarks: notified pos=" + pos + " student=" + studentId);
                     return;
                 }
             }
-            // Student not in list yet — do a full refresh
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
         }
 
@@ -468,6 +506,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Student st = students.get(position);
             holder.bind(st, position + 1);
+            com.kartik.myschool.utils.UiAnimations.animateScrollReveal(holder.itemView, position, lastPosition);
         }
 
         @Override
@@ -481,6 +520,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             public ViewHolder(ItemDescriptiveStudentBlockBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
+                binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
             }
 
             public void bind(Student s, int index) {
@@ -488,118 +528,46 @@ public class DescriptiveEntriesFragment extends Fragment {
                 binding.btnStudentMore.setOnClickListener(v -> showStudentRemarkMenu(v, s));
 
                 MarksRecord marks = getDisplayMarksForStudent(s);
-                // User requested to not show remarks twice, only in the subject boxes
-                // renderSavedRemarkSummary(marks);
+                List<Subject> allDescriptiveSubjects = new ArrayList<>();
+                if (activeClass.subjects != null) {
+                    allDescriptiveSubjects.addAll(activeClass.subjects);
+                }
+                allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
+                allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
+                allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
+                allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+
+                binding.layoutSubjectsGridContainer.setVisibility(View.GONE);
+                binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);
 
                 if (isGridViewMode) {
-                    // Show 2-Column Grid, Hide Horizontal Scroll
-                    binding.layoutSubjectsScroll.setVisibility(View.GONE);
-                    binding.layoutSubjectsGridContainer.setVisibility(View.VISIBLE);
-                    binding.layoutSubjectsGridContainer.removeAllViews();
-
-                    List<Subject> allDescriptiveSubjects = new ArrayList<>();
-                    if (activeClass.subjects != null) {
-                        allDescriptiveSubjects.addAll(activeClass.subjects);
-                    }
-                    allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-                    allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-                    allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-                    allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
-
-                    if (!allDescriptiveSubjects.isEmpty()) {
-                        LinearLayout currentRow = null;
-                        for (int i = 0; i < allDescriptiveSubjects.size(); i++) {
-                            if (i % 2 == 0) {
-                                currentRow = new LinearLayout(itemView.getContext());
-                                currentRow.setOrientation(LinearLayout.HORIZONTAL);
-                                currentRow.setWeightSum(2f);
-                                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                                currentRow.setLayoutParams(rowParams);
-                                binding.layoutSubjectsGridContainer.addView(currentRow);
-                            }
-
-                            Subject sub = allDescriptiveSubjects.get(i);
-                            View cardView = createSubjectCard(s, sub, i + 1, marks);
-
-                            // Set layout params for 2-column grid item
-                            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                                    0,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    1f);
-
-                            float density = itemView.getResources().getDisplayMetrics().density;
-                            int margin = (int) (3 * density);
-                            param.setMargins(margin, margin, margin, margin);
-                            cardView.setLayoutParams(param);
-
-                            if (currentRow != null) {
-                                currentRow.addView(cardView);
-                            }
-                        }
-
-                        // If odd number of subjects, add an empty placeholder view to balance the last
-                        // row
-                        if (allDescriptiveSubjects.size() % 2 != 0 && currentRow != null) {
-                            View placeholder = new View(itemView.getContext());
-                            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                                    0,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    1f);
-                            placeholder.setLayoutParams(param);
-                            currentRow.addView(placeholder);
-                        }
-                    }
+                    binding.rvSubjectsHorizontal.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(itemView.getContext(), 2));
                 } else {
-                    // Show Horizontal Scroll (Slide Layout), Hide Grid
-                    binding.layoutSubjectsGridContainer.setVisibility(View.GONE);
-                    binding.layoutSubjectsScroll.setVisibility(View.VISIBLE);
-                    binding.layoutSubjectsHorizontal.removeAllViews();
+                    binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                }
 
-                    List<Subject> allDescriptiveSubjects = new ArrayList<>();
-                    if (activeClass.subjects != null) {
-                        allDescriptiveSubjects.addAll(activeClass.subjects);
-                    }
-                    allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-                    allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-                    allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-                    allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
-
-                    if (!allDescriptiveSubjects.isEmpty()) {
-                        for (int i = 0; i < allDescriptiveSubjects.size(); i++) {
-                            Subject sub = allDescriptiveSubjects.get(i);
-                            View cardView = createSubjectCard(s, sub, i + 1, marks);
-                            binding.layoutSubjectsHorizontal.addView(cardView);
-                        }
-                    }
+                SubjectInnerAdapter innerAdapter = (SubjectInnerAdapter) binding.rvSubjectsHorizontal.getAdapter();
+                if (innerAdapter == null || innerAdapter.isGridViewMode() != isGridViewMode) {
+                    innerAdapter = new SubjectInnerAdapter(s, allDescriptiveSubjects, marks, isGridViewMode, this);
+                    binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
+                } else {
+                    innerAdapter.updateData(s, allDescriptiveSubjects, marks);
                 }
             }
 
+
+
             private void showStudentRemarkMenu(View anchor, Student student) {
-                androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
-                        itemView.getContext(), anchor);
+                androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(itemView.getContext(), anchor);
                 popup.getMenu().add(0, 1, 0, "Edit remark");
                 popup.getMenu().add(0, 2, 1, "Delete remark");
                 popup.getMenu().add(0, 3, 2, "Change to Male (सर्व विषय)");
                 popup.getMenu().add(0, 4, 3, "Change to Female (सर्व विषय)");
                 popup.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == 1) {
-                        openMarksEntry(student);
-                        return true;
-                    }
-                    if (item.getItemId() == 2) {
-                        confirmDeleteRemarks(student);
-                        return true;
-                    }
-                    if (item.getItemId() == 3) {
-                        applyGenderRemarkChange(student, false);
-                        return true;
-                    }
-                    if (item.getItemId() == 4) {
-                        applyGenderRemarkChange(student, true);
-                        return true;
-                    }
+                    if (item.getItemId() == 1) { openMarksEntry(student); return true; }
+                    if (item.getItemId() == 2) { confirmDeleteRemarks(student); return true; }
+                    if (item.getItemId() == 3) { applyGenderRemarkChange(student, false); return true; }
+                    if (item.getItemId() == 4) { applyGenderRemarkChange(student, true); return true; }
                     return false;
                 });
                 popup.show();
@@ -610,18 +578,15 @@ public class DescriptiveEntriesFragment extends Fragment {
                         .setTitle(R.string.msg_delete_remarks)
                         .setMessage("This will remove saved descriptive remarks for this student only.")
                         .setNegativeButton("Cancel", null)
-                        .setPositiveButton("Delete", (dialog, which) -> deleteRemarks(student))
-                        .show();
+                        .setPositiveButton("Delete", (dialog, which) -> deleteRemarks(student)).show();
             }
 
             private void deleteRemarks(Student student) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 boolean changed = false;
                 for (MarksRecord.SubjectMarksDetail detail : record.detailedMarks.values()) {
                     if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
@@ -629,10 +594,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                         changed = true;
                     }
                 }
-
                 if (!changed) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 saveStudentRemarkRecord(student, record, "Remarks deleted.");
@@ -641,53 +604,29 @@ public class DescriptiveEntriesFragment extends Fragment {
             private void applyGenderRemarkChange(Student student, boolean female) {
                 MarksRecord record = getDisplayMarksForStudent(student);
                 if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_saved_remarks_found, Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 boolean changed = false;
                 for (MarksRecord.SubjectMarksDetail detail : record.detailedMarks.values()) {
-                    if (detail == null || detail.remark == null || detail.remark.trim().isEmpty()) {
-                        continue;
-                    }
+                    if (detail == null || detail.remark == null || detail.remark.trim().isEmpty()) continue;
                     String updated = adjustRemarkGender(detail.remark, female);
                     if (!updated.equals(detail.remark)) {
                         detail.remark = updated;
                         changed = true;
                     }
                 }
-
                 if (!changed) {
-                    Toast.makeText(itemView.getContext(), R.string.msg_no_gender_words_found_to_chang,
-                            Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(itemView.getContext(), R.string.msg_no_gender_words_found_to_chang, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 saveStudentRemarkRecord(student, record, "Gender sentence updated.");
             }
 
-            private boolean isFemaleStudent(Student student) {
-                String gender = student != null && student.gender != null
-                        ? student.gender.trim().toLowerCase(java.util.Locale.ROOT)
-                        : "";
-                return gender.contains("female")
-                        || gender.contains("girl")
-                        || gender.contains("\u092e\u0941\u0932\u0917\u0940")
-                        || gender.contains("\u0938\u094d\u0924\u094d\u0930\u0940");
-            }
-
             private String adjustRemarkGender(String remark, boolean female) {
-                String[] roots = {
-                    "कर", "दे", "घे", "शिक", "वाच", "लिहि", "बोल", "सांग", "सोडव", 
-                    "दाखव", "ओळख", "वापर", "जप", "जोपास", "वाढव", "मांड", "ऐक", 
-                    "निवड", "रेखाट", "रंगव", "खेळ", "धाव", "हो", "जिंक", "राह", 
-                    "ठेव", "पाड", "विचार", "आवड", "चाल", "पाह", "ये", "जा", "खा", 
-                    "पि", "झोप", "उठ", "बस", "म्हण", "वाग", "अस"
-                };
+                String[] roots = { "कर", "दे", "घे", "शिक", "वाच", "लिहि", "बोल", "सांग", "सोडव", "दाखव", "ओळख", "वापर", "जप", "जोपास", "वाढव", "मांड", "ऐक", "निवड", "रेखाट", "रंगव", "खेळ", "धाव", "हो", "जिंक", "राह", "ठेव", "पाड", "विचार", "आवड", "चाल", "पाह", "ये", "जा", "खा", "पि", "झोप", "उठ", "बस", "म्हण", "वाग", "अस" };
                 String rootPattern = String.join("|", roots);
                 String updated = remark;
-
                 if (!female) {
                     updated = updated.replaceAll("(?<![\\p{L}])(" + rootPattern + ")ते(?![\\p{L}])", "$1तो");
                     updated = updated.replaceAll("(?<![\\p{L}])ती(?![\\p{L}])", "तो");
@@ -697,8 +636,37 @@ public class DescriptiveEntriesFragment extends Fragment {
                     updated = updated.replaceAll("(?<![\\p{L}])तो(?![\\p{L}])", "ती");
                     updated = updated.replaceAll("([^\\s/]+?)\\s*तो\\s*/\\s*([^\\s/]+?)\\s*ते", "$2ते");
                 }
-                
                 return updated;
+            }
+
+            private MarksRecord getDisplayMarksForStudent(Student student) {
+                MarksRecord record = marksMap.get(student.id);
+                MarksRecord cachedRecord = null;
+                if (AppCache.cachedMarksMap != null
+                        && java.util.Objects.equals(activeClass != null ? activeClass.id : null, AppCache.cachedClassIdForStudents)
+                        && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
+                    cachedRecord = AppCache.cachedMarksMap.get(student.id);
+                }
+                if (cachedRecord != null && (record == null || cachedRecord.updatedAt >= record.updatedAt)) {
+                    record = cachedRecord;
+                }
+
+                MarksRecord descriptiveCachedRecord = null;
+                if (AppCache.cachedDescriptiveMarksMap != null
+                        && java.util.Objects.equals(activeClass != null ? activeClass.id : null, AppCache.cachedDescriptiveClassId)
+                        && java.util.Objects.equals(activeSemesterId, AppCache.cachedDescriptiveSemesterId)) {
+                    descriptiveCachedRecord = AppCache.cachedDescriptiveMarksMap.get(student.id);
+                }
+                if (descriptiveCachedRecord != null && (record == null || descriptiveCachedRecord.updatedAt >= record.updatedAt)) {
+                    record = descriptiveCachedRecord;
+                }
+
+                MarksRecord selectedRecord = AppCache.selectedMarks;
+                if (selectedRecord == null || student.id == null || !java.util.Objects.equals(student.id, selectedRecord.studentId)) return record;
+                if (activeClass == null || activeClass.id == null || !java.util.Objects.equals(activeClass.id, selectedRecord.classId)) return record;
+                if (selectedRecord.semesterId != null && activeSemesterId != null && !selectedRecord.semesterId.isEmpty() && !java.util.Objects.equals(activeSemesterId, selectedRecord.semesterId)) return record;
+                if (record == null || selectedRecord.updatedAt >= record.updatedAt) return selectedRecord;
+                return record;
             }
 
             private void saveStudentRemarkRecord(Student student, MarksRecord record, String successMessage) {
@@ -709,302 +677,165 @@ public class DescriptiveEntriesFragment extends Fragment {
                 }
                 record.semesterId = activeSemesterId;
                 record.semesterNumber = String.valueOf(activeSemesterNumber);
-
                 FirebaseRepository.get().saveMarks(record, new FirebaseRepository.OnResult<String>() {
                     @Override
                     public void onSuccess(String id) {
                         record.id = id;
                         AppCache.selectedMarks = null;
                         patchStudentMarks(student.id, record);
-                        FirebaseRepository.get().updateMarksInCache(record.classId, record.semesterId, student.id,
-                                record);
+                        FirebaseRepository.get().updateMarksInCache(record.classId, record.semesterId, student.id, record);
                         Toast.makeText(itemView.getContext(), successMessage, Toast.LENGTH_SHORT).show();
                     }
-
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(itemView.getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG)
-                                .show();
+                        Toast.makeText(itemView.getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
 
-            private View createSubjectCard(Student student, Subject sub, int number, MarksRecord record) {
-                ItemDescriptiveSubjectCardBinding cardB = ItemDescriptiveSubjectCardBinding.inflate(
-                        LayoutInflater.from(itemView.getContext()),
-                        isGridViewMode ? binding.layoutSubjectsGridContainer : binding.layoutSubjectsHorizontal,
-                        false);
+            public void openSubjectRemarkEntry(Student student, Subject subject, int subjectIndex) {
+                ClassModel freshClass = SessionContext.selectedClass != null ? SessionContext.selectedClass : activeClass;
+                activeClass = freshClass;
+                MarksRecord record = getDisplayMarksForStudent(student);
+                SubjectRemarkEntryDialog dialog = SubjectRemarkEntryDialog.newInstance(student, subject, subjectIndex, freshClass, record);
+                dialog.setOnRemarkSavedListener((studentId, newRecord) -> {
+                    patchStudentMarks(studentId, newRecord);
+                });
+                dialog.show(DescriptiveEntriesFragment.this.getChildFragmentManager(), "SubjectRemarkEntryDialog");
+            }
 
-                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), sub.name));
+            public void openMarksEntry(Student student) {
+                AppCache.selectedStudent = student;
+                ClassModel freshClass = SessionContext.selectedClass != null ? SessionContext.selectedClass : activeClass;
+                AppCache.selectedClass = freshClass;
+                activeClass = freshClass;
+                MarksRecord existingRecord = marksMap.get(student.id);
+                AppCache.selectedMarks = existingRecord;
+                Intent intent = new Intent(itemView.getContext(), EnterDescriptiveActivity.class);
+                itemView.getContext().startActivity(intent);
+            }
+        }
+    }
 
+    public static MarksRecord.SubjectMarksDetail getSubjectDetail(MarksRecord record, Subject sub, int subjectIndex) {
+        if (record == null || record.detailedMarks == null || sub == null || sub.name == null) return null;
+        String safeKey = MarksRecord.sanitizeKey(sub.name);
+        MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
+        if (detail != null) return detail;
+        detail = record.detailedMarks.get(sub.name);
+        if (detail != null) return detail;
+        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : record.detailedMarks.entrySet()) {
+            String key = entry.getKey();
+            if (key != null && MarksRecord.sanitizeKey(key).equals(safeKey)) return entry.getValue();
+        }
+        if (subjectIndex >= 0 && subjectIndex < record.detailedMarks.size()) {
+            int i = 0;
+            for (MarksRecord.SubjectMarksDetail value : record.detailedMarks.values()) {
+                if (i == subjectIndex) return value;
+                i++;
+            }
+        }
+        return null;
+    }
+
+    private static class SubjectInnerAdapter extends RecyclerView.Adapter<SubjectInnerAdapter.ViewHolder> {
+        private Student student;
+        private List<Subject> subjects;
+        private MarksRecord marks;
+        private final boolean isGridViewMode;
+        private final DescriptiveAdapter.ViewHolder parentHolder;
+
+        public SubjectInnerAdapter(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridViewMode, DescriptiveAdapter.ViewHolder parentHolder) {
+            this.student = student;
+            this.subjects = subjects;
+            this.marks = marks;
+            this.isGridViewMode = isGridViewMode;
+            this.parentHolder = parentHolder;
+        }
+
+        public boolean isGridViewMode() { return isGridViewMode; }
+
+        public void updateData(Student student, List<Subject> subjects, MarksRecord marks) {
+            this.student = student;
+            this.subjects = subjects;
+            this.marks = marks;
+            notifyDataSetChanged();
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            ItemDescriptiveSubjectCardBinding cardB = ItemDescriptiveSubjectCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ViewHolder(cardB);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Subject sub = subjects.get(position);
+            holder.bind(student, sub, position + 1, marks, parentHolder);
+        }
+
+        @Override
+        public int getItemCount() {
+            return subjects != null ? subjects.size() : 0;
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            ItemDescriptiveSubjectCardBinding cardB;
+            public ViewHolder(ItemDescriptiveSubjectCardBinding binding) {
+                super(binding.getRoot());
+                this.cardB = binding;
+            }
+
+            public void bind(Student student, Subject sub, int number, MarksRecord record, DescriptiveAdapter.ViewHolder parentHolder) {
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub.name));
                 List<String> remarks = new ArrayList<>();
                 MarksRecord.SubjectMarksDetail detail = getSubjectDetail(record, sub, number - 1);
                 if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
                     String[] parts = detail.remark.trim().split("\\|\\|");
                     for (String p : parts) {
                         String trimmed = p.trim();
-                        if (!trimmed.isEmpty()) {
-                            remarks.add(trimmed);
-                        }
+                        if (!trimmed.isEmpty()) remarks.add(trimmed);
                     }
                 }
 
-                com.google.android.material.card.MaterialCardView cardRoot = (com.google.android.material.card.MaterialCardView) cardB
-                        .getRoot();
-
+                com.google.android.material.card.MaterialCardView cardRoot = (com.google.android.material.card.MaterialCardView) cardB.getRoot();
                 if (!remarks.isEmpty()) {
-                    // ── Has remarks → show ALL chips, hide empty state ────────────────
                     cardB.cgRemarkChips.setVisibility(View.VISIBLE);
                     cardB.layoutEmptyRemark.setVisibility(View.GONE);
                     cardB.cgRemarkChips.removeAllViews();
-
                     StringBuilder sb = new StringBuilder();
                     for (int r = 0; r < remarks.size(); r++) {
-                        if (r > 0)
-                            sb.append("\n");
+                        if (r > 0) sb.append("\n");
                         sb.append("• ").append(remarks.get(r));
                     }
-
                     TextView tv = new TextView(itemView.getContext());
                     tv.setText(sb.toString());
                     tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10f);
-                    tv.setTextColor(0xFF455A64); // Dark greyish blue
+                    tv.setTextColor(0xFF455A64);
                     tv.setLineSpacing(0f, 1.15f);
-
                     cardB.cgRemarkChips.addView(tv);
-
-                    // Green border = filled
                     cardRoot.setStrokeColor(0xFF81C784);
                 } else {
-                    // ── No remarks → show empty state ──────────────────────
                     cardB.cgRemarkChips.setVisibility(View.GONE);
                     cardB.layoutEmptyRemark.setVisibility(View.VISIBLE);
-                    // Orange border signals needs-entry
                     cardRoot.setStrokeColor(0xFFFFB74D);
                 }
 
-                // Tap anywhere on card -> open this subject's remark screen
-                cardB.getRoot().setOnClickListener(v -> openSubjectRemarkEntry(student, sub, number - 1));
+                cardB.getRoot().setOnClickListener(v -> parentHolder.openSubjectRemarkEntry(student, sub, number - 1));
 
-                // Layout params configured depending on active mode (Grid mode has weight,
-                // Slide mode has fixed 240dp width)
                 float density = itemView.getResources().getDisplayMetrics().density;
-                android.widget.LinearLayout.LayoutParams param;
+                RecyclerView.LayoutParams param;
                 if (isGridViewMode) {
-                    param = new android.widget.LinearLayout.LayoutParams(
-                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    param = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
                     int margin = (int) (3 * density);
                     param.setMargins(margin, margin, margin, margin);
                 } else {
-                    param = new android.widget.LinearLayout.LayoutParams(
-                            (int) (240 * density),
-                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    param = new RecyclerView.LayoutParams((int) (240 * density), RecyclerView.LayoutParams.WRAP_CONTENT);
                     int margin = (int) (4 * density);
                     param.setMargins(margin, margin, margin, margin);
                 }
                 cardB.getRoot().setLayoutParams(param);
-
-                return cardB.getRoot();
-            }
-
-            private void renderSavedRemarkSummary(MarksRecord record) {
-                binding.cgSavedRemarkSummary.removeAllViews();
-                java.util.List<String> remarks = getAllSavedRemarksForBlock(record);
-                if (remarks.isEmpty()) {
-                    binding.cgSavedRemarkSummary.setVisibility(View.GONE);
-                    return;
-                }
-
-                binding.cgSavedRemarkSummary.setVisibility(View.VISIBLE);
-                float density = itemView.getResources().getDisplayMetrics().density;
-                for (String remark : remarks) {
-                    com.google.android.material.chip.Chip chip = new com.google.android.material.chip.Chip(
-                            itemView.getContext());
-                    chip.setText(remark);
-                    chip.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10f);
-                    chip.setTextColor(0xFF2E7D32);
-                    chip.setChipBackgroundColor(android.content.res.ColorStateList.valueOf(0xFFE8F5E9));
-                    chip.setChipStrokeWidth(1 * density);
-                    chip.setChipStrokeColor(android.content.res.ColorStateList.valueOf(0xFF81C784));
-                    chip.setEnsureMinTouchTargetSize(false);
-                    chip.setChipMinHeight((int) (24 * density));
-
-                    binding.cgSavedRemarkSummary.addView(chip);
-                }
-            }
-
-            private java.util.List<String> getAllSavedRemarksForBlock(MarksRecord record) {
-                java.util.LinkedHashSet<String> remarks = new java.util.LinkedHashSet<>();
-                if (record == null || record.detailedMarks == null || record.detailedMarks.isEmpty()) {
-                    return new ArrayList<>();
-                }
-
-                if (activeClass != null && activeClass.subjects != null) {
-                    for (int i = 0; i < activeClass.subjects.size(); i++) {
-                        Subject subject = activeClass.subjects.get(i);
-                        MarksRecord.SubjectMarksDetail detail = getSubjectDetail(record, subject, i);
-                        addRemarkParts(remarks, detail);
-                    }
-                }
-
-                for (MarksRecord.SubjectMarksDetail detail : record.detailedMarks.values()) {
-                    addRemarkParts(remarks, detail);
-                }
-
-                return new ArrayList<>(remarks);
-            }
-
-            private void addRemarkParts(java.util.LinkedHashSet<String> remarks,
-                    MarksRecord.SubjectMarksDetail detail) {
-                if (detail == null || detail.remark == null || detail.remark.trim().isEmpty()) {
-                    return;
-                }
-                String[] parts = detail.remark.trim().split("\\|\\|");
-                for (String part : parts) {
-                    String trimmed = part.trim();
-                    if (!trimmed.isEmpty()) {
-                        remarks.add(trimmed);
-                    }
-                }
-            }
-
-            private MarksRecord.SubjectMarksDetail getSubjectDetail(MarksRecord record, Subject sub, int subjectIndex) {
-                if (record == null || record.detailedMarks == null || sub == null || sub.name == null) {
-                    return null;
-                }
-
-                String safeKey = MarksRecord.sanitizeKey(sub.name);
-                MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
-                if (detail != null) {
-                    return detail;
-                }
-
-                detail = record.detailedMarks.get(sub.name);
-                if (detail != null) {
-                    return detail;
-                }
-
-                for (Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : record.detailedMarks.entrySet()) {
-                    String key = entry.getKey();
-                    if (key != null && MarksRecord.sanitizeKey(key).equals(safeKey)) {
-                        return entry.getValue();
-                    }
-                }
-
-                if (subjectIndex >= 0 && subjectIndex < record.detailedMarks.size()) {
-                    int i = 0;
-                    for (MarksRecord.SubjectMarksDetail value : record.detailedMarks.values()) {
-                        if (i == subjectIndex) {
-                            return value;
-                        }
-                        i++;
-                    }
-                }
-                return null;
-            }
-
-            private MarksRecord getDisplayMarksForStudent(Student student) {
-                // Primary source: adapter's marksMap (always keyed by studentId)
-                MarksRecord record = marksMap.get(student.id);
-                MarksRecord cachedRecord = null;
-                if (AppCache.cachedMarksMap != null
-                        && java.util.Objects.equals(activeClass != null ? activeClass.id : null,
-                                AppCache.cachedClassIdForStudents)
-                        && java.util.Objects.equals(activeSemesterId, AppCache.cachedSemesterIdForMarks)) {
-                    cachedRecord = AppCache.cachedMarksMap.get(student.id);
-                }
-                if (cachedRecord != null && (record == null || cachedRecord.updatedAt >= record.updatedAt)) {
-                    record = cachedRecord;
-                }
-
-                MarksRecord descriptiveCachedRecord = null;
-                if (AppCache.cachedDescriptiveMarksMap != null
-                        && java.util.Objects.equals(activeClass != null ? activeClass.id : null,
-                                AppCache.cachedDescriptiveClassId)
-                        && java.util.Objects.equals(activeSemesterId, AppCache.cachedDescriptiveSemesterId)) {
-                    descriptiveCachedRecord = AppCache.cachedDescriptiveMarksMap.get(student.id);
-                }
-                if (descriptiveCachedRecord != null
-                        && (record == null || descriptiveCachedRecord.updatedAt >= record.updatedAt)) {
-                    record = descriptiveCachedRecord;
-                }
-
-                // Secondary: AppCache.selectedMarks — ONLY use if it belongs to THIS student
-                MarksRecord selectedRecord = AppCache.selectedMarks;
-                if (selectedRecord == null
-                        || student.id == null
-                        || !java.util.Objects.equals(student.id, selectedRecord.studentId)) {
-                    // selectedRecord is null or belongs to a DIFFERENT student — ignore it
-                    return record;
-                }
-                if (activeClass == null
-                        || activeClass.id == null
-                        || !java.util.Objects.equals(activeClass.id, selectedRecord.classId)) {
-                    return record;
-                }
-                if (selectedRecord.semesterId != null
-                        && activeSemesterId != null
-                        && !selectedRecord.semesterId.isEmpty()
-                        && !java.util.Objects.equals(activeSemesterId, selectedRecord.semesterId)) {
-                    return record;
-                }
-                // selectedRecord belongs to this student; use whichever is newer
-                if (record == null || selectedRecord.updatedAt >= record.updatedAt) {
-                    return selectedRecord;
-                }
-                return record;
-            }
-
-            private boolean hasEnteredMarks(MarksRecord.SubjectMarksDetail detail) {
-                return detail.nirikhshan > 0
-                        || detail.tondiKam > 0
-                        || detail.pratyakshik > 0
-                        || detail.upkram > 0
-                        || detail.prakalp > 0
-                        || detail.chachani > 0
-                        || detail.swadhyay > 0
-                        || detail.itar > 0
-                        || detail.akarikTotal > 0
-                        || detail.tondi > 0
-                        || detail.pratyakshikB > 0
-                        || detail.lekhi > 0
-                        || detail.sanklit > 0
-                        || detail.grandTotal > 0;
-            }
-
-            private void openMarksEntry(Student student) {
-                AppCache.selectedStudent = student;
-                // FIX: Always use SessionContext.selectedClass for the freshest subjects.
-                ClassModel freshClass = SessionContext.selectedClass != null
-                        ? SessionContext.selectedClass
-                        : activeClass;
-                AppCache.selectedClass = freshClass;
-                activeClass = freshClass;
-                // FIX: Pass the existing marks record from the adapter's marksMap.
-                // This ensures EnterDescriptiveActivity loads the correct existing doc
-                // (with proper id) so it UPDATE rather than INSERT a new document.
-                MarksRecord existingRecord = marksMap.get(student.id);
-                AppCache.selectedMarks = existingRecord;
-                android.util.Log.d("DESCRIPTIVE", "openMarksEntry: student=" + student.id
-                        + " existingRecord=" + (existingRecord != null ? existingRecord.id : "null"));
-                Intent intent = new Intent(itemView.getContext(), EnterDescriptiveActivity.class);
-                itemView.getContext().startActivity(intent);
-            }
-
-            private void openSubjectRemarkEntry(Student student, Subject subject, int subjectIndex) {
-                ClassModel freshClass = SessionContext.selectedClass != null
-                        ? SessionContext.selectedClass
-                        : activeClass;
-                activeClass = freshClass;
-                MarksRecord record = getDisplayMarksForStudent(student);
-
-                SubjectRemarkEntryDialog dialog = SubjectRemarkEntryDialog.newInstance(
-                        student, subject, subjectIndex, freshClass, record);
-                dialog.setOnRemarkSavedListener((studentId, newRecord) -> {
-                    adapter.patchStudentMarks(studentId, newRecord);
-                });
-                dialog.show(DescriptiveEntriesFragment.this.getChildFragmentManager(), "SubjectRemarkEntryDialog");
             }
         }
     }

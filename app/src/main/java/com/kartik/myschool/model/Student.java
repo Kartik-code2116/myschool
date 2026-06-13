@@ -57,5 +57,7 @@ public class Student {
     public String religion;
     public String bloodGroup;
 
+    public transient android.graphics.Bitmap cachedPhotoBitmap;
+
     public Student() {}
 }

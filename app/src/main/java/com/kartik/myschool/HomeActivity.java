@@ -178,8 +178,9 @@ public class HomeActivity extends AppCompatActivity {
                 title = "Classes";
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_subject) {
-                title = "Subject";
-                subtitle = SessionContext.getClassDivLabel();
+                boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+                title = isMr ? "विषय" : "Subject";
+                subtitle = isMr ? "शाळास्तर सर्व विषयांची यादी" : "School level list of all subjects";
             } else if (id == R.id.nav_default_values) {
                 title = "Default Values";
                 subtitle = SessionContext.getClassDivLabel();
@@ -761,14 +762,12 @@ public class HomeActivity extends AppCompatActivity {
             return;
 
         prefs.edit().putString("language", lang).apply();
+        com.kartik.myschool.utils.pdf.PdfLocalizer.clearCache();
 
-        // Apply locale runtime change to application and context resources
-        java.util.Locale locale = new java.util.Locale(lang);
-        java.util.Locale.setDefault(locale);
-        android.content.res.Resources res = getResources();
-        android.content.res.Configuration config = new android.content.res.Configuration(res.getConfiguration());
-        config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
+        // Apply locale runtime change using AppCompatDelegate
+        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                androidx.core.os.LocaleListCompat.forLanguageTags(lang)
+        );
 
         Toast.makeText(this, R.string.msg_language_updated, Toast.LENGTH_SHORT).show();
 

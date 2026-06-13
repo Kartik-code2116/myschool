@@ -54,33 +54,19 @@
                 android:contentDescription="Options Menu" />
         </RelativeLayout>
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/cgSavedRemarkSummary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"
-            app:singleLine="false"
-            app:chipSpacingHorizontal="4dp"
-            app:chipSpacingVertical="3dp" />
+
 
         <!-- Subject Cards Section: Horizontal Scrollable List (Slide Layout) -->
-        <HorizontalScrollView
-            android:id="@+id/layoutSubjectsScroll"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSubjectsHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
             android:overScrollMode="never"
-            android:visibility="visible">
-
-            <LinearLayout
-                android:id="@+id/layoutSubjectsHorizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp" />
-        </HorizontalScrollView>
+            android:visibility="visible"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:clipToPadding="false" />
 
         <!-- Subject Cards Section: Two-Column Vertical Grid Layout Container -->
         <LinearLayout

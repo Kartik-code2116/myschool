@@ -60,7 +60,7 @@ dependencies {
     implementation("androidx.fragment:fragment:1.8.8")
 
     // Firebase - using BoM for version consistency
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")

@@ -18,3 +18,6 @@ local.properties
 /jdk17.zip
 /*.txt
 /*.py
+/*.js
+/old_*.java
+/com/

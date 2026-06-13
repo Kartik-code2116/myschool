@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.kartik.myschool.repository.FirebaseRepository;
+import com.kartik.myschool.utils.zoom.ZoomHelper;
 
 import java.util.Locale;
 
@@ -15,6 +16,9 @@ public class MySchoolApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Initialize Global Zoom Helper
+        ZoomHelper.initialize(this);
 
         // Force FirebaseRepository to re-initialize so it always uses
         // the current google-services.json project (not a stale cached instance)
@@ -31,7 +35,10 @@ public class MySchoolApplication extends Application {
 
         // 3. Load and apply persistent locale language
         String lang = settingsPrefs.getString("language", "mr"); // default Marathi
-        applyLocale(lang);
+        androidx.core.os.LocaleListCompat currentLocales = AppCompatDelegate.getApplicationLocales();
+        if (currentLocales.isEmpty()) {
+            AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(lang));
+        }
     }
 
     public static void applyTheme(int themeMode) {
@@ -42,51 +49,5 @@ public class MySchoolApplication extends Application {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
-    }
-
-    public void applyLocale(String lang) {
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Resources res = getResources();
-        Configuration config = res.getConfiguration();
-        config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
-
-        // Register ActivityLifecycleCallbacks to dynamically apply the locale to all activities on startup
-        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
-            @Override
-            public void onActivityCreated(android.app.Activity activity, android.os.Bundle savedInstanceState) {
-                applyLocaleForContext(activity);
-            }
-
-            @Override
-            public void onActivityStarted(android.app.Activity activity) {}
-
-            @Override
-            public void onActivityResumed(android.app.Activity activity) {}
-
-            @Override
-            public void onActivityPaused(android.app.Activity activity) {}
-
-            @Override
-            public void onActivityStopped(android.app.Activity activity) {}
-
-            @Override
-            public void onActivitySaveInstanceState(android.app.Activity activity, android.os.Bundle outState) {}
-
-            @Override
-            public void onActivityDestroyed(android.app.Activity activity) {}
-        });
-    }
-
-    public void applyLocaleForContext(android.content.Context context) {
-        android.content.SharedPreferences settingsPrefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
-        String lang = settingsPrefs.getString("language", "mr"); // default Marathi
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Resources res = context.getResources();
-        Configuration config = res.getConfiguration();
-        config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
     }
 }

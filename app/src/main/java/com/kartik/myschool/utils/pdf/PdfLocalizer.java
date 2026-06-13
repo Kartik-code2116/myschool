@@ -3,21 +3,28 @@ package com.kartik.myschool.utils.pdf;
 import android.content.Context;
 
 public class PdfLocalizer {
+    private static Boolean cachedIsEnglish = null;
+
+    public static synchronized void clearCache() {
+        cachedIsEnglish = null;
+    }
+
     public static String get(Context ctx, String mrText, String enText) {
-        if (ctx == null) return mrText;
-        android.content.SharedPreferences prefs = ctx.getSharedPreferences("myschool_settings_prefs", Context.MODE_PRIVATE);
-        String lang = prefs.getString("language", "mr");
-        if ("en".equals(lang)) {
+        if (isEnglish(ctx)) {
             return enText;
         }
         return mrText;
     }
 
     public static boolean isEnglish(Context ctx) {
+        if (cachedIsEnglish != null) {
+            return cachedIsEnglish;
+        }
         if (ctx == null) return false;
-        android.content.SharedPreferences prefs = ctx.getSharedPreferences("myschool_settings_prefs", Context.MODE_PRIVATE);
+        android.content.SharedPreferences prefs = ctx.getApplicationContext().getSharedPreferences("myschool_settings_prefs", Context.MODE_PRIVATE);
         String lang = prefs.getString("language", "mr");
-        return "en".equals(lang);
+        cachedIsEnglish = "en".equals(lang);
+        return cachedIsEnglish;
     }
 
     public static String translateSubject(Context ctx, String subName) {

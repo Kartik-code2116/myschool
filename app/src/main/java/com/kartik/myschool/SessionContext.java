@@ -10,44 +10,44 @@ import com.kartik.myschool.model.Semester;
  */
 public final class SessionContext {
 
-    public static AcademicYear selectedYear;
-    public static Semester selectedSemester;
-    public static School selectedSchool;
-    public static ClassModel selectedClass;
-    public static com.kartik.myschool.model.Student currentStudentForMarks;
-    public static com.kartik.myschool.model.Student currentStudentForAttendance;
-    public static com.kartik.myschool.model.AttendanceRecord currentRecordForAttendance;
+    public static volatile AcademicYear selectedYear;
+    public static volatile Semester selectedSemester;
+    public static volatile School selectedSchool;
+    public static volatile ClassModel selectedClass;
+    public static volatile com.kartik.myschool.model.Student currentStudentForMarks;
+    public static volatile com.kartik.myschool.model.Student currentStudentForAttendance;
+    public static volatile com.kartik.myschool.model.AttendanceRecord currentRecordForAttendance;
 
     private SessionContext() {}
 
-    public static String getYearLabel() {
+    public static synchronized String getYearLabel() {
         return selectedYear != null && selectedYear.label != null
                 ? selectedYear.label : "2026-27";
     }
 
-    public static String getSemesterLabel() {
+    public static synchronized String getSemesterLabel() {
         return selectedSemester != null && selectedSemester.name != null
                 ? selectedSemester.name : "First Semester";
     }
 
-    public static String getClassDivLabel() {
+    public static synchronized String getClassDivLabel() {
         if (selectedClass == null) return "Class: 1, Div: -";
         String div = selectedClass.division != null && !selectedClass.division.isEmpty()
                 ? selectedClass.division : "-";
         return "Class: " + selectedClass.className + ", Div: " + div;
     }
 
-    public static void syncFromAppCache() {
+    public static synchronized void syncFromAppCache() {
         if (AppCache.selectedSchool != null) selectedSchool = AppCache.selectedSchool;
         if (AppCache.selectedClass != null) selectedClass = AppCache.selectedClass;
     }
 
-    public static void syncToAppCache() {
+    public static synchronized void syncToAppCache() {
         AppCache.selectedSchool = selectedSchool;
         AppCache.selectedClass = selectedClass;
     }
 
-    public static void save(android.content.Context ctx) {
+    public static synchronized void save(android.content.Context ctx) {
         if (ctx == null) return;
         android.content.SharedPreferences.Editor editor = ctx.getSharedPreferences("myschool_session_prefs", android.content.Context.MODE_PRIVATE).edit();
         
@@ -162,7 +162,7 @@ public final class SessionContext {
         syncToAppCache();
     }
 
-    public static void load(android.content.Context ctx) {
+    public static synchronized void load(android.content.Context ctx) {
         if (ctx == null) return;
         android.content.SharedPreferences prefs = ctx.getSharedPreferences("myschool_session_prefs", android.content.Context.MODE_PRIVATE);
         
@@ -272,7 +272,7 @@ public final class SessionContext {
         syncToAppCache();
     }
 
-    public static void clear(android.content.Context ctx) {
+    public static synchronized void clear(android.content.Context ctx) {
         selectedYear = null;
         selectedSemester = null;
         selectedSchool = null;

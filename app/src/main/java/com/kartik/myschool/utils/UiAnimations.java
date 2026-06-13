@@ -151,6 +151,11 @@ public final class UiAnimations {
         if (position > lastPosition[0]) {
             lastPosition[0] = position;
 
+            // Cap animation on scroll to prevent main-thread layout lag for long lists
+            if (position >= 10) {
+                return;
+            }
+
             float density = view.getResources().getDisplayMetrics().density;
             float translateY = 48 * density;
 

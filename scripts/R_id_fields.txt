@@ -1,0 +1,2 @@
+﻿public final class com.kartik.myschool.R {
+}

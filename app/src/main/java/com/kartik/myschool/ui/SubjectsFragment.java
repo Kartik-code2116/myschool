@@ -45,8 +45,6 @@ public class SubjectsFragment extends Fragment {
         displayHeaderInfo();
         
         b.fabAddSubject.setOnClickListener(v -> showAddCustomSubjectDialog());
-        
-        loadSubjects();
     }
 
     private void setupRecyclerView() {

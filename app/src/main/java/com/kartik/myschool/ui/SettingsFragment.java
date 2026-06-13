@@ -155,14 +155,13 @@ public class SettingsFragment extends Fragment {
         if (currentLang.equals(lang)) return;
 
         settingsPrefs.edit().putString("language", lang).apply();
+        com.kartik.myschool.utils.pdf.PdfLocalizer.clearCache();
         updateLanguageUi(lang);
 
-        // Apply locale runtime change
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        android.content.res.Configuration config = new android.content.res.Configuration();
-        config.setLocale(locale);
-        requireContext().getResources().updateConfiguration(config, requireContext().getResources().getDisplayMetrics());
+        // Apply locale runtime change using AppCompatDelegate
+        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                androidx.core.os.LocaleListCompat.forLanguageTags(lang)
+        );
 
         Toast.makeText(requireContext(), R.string.msg_language_updated, Toast.LENGTH_SHORT).show();
 

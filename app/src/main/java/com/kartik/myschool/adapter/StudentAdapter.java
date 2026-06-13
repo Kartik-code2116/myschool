@@ -121,13 +121,18 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             h.ivPhoto.setPadding(0, 0, 0, 0);
             h.ivPhoto.setImageTintList(null);
             if (s.photoUrl.startsWith("data:image")) {
-                try {
-                    String base64Data = s.photoUrl.substring(s.photoUrl.indexOf(",") + 1);
-                    byte[] decodedString = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
-                    android.graphics.Bitmap decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    h.ivPhoto.setImageBitmap(decodedByte);
-                } catch (Exception e) {
-                    bindPlaceholder(h, s);
+                if (s.cachedPhotoBitmap != null) {
+                    h.ivPhoto.setImageBitmap(s.cachedPhotoBitmap);
+                } else {
+                    try {
+                        String base64Data = s.photoUrl.substring(s.photoUrl.indexOf(",") + 1);
+                        byte[] decodedString = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
+                        android.graphics.Bitmap decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        s.cachedPhotoBitmap = decodedByte;
+                        h.ivPhoto.setImageBitmap(decodedByte);
+                    } catch (Exception e) {
+                        bindPlaceholder(h, s);
+                    }
                 }
             } else {
                 Glide.with(h.ivPhoto.getContext())

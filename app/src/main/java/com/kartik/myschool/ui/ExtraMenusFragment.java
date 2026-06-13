@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kartik.myschool.HomeActivity;
 import com.kartik.myschool.R;
@@ -69,6 +71,18 @@ public class ExtraMenusFragment extends Fragment {
                 if (school.address != null && !school.address.isEmpty()) b.tvSchoolInfoAddress.setText(getString(R.string.fmt_school_address, school.address));
             }
         }
+        if ("subject".equals(menuType)) {
+            if (getActivity() instanceof HomeActivity) {
+                boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+                String title = isMr ? "विषय" : "Subject";
+                String subtitle = isMr ? "शाळास्तर सर्व विषयांची यादी" : "School level list of all subjects";
+                ((HomeActivity) getActivity()).updateToolbar(title, subtitle);
+            }
+            ClassModel activeClass = SessionContext.selectedClass;
+            if (activeClass != null && schoolSubjectAdapter != null) {
+                loadSchoolSubjectsList(activeClass);
+            }
+        }
     }
 
     private void displayHeaderInfo() {
@@ -92,6 +106,10 @@ public class ExtraMenusFragment extends Fragment {
     }
 
     private void toggleDataModule() {
+        b.cvContextHeader.setVisibility(View.VISIBLE);
+        b.cvUnifiedContent.setVisibility(View.VISIBLE);
+        b.llSubjectSelectionStyle.setVisibility(View.GONE);
+
         b.llSchoolInfo.setVisibility(View.GONE);
         b.llGender.setVisibility(View.GONE);
         b.llCastCategory.setVisibility(View.GONE);
@@ -108,7 +126,11 @@ public class ExtraMenusFragment extends Fragment {
             case "cast_category": b.llCastCategory.setVisibility(View.VISIBLE); break;
             case "class_teacher": b.llClassTeacher.setVisibility(View.VISIBLE); break;
             case "classes": b.llClasses.setVisibility(View.VISIBLE); break;
-            case "subject": b.llSubject.setVisibility(View.VISIBLE); break;
+            case "subject": 
+                b.cvContextHeader.setVisibility(View.GONE);
+                b.cvUnifiedContent.setVisibility(View.GONE);
+                b.llSubjectSelectionStyle.setVisibility(View.VISIBLE);
+                break;
             case "default_values": b.llDefaultValues.setVisibility(View.VISIBLE); break;
             case "working_days": b.llWorkingDays.setVisibility(View.VISIBLE); break;
             case "he_she_items": b.llHeSheItems.setVisibility(View.VISIBLE); break;
@@ -160,55 +182,219 @@ public class ExtraMenusFragment extends Fragment {
         }
     }
 
+    private SchoolSubjectAdapter schoolSubjectAdapter;
+
+    private static class SchoolSubjectItem {
+        String name;
+        String code;
+        String serial;
+        String category;
+        String colorHex;
+        boolean isHeader;
+        String headerText;
+        String detailsLeft1;
+        String detailsLeft2;
+        String detailsRight1;
+
+        SchoolSubjectItem(String headerText) {
+            this.isHeader = true;
+            this.headerText = headerText;
+        }
+
+        SchoolSubjectItem(String name, String code, String serial, String category, String colorHex, String detailsLeft1, String detailsLeft2, String detailsRight1) {
+            this.name = name;
+            this.code = code;
+            this.serial = serial;
+            this.category = category;
+            this.colorHex = colorHex;
+            this.detailsLeft1 = detailsLeft1;
+            this.detailsLeft2 = detailsLeft2;
+            this.detailsRight1 = detailsRight1;
+            this.isHeader = false;
+        }
+    }
+
+    public static String getSubjectDisplayName(android.content.Context ctx, String originalName) {
+        boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+        if (originalName.equalsIgnoreCase("Vishesh pragati") || originalName.equalsIgnoreCase("Special Development")) {
+            return isMr ? "विशेष प्रगती" : "Special Development";
+        }
+        if (originalName.equalsIgnoreCase("Aavad, chanda, etc") || originalName.equalsIgnoreCase("Interest, Hobby")) {
+            return isMr ? "आवड, छंद, इत्यादी" : "Interest, Hobby";
+        }
+        if (originalName.equalsIgnoreCase("Sudharna Aavashyaka") || originalName.equalsIgnoreCase("Necessary Improvement")) {
+            return isMr ? "सुधारणा आवश्यक" : "Necessary Improvement";
+        }
+        if (originalName.equalsIgnoreCase("Vyaktimatva gun vishgesh") || originalName.equalsIgnoreCase("Personality / Features")) {
+            return isMr ? "व्यक्तिमत्त्व गुण विशेष" : "Personality / Features";
+        }
+        return com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(ctx, originalName);
+    }
+
+    private String getSubjectDetails1(String originalName) {
+        if (originalName.equalsIgnoreCase("Vishesh pragati") || originalName.equalsIgnoreCase("Special Development")) {
+            return "Special Development";
+        }
+        if (originalName.equalsIgnoreCase("Aavad, chanda, etc") || originalName.equalsIgnoreCase("Interest, Hobby")) {
+            return "Hobby";
+        }
+        if (originalName.equalsIgnoreCase("Sudharna Aavashyaka") || originalName.equalsIgnoreCase("Necessary Improvement")) {
+            return "Necessary Improvement";
+        }
+        if (originalName.equalsIgnoreCase("Vyaktimatva gun vishgesh") || originalName.equalsIgnoreCase("Personality / Features")) {
+            return "Personality";
+        }
+        if (originalName.equalsIgnoreCase("Physical Education")) return "Physical Edu.";
+        if (originalName.equalsIgnoreCase("Work Experience")) return "Work Experience";
+        return originalName;
+    }
+
+    private String getSubjectDetails2(String originalName) {
+        if (originalName.equalsIgnoreCase("Vishesh pragati") || originalName.equalsIgnoreCase("Special Development")) {
+            return "Special Development";
+        }
+        if (originalName.equalsIgnoreCase("Aavad, chanda, etc") || originalName.equalsIgnoreCase("Interest, Hobby")) {
+            return "Interest, Hobby";
+        }
+        if (originalName.equalsIgnoreCase("Sudharna Aavashyaka") || originalName.equalsIgnoreCase("Necessary Improvement")) {
+            return "Necessary Improvement";
+        }
+        if (originalName.equalsIgnoreCase("Vyaktimatva gun vishgesh") || originalName.equalsIgnoreCase("Personality / Features")) {
+            return "Personality / Features";
+        }
+        return originalName;
+    }
+
     private void setupRemarkBankEditor(ClassModel activeClass) {
         if (!isAdded() || activeClass == null) return;
 
-        remarkBankSubjects.clear();
-        remarkBankSubjects.add("General");
+        b.rvSchoolSubjectsListFull.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        schoolSubjectAdapter = new SchoolSubjectAdapter();
+        b.rvSchoolSubjectsListFull.setAdapter(schoolSubjectAdapter);
+
+        // Bind the header info
+        String yearLabel = SessionContext.getYearLabel();
+        String classDiv = SessionContext.getClassDivLabel();
+        b.tvSubjectHeaderLabel.setText("Year: " + yearLabel + "   " + classDiv);
+
+        loadSchoolSubjectsList(activeClass);
+    }
+
+    private void loadSchoolSubjectsList(ClassModel activeClass) {
+        List<SchoolSubjectItem> list = new ArrayList<>();
+
+        int serialCounter = 1;
         if (activeClass.subjects != null) {
-            for (Subject subject : activeClass.subjects) {
-                if (subject != null && subject.name != null && !subject.name.trim().isEmpty()) {
-                    remarkBankSubjects.add(subject.name);
+            for (Subject s : activeClass.subjects) {
+                if (s != null && s.name != null && !s.name.trim().isEmpty()) {
+                    String category = "Academic";
+                    String colorHex = "#2196F3";
+                    
+                    String lower = s.name.toLowerCase();
+                    if (lower.contains("drawing") || lower.contains("work experience") || lower.contains("physical education")) {
+                        category = "Activities";
+                        colorHex = "#4CAF50";
+                    } else if (lower.contains("special development") || lower.contains("personality")) {
+                        category = "Personality";
+                        colorHex = "#009688";
+                    } else if (lower.contains("information & comm") || lower.contains("water security") || lower.contains("environment")) {
+                        category = "State Board";
+                        colorHex = "#FF9800";
+                    }
+
+                    int fe = s.maxNirikhshan + s.maxTondiKam + s.maxPratyakshik + s.maxUpkram + s.maxPrakalp + s.maxChachani + s.maxSwadhyay + s.maxItar;
+                    int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
+                    String det1 = "FE: " + fe;
+                    String det2 = se > 0 ? "SE: " + se : "";
+
+                    String serialStr = String.valueOf(serialCounter++);
+                    list.add(new SchoolSubjectItem(s.name, s.subjectCode != null ? s.subjectCode : "", serialStr, category, colorHex, det1, det2, ""));
                 }
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                remarkBankSubjects
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        b.spRemarkBankSubject.setAdapter(adapter);
-        b.spRemarkBankSubject.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                selectedRemarkBankSubject = remarkBankSubjects.get(position);
-                loadRemarkBankOptions();
-            }
+        boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+        String headerText = isMr ? "001 : फक्त वर्णनात्मक नोंदीचे विषय" : "001 : Only Descriptive Entries Subjects";
+        list.add(new SchoolSubjectItem(headerText));
 
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        });
-        b.btnAddRemarkBankOption.setOnClickListener(v -> showAddRemarkOptionDialog());
-        loadRemarkBankOptions();
+        String tealColor = "#009688";
+        list.add(new SchoolSubjectItem("Vishesh pragati", "", String.valueOf(serialCounter++), "Personality", tealColor, "", "", ""));
+        list.add(new SchoolSubjectItem("Aavad, chanda, etc", "", String.valueOf(serialCounter++), "Personality", tealColor, "", "", ""));
+        list.add(new SchoolSubjectItem("Sudharna Aavashyaka", "", String.valueOf(serialCounter++), "Personality", tealColor, "", "", ""));
+        list.add(new SchoolSubjectItem("Vyaktimatva gun vishgesh", "", String.valueOf(serialCounter++), "Personality", tealColor, "", "", ""));
+
+        schoolSubjectAdapter.setData(list);
     }
 
-    private void loadRemarkBankOptions() {
+    private void showRemarksEditDialog(String subjectName) {
+        if (!isAdded() || getContext() == null) return;
+
+        selectedRemarkBankSubject = subjectName;
+
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_school_subject_remarks, null);
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        android.widget.TextView tvTitle = dialogView.findViewById(R.id.tvDialogRemarksTitle);
+        com.google.android.material.chip.ChipGroup cgRemarks = dialogView.findViewById(R.id.cgDialogRemarkOptions);
+        com.google.android.material.button.MaterialButton btnAdd = dialogView.findViewById(R.id.btnDialogAddRemark);
+        com.google.android.material.button.MaterialButton btnClose = dialogView.findViewById(R.id.btnDialogClose);
+
+        boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+        String localizedName = getSubjectDisplayName(getContext(), subjectName);
+        tvTitle.setText(isMr ? "विषय : " + localizedName : "Remarks for " + localizedName);
+
+        loadRemarksForDialog(subjectName, cgRemarks);
+
+        btnAdd.setOnClickListener(v -> {
+            EditText input = new EditText(getContext());
+            input.setHint("Remark option");
+            input.setSingleLine(false);
+            input.setMinLines(2);
+
+            new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                    .setTitle("Add remark option")
+                    .setView(input)
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Add", (d, which) -> {
+                        String text = input.getText() != null ? input.getText().toString().trim() : "";
+                        if (text.isEmpty()) {
+                            Toast.makeText(getContext(), "Enter a remark option.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (!remarkBankOptions.contains(text)) {
+                            remarkBankOptions.add(text);
+                            saveRemarksFromDialog(subjectName, cgRemarks);
+                        }
+                    })
+                    .show();
+        });
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void loadRemarksForDialog(String subjectName, com.google.android.material.chip.ChipGroup cgRemarks) {
         String schoolId = getActiveSchoolId();
         ClassModel activeClass = SessionContext.selectedClass;
         String className = activeClass != null && activeClass.className != null ? activeClass.className : "5";
         int semesterNumber = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.number : 1;
 
-        List<String> cached = AppCache.cachedRemarkBank.get(selectedRemarkBankSubject);
+        List<String> cached = AppCache.cachedRemarkBank.get(subjectName);
         if (cached != null && !cached.isEmpty()) {
             remarkBankOptions.clear();
             remarkBankOptions.addAll(cached);
-            renderRemarkBankOptions();
+            renderRemarksInDialog(cgRemarks, subjectName);
             return;
         }
 
-        FirebaseRepository.get().getRemarkBank(schoolId, className, semesterNumber, selectedRemarkBankSubject,
+        FirebaseRepository.get().getRemarkBank(schoolId, className, semesterNumber, subjectName,
                 new FirebaseRepository.OnResult<List<String>>() {
                     @Override
                     public void onSuccess(List<String> options) {
@@ -217,97 +403,198 @@ public class ExtraMenusFragment extends Fragment {
                         if (options != null) {
                             remarkBankOptions.addAll(options);
                         }
-                        AppCache.cachedRemarkBank.put(selectedRemarkBankSubject, new ArrayList<>(remarkBankOptions));
-                        renderRemarkBankOptions();
+                        AppCache.cachedRemarkBank.put(subjectName, new ArrayList<>(remarkBankOptions));
+                        renderRemarksInDialog(cgRemarks, subjectName);
                     }
 
                     @Override
                     public void onError(Exception e) {
                         if (!isAdded()) return;
                         remarkBankOptions.clear();
-                        remarkBankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(selectedRemarkBankSubject, semesterNumber));
-                        renderRemarkBankOptions();
+                        remarkBankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
+                        renderRemarksInDialog(cgRemarks, subjectName);
                     }
                 });
     }
 
-    private void renderRemarkBankOptions() {
-        if (b == null) return;
-        b.cgRemarkBankOptions.removeAllViews();
+    private void renderRemarksInDialog(com.google.android.material.chip.ChipGroup cgRemarks, String subjectName) {
+        if (cgRemarks == null) return;
+        cgRemarks.removeAllViews();
         for (String option : remarkBankOptions) {
             Chip chip = new Chip(requireContext());
             chip.setText(option);
             chip.setCloseIconVisible(true);
             chip.setEnsureMinTouchTargetSize(false);
-            chip.setOnCloseIconClickListener(v -> confirmRemoveRemarkOption(option));
-            chip.setOnLongClickListener(v -> {
-                confirmRemoveRemarkOption(option);
-                return true;
+            chip.setOnCloseIconClickListener(v -> {
+                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Remove option?")
+                        .setMessage(option)
+                        .setNegativeButton("Cancel", null)
+                        .setPositiveButton("Remove", (dialog, which) -> {
+                            remarkBankOptions.remove(option);
+                            saveRemarksFromDialog(subjectName, cgRemarks);
+                        })
+                        .show();
             });
-            b.cgRemarkBankOptions.addView(chip);
+            cgRemarks.addView(chip);
         }
     }
 
-    private void showAddRemarkOptionDialog() {
-        if (!isAdded()) return;
-        EditText input = new EditText(requireContext());
-        input.setHint("Remark option");
-        input.setSingleLine(false);
-        input.setMinLines(2);
-
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Add remark option")
-                .setView(input)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Add", (dialog, which) -> {
-                    String text = input.getText() != null ? input.getText().toString().trim() : "";
-                    if (text.isEmpty()) {
-                        Toast.makeText(getContext(), "Enter a remark option.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    if (!remarkBankOptions.contains(text)) {
-                        remarkBankOptions.add(text);
-                    }
-                    saveRemarkBankOptions("Option added.");
-                })
-                .show();
-    }
-
-    private void confirmRemoveRemarkOption(String option) {
-        if (!isAdded()) return;
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Remove option?")
-                .setMessage(option)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Remove", (dialog, which) -> {
-                    remarkBankOptions.remove(option);
-                    saveRemarkBankOptions("Option removed.");
-                })
-                .show();
-    }
-
-    private void saveRemarkBankOptions(String message) {
+    private void saveRemarksFromDialog(String subjectName, com.google.android.material.chip.ChipGroup cgRemarks) {
         String schoolId = getActiveSchoolId();
-        b.btnAddRemarkBankOption.setEnabled(false);
-        FirebaseRepository.get().saveRemarkBank(schoolId, selectedRemarkBankSubject,
+        FirebaseRepository.get().saveRemarkBank(schoolId, subjectName,
                 new ArrayList<>(remarkBankOptions), new FirebaseRepository.OnResult<Void>() {
                     @Override
                     public void onSuccess(Void result) {
                         if (!isAdded()) return;
-                        AppCache.cachedRemarkBank.put(selectedRemarkBankSubject, new ArrayList<>(remarkBankOptions));
-                        b.btnAddRemarkBankOption.setEnabled(true);
-                        renderRemarkBankOptions();
-                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        AppCache.cachedRemarkBank.put(subjectName, new ArrayList<>(remarkBankOptions));
+                        renderRemarksInDialog(cgRemarks, subjectName);
+                        Toast.makeText(getContext(), "Remarks saved.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onError(Exception e) {
                         if (!isAdded()) return;
-                        b.btnAddRemarkBankOption.setEnabled(true);
                         Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        loadRemarkBankOptions();
                     }
                 });
+    }
+
+    private class SchoolSubjectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private static final int TYPE_HEADER = 0;
+        private static final int TYPE_SUBJECT = 1;
+
+        private final List<SchoolSubjectItem> items = new ArrayList<>();
+
+        public void setData(List<SchoolSubjectItem> data) {
+            items.clear();
+            if (data != null) {
+                items.addAll(data);
+            }
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return items.get(position).isHeader ? TYPE_HEADER : TYPE_SUBJECT;
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            if (viewType == TYPE_HEADER) {
+                android.widget.TextView textView = new android.widget.TextView(parent.getContext());
+                android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                float density = parent.getResources().getDisplayMetrics().density;
+                int marginStart = (int) (12 * density);
+                int marginVertical = (int) (12 * density);
+                lp.setMargins(marginStart, marginVertical, marginStart, marginVertical);
+                textView.setLayoutParams(lp);
+                textView.setTextSize(14);
+                textView.setTextColor(0xFF757575);
+                textView.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL));
+                return new HeaderVH(textView);
+            } else {
+                com.kartik.myschool.databinding.ItemSubjectCardBinding cardB = 
+                        com.kartik.myschool.databinding.ItemSubjectCardBinding.inflate(
+                                LayoutInflater.from(parent.getContext()), parent, false);
+                return new SubjectVH(cardB);
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            SchoolSubjectItem item = items.get(position);
+            if (getItemViewType(position) == TYPE_HEADER) {
+                HeaderVH h = (HeaderVH) holder;
+                h.textView.setText(item.headerText);
+            } else {
+                SubjectVH sHolder = (SubjectVH) holder;
+                com.kartik.myschool.databinding.ItemSubjectCardBinding b = sHolder.b;
+
+                b.tvSubjectCode.setText(item.code);
+                b.tvSerialNumber.setText(item.serial);
+                
+                String dispName = getSubjectDisplayName(b.getRoot().getContext(), item.name);
+                b.tvSubjectName.setText(dispName);
+                
+                b.tvDetailsLeft1.setText(item.detailsLeft1);
+                b.tvDetailsLeft2.setText(item.detailsLeft2);
+                b.tvDetailsRight1.setText(item.detailsRight1);
+                b.tvDetailsRight1.setVisibility(View.VISIBLE);
+                
+                b.tvIsApplicableLabel.setVisibility(View.GONE);
+                b.switchApplicable.setVisibility(View.GONE);
+
+                int color = android.graphics.Color.parseColor(item.colorHex);
+                b.tvSerialNumber.setTextColor(color);
+                b.tvSubjectName.setTextColor(color);
+
+                int maxMarks = 100;
+                if (com.kartik.myschool.SessionContext.selectedClass != null && com.kartik.myschool.SessionContext.selectedClass.subjects != null) {
+                    for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
+                        if (s.name != null && s.name.equalsIgnoreCase(item.name)) {
+                            maxMarks = s.maxMarks;
+                            break;
+                        }
+                    }
+                }
+
+                final int finalMaxMarks = maxMarks;
+                b.cardSubject.setOnClickListener(v -> {
+                    android.content.Intent intent = new android.content.Intent(v.getContext(), com.kartik.myschool.SubjectUpdateActivity.class);
+                    intent.putExtra("subject_name", item.name);
+                    intent.putExtra("subject_code", item.code);
+                    intent.putExtra("subject_serial", item.serial);
+                    intent.putExtra("subject_category", item.category);
+                    intent.putExtra("subject_max_marks", finalMaxMarks);
+                    intent.putExtra("details_left_1", item.detailsLeft1);
+                    intent.putExtra("details_left_2", item.detailsLeft2);
+                    v.getContext().startActivity(intent);
+                });
+                b.btnCardMenu.setOnClickListener(v -> {
+                    androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(v.getContext(), v);
+                    popup.getMenu().add("Details");
+                    popup.getMenu().add("Edit Max Marks");
+                    popup.setOnMenuItemClickListener(menuItem -> {
+                        android.content.Intent intent = new android.content.Intent(v.getContext(), com.kartik.myschool.SubjectUpdateActivity.class);
+                        intent.putExtra("subject_name", item.name);
+                        intent.putExtra("subject_code", item.code);
+                        intent.putExtra("subject_serial", item.serial);
+                        intent.putExtra("subject_category", item.category);
+                        intent.putExtra("subject_max_marks", finalMaxMarks);
+                        intent.putExtra("details_left_1", item.detailsLeft1);
+                        intent.putExtra("details_left_2", item.detailsLeft2);
+                        v.getContext().startActivity(intent);
+                        return true;
+                    });
+                    popup.show();
+                });
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+
+        class HeaderVH extends RecyclerView.ViewHolder {
+            android.widget.TextView textView;
+            HeaderVH(android.widget.TextView textView) {
+                super(textView);
+                this.textView = textView;
+            }
+        }
+
+        class SubjectVH extends RecyclerView.ViewHolder {
+            final com.kartik.myschool.databinding.ItemSubjectCardBinding b;
+            SubjectVH(com.kartik.myschool.databinding.ItemSubjectCardBinding b) {
+                super(b.getRoot());
+                this.b = b;
+            }
+        }
     }
 
     private String getActiveSchoolId() {
