@@ -97,7 +97,13 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         // Toggle state
         b.tvIsApplicableLabel.setVisibility(View.VISIBLE);
         b.switchApplicable.setVisibility(View.VISIBLE);
-        boolean isActive = activeSubjectNames.contains(item.name);
+        boolean isActive = false;
+        for (String activeName : activeSubjectNames) {
+            if (com.kartik.myschool.model.Subject.isSameSubject(activeName, item.name)) {
+                isActive = true;
+                break;
+            }
+        }
         
         // Prevent trigger during binding
         b.switchApplicable.setOnCheckedChangeListener(null);

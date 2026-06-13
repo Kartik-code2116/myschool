@@ -33,44 +33,35 @@
 
             <!-- ── Text info (left side) ── -->
 
-            <!-- ── Animated Illustration (right side) ── -->
+            <!-- Version pill (top of header poster) -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="22dp"
+                android:layout_gravity="top|start"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:letterSpacing="0.1"
+                android:paddingHorizontal="10dp"
+                android:text="@string/txt_myschool_1_0"
+                android:textAllCaps="true"
+                android:textColor="#BBDEFB"
+                android:textSize="9sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="108dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
                 android:orientation="vertical"
                 android:paddingStart="24dp"
                 android:paddingEnd="23dp">
 
-                <!-- Version pill -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="22dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@drawable/bg_badge_pill"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="center"
-                    android:letterSpacing="0.1"
-                    android:paddingHorizontal="10dp"
-                    android:text="@string/txt_myschool_1_0"
-                    android:textAllCaps="true"
-                    android:textColor="#BBDEFB"
-                    android:textSize="9sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="Welcome back,"
-                    android:textColor="#BBDEFB"
-                    android:textSize="12sp" />
-
                 <TextView
                     android:id="@+id/tvTeacherNameHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:fontFamily="sans-serif-black"
                     android:letterSpacing="0.01"
                     android:shadowColor="#33000000"
@@ -79,19 +70,25 @@
                     android:shadowRadius="4"
                     android:text="@string/txt_kartik_thorat"
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
+                    android:textSize="24sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.06"
-                    android:text="@string/txt_myschool"
-                    android:textColor="#90CAF9"
-                    android:textSize="12sp" />
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPosterName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="22dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/txt_kartik"
+                android:textColor="#BBDEFB"
+                android:textSize="11sp"
+                android:letterSpacing="0.05"
+                android:alpha="0.85"/>
 
             <FrameLayout
                 android:id="@+id/frameHeaderAnim"
@@ -135,14 +132,26 @@
                     android:src="@drawable/ic_school"
                     app:tint="#3F51B5"/>
 
+                <!-- App logo (centered, hidden by default) -->
+                <ImageView
+                    android:id="@+id/ivAnimLogo"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/app_logo"
+                    android:visibility="gone"
+                    android:alpha="0.0"
+                    android:scaleX="0.0"
+                    android:scaleY="0.0"/>
+
                 <!-- Floating icon: Book (top-left area) -->
                 <FrameLayout
                     android:id="@+id/frameBook"
                     android:layout_width="38dp"
                     android:layout_height="38dp"
-                    android:layout_gravity="start|top"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_gravity="center"
+                    android:translationX="-63dp"
+                    android:translationY="-55dp"
                     android:background="@drawable/ic_anim_ring_center"
                     android:elevation="4dp">
                     <ImageView
@@ -158,9 +167,9 @@
                     android:id="@+id/frameStudents"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_gravity="end|top"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginTop="22dp"
+                    android:layout_gravity="center"
+                    android:translationX="66dp"
+                    android:translationY="-50dp"
                     android:background="@drawable/ic_anim_ring_center"
                     android:elevation="4dp">
                     <ImageView
@@ -176,9 +185,9 @@
                     android:id="@+id/frameChart"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_gravity="start|bottom"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginBottom="18dp"
+                    android:layout_gravity="center"
+                    android:translationX="-62dp"
+                    android:translationY="54dp"
                     android:background="@drawable/ic_anim_ring_center"
                     android:elevation="4dp">
                     <ImageView
@@ -194,9 +203,9 @@
                     android:id="@+id/frameCalendar"
                     android:layout_width="34dp"
                     android:layout_height="34dp"
-                    android:layout_gravity="end|bottom"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="22dp"
+                    android:layout_gravity="center"
+                    android:translationX="65dp"
+                    android:translationY="51dp"
                     android:background="@drawable/ic_anim_ring_center"
                     android:elevation="4dp">
                     <ImageView
@@ -236,6 +245,163 @@
                     android:background="@drawable/ic_sparkle_dot"/>
 
             </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/frameHeaderAnimSecond"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="12dp"
+                android:clipChildren="false"
+                android:visibility="gone">
+
+                <!-- Outer glow ring (pulsing) -->
+                <ImageView
+                    android:id="@+id/ivRingOuterSecond"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_anim_ring_outer"
+                    android:alpha="0.5"/>
+
+                <!-- Middle ring -->
+                <ImageView
+                    android:id="@+id/ivRingInnerSecond"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_anim_ring_inner"
+                    android:alpha="0.7"/>
+
+                <!-- White center circle -->
+                <ImageView
+                    android:layout_width="76dp"
+                    android:layout_height="76dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_anim_ring_center"/>
+
+                <!-- Main reports icon (center) -->
+                <ImageView
+                    android:id="@+id/ivAnimReports"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_reports"
+                    app:tint="#D81B60"/>
+
+                <!-- App logo (centered, hidden by default) -->
+                <ImageView
+                    android:id="@+id/ivAnimLogoSecond"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/app_logo"
+                    android:visibility="gone"
+                    android:alpha="0.0"
+                    android:scaleX="0.0"
+                    android:scaleY="0.0"/>
+
+                <!-- Floating icon: Calculator (top-left area) -->
+                <FrameLayout
+                    android:id="@+id/frameCalculator"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="center"
+                    android:translationX="-63dp"
+                    android:translationY="-55dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_calculator"
+                        app:tint="#7B1FA2"/>
+                </FrameLayout>
+
+                <!-- Floating icon: Check Circle (top-right area) -->
+                <FrameLayout
+                    android:id="@+id/frameCheckCircle"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:translationX="66dp"
+                    android:translationY="-50dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_check_circle"
+                        app:tint="#2E7D32"/>
+                </FrameLayout>
+
+                <!-- Floating icon: Document (bottom-left) -->
+                <FrameLayout
+                    android:id="@+id/frameDocument"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:translationX="-62dp"
+                    android:translationY="54dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_document"
+                        app:tint="#1565C0"/>
+                </FrameLayout>
+
+                <!-- Floating icon: Print (bottom-right) -->
+                <FrameLayout
+                    android:id="@+id/framePrint"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:translationX="65dp"
+                    android:translationY="51dp"
+                    android:background="@drawable/ic_anim_ring_center"
+                    android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_print"
+                        app:tint="#E65100"/>
+                </FrameLayout>
+
+                <!-- Sparkle dots -->
+                <View
+                    android:id="@+id/dotSpark1Second"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginBottom="44dp"
+                    android:background="@drawable/ic_sparkle_dot"/>
+
+                <View
+                    android:id="@+id/dotSpark2Second"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="26dp"
+                    android:layout_marginTop="36dp"
+                    android:background="@drawable/ic_sparkle_dot"/>
+
+                <View
+                    android:id="@+id/dotSpark3Second"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/ic_sparkle_dot"/>
+
+            </FrameLayout>
         </FrameLayout>
 
         <!-- ═══ OVERLAPPING WHITE ROUNDED CARD ═══ -->
@@ -254,387 +420,409 @@
 
             <!-- ─── SECTION: Year ─── -->
             <LinearLayout
+                android:id="@+id/layoutYearSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical">
 
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="20dp"
-                    android:background="#5E35B1"
-                    android:layout_marginEnd="10dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_academic_year"
-                    android:textColor="#1A237E"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.08"/>
-            </LinearLayout>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:layout_marginBottom="22dp">
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="#5E35B1"
+                        android:layout_marginEnd="10dp"/>
 
-                <ImageButton
-                    android:id="@+id/btnYearPrev"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_previous"
-                    android:src="@drawable/ic_chevron_left"
-                    app:tint="#90A4AE"
-                    android:padding="10dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_academic_year"
+                        android:textColor="#1A237E"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.08"/>
+                </LinearLayout>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardYear"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="6dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="16dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#E2E8F0"
-                    app:cardElevation="2dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="22dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                    <ImageButton
+                        android:id="@+id/btnYearPrev"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_previous"
+                        android:src="@drawable/ic_chevron_left"
+                        app:tint="#90A4AE"
+                        android:padding="10dp"/>
 
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_calendar"
-                            app:tint="#6366F1"
-                            android:layout_marginEnd="8dp"/>
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardYear"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="6dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="16dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:cardElevation="2dp">
 
-                        <TextView
-                            android:id="@+id/tvYearLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-black"
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:gravity="center"
-                            android:text="2026-27"
-                            android:textColor="#1E293B"
-                            android:textSize="17sp"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/btnYearNext"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_next"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="#90A4AE"
-                    android:padding="10dp"/>
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_calendar"
+                                app:tint="#6366F1"
+                                android:layout_marginEnd="8dp"/>
+
+                            <TextView
+                                android:id="@+id/tvYearLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-black"
+                                android:gravity="center"
+                                android:text="2026-27"
+                                android:textColor="#1E293B"
+                                android:textSize="17sp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <ImageButton
+                        android:id="@+id/btnYearNext"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_next"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#90A4AE"
+                        android:padding="10dp"/>
+                </LinearLayout>
+
+                <!-- Subtle divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F6"
+                    android:layout_marginBottom="20dp"/>
             </LinearLayout>
-
-            <!-- Subtle divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#F0F0F6"
-                android:layout_marginBottom="20dp"/>
 
             <!-- ─── SECTION: Semester ─── -->
             <LinearLayout
+                android:id="@+id/layoutSemesterSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical">
 
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="20dp"
-                    android:background="#7E57C2"
-                    android:layout_marginEnd="10dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_semester"
-                    android:textColor="#1A237E"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.08"/>
-            </LinearLayout>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
 
-            <LinearLayout
-                android:id="@+id/panelSemester"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:layout_marginBottom="22dp">
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="#7E57C2"
+                        android:layout_marginEnd="10dp"/>
 
-                <ImageButton
-                    android:id="@+id/btnSemesterPrev"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_previous"
-                    android:src="@drawable/ic_chevron_left"
-                    app:tint="#90A4AE"
-                    android:padding="10dp"/>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardSemester"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="6dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="16dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#E2E8F0"
-                    app:cardElevation="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_book"
-                            app:tint="#6366F1"
-                            android:layout_marginEnd="8dp"/>
-
-                        <TextView
-                            android:id="@+id/tvSemesterName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:gravity="center"
-                            android:text="@string/txt_first_semester"
-                            android:textColor="#1E293B"
-                            android:textSize="16sp"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <ImageButton
-                    android:id="@+id/btnSemesterNext"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_next"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="#90A4AE"
-                    android:padding="10dp"/>
-            </LinearLayout>
-
-            <!-- Subtle divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#F0F0F6"
-                android:layout_marginBottom="20dp"/>
-
-            <!-- ─── SECTION: Class Selection ─── -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
-
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="20dp"
-                    android:background="#4CAF50"
-                    android:layout_marginEnd="10dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_class_activation"
-                    android:textColor="#1A237E"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.08"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"/>
-
-                <!-- Live swipe hint badge -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_swipe"
-                    android:textColor="#90A4AE"
-                    android:textSize="10sp"
-                    android:fontFamily="sans-serif"
-                    android:letterSpacing="0.06"/>
-            </LinearLayout>
-
-            <!-- Class sliding row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/btnClassPrev"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_previous"
-                    android:src="@drawable/ic_chevron_left"
-                    app:tint="#90A4AE"
-                    android:padding="10dp"/>
-
-                <!-- Class Activation Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/panelClass"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="6dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="16dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#E2E8F0"
-                    app:cardElevation="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="14dp"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
+                        android:text="@string/txt_semester"
+                        android:textColor="#1A237E"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.08"/>
+                </LinearLayout>
 
-                        <!-- Left: Class Number Circle -->
-                        <FrameLayout
-                            android:id="@+id/frameClassNumCircle"
-                            android:layout_width="58dp"
-                            android:layout_height="58dp"
-                            android:background="@drawable/bg_class_num_normal">
+                <LinearLayout
+                    android:id="@+id/panelSemester"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="22dp">
 
-                            <TextView
-                                android:id="@+id/tvClassNumberBig"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:fontFamily="sans-serif-black"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textColor="#5E35B1"
-                                android:textSize="22sp"
-                                android:textStyle="bold"/>
-                        </FrameLayout>
+                    <ImageButton
+                        android:id="@+id/btnSemesterPrev"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_previous"
+                        android:src="@drawable/ic_chevron_left"
+                        app:tint="#90A4AE"
+                        android:padding="10dp"/>
 
-                        <!-- Center: Class details -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSemester"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="6dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="16dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:cardElevation="2dp">
+
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_weight="1"
-                            android:layout_marginStart="14dp"
-                            android:layout_marginEnd="8dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_book"
+                                app:tint="#6366F1"
+                                android:layout_marginEnd="8dp"/>
 
                             <TextView
-                                android:id="@+id/tvClassDivLabel"
+                                android:id="@+id/tvSemesterName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
-                                android:text="@string/txt_class_1_div_a"
-                                android:textColor="#1A237E"
-                                android:textSize="15sp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="1dp"
-                                android:fontFamily="sans-serif"
-                                android:text="@string/txt_tap_to_manage_students"
-                                android:textColor="#90A4AE"
-                                android:textSize="11sp"/>
-
-                            <!-- Status Badge Pill -->
-                            <TextView
-                                android:id="@+id/tvClassStatusBadge"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:background="@drawable/bg_pill_activate"
-                                android:paddingStart="12dp"
-                                android:paddingEnd="12dp"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="4dp"
-                                android:text="@string/txt_activate_it"
-                                android:textColor="#E65100"
-                                android:textSize="12sp"
-                                android:fontFamily="sans-serif-medium"/>
+                                android:gravity="center"
+                                android:text="@string/txt_first_semester"
+                                android:textColor="#1E293B"
+                                android:textSize="16sp"/>
                         </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Right: Arrow -->
-                        <ImageView
-                            android:id="@+id/ivClassArrow"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@drawable/ic_chevron_right"
-                            app:tint="#C5CAE9"
-                            android:contentDescription="Select"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                    <ImageButton
+                        android:id="@+id/btnSemesterNext"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_next"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#90A4AE"
+                        android:padding="10dp"/>
+                </LinearLayout>
 
-                <ImageButton
-                    android:id="@+id/btnClassNext"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_next"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="#90A4AE"
-                    android:padding="10dp"/>
+                <!-- Subtle divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F6"
+                    android:layout_marginBottom="20dp"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvNoClassHint"
+            <!-- ─── SECTION: Class Selection ─── -->
+            <LinearLayout
+                android:id="@+id/layoutClassSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:text="@string/home_no_class_hint"
-                android:textColor="#90A4AE"
-                android:textSize="12sp"
-                android:visibility="gone"/>
+                android:orientation="vertical">
 
-            <!-- Subtle divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#F0F0F6"
-                android:layout_marginTop="22dp"
-                android:layout_marginBottom="22dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="#4CAF50"
+                        android:layout_marginEnd="10dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_class_activation"
+                        android:textColor="#1A237E"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.08"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"/>
+
+                    <!-- Live swipe hint badge -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_swipe"
+                        android:textColor="#90A4AE"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif"
+                        android:letterSpacing="0.06"/>
+                </LinearLayout>
+
+                <!-- Class sliding row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnClassPrev"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_previous"
+                        android:src="@drawable/ic_chevron_left"
+                        app:tint="#90A4AE"
+                        android:padding="10dp"/>
+
+                    <!-- Class Activation Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/panelClass"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="6dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="16dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E2E8F0"
+                        app:cardElevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <!-- Left: Class Number Circle -->
+                            <FrameLayout
+                                android:id="@+id/frameClassNumCircle"
+                                android:layout_width="58dp"
+                                android:layout_height="58dp"
+                                android:background="@drawable/bg_class_num_normal">
+
+                                <TextView
+                                    android:id="@+id/tvClassNumberBig"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="sans-serif-black"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textColor="#5E35B1"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"/>
+                            </FrameLayout>
+
+                            <!-- Center: Class details -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_weight="1"
+                                android:layout_marginStart="14dp"
+                                android:layout_marginEnd="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvClassDivLabel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="@string/txt_class_1_div_a"
+                                    android:textColor="#1A237E"
+                                    android:textSize="15sp"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:fontFamily="sans-serif"
+                                    android:text="@string/txt_tap_to_manage_students"
+                                    android:textColor="#90A4AE"
+                                    android:textSize="11sp"/>
+
+                                <!-- Status Badge Pill -->
+                                <TextView
+                                    android:id="@+id/tvClassStatusBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:background="@drawable/bg_pill_activate"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:paddingTop="4dp"
+                                    android:paddingBottom="4dp"
+                                    android:text="@string/txt_activate_it"
+                                    android:textColor="#E65100"
+                                    android:textSize="12sp"
+                                    android:fontFamily="sans-serif-medium"/>
+                            </LinearLayout>
+
+                            <!-- Right: Arrow -->
+                            <ImageView
+                                android:id="@+id/ivClassArrow"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="#C5CAE9"
+                                android:contentDescription="Select"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <ImageButton
+                        android:id="@+id/btnClassNext"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_next"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="#90A4AE"
+                        android:padding="10dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvNoClassHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="@string/home_no_class_hint"
+                    android:textColor="#90A4AE"
+                    android:textSize="12sp"
+                    android:visibility="gone"/>
+
+                <!-- Subtle divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F6"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginBottom="22dp"/>
+            </LinearLayout>
 
             <!-- ═══ ACTION BUTTONS ═══ -->
 
             <!-- Row 1: GO TO CLASS & ALL CLASSES -->
             <LinearLayout
+                android:id="@+id/rowButtons1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -681,6 +869,7 @@
 
             <!-- Row 2: HOW TO USE & ONLINE HELP -->
             <LinearLayout
+                android:id="@+id/rowButtons2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -726,6 +915,7 @@
 
             <!-- ─── Bottom Instruction Panel ─── -->
             <LinearLayout
+                android:id="@+id/panelBottomInstructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

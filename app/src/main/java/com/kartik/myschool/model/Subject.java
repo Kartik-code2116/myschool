@@ -169,5 +169,47 @@ public class Subject {
             return Integer.compare(i1, i2);
         });
     }
+
+    private static boolean isPhysicalEd(String sc) {
+        return sc.contains("physical education") || sc.contains("शारीरिक") || sc.contains("शा.शि.") 
+            || sc.equals("p.e.") || sc.equals("p.e") || sc.equals("pe")
+            || sc.contains("shirik");
+    }
+
+    private static boolean isSocialSci(String sc) {
+        return sc.contains("social science") || sc.equals("सामाजिक शास्त्र") || sc.contains("सामाजिक")
+            || sc.contains("soc. science") || sc.contains("soc.science") || sc.contains("soc science")
+            || sc.contains("इतिहास व नागरिकशास्त्र") || sc.contains("भूगोल व सामाजिक शास्त्र");
+    }
+
+    public static boolean isSameSubject(String s1, String s2) {
+        if (s1 == null || s2 == null) return false;
+        if (s1.equalsIgnoreCase(s2)) return true;
+
+        String sc1 = s1.trim().toLowerCase().replaceAll("\\s+", " ");
+        String sc2 = s2.trim().toLowerCase().replaceAll("\\s+", " ");
+        if (sc1.equals(sc2)) return true;
+
+        // Check English vs Marathi equivalents
+        if ((sc1.equals("marathi") || sc1.equals("मराठी")) && (sc2.equals("marathi") || sc2.equals("मराठी"))) return true;
+        if ((sc1.equals("english") || sc1.equals("इंग्रजी")) && (sc2.equals("english") || sc2.equals("इंग्रजी"))) return true;
+        if ((sc1.equals("hindi") || sc1.equals("हिंदी")) && (sc2.equals("hindi") || sc2.equals("हिंदी"))) return true;
+        if ((sc1.equals("sanskrit") || sc1.equals("संस्कृत")) && (sc2.equals("sanskrit") || sc2.equals("संस्कृत"))) return true;
+        if ((sc1.equals("mathematics") || sc1.equals("maths") || sc1.equals("math") || sc1.equals("गणित")) && (sc2.equals("mathematics") || sc2.equals("maths") || sc2.equals("math") || sc2.equals("गणित"))) return true;
+        if ((sc1.equals("science") || sc1.equals("विज्ञान")) && (sc2.equals("science") || sc2.equals("विज्ञान"))) return true;
+        if ((sc1.equals("history") || sc1.equals("इतिहास")) && (sc2.equals("history") || sc2.equals("इतिहास"))) return true;
+        if ((sc1.equals("geography") || sc1.equals("भूगोल")) && (sc2.equals("geography") || sc2.equals("भूगोल"))) return true;
+        if ((sc1.equals("civics") || sc1.equals("नागरिकशास्त्र")) && (sc2.equals("civics") || sc2.equals("नागरिकशास्त्र"))) return true;
+        if (isSocialSci(sc1) && isSocialSci(sc2)) return true;
+        if ((sc1.equals("art") || sc1.equals("drawing") || sc1.equals("कला")) && (sc2.equals("art") || sc2.equals("drawing") || sc2.equals("कला"))) return true;
+        if ((sc1.equals("work experience") || sc1.equals("कार्यानुभव")) && (sc2.equals("work experience") || sc2.equals("कार्यानुभव"))) return true;
+        if (isPhysicalEd(sc1) && isPhysicalEd(sc2)) return true;
+        if ((sc1.equals("personality development") || sc1.equals("व्यक्तिमत्त्व विकास")) && (sc2.equals("personality development") || sc2.equals("व्यक्तिमत्त्व विकास"))) return true;
+        if ((sc1.contains("information & comm") || sc1.contains("ict") || sc1.contains("संप्रेषण")) && (sc2.contains("information & comm") || sc2.contains("ict") || sc2.contains("संप्रेषण"))) return true;
+        if ((sc1.contains("water security") || sc1.contains("जलसुरक्षा")) && (sc2.contains("water security") || sc2.contains("जलसुरक्षा"))) return true;
+
+        return false;
+    }
 }
+
 

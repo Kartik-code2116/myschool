@@ -415,9 +415,9 @@ public class FirebaseRepository {
     }
 
     private void seedSemesters(String yearId, Runnable done) {
-        Semester s1 = new Semester(1, "First Semester", "Easy Reports");
+        Semester s1 = new Semester(1, "प्रथम सत्र", "Easy Reports");
         s1.yearId = yearId;
-        Semester s2 = new Semester(2, "Second Semester", "Final Reports");
+        Semester s2 = new Semester(2, "द्वितीय सत्र", "Final Reports");
         s2.yearId = yearId;
         saveSemester(s1, new OnResult<String>() {
             @Override public void onSuccess(String id) {

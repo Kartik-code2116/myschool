@@ -65,7 +65,7 @@ public class SubjectsFragment extends Fragment {
 
             Subject match = null;
             for (Subject s : selectedClass.subjects) {
-                if (s.name != null && s.name.equalsIgnoreCase(item.name)) {
+                if (s.name != null && Subject.isSameSubject(s.name, item.name)) {
                     match = s;
                     break;
                 }
@@ -121,6 +121,38 @@ public class SubjectsFragment extends Fragment {
     private void loadSubjects() {
         final List<Subject> activeSubjects;
         if (SessionContext.selectedClass != null && SessionContext.selectedClass.subjects != null) {
+            // Deduplicate active subjects to remove English vs Marathi duplicates (e.g. Science vs विज्ञान)
+            List<Subject> cleanList = new ArrayList<>();
+            boolean modified = false;
+            for (Subject active : SessionContext.selectedClass.subjects) {
+                // Auto-fix non-academic subjects that have SE marks (e.g., 50-50 instead of 100-0)
+                if (Subject.isNonAcademic(active.name)) {
+                    int se = active.maxTondi + active.maxPratyakshikB + active.maxLekhi;
+                    if (se > 0) {
+                        Subject fixed = new Subject(active.name, active.maxMarks);
+                        fixed.subjectCode = active.subjectCode;
+                        active = fixed;
+                        modified = true;
+                    }
+                }
+                
+                boolean duplicate = false;
+                for (Subject clean : cleanList) {
+                    if (Subject.isSameSubject(clean.name, active.name)) {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (!duplicate) {
+                    cleanList.add(active);
+                }
+            }
+            if (modified || cleanList.size() != SessionContext.selectedClass.subjects.size()) {
+                SessionContext.selectedClass.subjects = cleanList;
+                SessionContext.save(getContext());
+                com.kartik.myschool.AppCache.selectedClass = SessionContext.selectedClass;
+                FirebaseRepository.get().saveClass(SessionContext.selectedClass, null);
+            }
             activeSubjects = SessionContext.selectedClass.subjects;
         } else {
             activeSubjects = new ArrayList<>();
@@ -133,7 +165,7 @@ public class SubjectsFragment extends Fragment {
         for (Subject active : activeSubjects) {
             boolean found = false;
             for (SubjectAdapter.SubjectItem item : predefined) {
-                if (item.name.equalsIgnoreCase(active.name)) {
+                if (Subject.isSameSubject(item.name, active.name)) {
                     item.maxMarks = active.maxMarks;
                     int fe = active.maxNirikhshan + active.maxTondiKam + active.maxPratyakshik + active.maxUpkram + active.maxPrakalp + active.maxChachani + active.maxSwadhyay + active.maxItar;
                     int se = active.maxTondi + active.maxPratyakshikB + active.maxLekhi;
@@ -156,7 +188,7 @@ public class SubjectsFragment extends Fragment {
             }
         }
         
-        adapter.setData(predefined, activeSubjects);
+        adapter.setData(deduplicateItems(predefined), activeSubjects);
 
         // Fetch global subjects defined by Admin and merge
         FirebaseRepository.get().getGlobalSubjects(new FirebaseRepository.OnResult<List<Subject>>() {
@@ -167,7 +199,7 @@ public class SubjectsFragment extends Fragment {
                     for (Subject gSub : globalSubjects) {
                         boolean exists = false;
                         for (SubjectAdapter.SubjectItem existing : currentList) {
-                            if (existing.name.equalsIgnoreCase(gSub.name)) {
+                            if (Subject.isSameSubject(existing.name, gSub.name)) {
                                 if ("Custom".equals(existing.category)) {
                                     existing.category = "Global";
                                     existing.colorHex = "#FF5722";
@@ -185,7 +217,7 @@ public class SubjectsFragment extends Fragment {
                             currentList.add(new SubjectAdapter.SubjectItem(gSub.name, "", orderStr, "Global", gSub.maxMarks, "FE: " + fe, seStr, "", "#FF5722"));
                         }
                     }
-                    adapter.setData(currentList, activeSubjects);
+                    adapter.setData(deduplicateItems(currentList), activeSubjects);
                 }
             }
             @Override
@@ -193,6 +225,23 @@ public class SubjectsFragment extends Fragment {
                 // Ignore, just use predefined
             }
         });
+    }
+
+    private List<SubjectAdapter.SubjectItem> deduplicateItems(List<SubjectAdapter.SubjectItem> list) {
+        List<SubjectAdapter.SubjectItem> clean = new ArrayList<>();
+        for (SubjectAdapter.SubjectItem item : list) {
+            boolean dup = false;
+            for (SubjectAdapter.SubjectItem c : clean) {
+                if (Subject.isSameSubject(c.name, item.name)) {
+                    dup = true;
+                    break;
+                }
+            }
+            if (!dup) {
+                clean.add(item);
+            }
+        }
+        return clean;
     }
 
     private void showAddCustomSubjectDialog() {
@@ -236,7 +285,7 @@ public class SubjectsFragment extends Fragment {
                     
                     // Check if already exists
                     for (Subject s : cls.subjects) {
-                        if (s.name.equalsIgnoreCase(name)) {
+                        if (Subject.isSameSubject(s.name, name)) {
                             Toast.makeText(getContext(), "Subject already exists in your class", Toast.LENGTH_SHORT).show();
                             return;
                         }

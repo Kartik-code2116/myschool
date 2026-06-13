@@ -49,6 +49,36 @@ public class InfoPrintSettingFragment extends Fragment {
     private boolean entrancePlayed;
     private boolean isFirstLoad = true;
     private boolean isSwipeOngoing = false;
+    private boolean isSecondPosterShowing = false;
+
+    // Animation coordinates caching and tracking
+    private float bookOrigX, bookOrigY;
+    private float studentsOrigX, studentsOrigY;
+    private float chartOrigX, chartOrigY;
+    private float calendarOrigX, calendarOrigY;
+
+    private float calculatorOrigX, calculatorOrigY;
+    private float checkCircleOrigX, checkCircleOrigY;
+    private float documentOrigX, documentOrigY;
+    private float printOrigX, printOrigY;
+
+    private boolean origValsCaptured = false;
+    private boolean isCombineAnimRunning = false;
+    private final List<Animator> headerAnimators = new ArrayList<>();
+
+    private final android.os.Handler animHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable combineLoopRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isViewActive()) {
+                if (!isCombineAnimRunning && b != null && b.headerBand.isEnabled()) {
+                    playCombineAndLogoAnimation();
+                }
+                animHandler.postDelayed(this, 15000);
+            }
+        }
+    };
+
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -72,6 +102,10 @@ public class InfoPrintSettingFragment extends Fragment {
         b.btnSemesterNext.setOnClickListener(v -> cycleSemester(1));
         b.btnClassPrev.setOnClickListener(v    -> cycleClass(-1));
         b.btnClassNext.setOnClickListener(v    -> cycleClass(1));
+
+        b.headerBand.setOnClickListener(v -> togglePoster());
+        b.ivAnimSchool.setOnClickListener(v -> playCombineAndLogoAnimation());
+        b.ivAnimReports.setOnClickListener(v -> playCombineAndLogoAnimation());
 
         b.btnGoToClass.setOnClickListener(v -> { UiAnimations.pulse(b.btnGoToClass); goToClassStudents(); });
         b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_class_div); });
@@ -109,6 +143,12 @@ public class InfoPrintSettingFragment extends Fragment {
 
 
     // ── Teacher name ──────────────────────────────────────────────────────────
+    private void updateWelcomeHeader(String teacherName) {
+        if (b != null && isAdded() && teacherName != null) {
+            b.tvTeacherNameHeader.setText(getString(R.string.welcome_back_name, teacherName));
+        }
+    }
+
     /**
      * Two-phase load:
      * Phase 1 (sync, 0ms): read AppCache.cachedTeacherName → set TextView immediately.
@@ -118,7 +158,7 @@ public class InfoPrintSettingFragment extends Fragment {
     private void loadTeacherName() {
         // Phase 1 — instant
         if (AppCache.cachedTeacherName != null && b != null) {
-            b.tvTeacherNameHeader.setText(AppCache.cachedTeacherName);
+            updateWelcomeHeader(AppCache.cachedTeacherName);
         }
         // Phase 2 — background refresh
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
@@ -128,7 +168,7 @@ public class InfoPrintSettingFragment extends Fragment {
                 AppCache.cachedTeacherName = t.name;
                 if (b != null) {
                     requireActivity().runOnUiThread(() -> {
-                        b.tvTeacherNameHeader.setText(t.name);
+                        updateWelcomeHeader(t.name);
                         if (wasBlank) UiAnimations.fadeIn(b.tvTeacherNameHeader);
                     });
                 }
@@ -229,7 +269,7 @@ public class InfoPrintSettingFragment extends Fragment {
                     if (t != null && t.name != null) {
                         AppCache.cachedTeacherName = t.name;
                         if (b != null) {
-                            requireActivity().runOnUiThread(() -> b.tvTeacherNameHeader.setText(t.name));
+                            requireActivity().runOnUiThread(() -> updateWelcomeHeader(t.name));
                         }
                     }
                     FirebaseRepository.get().ensureTeacherSchool(t, new FirebaseRepository.OnResult<School>() {
@@ -336,8 +376,8 @@ public class InfoPrintSettingFragment extends Fragment {
 
     private void seedFallbackSemesters() {
         semesters.clear();
-        semesters.add(new Semester(1, "First Semester",  "Easy Reports"));
-        semesters.add(new Semester(2, "Second Semester", "Final Reports"));
+        semesters.add(new Semester(1, "प्रथम सत्र",  "Easy Reports"));
+        semesters.add(new Semester(2, "द्वितीय सत्र", "Final Reports"));
         AppCache.cachedSemesters = new ArrayList<>(semesters);
     }
 
@@ -453,7 +493,15 @@ public class InfoPrintSettingFragment extends Fragment {
         SessionContext.selectedSemester = s;
         SessionContext.save(getContext());
         if (!isViewActive()) return;
-        b.tvSemesterName.setText(s.name != null ? s.name : "");
+        String semName = s.name;
+        if (semName != null) {
+            if (semName.equals("First Semester") || semName.equals("प्रथम सत्र") || semName.toLowerCase().contains("first") || semName.contains("१") || semName.contains("1")) {
+                semName = getString(R.string.txt_semester_1);
+            } else if (semName.equals("Second Semester") || semName.equals("द्वितीय सत्र") || semName.toLowerCase().contains("second") || semName.contains("२") || semName.contains("2")) {
+                semName = getString(R.string.txt_semester_2);
+            }
+        }
+        b.tvSemesterName.setText(semName != null ? semName : "");
         if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.panelSemester, dir);
     }
 
@@ -539,15 +587,53 @@ public class InfoPrintSettingFragment extends Fragment {
         b.homeRoot.setAlpha(1f);
         b.homeRoot.post(() -> {
             if (!isViewActive()) return;
-            UiAnimations.staggerFadeIn(b.headerBand, b.cardMain, b.btnGoToClass, b.btnAllClasses);
+            UiAnimations.fadeIn(b.headerBand);
+            UiAnimations.fadeIn(b.cardMain);
+            UiAnimations.staggerFadeIn(
+                b.layoutYearSection,
+                b.layoutSemesterSection,
+                b.layoutClassSection,
+                b.rowButtons1,
+                b.rowButtons2,
+                b.panelBottomInstructions
+            );
+            captureOriginalTranslations();
             startHeaderAnimations();
         });
+    }
+
+    // ── Header illustration animations ───────────────────────────────────────
+    private void captureOriginalTranslations() {
+        if (origValsCaptured || b == null) return;
+        bookOrigX = b.frameBook.getTranslationX();
+        bookOrigY = b.frameBook.getTranslationY();
+        studentsOrigX = b.frameStudents.getTranslationX();
+        studentsOrigY = b.frameStudents.getTranslationY();
+        chartOrigX = b.frameChart.getTranslationX();
+        chartOrigY = b.frameChart.getTranslationY();
+        calendarOrigX = b.frameCalendar.getTranslationX();
+        calendarOrigY = b.frameCalendar.getTranslationY();
+
+        calculatorOrigX = b.frameCalculator.getTranslationX();
+        calculatorOrigY = b.frameCalculator.getTranslationY();
+        checkCircleOrigX = b.frameCheckCircle.getTranslationX();
+        checkCircleOrigY = b.frameCheckCircle.getTranslationY();
+        documentOrigX = b.frameDocument.getTranslationX();
+        documentOrigY = b.frameDocument.getTranslationY();
+        printOrigX = b.framePrint.getTranslationX();
+        printOrigY = b.framePrint.getTranslationY();
+
+        origValsCaptured = true;
     }
 
     // ── Header illustration animations ───────────────────────────────────────
     private void startHeaderAnimations() {
         if (!isViewActive()) return;
 
+        // Ensure clean state before running loops
+        stopHeaderAnimators();
+
+        // --- FIRST POSTER ANIMATIONS ---
         // 1. Outer ring: slow continuous pulse scale
         ObjectAnimator outerScaleX = ObjectAnimator.ofFloat(b.ivRingOuter, "scaleX", 0.85f, 1.12f);
         ObjectAnimator outerScaleY = ObjectAnimator.ofFloat(b.ivRingOuter, "scaleY", 0.85f, 1.12f);
@@ -559,6 +645,7 @@ public class InfoPrintSettingFragment extends Fragment {
         outerSet.playTogether(outerScaleX, outerScaleY, outerAlpha);
         outerSet.setInterpolator(new AccelerateDecelerateInterpolator());
         outerSet.start();
+        headerAnimators.add(outerSet);
 
         // 2. Inner ring: counter-phase pulse (offset timing)
         ObjectAnimator innerScaleX = ObjectAnimator.ofFloat(b.ivRingInner, "scaleX", 0.9f, 1.08f);
@@ -570,8 +657,9 @@ public class InfoPrintSettingFragment extends Fragment {
         innerSet.playTogether(innerScaleX, innerScaleY);
         innerSet.setInterpolator(new AccelerateDecelerateInterpolator());
         innerSet.start();
+        headerAnimators.add(innerSet);
 
-        // 3. School icon: slow breathe scale + gentle rotation
+        // 3. School icon: slow breathe scale
         ObjectAnimator schoolBreath = ObjectAnimator.ofFloat(b.ivAnimSchool, "scaleX", 0.92f, 1.08f);
         ObjectAnimator schoolBreathY = ObjectAnimator.ofFloat(b.ivAnimSchool, "scaleY", 0.92f, 1.08f);
         schoolBreath.setDuration(1800);  schoolBreath.setRepeatMode(ValueAnimator.REVERSE);  schoolBreath.setRepeatCount(ValueAnimator.INFINITE);
@@ -580,35 +668,50 @@ public class InfoPrintSettingFragment extends Fragment {
         schoolSet.playTogether(schoolBreath, schoolBreathY);
         schoolSet.setInterpolator(new AccelerateDecelerateInterpolator());
         schoolSet.start();
+        headerAnimators.add(schoolSet);
 
-        // 4. Floating satellite icons — staggered bob up/down
+        // 4. Floating satellite icons — staggered bob up/down (relative to original XML positions)
+        float density = getResources().getDisplayMetrics().density;
         float[] offsets = {0f, 500f, 900f, 1300f};
         View[] floaters = {b.frameBook, b.frameStudents, b.frameChart, b.frameCalendar};
-        float[] amplitudes = {-16f, -12f, -14f, -10f};
+        float[] origYs = {bookOrigY, studentsOrigY, chartOrigY, calendarOrigY};
+        float[] amplitudes = {-8f * density, -6f * density, -7f * density, -5f * density};
         int[] durations   = {2000,  1700,  2300,  1900};
+        
         for (int i = 0; i < floaters.length; i++) {
-            ObjectAnimator bobY = ObjectAnimator.ofFloat(floaters[i], "translationY", 0f, amplitudes[i]);
+            ObjectAnimator bobY = ObjectAnimator.ofFloat(floaters[i], "translationY", origYs[i], origYs[i] + amplitudes[i]);
             bobY.setDuration(durations[i]);
             bobY.setRepeatMode(ValueAnimator.REVERSE);
             bobY.setRepeatCount(ValueAnimator.INFINITE);
             bobY.setStartDelay((long) offsets[i]);
             bobY.setInterpolator(new AccelerateDecelerateInterpolator());
             bobY.start();
+            headerAnimators.add(bobY);
 
-            // Entrance pop-in for each floater
-            floaters[i].setScaleX(0f); floaters[i].setScaleY(0f); floaters[i].setAlpha(0f);
-            ObjectAnimator popX = ObjectAnimator.ofFloat(floaters[i], "scaleX", 0f, 1f);
-            ObjectAnimator popY = ObjectAnimator.ofFloat(floaters[i], "scaleY", 0f, 1f);
-            ObjectAnimator popA = ObjectAnimator.ofFloat(floaters[i], "alpha",  0f, 1f);
-            popX.setDuration(500); popY.setDuration(500); popA.setDuration(400);
-            popX.setStartDelay(300 + (long)(i * 120));
-            popY.setStartDelay(300 + (long)(i * 120));
-            popA.setStartDelay(300 + (long)(i * 120));
-            popX.setInterpolator(new OvershootInterpolator(1.5f));
-            popY.setInterpolator(new OvershootInterpolator(1.5f));
-            AnimatorSet popSet = new AnimatorSet();
-            popSet.playTogether(popX, popY, popA);
-            popSet.start();
+            // Pop-in is only executed during the initial entrance flow.
+            // On subsequent start calls, we reset state to normal float position if not animating.
+            if (!entrancePlayed) {
+                floaters[i].setScaleX(0f); floaters[i].setScaleY(0f); floaters[i].setAlpha(0f);
+                ObjectAnimator popX = ObjectAnimator.ofFloat(floaters[i], "scaleX", 0f, 1f);
+                ObjectAnimator popY = ObjectAnimator.ofFloat(floaters[i], "scaleY", 0f, 1f);
+                ObjectAnimator popA = ObjectAnimator.ofFloat(floaters[i], "alpha",  0f, 1f);
+                popX.setDuration(500); popY.setDuration(500); popA.setDuration(400);
+                popX.setStartDelay(300 + (long)(i * 120));
+                popY.setStartDelay(300 + (long)(i * 120));
+                popA.setStartDelay(300 + (long)(i * 120));
+                popX.setInterpolator(new OvershootInterpolator(1.5f));
+                popY.setInterpolator(new OvershootInterpolator(1.5f));
+                AnimatorSet popSet = new AnimatorSet();
+                popSet.playTogether(popX, popY, popA);
+                popSet.start();
+            } else {
+                if (!isCombineAnimRunning) {
+                    floaters[i].setScaleX(1f);
+                    floaters[i].setScaleY(1f);
+                    floaters[i].setAlpha(1f);
+                    floaters[i].setTranslationX(i == 0 ? bookOrigX : (i == 1 ? studentsOrigX : (i == 2 ? chartOrigX : calendarOrigX)));
+                }
+            }
         }
 
         // 5. Sparkle dots — twinkle alpha
@@ -623,12 +726,302 @@ public class InfoPrintSettingFragment extends Fragment {
             twinkle.setStartDelay(dotDelays[i]);
             twinkle.setInterpolator(new AccelerateDecelerateInterpolator());
             twinkle.start();
+            headerAnimators.add(twinkle);
 
             ObjectAnimator twinkleScale = ObjectAnimator.ofFloat(dots[i], "scaleX", 0.5f, 1.3f);
             ObjectAnimator twinkleScaleY = ObjectAnimator.ofFloat(dots[i], "scaleY", 0.5f, 1.3f);
             twinkleScale.setDuration(dotDurations[i]);  twinkleScale.setRepeatMode(ValueAnimator.REVERSE);  twinkleScale.setRepeatCount(ValueAnimator.INFINITE); twinkleScale.setStartDelay(dotDelays[i]);
             twinkleScaleY.setDuration(dotDurations[i]); twinkleScaleY.setRepeatMode(ValueAnimator.REVERSE); twinkleScaleY.setRepeatCount(ValueAnimator.INFINITE); twinkleScaleY.setStartDelay(dotDelays[i]);
             twinkleScale.start(); twinkleScaleY.start();
+            headerAnimators.add(twinkleScale);
+            headerAnimators.add(twinkleScaleY);
+        }
+
+        // --- SECOND POSTER ANIMATIONS ---
+        // 1. Outer ring second: slow continuous pulse scale
+        ObjectAnimator outerScaleXSecond = ObjectAnimator.ofFloat(b.ivRingOuterSecond, "scaleX", 0.85f, 1.12f);
+        ObjectAnimator outerScaleYSecond = ObjectAnimator.ofFloat(b.ivRingOuterSecond, "scaleY", 0.85f, 1.12f);
+        ObjectAnimator outerAlphaSecond  = ObjectAnimator.ofFloat(b.ivRingOuterSecond, "alpha",  0.3f, 0.65f);
+        outerScaleXSecond.setDuration(2000); outerScaleXSecond.setRepeatMode(ValueAnimator.REVERSE); outerScaleXSecond.setRepeatCount(ValueAnimator.INFINITE);
+        outerScaleYSecond.setDuration(2000); outerScaleYSecond.setRepeatMode(ValueAnimator.REVERSE); outerScaleYSecond.setRepeatCount(ValueAnimator.INFINITE);
+        outerAlphaSecond.setDuration(2000);  outerAlphaSecond.setRepeatMode(ValueAnimator.REVERSE);  outerAlphaSecond.setRepeatCount(ValueAnimator.INFINITE);
+        AnimatorSet outerSetSecond = new AnimatorSet();
+        outerSetSecond.playTogether(outerScaleXSecond, outerScaleYSecond, outerAlphaSecond);
+        outerSetSecond.setInterpolator(new AccelerateDecelerateInterpolator());
+        outerSetSecond.start();
+        headerAnimators.add(outerSetSecond);
+
+        // 2. Inner ring second: counter-phase pulse (offset timing)
+        ObjectAnimator innerScaleXSecond = ObjectAnimator.ofFloat(b.ivRingInnerSecond, "scaleX", 0.9f, 1.08f);
+        ObjectAnimator innerScaleYSecond = ObjectAnimator.ofFloat(b.ivRingInnerSecond, "scaleY", 0.9f, 1.08f);
+        innerScaleXSecond.setDuration(1600); innerScaleXSecond.setRepeatMode(ValueAnimator.REVERSE); innerScaleXSecond.setRepeatCount(ValueAnimator.INFINITE);
+        innerScaleYSecond.setDuration(1600); innerScaleYSecond.setRepeatMode(ValueAnimator.REVERSE); innerScaleYSecond.setRepeatCount(ValueAnimator.INFINITE);
+        innerScaleXSecond.setStartDelay(400); innerScaleYSecond.setStartDelay(400);
+        AnimatorSet innerSetSecond = new AnimatorSet();
+        innerSetSecond.playTogether(innerScaleXSecond, innerScaleYSecond);
+        innerSetSecond.setInterpolator(new AccelerateDecelerateInterpolator());
+        innerSetSecond.start();
+        headerAnimators.add(innerSetSecond);
+
+        // 3. Reports icon second: slow breathe scale
+        ObjectAnimator reportsBreath = ObjectAnimator.ofFloat(b.ivAnimReports, "scaleX", 0.92f, 1.08f);
+        ObjectAnimator reportsBreathY = ObjectAnimator.ofFloat(b.ivAnimReports, "scaleY", 0.92f, 1.08f);
+        reportsBreath.setDuration(1800);  reportsBreath.setRepeatMode(ValueAnimator.REVERSE);  reportsBreath.setRepeatCount(ValueAnimator.INFINITE);
+        reportsBreathY.setDuration(1800); reportsBreathY.setRepeatMode(ValueAnimator.REVERSE); reportsBreathY.setRepeatCount(ValueAnimator.INFINITE);
+        AnimatorSet reportsSet = new AnimatorSet();
+        reportsSet.playTogether(reportsBreath, reportsBreathY);
+        reportsSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        reportsSet.start();
+        headerAnimators.add(reportsSet);
+
+        // 4. Floating satellite icons for second poster (relative to original XML positions)
+        View[] floatersSecond = {b.frameCalculator, b.frameCheckCircle, b.frameDocument, b.framePrint};
+        float[] origYsSecond = {calculatorOrigY, checkCircleOrigY, documentOrigY, printOrigY};
+        for (int i = 0; i < floatersSecond.length; i++) {
+            ObjectAnimator bobY = ObjectAnimator.ofFloat(floatersSecond[i], "translationY", origYsSecond[i], origYsSecond[i] + amplitudes[i]);
+            bobY.setDuration(durations[i]);
+            bobY.setRepeatMode(ValueAnimator.REVERSE);
+            bobY.setRepeatCount(ValueAnimator.INFINITE);
+            bobY.setStartDelay((long) offsets[i]);
+            bobY.setInterpolator(new AccelerateDecelerateInterpolator());
+            bobY.start();
+            headerAnimators.add(bobY);
+
+            if (!entrancePlayed) {
+                floatersSecond[i].setScaleX(0f); floatersSecond[i].setScaleY(0f); floatersSecond[i].setAlpha(0f);
+                ObjectAnimator popX = ObjectAnimator.ofFloat(floatersSecond[i], "scaleX", 0f, 1f);
+                ObjectAnimator popY = ObjectAnimator.ofFloat(floatersSecond[i], "scaleY", 0f, 1f);
+                ObjectAnimator popA = ObjectAnimator.ofFloat(floatersSecond[i], "alpha",  0f, 1f);
+                popX.setDuration(500); popY.setDuration(500); popA.setDuration(400);
+                popX.setStartDelay(300 + (long)(i * 120));
+                popY.setStartDelay(300 + (long)(i * 120));
+                popA.setStartDelay(300 + (long)(i * 120));
+                popX.setInterpolator(new OvershootInterpolator(1.5f));
+                popY.setInterpolator(new OvershootInterpolator(1.5f));
+                AnimatorSet popSet = new AnimatorSet();
+                popSet.playTogether(popX, popY, popA);
+                popSet.start();
+            } else {
+                if (!isCombineAnimRunning) {
+                    floatersSecond[i].setScaleX(1f);
+                    floatersSecond[i].setScaleY(1f);
+                    floatersSecond[i].setAlpha(1f);
+                    floatersSecond[i].setTranslationX(i == 0 ? calculatorOrigX : (i == 1 ? checkCircleOrigX : (i == 2 ? documentOrigX : printOrigX)));
+                }
+            }
+        }
+
+        // 5. Sparkle dots for second poster
+        View[] dotsSecond = {b.dotSpark1Second, b.dotSpark2Second, b.dotSpark3Second};
+        for (int i = 0; i < dotsSecond.length; i++) {
+            ObjectAnimator twinkle = ObjectAnimator.ofFloat(dotsSecond[i], "alpha", 0.1f, 1.0f);
+            twinkle.setDuration(dotDurations[i]);
+            twinkle.setRepeatMode(ValueAnimator.REVERSE);
+            twinkle.setRepeatCount(ValueAnimator.INFINITE);
+            twinkle.setStartDelay(dotDelays[i]);
+            twinkle.setInterpolator(new AccelerateDecelerateInterpolator());
+            twinkle.start();
+            headerAnimators.add(twinkle);
+
+            ObjectAnimator twinkleScale = ObjectAnimator.ofFloat(dotsSecond[i], "scaleX", 0.5f, 1.3f);
+            ObjectAnimator twinkleScaleY = ObjectAnimator.ofFloat(dotsSecond[i], "scaleY", 0.5f, 1.3f);
+            twinkleScale.setDuration(dotDurations[i]);  twinkleScale.setRepeatMode(ValueAnimator.REVERSE);  twinkleScale.setRepeatCount(ValueAnimator.INFINITE); twinkleScale.setStartDelay(dotDelays[i]);
+            twinkleScaleY.setDuration(dotDurations[i]); twinkleScaleY.setRepeatMode(ValueAnimator.REVERSE); twinkleScaleY.setRepeatCount(ValueAnimator.INFINITE); twinkleScaleY.setStartDelay(dotDelays[i]);
+            twinkleScale.start(); twinkleScaleY.start();
+            headerAnimators.add(twinkleScale);
+            headerAnimators.add(twinkleScaleY);
+        }
+    }
+
+    private void stopHeaderAnimators() {
+        for (Animator anim : headerAnimators) {
+            if (anim != null) {
+                anim.cancel();
+            }
+        }
+        headerAnimators.clear();
+    }
+
+    private void playCombineAndLogoAnimation() {
+        if (isCombineAnimRunning || b == null) return;
+        isCombineAnimRunning = true;
+
+        // Temporarily lock header poster toggling to prevent layout collision
+        b.headerBand.setEnabled(false);
+
+        // Cancel running continuous bobbing/pulsing animations
+        stopHeaderAnimators();
+
+        final boolean isSecond = isSecondPosterShowing;
+        final View centerIcon = isSecond ? b.ivAnimReports : b.ivAnimSchool;
+        final View appLogo = isSecond ? b.ivAnimLogoSecond : b.ivAnimLogo;
+        final View[] floaters = isSecond
+                ? new View[]{b.frameCalculator, b.frameCheckCircle, b.frameDocument, b.framePrint}
+                : new View[]{b.frameBook, b.frameStudents, b.frameChart, b.frameCalendar};
+
+        final float[] origXs = isSecond
+                ? new float[]{calculatorOrigX, checkCircleOrigX, documentOrigX, printOrigX}
+                : new float[]{bookOrigX, studentsOrigX, chartOrigX, calendarOrigX};
+
+        final float[] origYs = isSecond
+                ? new float[]{calculatorOrigY, checkCircleOrigY, documentOrigY, printOrigY}
+                : new float[]{bookOrigY, studentsOrigY, chartOrigY, calendarOrigY};
+
+        // 1. Implode floating views and center main icon to the center
+        List<Animator> implodeAnims = new ArrayList<>();
+
+        // Center main icon shrinks to 0 and fades out
+        implodeAnims.add(ObjectAnimator.ofFloat(centerIcon, "scaleX", 1f, 0f));
+        implodeAnims.add(ObjectAnimator.ofFloat(centerIcon, "scaleY", 1f, 0f));
+        implodeAnims.add(ObjectAnimator.ofFloat(centerIcon, "alpha", 1f, 0f));
+
+        // Floating badges glide to center (translationX/Y -> 0), shrink and fade
+        for (int i = 0; i < floaters.length; i++) {
+            implodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "translationX", floaters[i].getTranslationX(), 0f));
+            implodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "translationY", floaters[i].getTranslationY(), 0f));
+            implodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "scaleX", floaters[i].getScaleX(), 0f));
+            implodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "scaleY", floaters[i].getScaleY(), 0f));
+            implodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "alpha", floaters[i].getAlpha(), 0f));
+        }
+
+        AnimatorSet implodeSet = new AnimatorSet();
+        implodeSet.playTogether(implodeAnims);
+        implodeSet.setDuration(500);
+        implodeSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        implodeSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (b == null) return;
+                
+                // 2. Reveal app logo with an Overshoot bounce effect
+                appLogo.setVisibility(View.VISIBLE);
+                appLogo.setScaleX(0f);
+                appLogo.setScaleY(0f);
+                appLogo.setAlpha(0f);
+
+                List<Animator> logoRevealAnims = new ArrayList<>();
+                logoRevealAnims.add(ObjectAnimator.ofFloat(appLogo, "scaleX", 0f, 1f));
+                logoRevealAnims.add(ObjectAnimator.ofFloat(appLogo, "scaleY", 0f, 1f));
+                logoRevealAnims.add(ObjectAnimator.ofFloat(appLogo, "alpha", 0f, 1f));
+
+                AnimatorSet logoRevealSet = new AnimatorSet();
+                logoRevealSet.playTogether(logoRevealAnims);
+                logoRevealSet.setDuration(500);
+                logoRevealSet.setInterpolator(new OvershootInterpolator(1.4f));
+                logoRevealSet.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (b == null) return;
+
+                        // 3. Hold logo centered for 1500ms before returning to normal poster state
+                        b.headerBand.postDelayed(() -> {
+                            if (b == null) return;
+
+                            // 4. Explode all elements back outwards and fade out the logo
+                            List<Animator> explodeAnims = new ArrayList<>();
+
+                            explodeAnims.add(ObjectAnimator.ofFloat(appLogo, "scaleX", 1f, 0f));
+                            explodeAnims.add(ObjectAnimator.ofFloat(appLogo, "scaleY", 1f, 0f));
+                            explodeAnims.add(ObjectAnimator.ofFloat(appLogo, "alpha", 1f, 0f));
+
+                            explodeAnims.add(ObjectAnimator.ofFloat(centerIcon, "scaleX", 0f, 1f));
+                            explodeAnims.add(ObjectAnimator.ofFloat(centerIcon, "scaleY", 0f, 1f));
+                            explodeAnims.add(ObjectAnimator.ofFloat(centerIcon, "alpha", 0f, 1f));
+
+                            for (int i = 0; i < floaters.length; i++) {
+                                explodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "translationX", 0f, origXs[i]));
+                                explodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "translationY", 0f, origYs[i]));
+                                explodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "scaleX", 0f, 1f));
+                                explodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "scaleY", 0f, 1f));
+                                explodeAnims.add(ObjectAnimator.ofFloat(floaters[i], "alpha", 0f, 1f));
+                            }
+
+                            AnimatorSet explodeSet = new AnimatorSet();
+                            explodeSet.playTogether(explodeAnims);
+                            explodeSet.setDuration(600);
+                            explodeSet.setInterpolator(new OvershootInterpolator(1.3f));
+                            explodeSet.addListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    if (b == null) return;
+                                    appLogo.setVisibility(View.GONE);
+                                    isCombineAnimRunning = false;
+                                    b.headerBand.setEnabled(true);
+                                    
+                                    // Resume standard floating and breathing animations
+                                    startHeaderAnimations();
+                                }
+                            });
+                            explodeSet.start();
+
+                        }, 1500);
+                    }
+                });
+                logoRevealSet.start();
+            }
+        });
+        implodeSet.start();
+    }
+
+    private void togglePoster() {
+        if (b == null) return;
+        b.headerBand.setEnabled(false); // disable during animation to prevent overlapping animation cycles
+        
+        float width = b.frameHeaderAnim.getWidth() > 0 ? b.frameHeaderAnim.getWidth() : 500f;
+        float offset = width + 50f;
+
+        if (!isSecondPosterShowing) {
+            // Slide current poster left and fade out
+            b.frameHeaderAnim.animate()
+                    .translationX(-offset)
+                    .alpha(0f)
+                    .setDuration(450)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(() -> {
+                        b.frameHeaderAnim.setVisibility(View.GONE);
+                    })
+                    .start();
+
+            // Slide new poster in from right and fade in
+            b.frameHeaderAnimSecond.setVisibility(View.VISIBLE);
+            b.frameHeaderAnimSecond.setTranslationX(offset);
+            b.frameHeaderAnimSecond.setAlpha(0f);
+            b.frameHeaderAnimSecond.animate()
+                    .translationX(0f)
+                    .alpha(1f)
+                    .setDuration(450)
+                    .setInterpolator(new OvershootInterpolator(0.9f))
+                    .withEndAction(() -> {
+                        isSecondPosterShowing = true;
+                        b.headerBand.setEnabled(true);
+                    })
+                    .start();
+        } else {
+            // Slide current poster right and fade out
+            b.frameHeaderAnimSecond.animate()
+                    .translationX(offset)
+                    .alpha(0f)
+                    .setDuration(450)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(() -> {
+                        b.frameHeaderAnimSecond.setVisibility(View.GONE);
+                    })
+                    .start();
+
+            // Slide original poster in from left and fade in
+            b.frameHeaderAnim.setVisibility(View.VISIBLE);
+            b.frameHeaderAnim.setTranslationX(-offset);
+            b.frameHeaderAnim.setAlpha(0f);
+            b.frameHeaderAnim.animate()
+                    .translationX(0f)
+                    .alpha(1f)
+                    .setDuration(450)
+                    .setInterpolator(new OvershootInterpolator(0.9f))
+                    .withEndAction(() -> {
+                        isSecondPosterShowing = false;
+                        b.headerBand.setEnabled(true);
+                    })
+                    .start();
         }
     }
 
@@ -636,7 +1029,17 @@ public class InfoPrintSettingFragment extends Fragment {
     private void showSemesterPickerDialog() {
         if (semesters.isEmpty()) return;
         String[] names = new String[semesters.size()];
-        for (int i = 0; i < semesters.size(); i++) names[i] = semesters.get(i).name;
+        for (int i = 0; i < semesters.size(); i++) {
+            String semName = semesters.get(i).name;
+            if (semName != null) {
+                if (semName.equals("First Semester") || semName.equals("प्रथम सत्र") || semName.toLowerCase().contains("first") || semName.contains("१") || semName.contains("1")) {
+                    semName = getString(R.string.txt_semester_1);
+                } else if (semName.equals("Second Semester") || semName.equals("द्वितीय सत्र") || semName.toLowerCase().contains("second") || semName.contains("२") || semName.contains("2")) {
+                    semName = getString(R.string.txt_semester_2);
+                }
+            }
+            names[i] = semName;
+        }
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle(R.string.msg_select_semester).setItems(names, (d, w) -> { semesterIndex = w; applySemester(0); }).show();
     }
@@ -761,10 +1164,29 @@ public class InfoPrintSettingFragment extends Fragment {
     @Override public void onResume() {
         super.onResume();
         if (isViewActive()) {
-            if (isFirstLoad) isFirstLoad = false;
-            else loadClasses();
+            if (isFirstLoad) {
+                isFirstLoad = false;
+            } else {
+                loadClasses();
+                if (!isCombineAnimRunning) {
+                    startHeaderAnimations();
+                }
+            }
+            animHandler.removeCallbacks(combineLoopRunnable);
+            animHandler.postDelayed(combineLoopRunnable, 12000);
         }
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); b = null; }
+    @Override public void onPause() {
+        super.onPause();
+        animHandler.removeCallbacks(combineLoopRunnable);
+        stopHeaderAnimators();
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        animHandler.removeCallbacks(combineLoopRunnable);
+        stopHeaderAnimators();
+        b = null;
+    }
 }

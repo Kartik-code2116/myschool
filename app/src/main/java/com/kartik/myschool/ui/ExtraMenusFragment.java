@@ -217,7 +217,7 @@ public class ExtraMenusFragment extends Fragment {
     public static String getSubjectDisplayName(android.content.Context ctx, String originalName) {
         boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
         if (originalName.equalsIgnoreCase("Vishesh pragati") || originalName.equalsIgnoreCase("Special Development")) {
-            return isMr ? "विशेष प्रगती" : "Special Development";
+            return isMr ? "विशेष विकास" : "Special Development";
         }
         if (originalName.equalsIgnoreCase("Aavad, chanda, etc") || originalName.equalsIgnoreCase("Interest, Hobby")) {
             return isMr ? "आवड, छंद, इत्यादी" : "Interest, Hobby";
@@ -285,7 +285,29 @@ public class ExtraMenusFragment extends Fragment {
 
         int serialCounter = 1;
         if (activeClass.subjects != null) {
+            List<Subject> cleanSubjects = new ArrayList<>();
             for (Subject s : activeClass.subjects) {
+                if (Subject.isNonAcademic(s.name)) {
+                    int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
+                    if (se > 0) {
+                        Subject fixed = new Subject(s.name, s.maxMarks);
+                        fixed.subjectCode = s.subjectCode;
+                        s = fixed;
+                    }
+                }
+                boolean duplicate = false;
+                for (Subject clean : cleanSubjects) {
+                    if (Subject.isSameSubject(clean.name, s.name)) {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (!duplicate) {
+                    cleanSubjects.add(s);
+                }
+            }
+
+            for (Subject s : cleanSubjects) {
                 if (s != null && s.name != null && !s.name.trim().isEmpty()) {
                     String category = "Academic";
                     String colorHex = "#2196F3";
