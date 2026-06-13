@@ -383,7 +383,8 @@ public class SubjectsFragment extends Fragment {
         list.add(createItem("Mathematics",        p1 + "05", "05", "Academic",    100, "#2196F3"));
         list.add(createItem("Science",            p1 + "06", "06", "Academic",    100, "#2196F3"));
         list.add(createItem("History",            p1 + "07", "07", "Academic",    100, "#2196F3"));
-        list.add(createItem("Social Science",     p1 + "08", "08", "Academic",    100, "#2196F3"));
+        list.add(createItem("Geography",          p1 + "08", "08", "Academic",    100, "#2196F3"));
+        list.add(createItem("Social Science",     p1 + "09", "09", "Academic",    100, "#2196F3"));
         // ── Activity subjects ──────────────────────────────────────────────────
         list.add(createItem("Drawing",            p2 + "01", "09", "Activities",  100, "#4CAF50"));
         list.add(createItem("Work Experience",    p2 + "02", "10", "Activities",  100, "#4CAF50"));

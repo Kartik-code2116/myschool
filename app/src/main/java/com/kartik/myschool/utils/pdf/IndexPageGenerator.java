@@ -66,17 +66,17 @@ public class IndexPageGenerator {
         headerTbl.setWidths(new float[]{1.5f, 1f, 1f});
 
         // Row 1
-        PdfPCell c1 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + (school != null ? nvl(school.udiseCode) : ""), fBold)); c1.setBorder(Rectangle.NO_BORDER);
+        PdfPCell c1 = noBorderTextCell(PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ") + (school != null ? nvl(school.udiseCode) : ""), Element.ALIGN_LEFT);
         String semText = isSecondSemester()
                 ? PdfLocalizer.get(ctx, "\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u0938\u0924\u094d\u0930", "Second Semester")
                 : PdfLocalizer.get(ctx, "\u092a\u094d\u0930\u0925\u092e \u0938\u0924\u094d\u0930", "First Semester");
         PdfPCell c2 = noBorderTextCell(semText, Element.ALIGN_CENTER);
-        PdfPCell c3 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), fBold)); c3.setBorder(Rectangle.NO_BORDER); c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c3 = noBorderTextCell(PdfLocalizer.get(ctx, "सन: ", "Year: ") + (cls != null ? nvl(cls.academicYearLabel) : "2025-26"), Element.ALIGN_RIGHT);
         headerTbl.addCell(c1); headerTbl.addCell(c2); headerTbl.addCell(c3);
 
         // Row 2
-        PdfPCell c4 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "शाळा: ", "School: ") + (school != null ? nvl(school.name) : ""), fBold)); c4.setBorder(Rectangle.NO_BORDER); c4.setColspan(2);
-        PdfPCell c5 = new PdfPCell(PdfGenerator.createMixedPhrase(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + (cls != null ? nvl(cls.className) : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + (cls != null ? nvl(cls.division) : "-"), fBold)); c5.setBorder(Rectangle.NO_BORDER); c5.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        PdfPCell c4 = noBorderTextCell(PdfLocalizer.get(ctx, "शाळा: ", "School: ") + (school != null ? nvl(school.name) : ""), Element.ALIGN_LEFT); c4.setColspan(2);
+        PdfPCell c5 = noBorderTextCell(PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + (cls != null ? nvl(cls.className) : "") + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + (cls != null ? nvl(cls.division) : "-"), Element.ALIGN_RIGHT);
         headerTbl.addCell(c4); headerTbl.addCell(c5);
         
         headerTbl.setSpacingAfter(15);

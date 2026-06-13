@@ -105,7 +105,12 @@ public class Subject {
             list.add(new Subject("History", 100));
         }
 
-        // 8. Social Science - 5th to 10th
+        // 8. Geography - 5th to 10th
+        if (std >= 5) {
+            list.add(new Subject("Geography", 100));
+        }
+
+        // 9. Social Science - 5th to 10th
         if (std >= 5) {
             list.add(new Subject("Social Science", 100));
         }
@@ -151,6 +156,7 @@ public class Subject {
             "Mathematics",
             "Science",
             "History",
+            "Geography",
             "Social Science",
             "Drawing",
             "Work Experience",
