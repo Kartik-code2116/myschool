@@ -1094,10 +1094,7 @@ public class FirebaseRepository {
             return;
         }
         db.collection(COL_SUBSCRIPTIONS)
-                .where(com.google.firebase.firestore.Filter.or(
-                        com.google.firebase.firestore.Filter.equalTo("teacherId", teacherId),
-                        com.google.firebase.firestore.Filter.equalTo("userId", teacherId)
-                ))
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<com.kartik.myschool.model.SubscriptionRequest> list = new ArrayList<>();

@@ -6,6 +6,7 @@ import './AdminProfile.css';
 
 export default function AdminProfile() {
   const [upiId, setUpiId] = useState('');
+  const [upgradeMessage, setUpgradeMessage] = useState('You have reached the free limit of 3 students. Upgrade for ₹100/year to add unlimited students.');
   const [qrFile, setQrFile] = useState(null);
   const [currentQrUrl, setCurrentQrUrl] = useState('');
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,7 @@ export default function AdminProfile() {
         if (paymentSnap.exists()) {
           const data = paymentSnap.data();
           setUpiId(data.upi_id || '');
+          setUpgradeMessage(data.upgrade_message || 'You have reached the free limit of 3 students. Upgrade for ₹100/year to add unlimited students.');
           setCurrentQrUrl(data.upi_qr_url || '');
         }
 
@@ -98,6 +100,7 @@ export default function AdminProfile() {
       const docRef = doc(db, 'admin_settings', 'payment_info');
       await setDoc(docRef, {
         upi_id: upiId,
+        upgrade_message: upgradeMessage,
         upi_qr_url: finalQrUrl
       }, { merge: true });
 
@@ -180,6 +183,18 @@ export default function AdminProfile() {
                 value={upiId}
                 onChange={(e) => setUpiId(e.target.value)}
                 placeholder="e.g. myschool@upi"
+                required
+              />
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="upgradeMessage">Subscription Upgrade Message</label>
+              <textarea
+                id="upgradeMessage"
+                value={upgradeMessage}
+                onChange={(e) => setUpgradeMessage(e.target.value)}
+                placeholder="e.g. You have reached the free limit of 3 students. Upgrade for ₹100/year to add unlimited students."
+                rows={3}
                 required
               />
             </div>

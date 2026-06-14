@@ -61,6 +61,7 @@ public class SubscriptionBottomSheet extends BottomSheetDialogFragment {
 
         ImageView ivUpiQr = view.findViewById(R.id.ivUpiQr);
         TextView tvUpiId = view.findViewById(R.id.tvUpiId);
+        TextView tvUpgradeMessage = view.findViewById(R.id.tvUpgradeMessage);
 
         ivUpiQr.setOnClickListener(v -> {
             if (upiQrUrl != null && !upiQrUrl.isEmpty()) {
@@ -74,9 +75,14 @@ public class SubscriptionBottomSheet extends BottomSheetDialogFragment {
                     if (documentSnapshot.exists()) {
                         String upiId = documentSnapshot.getString("upi_id");
                         upiQrUrl = documentSnapshot.getString("upi_qr_url");
+                        String upgradeMessage = documentSnapshot.getString("upgrade_message");
 
                         if (upiId != null && !upiId.isEmpty()) {
                             tvUpiId.setText("UPI: " + upiId);
+                        }
+
+                        if (upgradeMessage != null && !upgradeMessage.isEmpty()) {
+                            tvUpgradeMessage.setText(upgradeMessage);
                         }
 
                         if (upiQrUrl != null && !upiQrUrl.isEmpty()) {
