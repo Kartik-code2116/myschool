@@ -193,6 +193,14 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         }
     }
 
+    private boolean isStudentMale() {
+        if (student == null || student.gender == null) return true;
+        return !student.gender.equalsIgnoreCase("Female") && 
+               !student.gender.equalsIgnoreCase("स्त्री") && 
+               !student.gender.equalsIgnoreCase("मुलगी") &&
+               !student.gender.equals("2");
+    }
+
     private void loadRemarkBank() {
         String schoolId = classModel.schoolId != null ? classModel.schoolId
                 : SessionContext.selectedSchool != null ? SessionContext.selectedSchool.id : null;
@@ -204,7 +212,10 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         List<String> cached = AppCache.cachedRemarkBank.get(cacheKey);
         if (cached != null && !cached.isEmpty()) {
             bankOptions.clear();
-            bankOptions.addAll(cached);
+            boolean isMale = isStudentMale();
+            for (String opt : cached) {
+                bankOptions.add(applyGenderReplacement(opt, isMale));
+            }
             renderSelection();
             return;
         }
@@ -215,8 +226,11 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
                     public void onSuccess(List<String> options) {
                         bankOptions.clear();
                         if (options != null) {
-                            bankOptions.addAll(options);
                             AppCache.cachedRemarkBank.put(cacheKey, new ArrayList<>(options));
+                            boolean isMale = isStudentMale();
+                            for (String opt : options) {
+                                bankOptions.add(applyGenderReplacement(opt, isMale));
+                            }
                         }
                         renderSelection();
                     }
@@ -224,7 +238,10 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
                     @Override
                     public void onError(Exception e) {
                         bankOptions.clear();
-                        bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
+                        boolean isMale = isStudentMale();
+                        for (String opt : com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber)) {
+                            bankOptions.add(applyGenderReplacement(opt, isMale));
+                        }
                         renderSelection();
                     }
                 });
