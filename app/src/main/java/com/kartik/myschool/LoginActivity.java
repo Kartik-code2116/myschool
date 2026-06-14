@@ -335,13 +335,28 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                     finishAffinity();
                 } else {
-                    showLoading(false);
-                    Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
-                    i.putExtra("isGoogleSignIn", true);
-                    i.putExtra("googleEmail", email);
-                    i.putExtra("googleName", name);
-                    startActivity(i);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+                    // Direct sign-up: create the profile immediately
+                    Teacher newTeacher = new Teacher();
+                    newTeacher.id = uid;
+                    newTeacher.email = email;
+                    newTeacher.name = name != null ? name : "Teacher";
+                    newTeacher.phone = ""; // Phone not provided by Google
+                    
+                    repo.saveTeacher(newTeacher, new FirebaseRepository.OnResult<Void>() {
+                        @Override
+                        public void onSuccess(Void v) {
+                            SessionContext.clear(LoginActivity.this);
+                            showLoading(false);
+                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            finishAffinity();
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            showLoading(false);
+                            showError("Database Error", "Failed to create profile: " + e.getMessage());
+                        }
+                    });
                 }
             }
 

@@ -1209,6 +1209,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_SCHOOLS)
                 .whereEqualTo("udiseCode", udiseCode)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(schoolSnap -> {
                     List<String> schoolIds = new ArrayList<>();
@@ -1316,6 +1317,7 @@ public class FirebaseRepository {
             List<String> chunk = schoolIds.subList(i, Math.min(i + limit, size));
             db.collection(COL_STUDENTS)
                     .whereIn("schoolId", chunk)
+                    .whereEqualTo("teacherId", currentUid())
                     .get()
                     .addOnSuccessListener(snap -> {
                         if (snap != null) {
@@ -1352,6 +1354,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_SCHOOLS)
                 .whereEqualTo("udiseCode", udiseCode)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(schoolSnap -> {
                     List<String> schoolIds = new ArrayList<>();
@@ -1381,6 +1384,7 @@ public class FirebaseRepository {
             List<String> chunk = schoolIds.subList(i, Math.min(i + limit, size));
             db.collection(COL_STUDENTS)
                     .whereIn("schoolId", chunk)
+                    .whereEqualTo("teacherId", currentUid())
                     .get()
                     .addOnSuccessListener(snap -> {
                         if (snap != null) {
