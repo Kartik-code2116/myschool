@@ -113,11 +113,11 @@ public class StudentListFragment extends Fragment {
 
     private void showStudentContextPopupMenu(View v) {
         android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
-        popup.getMenu().add(0, 1, 0, "👥 Promote / Transfer Students");
-        popup.getMenu().add(0, 2, 1, "📤 Export Students (CSV)");
-        popup.getMenu().add(0, 3, 2, "📥 Import Students (Excel / CSV)");
-        popup.getMenu().add(0, 4, 3, "🏫 Switch Class / Division");
-        popup.getMenu().add(0, 5, 4, "🌐 App-Wide Main Menu");
+        popup.getMenu().add(0, 1, 0, getString(R.string.menu_promote_students));
+        popup.getMenu().add(0, 2, 1, getString(R.string.menu_export_students));
+        popup.getMenu().add(0, 3, 2, getString(R.string.menu_import_students));
+        popup.getMenu().add(0, 4, 3, getString(R.string.menu_switch_class));
+        popup.getMenu().add(0, 5, 4, getString(R.string.menu_app_wide_main));
         
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();

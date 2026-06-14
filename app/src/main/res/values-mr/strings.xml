@@ -781,4 +781,9 @@
     <string name="msg_enter_year_label">नवीन शैक्षणिक वर्षाचे नाव प्रविष्ट करा:</string>
     <string name="msg_year_empty">नाव रिकामे ठेवता येणार नाही.</string>
     <string name="msg_year_sem_created">शैक्षणिक वर्ष आणि सत्रे तयार झाली.</string>
+    <string name="menu_promote_students">👥 विद्यार्थी बढती / बदली</string>
+    <string name="menu_export_students">📤 विद्यार्थी निर्यात करा (CSV)</string>
+    <string name="menu_import_students">📥 विद्यार्थी आयात करा (Excel / CSV)</string>
+    <string name="menu_switch_class">🏫 वर्ग / तुकडी बदला</string>
+    <string name="menu_app_wide_main">🌐 ॲप मुख्य मेनू</string>
 </resources>

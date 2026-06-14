@@ -6,20 +6,24 @@ import './AdminRemarks.css';
 const CLASSES = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const SEMESTERS = ['1', '2'];
 const SUBJECTS = [
-  'Marathi',
-  'Hindi',
-  'English',
-  'Mathematics',
-  'Science',
-  'Science / EVS',
-  'Soc. Science',
-  'Drawing',
-  'Work Experience',
-  'Physical Education',
-  'Personality Development',
-  'Special Development',
-  'Information & Comm. Technology (ICT)',
-  'Water Security & Environment Studies'
+  { value: 'Marathi', label: 'Marathi' },
+  { value: 'Hindi', label: 'Hindi' },
+  { value: 'English', label: 'English' },
+  { value: 'Mathematics', label: 'Mathematics' },
+  { value: 'Science', label: 'Science' },
+  { value: 'Science / EVS', label: 'Science / EVS' },
+  { value: 'Soc. Science', label: 'Soc. Science' },
+  { value: 'Drawing', label: 'Drawing' },
+  { value: 'Work Experience', label: 'Work Experience' },
+  { value: 'Physical Education', label: 'Physical Education' },
+  { value: 'Personality Development', label: 'Personality Development' },
+  { value: 'Special Development', label: 'Special Development' },
+  { value: 'Information & Comm. Technology (ICT)', label: 'Information & Comm. Technology (ICT)' },
+  { value: 'Water Security & Environment Studies', label: 'Water Security & Environment Studies' },
+  { value: 'Vishesh pragati', label: 'Special Progress (विशेष प्रगती)' },
+  { value: 'Sudharna Aavashyaka', label: 'Improvement Needed (सुधारणा आवश्यक)' },
+  { value: 'Aavad, chanda, etc', label: 'Interests & Hobbies (आवड व छंद)' },
+  { value: 'Vyaktimatva gun vishgesh', label: 'Personality Traits (व्यक्तिमत्त्व गुण विशेष)' }
 ];
 
 const getDefaultRemarks = (subjectName, semesterNumber) => {
@@ -57,6 +61,12 @@ const getDefaultRemarks = (subjectName, semesterNumber) => {
     } else {
       defaults.push("द्वितीय सत्रात शारीरिक क्षमता वाढली.", "खेळाडूवृत्ती उत्तम आहे.");
     }
+  } else if (s.includes('प्रगती') || s.includes('progress')) {
+    defaults.push("स्वच्छता व टापटीपपणा ठेवतो.", "इतरांना नेहमी मदत करतो.", "नियमित शाळेत उपस्थित असतो.", "गृहपाठ वेळेवर पूर्ण करतो.");
+  } else if (s.includes('सुधारणा') || s.includes('improvement')) {
+    defaults.push("अक्षरात सुधारणा करणे आवश्यक.", "गणितात अधिक सराव आवश्यक.", "वाचनाचा सराव हवा.", "नियमित उपस्थिती आवश्यक.");
+  } else if (s.includes('छंद') || s.includes('hobbies')) {
+    defaults.push("चित्रकलेची विशेष आवड आहे.", "खेळांमध्ये उत्तम गती आहे.", "वाचनाची खूप आवड आहे.", "गायन छान करतो.");
   } else {
     if (isSem1) {
       defaults.push("प्रथम सत्रात अभ्यासात चांगली गती.", "वर्गकार्यात सक्रिय सहभाग.", "नियमित शाळेत उपस्थित असतो.", "प्रथम सत्रात अधिक लक्ष देणे गरजेचे.");
@@ -247,7 +257,7 @@ export default function AdminRemarks() {
           <div className="form-group">
             <label>Subject</label>
             <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
-              {SUBJECTS.map(sub => <option key={sub} value={sub}>{sub}</option>)}
+              {SUBJECTS.map(sub => <option key={sub.value} value={sub.value}>{sub.label}</option>)}
             </select>
           </div>
 
