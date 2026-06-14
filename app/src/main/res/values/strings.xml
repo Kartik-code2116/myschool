@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="default_web_client_id" translatable="false">323006914636-t0v6uav8qrhjvf5du7re90gpae1j8qe5.apps.googleusercontent.com</string>
     <string name="app_name">मायस्कूल</string>
     <string name="app_tagline">स्मार्ट परिणाम व्यवस्थापन</string>
     

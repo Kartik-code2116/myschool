@@ -100,6 +100,7 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="100"
                         android:id="@+id/etFullName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -127,6 +128,7 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="20"
                         android:id="@+id/etPhone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -154,6 +156,7 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="100"
                         android:id="@+id/etRegEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -183,6 +186,7 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="128"
                         android:id="@+id/etRegPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -212,6 +216,7 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="128"
                         android:id="@+id/etConfirmPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

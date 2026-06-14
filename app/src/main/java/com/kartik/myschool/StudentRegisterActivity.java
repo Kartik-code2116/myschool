@@ -187,11 +187,21 @@ public class StudentRegisterActivity extends AppCompatActivity {
         String parent = str(b.etParentName);
         String gender = b.rbFemale.isChecked() ? "Female" : "Male";
 
-        if (TextUtils.isEmpty(name)) { b.tilStudentName.setError("Required"); return; }
-        if (TextUtils.isEmpty(roll)) { b.tilRollNo.setError("Required"); return; }
-        if (selectedSchool == null)  { b.tilSelectSchool.setError("Select a school"); return; }
-        if (selectedClass == null)   { b.tilSelectClass.setError("Select a class"); return; }
-        b.tilStudentName.setError(null); b.tilRollNo.setError(null);
+        boolean valid = true;
+        if (TextUtils.isEmpty(name)) { b.tilStudentName.setError("Required"); valid = false; }
+        else if (name.length() > 100) { b.tilStudentName.setError("Name too long (max 100 chars)"); valid = false; }
+        
+        if (TextUtils.isEmpty(roll)) { b.tilRollNo.setError("Required"); valid = false; }
+        else if (roll.length() > 50) { b.tilRollNo.setError("Roll no too long (max 50 chars)"); valid = false; }
+        
+        if (parent.length() > 100) { b.tilParentName.setError("Parent name too long (max 100 chars)"); valid = false; }
+        
+        if (selectedSchool == null)  { b.tilSelectSchool.setError("Select a school"); valid = false; }
+        if (selectedClass == null)   { b.tilSelectClass.setError("Select a class"); valid = false; }
+        
+        if (!valid) return;
+        
+        b.tilStudentName.setError(null); b.tilRollNo.setError(null); b.tilParentName.setError(null);
         b.tilSelectSchool.setError(null); b.tilSelectClass.setError(null);
 
         Student s = editStudent != null ? editStudent : new Student();

@@ -8,17 +8,58 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockedOutUntil, setLockedOutUntil] = useState(null);
   const navigate = useNavigate();
+
+  const getFriendlyLoginError = (errMessage) => {
+    if (errMessage.includes('auth/invalid-credential') || errMessage.includes('auth/wrong-password')) {
+      return 'Invalid email or password.';
+    }
+    if (errMessage.includes('auth/too-many-requests')) {
+      return 'Too many failed login attempts. Please try again later.';
+    }
+    return 'Failed to log in. Please check your credentials and try again.';
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
+    if (lockedOutUntil && new Date() < lockedOutUntil) {
+      const remainingSeconds = Math.ceil((lockedOutUntil - new Date()) / 1000);
+      setError(`Too many failed attempts. Try again in ${remainingSeconds} seconds.`);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (password.length > 128) {
+      setError("Password too long.");
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      setFailedAttempts(0);
       navigate('/admin');
     } catch (err) {
-      setError(err.message);
+      const newFailures = failedAttempts + 1;
+      setFailedAttempts(newFailures);
+      
+      if (newFailures >= 5) {
+        const lockoutTime = new Date(new Date().getTime() + 30 * 1000);
+        setLockedOutUntil(lockoutTime);
+        setError(`Too many failed attempts. Try again in 30 seconds.`);
+      } else if (newFailures >= 3) {
+        setError(`${getFriendlyLoginError(err.message)} Warning: ${5 - newFailures} attempts left before lockout.`);
+      } else {
+        setError(getFriendlyLoginError(err.message));
+      }
     }
   };
 

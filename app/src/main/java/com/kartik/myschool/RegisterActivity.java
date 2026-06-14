@@ -33,9 +33,9 @@ public class RegisterActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         // Diagnostic: confirm which Firebase project is connected
-        Log.d("AUTH", "Firebase Auth initialized. App name: " +
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "Firebase Auth initialized. App name: " +
                 com.google.firebase.FirebaseApp.getInstance().getName() +
-                " | Current user: " + (auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "none"));
+                " | Current user: " + (auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "none")); }
 
         // 1. Staggered Entrance Animation (premium feel)
         b.logoContainer.setAlpha(0f);
@@ -64,6 +64,23 @@ public class RegisterActivity extends AppCompatActivity {
 
         // 2. Real-time dynamic input error clearing
         setupRealTimeValidation();
+
+        boolean isGoogleSignIn = getIntent().getBooleanExtra("isGoogleSignIn", false);
+        if (isGoogleSignIn) {
+            b.tilRegPassword.setVisibility(View.GONE);
+            b.tilConfirmPassword.setVisibility(View.GONE);
+            b.tvRegisterSubtitle.setText("Complete your profile to continue");
+            
+            String googleEmail = getIntent().getStringExtra("googleEmail");
+            String googleName = getIntent().getStringExtra("googleName");
+            if (!TextUtils.isEmpty(googleEmail)) {
+                b.etRegEmail.setText(googleEmail);
+                b.etRegEmail.setEnabled(false);
+            }
+            if (!TextUtils.isEmpty(googleName)) {
+                b.etFullName.setText(googleName);
+            }
+        }
 
         // 3. Interactive Click Listeners with Micro-animations
         b.btnRegister.setOnClickListener(v -> {
@@ -124,13 +141,17 @@ public class RegisterActivity extends AppCompatActivity {
         String name  = str(b.etFullName);
         String phone = str(b.etPhone);
         String email = str(b.etRegEmail);
-        String pass  = str(b.etRegPassword);
-        String conf  = str(b.etConfirmPassword);
+        boolean isGoogleSignIn = getIntent().getBooleanExtra("isGoogleSignIn", false);
+        String pass  = isGoogleSignIn ? "dummy_pass" : str(b.etRegPassword);
+        String conf  = isGoogleSignIn ? "dummy_pass" : str(b.etConfirmPassword);
 
         // Validation
         boolean valid = true;
         if (TextUtils.isEmpty(name)) {
             b.tilFullName.setError("Full name is required");
+            valid = false;
+        } else if (name.length() > 100) {
+            b.tilFullName.setError("Name too long (max 100 characters)");
             valid = false;
         }
 
@@ -139,6 +160,9 @@ public class RegisterActivity extends AppCompatActivity {
             valid = false;
         } else if (phone.length() < 10) {
             b.tilPhone.setError("Please enter a valid phone number");
+            valid = false;
+        } else if (phone.length() > 20) {
+            b.tilPhone.setError("Phone number too long (max 20 characters)");
             valid = false;
         }
 
@@ -156,6 +180,9 @@ public class RegisterActivity extends AppCompatActivity {
         } else if (pass.length() < 6) {
             b.tilRegPassword.setError("Password must be at least 6 characters");
             valid = false;
+        } else if (pass.length() > 128) {
+            b.tilRegPassword.setError("Password too long (max 128 characters)");
+            valid = false;
         }
 
         if (TextUtils.isEmpty(conf)) {
@@ -171,35 +198,44 @@ public class RegisterActivity extends AppCompatActivity {
         clearErrors();
         showLoading(true);
 
+        if (isGoogleSignIn) {
+            saveTeacherProfile(name, email, phone);
+            return;
+        }
+
         auth.createUserWithEmailAndPassword(email, pass)
                 .addOnSuccessListener(result -> {
-                    Log.d("AUTH", "createUserWithEmailAndPassword: SUCCESS uid=" +
-                            (result.getUser() != null ? result.getUser().getUid() : "null"));
-                    SessionContext.clear(RegisterActivity.this);
-                    Teacher t = new Teacher();
-                    t.name  = name;
-                    t.email = email;
-                    t.phone = phone;
-                    repo.saveTeacher(t, new FirebaseRepository.OnResult<Void>() {
-                        @Override public void onSuccess(Void v) {
-                            Log.d("AUTH", "saveTeacher: SUCCESS");
-                            showLoading(false);
-                            startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
-                            finishAffinity();
-                        }
-                        @Override public void onError(Exception e) {
-                            Log.e("AUTH", "saveTeacher: FAILED", e);
-                            showLoading(false);
-                            showError("Firestore Error", "Account created but profile save failed.\n" + e.getMessage());
-                        }
-                    });
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "createUserWithEmailAndPassword: SUCCESS uid=" +
+                            (result.getUser() != null ? result.getUser().getUid() : "null")); }
+                    saveTeacherProfile(name, email, phone);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("AUTH", "createUserWithEmailAndPassword: FAILED", e);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("AUTH", "createUserWithEmailAndPassword: FAILED", e); }
                     showLoading(false);
                     String userMessage = getFriendlyAuthError(e);
                     showError("Registration Failed", userMessage);
                 });
+    }
+
+    private void saveTeacherProfile(String name, String email, String phone) {
+        SessionContext.clear(RegisterActivity.this);
+        Teacher t = new Teacher();
+        t.name  = name;
+        t.email = email;
+        t.phone = phone;
+        repo.saveTeacher(t, new FirebaseRepository.OnResult<Void>() {
+            @Override public void onSuccess(Void v) {
+                if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "saveTeacher: SUCCESS"); }
+                showLoading(false);
+                startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                finishAffinity();
+            }
+            @Override public void onError(Exception e) {
+                if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("AUTH", "saveTeacher: FAILED", e); }
+                showLoading(false);
+                showError("Firestore Error", "Account authenticated but profile save failed.\n" + e.getMessage());
+            }
+        });
     }
 
     private void clearErrors() {
@@ -213,7 +249,7 @@ public class RegisterActivity extends AppCompatActivity {
     private String getFriendlyAuthError(Exception e) {
         if (e instanceof FirebaseAuthException) {
             String code = ((FirebaseAuthException) e).getErrorCode();
-            Log.e("AUTH", "Firebase error code: " + code);
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("AUTH", "Firebase error code: " + code); }
             switch (code) {
                 case "ERROR_OPERATION_NOT_ALLOWED":
                     return "Email/Password sign-in is DISABLED in Firebase Console.\n\n" +

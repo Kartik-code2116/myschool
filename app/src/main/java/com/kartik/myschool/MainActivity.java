@@ -138,7 +138,13 @@ public class MainActivity extends AppCompatActivity {
     private void setupHistory() {
         historyAdapter = new HistoryAdapter(item -> {
             if (item.pdfPath != null && !item.pdfPath.isEmpty()) {
-                sharePDF(new File(item.pdfPath));
+                File pdfDir = new File(getExternalFilesDir(null), "pdfs");
+                File pdfFile = new File(pdfDir, item.pdfPath);
+                if (pdfFile.exists() && pdfFile.getAbsolutePath().startsWith(pdfDir.getAbsolutePath())) {
+                    sharePDF(pdfFile);
+                } else {
+                    Toast.makeText(this, "PDF file not found.", Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
             extractedNumbers = item.numbers == null ? "" : item.numbers;
@@ -358,12 +364,12 @@ public class MainActivity extends AppCompatActivity {
             if (db == null) return;
 
             long now = System.currentTimeMillis();
-            String imagePath = (currentPhotoFile != null) ? currentPhotoFile.getAbsolutePath() : null;
+            String imageFileName = (currentPhotoFile != null) ? currentPhotoFile.getName() : null;
 
             OcrRecordEntity record = new OcrRecordEntity();
             record.timestamp = now;
             record.numbers = numbers;
-            record.imagePath = imagePath;
+            record.imagePath = imageFileName;
             record.pdfPath = null;
 
             dbExecutor.execute(() -> {
@@ -428,10 +434,11 @@ public class MainActivity extends AppCompatActivity {
                 // Update DB record with PDF path
                 if (db != null) {
                     long recordId = latestRecordId;
+                    String pdfFileName = pdfFile.getName();
                     dbExecutor.execute(() -> {
                         try {
                             if (recordId > 0) {
-                                db.ocrRecordDao().updatePdfPath(recordId, pdfFile.getAbsolutePath());
+                                db.ocrRecordDao().updatePdfPath(recordId, pdfFileName);
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "Database update failed: " + e.getMessage());

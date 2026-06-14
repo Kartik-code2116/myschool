@@ -41,7 +41,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:hint="@string/label_school_name"
                     app:startIconDrawable="@drawable/ic_school" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etSchoolName"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="100" android:id="@+id/etSchoolName"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -51,7 +52,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_udise_code"
                     app:startIconDrawable="@drawable/ic_reports" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etUdise"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="128" android:id="@+id/etUdise"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="number" android:imeOptions="actionNext" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -71,7 +73,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_address"
                     app:startIconDrawable="@drawable/ic_home" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etAddress"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="500" android:id="@+id/etAddress"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="textMultiLine" android:lines="2" android:maxLines="3"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -81,7 +84,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_principal_name"
                     app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etPrincipal"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="128" android:id="@+id/etPrincipal"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="textCapWords" android:imeOptions="actionDone" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>

@@ -20,12 +20,11 @@ const getInitialTheme = () => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-function ProtectedRoute({ children, user, loading, requireAdmin }) {
+function ProtectedRoute({ children, user, loading, requireAdmin, isAdmin }) {
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) {
-    return <Navigate to={requireAdmin ? "/admin-login" : "/"} replace />;
+    return <Navigate to="/" replace />;
   }
-  const isAdmin = checkIsAdmin(user.email);
   if (requireAdmin && !isAdmin) {
     return <Navigate to="/app-redirect" replace />;
   }
@@ -37,13 +36,21 @@ function ProtectedRoute({ children, user, loading, requireAdmin }) {
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(getInitialTheme);
   const [lang, setLang] = useState(() => localStorage.getItem('myschool-lang') || 'en');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        const adminStatus = checkIsAdmin(currentUser);
+        setIsAdmin(adminStatus);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -88,18 +95,18 @@ export default function App() {
         
         <Route path="/admin-login" element={
           loading ? <div className="loading">Loading...</div> :
-          user ? (checkIsAdmin(user.email) ? <Navigate to="/admin" replace /> : <Navigate to="/app-redirect" replace />) :
+          user ? (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/app-redirect" replace />) :
           <Login />
         } />
 
         <Route path="/app-redirect" element={
-          <ProtectedRoute user={user} loading={loading} requireAdmin={false}>
+          <ProtectedRoute user={user} loading={loading} requireAdmin={false} isAdmin={isAdmin}>
             <AppRedirect user={user} lang={lang} />
           </ProtectedRoute>
         } />
         
         <Route path="/admin" element={
-          <ProtectedRoute user={user} loading={loading} requireAdmin={true}>
+          <ProtectedRoute user={user} loading={loading} requireAdmin={true} isAdmin={isAdmin}>
             <Layout />
           </ProtectedRoute>
         }>

@@ -63,9 +63,22 @@ public class SchoolRegisterActivity extends AppCompatActivity {
         String address   = str(b.etAddress);
         String principal = str(b.etPrincipal);
 
-        if (TextUtils.isEmpty(name))  { b.tilSchoolName.setError("Required"); return; }
-        if (TextUtils.isEmpty(board)) { b.tilBoard.setError("Select a board"); return; }
-        b.tilSchoolName.setError(null); b.tilBoard.setError(null);
+        boolean valid = true;
+        if (TextUtils.isEmpty(name))  { b.tilSchoolName.setError("Required"); valid = false; }
+        else if (name.length() > 200) { b.tilSchoolName.setError("Name too long (max 200 chars)"); valid = false; }
+
+        if (TextUtils.isEmpty(board)) { b.tilBoard.setError("Select a board"); valid = false; }
+        
+        if (address.length() > 500) { 
+            // We use Toast for address if there is no tilAddress. Assuming it's there.
+            if (b.tilAddress != null) b.tilAddress.setError("Address too long (max 500 chars)"); 
+            valid = false; 
+        }
+
+        if (!valid) return;
+        
+        b.tilSchoolName.setError(null); b.tilBoard.setError(null); 
+        if (b.tilAddress != null) b.tilAddress.setError(null);
 
         School s = editSchool != null ? editSchool : new School();
         s.name          = name;

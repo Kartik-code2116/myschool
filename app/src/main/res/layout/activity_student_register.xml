@@ -41,7 +41,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:hint="@string/label_student_name"
                     app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etStudentName"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="100" android:id="@+id/etStudentName"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -51,7 +52,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_roll_no"
                     app:startIconDrawable="@drawable/ic_reports" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etRollNo"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="128" android:id="@+id/etRollNo"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="textCapCharacters" android:imeOptions="actionNext" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -62,7 +64,8 @@
                     android:layout_marginTop="14dp" android:hint="@string/label_dob"
                     app:startIconDrawable="@drawable/ic_calendar" app:startIconTint="@color/primary"
                     app:endIconDrawable="@drawable/ic_calendar" app:endIconMode="custom">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDob"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="128" android:id="@+id/etDob"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:focusable="false" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -87,7 +90,8 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_parent_name"
                     app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/etParentName"
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="100" android:id="@+id/etParentName"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>

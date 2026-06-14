@@ -7,7 +7,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    signOut(auth).then(() => navigate('/admin-login'));
+    signOut(auth).then(() => navigate('/'));
   };
 
   return (

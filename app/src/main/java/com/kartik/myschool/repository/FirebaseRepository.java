@@ -58,11 +58,11 @@ public class FirebaseRepository {
             String cacheKey = classId + "_" + semesterId;
             java.util.Map<String, MarksRecord> marksMap = cachedClassSemesterMarksMap.get(cacheKey);
             if (marksMap == null) {
-                Log.d("FIRESTORE_MARKS", "Skipped creating partial marks cache for class=" + classId + " sem=" + semesterId + " student=" + studentId);
+                if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "Skipped creating partial marks cache for class=" + classId + " sem=" + semesterId + " student=" + studentId); }
                 return;
             }
             marksMap.put(studentId, record);
-            Log.d("FIRESTORE_MARKS", "Directly updated internal memory cache for class=" + classId + " sem=" + semesterId + " student=" + studentId);
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "Directly updated internal memory cache for class=" + classId + " sem=" + semesterId + " student=" + studentId); }
         }
     }
 
@@ -93,16 +93,16 @@ public class FirebaseRepository {
         // Diagnostic: confirm which Firebase project this instance is connected to
         try {
             com.google.firebase.FirebaseApp app = com.google.firebase.FirebaseApp.getInstance();
-            Log.d("FIREBASE_INIT", "=====================================");
-            Log.d("FIREBASE_INIT", "FirebaseApp name     : " + app.getName());
-            Log.d("FIREBASE_INIT", "Project ID           : " + app.getOptions().getProjectId());
-            Log.d("FIREBASE_INIT", "Application ID       : " + app.getOptions().getApplicationId());
-            Log.d("FIREBASE_INIT", "Storage bucket       : " + app.getOptions().getStorageBucket());
-            Log.d("FIREBASE_INIT", "Auth domain          : " + app.getOptions().getDatabaseUrl());
-            Log.d("FIREBASE_INIT", "Current Auth user    : " + (auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "none"));
-            Log.d("FIREBASE_INIT", "=====================================");
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "====================================="); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "FirebaseApp name     : " + app.getName()); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "Project ID           : " + app.getOptions().getProjectId()); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "Application ID       : " + app.getOptions().getApplicationId()); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "Storage bucket       : " + app.getOptions().getStorageBucket()); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "Auth domain          : " + app.getOptions().getDatabaseUrl()); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "Current Auth user    : " + (auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "none")); }
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIREBASE_INIT", "====================================="); }
         } catch (Exception e) {
-            Log.e("FIREBASE_INIT", "Could not read FirebaseApp options", e);
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIREBASE_INIT", "Could not read FirebaseApp options", e); }
         }
     }
 
@@ -124,20 +124,20 @@ public class FirebaseRepository {
     public void saveTeacher(Teacher t, OnResult<Void> cb) {
         String uid = currentUid();
         if (uid == null) {
-            Log.e("FIRESTORE", "saveTeacher: uid is null — user not authenticated!");
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE", "saveTeacher: uid is null — user not authenticated!"); }
             cb.onError(new IllegalStateException("User not authenticated"));
             return;
         }
         t.id = uid;
-        Log.d("FIRESTORE", "saveTeacher: saving uid=" + uid + " email=" + t.email);
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE", "saveTeacher: saving uid=" + uid + " email=" + t.email); }
         db.collection(COL_TEACHERS).document(t.id).set(t)
                 .addOnSuccessListener(v -> {
-                    Log.d("FIRESTORE", "saveTeacher: SUCCESS for uid=" + uid);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE", "saveTeacher: SUCCESS for uid=" + uid); }
                     cachedTeacher = t;
                     cb.onSuccess(null);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FIRESTORE", "saveTeacher: FAILED for uid=" + uid, e);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE", "saveTeacher: FAILED for uid=" + uid, e); }
                     cb.onError(e);
                 });
     }
@@ -342,6 +342,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_SEMESTERS)
                 .whereEqualTo("yearId", yearId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<Semester> list = new ArrayList<>();
@@ -446,6 +447,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_CLASSES)
                 .whereEqualTo("yearId", yearId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<ClassModel> classes = snap != null ? snap.toObjects(ClassModel.class) : new ArrayList<>();
@@ -512,6 +514,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_CLASSES)
                 .whereEqualTo("schoolId", schoolId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<ClassModel> classes = snap != null ? snap.toObjects(ClassModel.class) : new ArrayList<>();
@@ -591,6 +594,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_STUDENTS)
                 .whereEqualTo("classId", classId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     // Bug #6 fix: return empty list instead of null
@@ -619,6 +623,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_STUDENTS)
                 .whereEqualTo("schoolId", schoolId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 // Bug #6 fix: return empty list instead of null
                 .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(Student.class) : new ArrayList<>()))
@@ -651,7 +656,7 @@ public class FirebaseRepository {
     public void saveMarks(MarksRecord m, OnResult<String> cb) {
         String uid = currentUid();
         if (uid == null) {
-            Log.e("FIRESTORE_MARKS", "saveMarks ABORTED: currentUid() is null — user not signed in.");
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "saveMarks ABORTED: currentUid() is null — user not signed in."); }
             cb.onError(new IllegalStateException("User not authenticated"));
             return;
         }
@@ -663,21 +668,21 @@ public class FirebaseRepository {
                 : db.collection(COL_MARKS).document();
         m.id = ref.getId();
 
-        Log.d("FIRESTORE_MARKS", "Saving marks doc: " + ref.getPath());
-        Log.d("FIRESTORE_MARKS", "  teacherId  = " + m.teacherId);
-        Log.d("FIRESTORE_MARKS", "  studentId  = " + m.studentId);
-        Log.d("FIRESTORE_MARKS", "  classId    = " + m.classId);
-        Log.d("FIRESTORE_MARKS", "  semesterId = " + m.semesterId);
-        Log.d("FIRESTORE_MARKS", "  subjects   = " + m.detailedMarks.size());
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "Saving marks doc: " + ref.getPath()); }
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "  teacherId  = " + m.teacherId); }
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "  studentId  = " + m.studentId); }
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "  classId    = " + m.classId); }
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "  semesterId = " + m.semesterId); }
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "  subjects   = " + m.detailedMarks.size()); }
 
         ref.set(m)
                 .addOnSuccessListener(v -> {
-                    Log.d("FIRESTORE_MARKS", "SUCCESS: doc written at " + ref.getPath());
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "SUCCESS: doc written at " + ref.getPath()); }
                     cachedClassSemesterMarksMap.clear();
                     cb.onSuccess(m.id);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FIRESTORE_MARKS", "FAILURE writing marks: " + e.getMessage(), e);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "FAILURE writing marks: " + e.getMessage(), e); }
                     cb.onError(e);
                 });
     }
@@ -690,6 +695,7 @@ public class FirebaseRepository {
         db.collection(COL_MARKS)
                 .whereEqualTo("studentId", studentId)
                 .whereEqualTo("classId", classId)
+                .whereEqualTo("teacherId", currentUid())
                 .limit(1)
                 .get()
                 .addOnSuccessListener(snap -> {
@@ -712,6 +718,7 @@ public class FirebaseRepository {
         db.collection(COL_MARKS)
                 .whereEqualTo("studentId", studentId)
                 .whereEqualTo("classId", classId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     if (snap != null && !snap.isEmpty()) {
@@ -792,24 +799,24 @@ public class FirebaseRepository {
                             for (int i = 0; i < matches.size() - 1; i++) {
                                 mergeRecords(result, matches.get(i));
                             }
-                            Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: found " + matches.size() + " matches, merged into result id=" + result.id);
+                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: found " + matches.size() + " matches, merged into result id=" + result.id); }
                         } else if (!fallbacks.isEmpty()) {
                             Collections.sort(fallbacks, (a, b) -> Long.compare(a.updatedAt, b.updatedAt));
                             result = fallbacks.get(fallbacks.size() - 1);
                             for (int i = 0; i < fallbacks.size() - 1; i++) {
                                 mergeRecords(result, fallbacks.get(i));
                             }
-                            Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no matches, found " + fallbacks.size() + " fallbacks, merged into result id=" + result.id);
+                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no matches, found " + fallbacks.size() + " fallbacks, merged into result id=" + result.id); }
                         }
 
                         cb.onSuccess(result);
                     } else {
-                        Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no docs found for student=" + studentId + " class=" + classId);
+                        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForStudentAndSemester: no docs found for student=" + studentId + " class=" + classId); }
                         cb.onSuccess(null);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FIRESTORE_MARKS", "getMarksForStudentAndSemester FAILED: " + e.getMessage(), e);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "getMarksForStudentAndSemester FAILED: " + e.getMessage(), e); }
                     cb.onError(e);
                 });
     }
@@ -821,6 +828,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_MARKS)
                 .whereEqualTo("classId", classId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 // Bug #6 fix: return empty list instead of null
                 .addOnSuccessListener(snap -> cb.onSuccess(snap != null ? snap.toObjects(MarksRecord.class) : new ArrayList<>()))
@@ -847,20 +855,21 @@ public class FirebaseRepository {
         }
         String cacheKey = classId + "_" + semesterId;
         if (cachedClassSemesterMarksMap.containsKey(cacheKey)) {
-            Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: cache hit key=" + cacheKey
-                    + " size=" + cachedClassSemesterMarksMap.get(cacheKey).size());
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: cache hit key=" + cacheKey
+                    + " size=" + cachedClassSemesterMarksMap.get(cacheKey).size()); }
             cb.onSuccess(new java.util.HashMap<>(cachedClassSemesterMarksMap.get(cacheKey)));
             return;
         }
-        Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: querying Firestore classId=" + classId + " semesterId=" + semesterId);
+        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: querying Firestore classId=" + classId + " semesterId=" + semesterId); }
         db.collection(COL_MARKS)
                 .whereEqualTo("classId", classId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     java.util.Map<String, MarksRecord> marksMap = new java.util.HashMap<>();
                     java.util.Map<String, MarksRecord> fallbackMap = new java.util.HashMap<>();
                     int totalDocs = snap != null ? snap.size() : 0;
-                    Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: got " + totalDocs + " docs for classId=" + classId);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: got " + totalDocs + " docs for classId=" + classId); }
                     
                     int targetSemNum = 1;
                     boolean foundSem = false;
@@ -888,7 +897,7 @@ public class FirebaseRepository {
                         }
                     }
                     final int finalTargetSemNum = targetSemNum;
-                    Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: active target semester number is " + finalTargetSemNum);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: active target semester number is " + finalTargetSemNum); }
 
                     if (snap != null) {
                         for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
@@ -897,10 +906,10 @@ public class FirebaseRepository {
                                 if (m.id == null || m.id.isEmpty()) {
                                     m.id = doc.getId();
                                 }
-                                Log.d("FIRESTORE_MARKS", "  doc studentId=" + m.studentId
+                                if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "  doc studentId=" + m.studentId
                                         + " semesterId=" + m.semesterId
                                         + " semesterNumber=" + m.semesterNumber
-                                        + " total=" + m.totalObtained);
+                                        + " total=" + m.totalObtained); }
                                         
                                 int recordSemNum = 1;
                                 boolean foundRecordSem = false;
@@ -959,7 +968,7 @@ public class FirebaseRepository {
                     }
                     // Merge fallback records into marksMap
                     if (!fallbackMap.isEmpty()) {
-                        Log.d("FIRESTORE_MARKS", "Merging fallback records: " + fallbackMap.size());
+                        if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "Merging fallback records: " + fallbackMap.size()); }
                         for (java.util.Map.Entry<String, MarksRecord> entry : fallbackMap.entrySet()) {
                             String studentId = entry.getKey();
                             MarksRecord fallbackRec = entry.getValue();
@@ -976,12 +985,12 @@ public class FirebaseRepository {
                             }
                         }
                     }
-                    Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: returning " + marksMap.size() + " marks records");
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: returning " + marksMap.size() + " marks records"); }
                     cachedClassSemesterMarksMap.put(cacheKey, marksMap);
                     cb.onSuccess(new java.util.HashMap<>(marksMap));
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FIRESTORE_MARKS", "getMarksForClassAndSemester FAILED: " + e.getMessage(), e);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "getMarksForClassAndSemester FAILED: " + e.getMessage(), e); }
                     cb.onError(e);
                 });
     }
@@ -1015,6 +1024,7 @@ public class FirebaseRepository {
         }
         db.collection(COL_ATTENDANCE_RECORDS)
                 .whereEqualTo("classId", classId)
+                .whereEqualTo("teacherId", currentUid())
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<com.kartik.myschool.model.AttendanceRecord> list =
@@ -1262,6 +1272,7 @@ public class FirebaseRepository {
             List<String> chunk = schoolIds.subList(i, Math.min(i + limit, size));
             db.collection(COL_CLASSES)
                     .whereIn("schoolId", chunk)
+                    .whereEqualTo("teacherId", currentUid())
                     .get()
                     .addOnSuccessListener(snap -> {
                         if (snap != null) {
@@ -1441,17 +1452,12 @@ public class FirebaseRepository {
                                     String downloadUrl = uri.toString();
                                     updateStudentPhotoUrl(studentId, downloadUrl, cb);
                                 })
-                                .addOnFailureListener(e -> savePhotoAsBase64(studentId, photoBytes, cb));
+                                .addOnFailureListener(e -> cb.onError(new Exception("Failed to get download URL for photo: " + e.getMessage())));
                     })
-                    .addOnFailureListener(e -> savePhotoAsBase64(studentId, photoBytes, cb));
+                    .addOnFailureListener(e -> cb.onError(new Exception("Failed to upload photo to Storage: " + e.getMessage())));
         } catch (Exception e) {
-            savePhotoAsBase64(studentId, photoBytes, cb);
+            cb.onError(new Exception("Failed to prepare photo for upload: " + e.getMessage()));
         }
-    }
-
-    private void savePhotoAsBase64(String studentId, byte[] photoBytes, OnResult<String> cb) {
-        String base64 = "data:image/jpeg;base64," + android.util.Base64.encodeToString(photoBytes, android.util.Base64.NO_WRAP);
-        updateStudentPhotoUrl(studentId, base64, cb);
     }
 
     private void updateStudentPhotoUrl(String studentId, String photoUrl, OnResult<String> cb) {

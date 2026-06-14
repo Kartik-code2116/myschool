@@ -20,6 +20,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.GoogleAuthProvider;
+
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.credentials.CredentialManagerCallback;
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding b;
     private FirebaseAuth auth;
     private final FirebaseRepository repo = FirebaseRepository.get();
+    private CredentialManager credentialManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         b = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         auth = FirebaseAuth.getInstance();
+        credentialManager = CredentialManager.create(this);
 
         // Staggered Entrance Animation
         b.logoContainer.setAlpha(0f);
@@ -81,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
 
         b.btnGoogle.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnGoogle);
-            Toast.makeText(this, R.string.msg_google_sign_in_coming_soon, Toast.LENGTH_SHORT).show();
+            doGoogleSignIn();
         });
     }
 
@@ -122,6 +135,9 @@ public class LoginActivity extends AppCompatActivity {
         } else if (pass.length() < 6) {
             b.tilPassword.setError("Password must be at least 6 characters");
             valid = false;
+        } else if (pass.length() > 128) {
+            b.tilPassword.setError("Password too long (max 128 characters)");
+            valid = false;
         }
         if (!valid) return;
 
@@ -135,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
         auth.signInWithEmailAndPassword(email, pass)
                 .addOnSuccessListener(result -> {
                     String uid = result.getUser() != null ? result.getUser().getUid() : null;
-                    Log.d(TAG, "Firebase Auth SUCCESS uid=" + uid);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d(TAG, "Firebase Auth SUCCESS uid=" + uid); }
 
                     if (uid == null) {
                         // Should never happen, but guard anyway
@@ -152,17 +168,28 @@ public class LoginActivity extends AppCompatActivity {
                         public void onSuccess(Teacher teacher) {
                             showLoading(false);
                             if (teacher == null) {
-                                // Auth account exists but no Firestore profile — sign out.
-                                Log.w(TAG, "No teacher profile in Firestore for uid=" + uid + ". Signing out.");
-                                auth.signOut();
-                                SessionContext.clear(LoginActivity.this);
-                                showError("Account Incomplete",
-                                        "Your account exists but the profile was not set up correctly.\n\n" +
-                                        "Please register again to create a complete account.");
+                                if (com.kartik.myschool.BuildConfig.DEBUG) { Log.w(TAG, "No teacher profile in Firestore for uid=" + uid + ". Auto-repairing."); }
+                                Teacher newTeacher = new Teacher();
+                                newTeacher.id = uid;
+                                newTeacher.email = auth.getCurrentUser() != null ? auth.getCurrentUser().getEmail() : email;
+                                newTeacher.name = "Teacher";
+                                repo.saveTeacher(newTeacher, new FirebaseRepository.OnResult<Void>() {
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                        SessionContext.clear(LoginActivity.this);
+                                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                                        finishAffinity();
+                                    }
+                                    @Override
+                                    public void onError(Exception ex) {
+                                        auth.signOut();
+                                        showError("Account Incomplete", "Your account is missing a profile and auto-repair failed: " + ex.getMessage());
+                                    }
+                                });
                                 return;
                             }
                             // Both Auth + Firestore OK — proceed to app
-                            Log.d(TAG, "Teacher profile found: " + teacher.name + ". Navigating to Home.");
+                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d(TAG, "Teacher profile found: " + teacher.name + ". Navigating to Home."); }
                             SessionContext.clear(LoginActivity.this);
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finishAffinity();
@@ -170,7 +197,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         @Override
                         public void onError(Exception e) {
-                            Log.e(TAG, "Firestore getTeacher FAILED", e);
+                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Firestore getTeacher FAILED", e); }
                             auth.signOut();
                             showLoading(false);
                             showError("Login Failed",
@@ -179,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                     });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Firebase Auth FAILED", e);
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Firebase Auth FAILED", e); }
                     showLoading(false);
                     showError("Login Failed", getFriendlyLoginError(e));
                 });
@@ -192,7 +219,7 @@ public class LoginActivity extends AppCompatActivity {
         // FirebaseAuthInvalidUserException covers: user not found, disabled, email changed
         if (e instanceof FirebaseAuthInvalidUserException) {
             String code = ((FirebaseAuthInvalidUserException) e).getErrorCode();
-            Log.e(TAG, "Auth error code: " + code);
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Auth error code: " + code); }
             switch (code) {
                 case "ERROR_USER_NOT_FOUND":
                     return "No account found with this email address.\n\nPlease check the email or register a new account.";
@@ -205,7 +232,7 @@ public class LoginActivity extends AppCompatActivity {
         // FirebaseAuthInvalidCredentialsException covers: wrong password, invalid email format
         if (e instanceof FirebaseAuthInvalidCredentialsException) {
             String code = ((FirebaseAuthInvalidCredentialsException) e).getErrorCode();
-            Log.e(TAG, "Auth error code: " + code);
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Auth error code: " + code); }
             switch (code) {
                 case "ERROR_WRONG_PASSWORD":
                 case "ERROR_INVALID_CREDENTIAL":
@@ -219,7 +246,7 @@ public class LoginActivity extends AppCompatActivity {
         // General FirebaseAuthException
         if (e instanceof FirebaseAuthException) {
             String code = ((FirebaseAuthException) e).getErrorCode();
-            Log.e(TAG, "Auth error code: " + code);
+            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Auth error code: " + code); }
             switch (code) {
                 case "ERROR_NETWORK_REQUEST_FAILED":
                     return "No internet connection. Please check your network and try again.";
@@ -232,6 +259,98 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         return e.getMessage() != null ? e.getMessage() : "An unknown error occurred. Please try again.";
+    }
+
+    private void doGoogleSignIn() {
+        showLoading(true);
+        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(getString(R.string.default_web_client_id))
+                .setAutoSelectEnabled(true)
+                .build();
+
+        GetCredentialRequest request = new GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build();
+
+        credentialManager.getCredentialAsync(
+                this,
+                request,
+                new android.os.CancellationSignal(),
+                Runnable::run,
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse result) {
+                        handleGoogleSignInResult(result);
+                    }
+
+                    @Override
+                    public void onError(GetCredentialException e) {
+                        showLoading(false);
+                        if (!e.getType().equals(androidx.credentials.exceptions.GetCredentialCancellationException.TYPE_GET_CREDENTIAL_CANCELLATION_EXCEPTION)) {
+                            showError("Google Sign-In", e.getMessage());
+                        }
+                    }
+                }
+        );
+    }
+
+    private void handleGoogleSignInResult(GetCredentialResponse result) {
+        androidx.credentials.Credential credential = result.getCredential();
+        if (credential instanceof CustomCredential &&
+                ((CustomCredential) credential).getType().equals(GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL)) {
+            try {
+                GoogleIdTokenCredential googleIdTokenCredential = GoogleIdTokenCredential.createFrom(((CustomCredential) credential).getData());
+                String idToken = googleIdTokenCredential.getIdToken();
+
+                com.google.firebase.auth.AuthCredential authCredential = GoogleAuthProvider.getCredential(idToken, null);
+                auth.signInWithCredential(authCredential)
+                        .addOnSuccessListener(authResult -> {
+                            String uid = authResult.getUser().getUid();
+                            String email = authResult.getUser().getEmail();
+                            String name = authResult.getUser().getDisplayName();
+                            checkIfTeacherExists(uid, email, name);
+                        })
+                        .addOnFailureListener(e -> {
+                            showLoading(false);
+                            showError("Firebase Auth Failed", getFriendlyLoginError(e));
+                        });
+            } catch (Exception e) {
+                showLoading(false);
+                showError("Google Sign-In", "Failed to parse Google ID token: " + e.getMessage());
+            }
+        } else {
+            showLoading(false);
+            showError("Google Sign-In", "Unexpected credential type");
+        }
+    }
+
+    private void checkIfTeacherExists(String uid, String email, String name) {
+        repo.getTeacher(new FirebaseRepository.OnResult<Teacher>() {
+            @Override
+            public void onSuccess(Teacher t) {
+                if (t != null) {
+                    SessionContext.clear(LoginActivity.this);
+                    showLoading(false);
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                    finishAffinity();
+                } else {
+                    showLoading(false);
+                    Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+                    i.putExtra("isGoogleSignIn", true);
+                    i.putExtra("googleEmail", email);
+                    i.putExtra("googleName", name);
+                    startActivity(i);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                showLoading(false);
+                showError("Database Error", "Failed to check profile: " + e.getMessage());
+            }
+        });
     }
 
     private void sendReset() {
