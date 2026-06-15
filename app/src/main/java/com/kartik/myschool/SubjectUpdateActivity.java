@@ -34,9 +34,10 @@ public class SubjectUpdateActivity extends AppCompatActivity {
         b.etTeacherId.setText(R.string.msg_null);
 
         if (name != null) {
-            b.etSubjectNameRegular.setText(name);
-            b.etSubjectNameShort.setText(name);
-            b.etSubjectNameLong.setText("First Language: " + name);
+            String localizedName = com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, name);
+            b.etSubjectNameRegular.setText(localizedName);
+            b.etSubjectNameShort.setText(localizedName);
+            b.etSubjectNameLong.setText("First Language: " + localizedName);
         }
 
         // Determine CURRENT formative and summative values
@@ -114,7 +115,11 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             try { summative = Integer.parseInt(b.etSummativeEval.getText().toString().trim()); } catch(Exception ignored){}
 
             // Update in SessionContext
-            if (com.kartik.myschool.SessionContext.selectedClass != null && com.kartik.myschool.SessionContext.selectedClass.subjects != null) {
+            if (com.kartik.myschool.SessionContext.selectedClass != null) {
+                if (com.kartik.myschool.SessionContext.selectedClass.subjects == null) {
+                    com.kartik.myschool.SessionContext.selectedClass.subjects = new java.util.ArrayList<>();
+                }
+                boolean updated = false;
                 for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
                     if (s.name != null && s.name.equalsIgnoreCase(name)) { // compare with original name
                         s.name = updatedName;
@@ -134,8 +139,27 @@ public class SubjectUpdateActivity extends AppCompatActivity {
                         s.maxTondi        = summative * 10 / 50;
                         s.maxPratyakshikB = summative * 10 / 50;
                         s.maxLekhi        = summative - s.maxTondi - s.maxPratyakshikB;
+                        updated = true;
                         break;
                     }
+                }
+                
+                if (!updated) {
+                    com.kartik.myschool.model.Subject newSub = new com.kartik.myschool.model.Subject(updatedName, formative + summative);
+                    newSub.subjectCode = b.etSubjectCode.getText().toString().trim();
+                    newSub.maxNirikhshan   = 0;
+                    newSub.maxTondiKam     = formative * 10 / 50;
+                    newSub.maxPratyakshik  = formative * 10 / 50;
+                    newSub.maxUpkram       = formative * 10 / 50;
+                    newSub.maxPrakalp      = 0;
+                    newSub.maxChachani     = formative * 20 / 50;
+                    newSub.maxSwadhyay     = 0;
+                    newSub.maxItar         = 0;
+
+                    newSub.maxTondi        = summative * 10 / 50;
+                    newSub.maxPratyakshikB = summative * 10 / 50;
+                    newSub.maxLekhi        = summative - newSub.maxTondi - newSub.maxPratyakshikB;
+                    com.kartik.myschool.SessionContext.selectedClass.subjects.add(newSub);
                 }
                 
                 // Save to local cache and Firestore

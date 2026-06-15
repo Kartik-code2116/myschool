@@ -65,11 +65,11 @@ public class PdfLocalizer {
         if (s.equals("general science") || s.equals("सामान्य विज्ञान")) {
             return isEn ? "General Science" : "सामान्य विज्ञान";
         }
-        if (s.contains("परिसर अभ्यास १") || s.contains("परिसर अभ्यास 1") || s.contains("evs 1") || s.contains("evs i")) {
-            return isEn ? "EVS 1" : "परिसर अभ्यास १";
+        if (s.contains("परिसर अभ्यास १") || s.contains("परिसर अभ्यास 1") || s.contains("evs 1") || s.contains("evs i") || s.contains("environmental studies part 1")) {
+            return isEn ? "EVS 1" : "परिसर अभ्यास भाग 1";
         }
-        if (s.contains("परिसर अभ्यास २") || s.contains("परिसर अभ्यास 2") || s.contains("evs 2") || s.contains("evs ii")) {
-            return isEn ? "EVS 2" : "परिसर अभ्यास २";
+        if (s.contains("परिसर अभ्यास २") || s.contains("परिसर अभ्यास 2") || s.contains("evs 2") || s.contains("evs ii") || s.contains("environmental studies part 2")) {
+            return isEn ? "EVS 2" : "परिसर अभ्यास भाग 2";
         }
         if (s.contains("परिसर अभ्यास") || s.equals("environmental studies") || s.equals("evs")) {
             return isEn ? "EVS" : "परिसर अभ्यास";
@@ -132,9 +132,9 @@ public class PdfLocalizer {
         if (s.contains("assamese") || s.contains("आसामी")) return isEn ? "Assamese" : "आसामी";
 
         if (s.contains("vishesh pragati") || s.contains("special development") || s.contains("vishesh vikas") || s.contains("विशेष प्रगती") || s.contains("विशेष विकास")) return isEn ? "Special Development" : "विशेष विकास";
-        if (s.contains("aavad,chanda,etc") || s.contains("aavad, chanda, etc") || s.contains("aavad,chhand")) return isEn ? "Interests, Hobbies, etc" : "आवड, छंद, इत्यादी";
-        if (s.contains("sudharna aavashyaka") || s.contains("sudharna aavasghyaka")) return isEn ? "Needs Improvement" : "सुधारणा आवश्यक";
-        if (s.contains("vyaktimatva gun vishgesh") || s.contains("vyaktimatva gun vishesh")) return isEn ? "Personality Traits" : "व्यक्तिमत्त्व गुण विशेष";
+        if (s.contains("aavad,chanda,etc") || s.contains("aavad, chanda, etc") || s.contains("aavad,chhand") || s.contains("interests") || s.contains("hobbies")) return isEn ? "Interests, Hobbies, etc" : "आवड, छंद, इत्यादी";
+        if (s.contains("sudharna aavashyaka") || s.contains("sudharna aavasghyaka") || s.contains("needs improvement")) return isEn ? "Needs Improvement" : "सुधारणा आवश्यक";
+        if (s.contains("vyaktimatva gun vishgesh") || s.contains("vyaktimatva gun vishesh") || s.contains("personality traits")) return isEn ? "Personality Traits" : "व्यक्तिमत्त्व गुण विशेष";
 
         return subName;
     }

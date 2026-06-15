@@ -44,12 +44,12 @@ public class DeclareWeightageFragment extends Fragment {
         setupRecyclerView();
         displayHeaderInfo();
 
-        // Defer heavy UI rendering so the sidebar can close smoothly
+        // Defer load slightly to allow smooth fragment transition, then animate in
         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
             if (isAdded()) {
                 loadActiveSubjects();
             }
-        }, 350);
+        }, 150);
 
         setupActions();
     }
@@ -100,6 +100,7 @@ public class DeclareWeightageFragment extends Fragment {
             b.rvWeightageSubjects.setVisibility(View.VISIBLE);
             b.btnSaveWeightage.setEnabled(true);
             adapter.setData(activeList);
+            b.rvWeightageSubjects.scheduleLayoutAnimation();
         }
     }
 

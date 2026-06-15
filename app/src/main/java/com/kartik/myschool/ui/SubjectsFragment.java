@@ -115,7 +115,8 @@ public class SubjectsFragment extends Fragment {
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
         String classDiv = SessionContext.getClassDivLabel();
-        b.tvHeaderLabel.setText("Year: " + yearLabel + "   " + classDiv);
+        boolean isEn = com.kartik.myschool.utils.pdf.PdfLocalizer.isEnglish(getContext());
+        b.tvHeaderLabel.setText((isEn ? "Year: " : "वर्ष: ") + yearLabel + "   " + classDiv);
     }
 
     private void loadSubjects() {
@@ -151,9 +152,18 @@ public class SubjectsFragment extends Fragment {
                 SessionContext.selectedClass.subjects = cleanList;
                 SessionContext.save(getContext());
                 com.kartik.myschool.AppCache.selectedClass = SessionContext.selectedClass;
-                FirebaseRepository.get().saveClass(SessionContext.selectedClass, null);
+                FirebaseRepository.get().saveClass(SessionContext.selectedClass, new com.kartik.myschool.repository.FirebaseRepository.OnResult<String>() {
+                    @Override public void onSuccess(String result) {}
+                    @Override public void onError(Exception e) {}
+                });
             }
             activeSubjects = SessionContext.selectedClass.subjects;
+            
+            // Auto-populate default subjects if class is completely empty
+            if (activeSubjects.isEmpty() && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.isEmpty()) {
+                resetSubjectsToDefault(true);
+                return; // UI will be refreshed by the callback
+            }
         } else {
             activeSubjects = new ArrayList<>();
         }
@@ -166,6 +176,7 @@ public class SubjectsFragment extends Fragment {
             boolean found = false;
             for (SubjectAdapter.SubjectItem item : predefined) {
                 if (Subject.isSameSubject(item.name, active.name)) {
+                    item.name = active.name; // Keep the newly edited custom name
                     item.maxMarks = active.maxMarks;
                     int fe = active.maxNirikhshan + active.maxTondiKam + active.maxPratyakshik + active.maxUpkram + active.maxPrakalp + active.maxChachani + active.maxSwadhyay + active.maxItar;
                     int se = active.maxTondi + active.maxPratyakshikB + active.maxLekhi;
@@ -325,9 +336,18 @@ public class SubjectsFragment extends Fragment {
                     v -> {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
                         popup.getMenu().add("Refresh Subjects");
-                        popup.getMenu().add("Reset All");
+                        popup.getMenu().add("Reset All to Default");
                         popup.setOnMenuItemClickListener(menuItem -> {
-                            Toast.makeText(getContext(), menuItem.getTitle() + " clicked", Toast.LENGTH_SHORT).show();
+                            if (menuItem.getTitle().toString().equals("Reset All to Default")) {
+                                new AlertDialog.Builder(getContext())
+                                    .setTitle("Reset Subjects")
+                                    .setMessage("Are you sure you want to reset subjects to their defaults for this class standard? This will replace your current selection.")
+                                    .setPositiveButton("Reset", (d, w) -> resetSubjectsToDefault(false))
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                            } else {
+                                loadSubjects();
+                            }
                             return true;
                         });
                         popup.show();
@@ -347,6 +367,80 @@ public class SubjectsFragment extends Fragment {
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).showCustomToolbarActions(false, null, null);
         }
+    }
+
+    private void resetSubjectsToDefault(boolean silent) {
+        if (SessionContext.selectedClass == null) return;
+        ClassModel cls = SessionContext.selectedClass;
+        
+        int std = 1;
+        if (cls.className != null) {
+            try {
+                String clean = cls.className.replaceAll("[^0-9]", "");
+                if (!clean.isEmpty()) std = Integer.parseInt(clean);
+            } catch (Exception ignored) {}
+        }
+        
+        List<SubjectAdapter.SubjectItem> predefined = getPredefinedSubjects();
+        List<Subject> newSubjects = new ArrayList<>();
+        
+        List<String> req = new ArrayList<>();
+        req.add("Marathi");
+        req.add("English");
+        req.add("Mathematics");
+        
+        if (std == 1 || std == 2) {
+            req.add("Play, Do, Learn");
+        } else if (std == 3 || std == 4) {
+            req.add("Environmental Studies");
+            req.add("Play, Do, Learn");
+        } else if (std == 5) {
+            req.add("Hindi");
+            req.add("Environmental Studies Part 1");
+            req.add("Environmental Studies Part 2");
+            req.add("Health & Physical Education");
+            req.add("Work Experience");
+            req.add("Art");
+        } else {
+            req.add("Hindi");
+            req.add("Science");
+            req.add("History and Civics");
+            req.add("Geography");
+            req.add("Health & Physical Education");
+            req.add("Work Experience");
+            req.add("Art");
+        }
+        
+        for (String nameToFind : req) {
+            for (SubjectAdapter.SubjectItem item : predefined) {
+                if (Subject.isSameSubject(item.name, nameToFind)) {
+                    Subject s = new Subject(item.name, item.maxMarks);
+                    s.subjectCode = item.code;
+                    newSubjects.add(s);
+                    break;
+                }
+            }
+        }
+        
+        cls.subjects = newSubjects;
+        Subject.sortSubjects(cls.subjects);
+        SessionContext.save(getContext());
+        com.kartik.myschool.AppCache.selectedClass = cls;
+        
+        final int finalStd = std;
+        FirebaseRepository.get().saveClass(cls, new FirebaseRepository.OnResult<String>() {
+            @Override
+            public void onSuccess(String result) {
+                if (isAdded()) {
+                    loadSubjects();
+                    if (!silent) Toast.makeText(getContext(), "Subjects reset for Std " + finalStd, Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                if (isAdded() && !silent) Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private SubjectAdapter.SubjectItem createItem(String name, String code, String serial, String category, int maxMarks, String color) {
@@ -385,42 +479,33 @@ public class SubjectsFragment extends Fragment {
         // 2. Second Language (English)
         list.add(createItem("English", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
 
-        if (std >= 5) {
-            // 3. Third Language (Hindi)
-            list.add(createItem("Hindi", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-        }
+        // 3. Third Language (Hindi)
+        list.add(createItem("Hindi", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
 
         // 4. Mathematics
         list.add(createItem("Mathematics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
 
-        if (std == 1 || std == 2) {
-            list.add(createItem("Play, Do, Learn", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-        } else if (std == 3 || std == 4) {
-            list.add(createItem("Environmental Studies", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Play, Do, Learn", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-        } else if (std == 5) {
-            list.add(createItem("Environmental Studies Part 1", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Environmental Studies Part 2", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-        } else if (std >= 6 && std <= 8) {
-            list.add(createItem("Science", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("History and Civics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Geography", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-        } else {
-            list.add(createItem("Science", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("History and Civics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Geography", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
-            list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
-            list.add(createItem("Information & Comm. Technology (ICT)", String.format(java.util.Locale.US, "%s%02d", p4, 1), String.format(java.util.Locale.US, "%02d", totalIdx++), "State Board", 100, "#FF9800"));
-            list.add(createItem("Water Security & Environment Studies", String.format(java.util.Locale.US, "%s%02d", p4, 2), String.format(java.util.Locale.US, "%02d", totalIdx++), "State Board", 100, "#FF9800"));
-        }
+        // 5. Play, Do, Learn
+        list.add(createItem("Play, Do, Learn", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        
+        // 6. Environmental Studies
+        list.add(createItem("Environmental Studies", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        list.add(createItem("Environmental Studies Part 1", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        list.add(createItem("Environmental Studies Part 2", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        
+        // 7. Sciences and Social Sciences
+        list.add(createItem("Science", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        list.add(createItem("History and Civics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        list.add(createItem("Geography", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+
+        // 8. Activities
+        list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+
+        // 9. State Board Specials
+        list.add(createItem("Information & Comm. Technology (ICT)", String.format(java.util.Locale.US, "%s%02d", p4, 1), String.format(java.util.Locale.US, "%02d", totalIdx++), "State Board", 100, "#FF9800"));
+        list.add(createItem("Water Security & Environment Studies", String.format(java.util.Locale.US, "%s%02d", p4, 2), String.format(java.util.Locale.US, "%02d", totalIdx++), "State Board", 100, "#FF9800"));
         
         return list;
     }
