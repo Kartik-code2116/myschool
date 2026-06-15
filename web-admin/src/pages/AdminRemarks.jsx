@@ -1,25 +1,12 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getDefaultSubjectsForClass } from '../utils/subjectUtils';
 import './AdminRemarks.css';
 
 const CLASSES = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const SEMESTERS = ['1', '2'];
-const SUBJECTS = [
-  { value: 'Marathi', label: 'Marathi' },
-  { value: 'Hindi', label: 'Hindi' },
-  { value: 'English', label: 'English' },
-  { value: 'Mathematics', label: 'Mathematics' },
-  { value: 'Science', label: 'Science' },
-  { value: 'Science / EVS', label: 'Science / EVS' },
-  { value: 'Soc. Science', label: 'Soc. Science' },
-  { value: 'Drawing', label: 'Drawing' },
-  { value: 'Work Experience', label: 'Work Experience' },
-  { value: 'Physical Education', label: 'Physical Education' },
-  { value: 'Personality Development', label: 'Personality Development' },
-  { value: 'Special Development', label: 'Special Development' },
-  { value: 'Information & Comm. Technology (ICT)', label: 'Information & Comm. Technology (ICT)' },
-  { value: 'Water Security & Environment Studies', label: 'Water Security & Environment Studies' },
+const SPECIAL_CATEGORIES = [
   { value: 'Vishesh pragati', label: 'Special Progress (विशेष प्रगती)' },
   { value: 'Sudharna Aavashyaka', label: 'Improvement Needed (सुधारणा आवश्यक)' },
   { value: 'Aavad, chanda, etc', label: 'Interests & Hobbies (आवड व छंद)' },
@@ -90,7 +77,45 @@ export default function AdminRemarks() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   
+  const [fetchedGlobalSubjects, setFetchedGlobalSubjects] = useState([]);
+  const [allSubjects, setAllSubjects] = useState([]);
+  
   const [draggedItemIndex, setDraggedItemIndex] = useState(null);
+
+  useEffect(() => {
+    fetchGlobalSubjects();
+  }, []);
+
+  const fetchGlobalSubjects = async () => {
+    try {
+      const colRef = collection(db, 'global_subjects');
+      const snapshot = await getDocs(colRef);
+      const fetchedSubjects = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return { value: data.name, label: data.name };
+      });
+      setFetchedGlobalSubjects(fetchedSubjects);
+    } catch (error) {
+      console.error('Error fetching global subjects:', error);
+    }
+  };
+
+  useEffect(() => {
+    const classSubjects = getDefaultSubjectsForClass(selectedClass).map(s => ({ value: s, label: s }));
+    const merged = [...classSubjects, ...SPECIAL_CATEGORIES];
+    
+    fetchedGlobalSubjects.forEach(fs => {
+      if (!merged.find(s => s.value === fs.value)) {
+        merged.push(fs);
+      }
+    });
+    setAllSubjects(merged);
+    
+    // Auto-select a valid subject if current selection is not in the new list
+    if (merged.length > 0 && !merged.find(s => s.value === selectedSubject)) {
+      setSelectedSubject(merged[0].value);
+    }
+  }, [selectedClass, fetchedGlobalSubjects]);
 
   const handleDragStart = (index) => {
     setDraggedItemIndex(index);
@@ -255,9 +280,28 @@ export default function AdminRemarks() {
           </div>
 
           <div className="form-group">
-            <label>Subject</label>
+            <label>Subject / Category</label>
             <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
-              {SUBJECTS.map(sub => <option key={sub.value} value={sub.value}>{sub.label}</option>)}
+              <optgroup label="Academic & Activity Subjects">
+                {getDefaultSubjectsForClass(selectedClass).map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Descriptive Entries">
+                {SPECIAL_CATEGORIES.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                ))}
+              </optgroup>
+              {fetchedGlobalSubjects.length > 0 && (
+                <optgroup label="Global Custom Subjects">
+                  {fetchedGlobalSubjects.map(fs => {
+                    const isDefault = getDefaultSubjectsForClass(selectedClass).includes(fs.value);
+                    const isSpecial = SPECIAL_CATEGORIES.find(c => c.value === fs.value);
+                    if (isDefault || isSpecial) return null;
+                    return <option key={fs.value} value={fs.value}>{fs.label}</option>;
+                  })}
+                </optgroup>
+              )}
             </select>
           </div>
 

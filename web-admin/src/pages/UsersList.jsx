@@ -73,7 +73,7 @@ export default function UsersList() {
       <div className="page-header">
         <div>
           <h1>App Users</h1>
-          <p>View every teacher account using the MySchool app and control their access.</p>
+          <p>View every teacher account using the Edu Report app and control their access.</p>
         </div>
         <div className="users-header-actions">
           <div className="users-search">

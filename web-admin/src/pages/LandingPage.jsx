@@ -7,11 +7,11 @@ import './LandingPage.css';
 
 const translations = {
   en: {
-    title: "MySchool Pro",
+    title: "Edu Report Pro",
     subtitle: "Next-Gen Classroom Administration",
     heroBadge: "MOBILE-FIRST WORKFLOW",
     heroTitle: "Zero-Latency CCE Grading & Progress Reporting",
-    heroDesc: "MySchool Pro enables teachers to record formative & summative scores, compile grades, track demographics, and generate print-ready progress cards instantly in the classroom.",
+    heroDesc: "Edu Report Pro enables teachers to record formative & summative scores, compile grades, track demographics, and generate print-ready progress cards instantly in the classroom.",
     feat1Title: "Demographics & Distribution",
     feat1Desc: "Track real-time distribution summaries by cast categories (SC, ST, OBC, Gen) and gender ratios.",
     feat2Title: "Multi-Semester Classrooms",
@@ -33,12 +33,12 @@ const translations = {
     labelConfirmPass: "Confirm Password",
     btnRegister: "Register Profile",
     btnRegistering: "Registering...",
-    footerCopy: "© 2026 MySchool Pro Classroom Suite. All rights reserved.",
+    footerCopy: "© 2026 Edu Report Pro Classroom Suite. All rights reserved.",
     footerVersion: "Version 2.4.0 (Stable)",
     footerOperator: "🔒 Operator Console",
     
     // Interactive How it works Section
-    howItWorksTitle: "How MySchool Pro Simplifies Your Day",
+    howItWorksTitle: "How Edu Report Pro Simplifies Your Day",
     howItWorksSubtitle: "Four simple steps to digitize classroom admin, designed for speed and reliability.",
     step1Title: "1. Class Setup",
     step1Desc: "Select standard and division. Link semesters and configure subjects with maximum mark weightages.",
@@ -50,7 +50,7 @@ const translations = {
     step4Desc: "Generate government-format school report cards. Save or share PDFs instantly without internet.",
     
     // Demo video section
-    videoTitle: "See MySchool Pro in Action",
+    videoTitle: "See Edu Report Pro in Action",
     videoSubtitle: "Watch our 2-minute walkthrough to see how teachers manage grades offline in the classroom.",
     videoPlaceholder: "App Demo Video Preview",
     videoTag1: "Offline Syncing",
@@ -69,11 +69,11 @@ const translations = {
     mockReportTitle: "Maharashtra State Board Format"
   },
   mr: {
-    title: "मायस्कूल प्रो (MySchool Pro)",
+    title: "वार्षिक मूल्यमापन प्रो (Edu Report Pro)",
     subtitle: "पुढील पिढीचे वर्ग प्रशासन",
     heroBadge: "मोबाईल-प्रथम कार्यप्रवाह",
     heroTitle: "शून्य-विलंबता (0ms) मूल्यमापन आणि प्रगती अहवाल",
-    heroDesc: "मायस्कूल प्रो शिक्षकांना वर्गात बसूनच आकारिक आणि संकलित गुण नोंदवण्यास, श्रेणी तयार करण्यास, लोकसंख्याशास्त्र (वर्गवारी) तपासण्यास आणि मुद्रणासाठी तयार प्रगतीपत्रके त्वरित जनरेट करण्यास सक्षम करते.",
+    heroDesc: "वार्षिक मूल्यमापन प्रो शिक्षकांना वर्गात बसूनच आकारिक आणि संकलित गुण नोंदवण्यास, श्रेणी तयार करण्यास, लोकसंख्याशास्त्र (वर्गवारी) तपासण्यास आणि मुद्रणासाठी तयार प्रगतीपत्रके त्वरित जनरेट करण्यास सक्षम करते.",
     feat1Title: "वर्गवारी आणि वितरण",
     feat1Desc: "जात प्रवर्ग (SC, ST, OBC, Gen) आणि लिंग गुणोत्तरानुसार रिअल-टाइम सारांश तपासा.",
     feat2Title: "बहु-सत्र (Multi-Semester) वर्ग",
@@ -95,12 +95,12 @@ const translations = {
     labelConfirmPass: "पासवर्डची पुष्टी करा",
     btnRegister: "नोंदणी करा",
     btnRegistering: "नोंदणी होत आहे...",
-    footerCopy: "© २०२६ मायस्कूल प्रो क्लासरूम सूट. सर्व हक्क राखीव.",
+    footerCopy: "© २०२६ वार्षिक मूल्यमापन प्रो क्लासरूम सूट. सर्व हक्क राखीव.",
     footerVersion: "आवृत्ती २.४.० (स्थिर)",
     footerOperator: "🔒 ऑपरेटर कन्सोल",
     
     // Interactive How it works Section
-    howItWorksTitle: "मायस्कूल प्रो तुमचे काम कसे सोपे करते?",
+    howItWorksTitle: "वार्षिक मूल्यमापन प्रो तुमचे काम कसे सोपे करते?",
     howItWorksSubtitle: "वर्गातील प्रशासकीय कामे डिजिटल करण्यासाठी ४ सोप्या पायऱ्या, जे वेग आणि विश्वासार्हतेसाठी डिझाइन केलेले आहेत.",
     step1Title: "१. वर्ग रचना (Class Setup)",
     step1Desc: "इयत्ता आणि तुकडी निवडा. सत्र लिंक करा आणि कमाल गुण भारांशांसह विषय सेट करा.",
@@ -112,7 +112,7 @@ const translations = {
     step4Desc: "शासकीय-नमुन्यात प्रगतीपत्रके जनरेट करा. इंटरनेटशिवाय पीडीएफ फाईल्स त्वरित जतन करा किंवा शेअर करा.",
     
     // Demo video section
-    videoTitle: "मायस्कूल प्रो कार्यरत पहा",
+    videoTitle: "वार्षिक मूल्यमापन प्रो कार्यरत पहा",
     videoSubtitle: "शिक्षक वर्गात ऑफलाईन गुण कसे व्यवस्थापित करतात हे पाहण्यासाठी आमचा २-मिनिटांचा डेमो पहा.",
     videoPlaceholder: "ॲप डेमो व्हिडिओचे पूर्वावलोकन",
     videoTag1: "ऑफलाईन सिंकिंग",
@@ -299,7 +299,7 @@ export default function LandingPage({ user, loading, lang }) {
               <div className="mock-class-badge">🏫 Room A</div>
               <div className="mock-form-row">
                 <span>{t.mockClassLabel}</span>
-                <strong>Class 7 - Div A</strong>
+                <strong>Class 1 - Div A</strong>
               </div>
               <div className="mock-sub-title">{t.mockSubjectsLabel}</div>
               <div className="mock-subjects-weights">
@@ -315,6 +315,11 @@ export default function LandingPage({ user, loading, lang }) {
                 </div>
                 <div className="mock-sub-row">
                   <span>Mathematics</span>
+                  <div className="mock-slider"><div className="mock-slider-bar slide-w-100"></div></div>
+                  <span>100</span>
+                </div>
+                <div className="mock-sub-row">
+                  <span>Play, Do, Learn</span>
                   <div className="mock-slider"><div className="mock-slider-bar slide-w-100"></div></div>
                   <span>100</span>
                 </div>
@@ -421,7 +426,7 @@ export default function LandingPage({ user, loading, lang }) {
             <div className="mock-window-body">
               <div className="mock-report-card">
                 <div className="mock-report-header">
-                  <strong>MySchool Pro</strong>
+                  <strong>Edu Report Pro</strong>
                   <span>{t.mockReportTitle}</span>
                 </div>
                 <div className="mock-report-body">
@@ -702,23 +707,11 @@ export default function LandingPage({ user, loading, lang }) {
           <p>{t.videoSubtitle}</p>
         </div>
 
-        <div className="video-player-container glass-panel">
-          <div className="video-mockup-wrapper" onClick={() => setIsModalOpen(true)}>
-            <div className="play-ripple-container">
-              <div className="ripple-wave r1" />
-              <div className="ripple-wave r2" />
-              <div className="ripple-wave r3" />
-              <button className="play-mockup-btn" aria-label="Play video demo" onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }}>
-                ▶
-              </button>
-            </div>
-            <div className="mock-video-tags">
-              <span>{t.videoTag1}</span>
-              <span>{t.videoTag2}</span>
-              <span>{t.videoTag3}</span>
-            </div>
-            <strong className="video-mockup-title">{t.videoPlaceholder}</strong>
-          </div>
+        <div className="video-player-container glass-panel" style={{ padding: '0', overflow: 'hidden', display: 'flex', justifyContent: 'center', backgroundColor: '#000' }}>
+          <video controls preload="metadata" style={{ width: '100%', maxHeight: '600px', objectFit: 'contain' }}>
+            <source src="/myschool_overview.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </section>
 
@@ -732,99 +725,6 @@ export default function LandingPage({ user, loading, lang }) {
           </span>
         </div>
       </footer>
-
-      {isModalOpen && (
-        <div className="emulator-modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="emulator-modal-content glass-panel" onClick={(e) => e.stopPropagation()}>
-            <button className="close-emulator-btn" onClick={() => setIsModalOpen(false)}>×</button>
-            
-            <div className="emulator-phone-wrapper">
-              <div className="phone-notch" />
-              <div className="phone-screen">
-                {/* Simulated StatusBar */}
-                <div className="app-status-bar">
-                  <span>12:30 PM</span>
-                  <div className="status-icons">📶 🔋 100%</div>
-                </div>
-
-                {/* Simulated App Content */}
-                <div className="emulator-app-body">
-                  <div className="emulator-header">
-                    <div className="avatar">KT</div>
-                    <div>
-                      <h4>Kartik Thorat</h4>
-                      <span className="sync-badge">🟢 Cloud Synced</span>
-                    </div>
-                  </div>
-
-                  <div className="emulator-stats-row">
-                    <div className="stat-card">
-                      <span>Standards</span>
-                      <strong>8</strong>
-                    </div>
-                    <div className="stat-card">
-                      <span>Offline Logs</span>
-                      <strong>240+</strong>
-                    </div>
-                  </div>
-
-                  <div className="emulator-simulated-workflow">
-                    <div className="workflow-screen-title">Simulated Grade Book</div>
-                    <div className="simulated-grades-grid">
-                      <div className="grade-item">
-                        <span>Mathematics</span>
-                        <div className="grade-pill a1">A1</div>
-                      </div>
-                      <div className="grade-item">
-                        <span>Science</span>
-                        <div className="grade-pill a1">A1</div>
-                      </div>
-                      <div className="grade-item">
-                        <span>Social Studies</span>
-                        <div className="grade-pill a2">A2</div>
-                      </div>
-                    </div>
-                    
-                    <div className="offline-alert-box">
-                      <span className="icon">💾</span>
-                      <div>
-                        <strong>Database Saved Locally</strong>
-                        <p>No internet required. Logs will sync next time you are online.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="emulator-info-sidebar">
-              <h3>{lang === 'en' ? 'MySchool Mobile App Simulator' : 'मायस्कूल मोबाईल ॲप सिम्युलेटर'}</h3>
-              <p>
-                {lang === 'en' 
-                  ? 'Explore the high-fidelity features of our mobile interface directly from your web browser:' 
-                  : 'थेट तुमच्या वेब ब्राउझरवरून आमच्या मोबाईल इंटरफेसच्या वैशिष्ट्यांचा अनुभव घ्या:'}
-              </p>
-              <ul>
-                <li>
-                  <strong>{lang === 'en' ? 'Local Database Engine' : 'स्थानिक डेटाबेस इंजिन'}:</strong>{' '}
-                  {lang === 'en' ? 'Works in areas with zero cell coverage.' : 'कव्हरेज नसलेल्या भागातही व्यवस्थित काम करते.'}
-                </li>
-                <li>
-                  <strong>{lang === 'en' ? 'Offline SQLite Storage' : 'ऑफलाईन SQLite स्टोरेज'}:</strong>{' '}
-                  {lang === 'en' ? 'Write operations take less than 1ms.' : 'गुण नोंदणी प्रक्रिया १ मिलीसेकंदापेक्षा कमी वेळात होते.'}
-                </li>
-                <li>
-                  <strong>{lang === 'en' ? 'Automated PDF Generation' : 'स्वयंचलित पीडीएफ निर्मिती'}:</strong>{' '}
-                  {lang === 'en' ? 'Creates progress cards offline inside the classroom.' : 'वर्गात बसून ऑफलाईन प्रगतीपत्रके तयार करा.'}
-                </li>
-              </ul>
-              <button className="btn btn-primary" onClick={() => setIsModalOpen(false)}>
-                {lang === 'en' ? 'Got It' : 'समजले'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

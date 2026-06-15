@@ -7,13 +7,13 @@ import './AppRedirect.css';
 const translations = {
   en: {
     logoText: "MS",
-    title: "MySchool Pro",
+    title: "Edu Report Pro",
     signOut: "Sign Out",
     statusBanner: "ACCOUNT ACTIVE & SYNCHRONIZED",
     welcomeTitle: "Welcome, ",
     leadText: "Your classroom profile has been successfully registered. To start managing students and grading cards, please transition to the mobile application.",
     whyTitle: "Why is this service mobile-only?",
-    whyDesc: "MySchool Pro is designed to function seamlessly in school classrooms, including rural areas with poor internet connection. By hosting grading databases, formative/summative exams, and attendance grids on the mobile app, we utilize local Android SQLite databases to guarantee 0ms offline latency.",
+    whyDesc: "Edu Report Pro is designed to function seamlessly in school classrooms, including rural areas with poor internet connection. By hosting grading databases, formative/summative exams, and attendance grids on the mobile app, we utilize local Android SQLite databases to guarantee 0ms offline latency.",
     guideTitle: "Setup Guide",
     step1Title: "1. Download APK",
     step1Desc: "Click the button below to download the latest stable release of the Android package.",
@@ -35,17 +35,17 @@ const translations = {
     mockNavHome: "🏠 Home",
     mockNavStudents: "👥 Students",
     mockNavSettings: "⚙️ Settings",
-    footerText: "© 2026 MySchool Pro. Fully compliant with local CCE grading standards."
+    footerText: "© 2026 Edu Report Pro. Fully compliant with local CCE grading standards."
   },
   mr: {
     logoText: "एमएस",
-    title: "मायस्कूल प्रो",
+    title: "वार्षिक मूल्यमापन प्रो",
     signOut: "साइन आउट करा",
     statusBanner: "खाते सक्रिय आणि समक्रमित (SYNCHRONIZED) आहे",
     welcomeTitle: "आपले स्वागत आहे, ",
     leadText: "तुमचे वर्ग प्रोफाईल यशस्वीरित्या नोंदणीकृत झाले आहे. विद्यार्थी आणि श्रेणी पत्रके व्यवस्थापित करण्यासाठी, कृपया मोबाईल ॲप्लिकेशन वापरा.",
     whyTitle: "ही सेवा केवळ मोबाईलवर का उपलब्ध आहे?",
-    whyDesc: "मायस्कूल प्रो हे वर्गात, विशेषत: खराब इंटरनेट सुविधा असलेल्या ग्रामीण भागातील शाळांमध्ये अखंडपणे काम करण्यासाठी तयार केले आहे. मोबाईल ॲपवर श्रेणी डेटाबेस, आकारिक/संकलित परीक्षा आणि उपस्थिती ग्रिड्स साठवून, आम्ही शून्य-विलंबता (0ms) ऑफलाईन कामाची हमी देण्यासाठी स्थानिक अँड्रॉइड SQLite डेटाबेसचा वापर करतो.",
+    whyDesc: "वार्षिक मूल्यमापन प्रो हे वर्गात, विशेषत: खराब इंटरनेट सुविधा असलेल्या ग्रामीण भागातील शाळांमध्ये अखंडपणे काम करण्यासाठी तयार केले आहे. मोबाईल ॲपवर श्रेणी डेटाबेस, आकारिक/संकलित परीक्षा आणि उपस्थिती ग्रिड्स साठवून, आम्ही शून्य-विलंबता (0ms) ऑफलाईन कामाची हमी देण्यासाठी स्थानिक अँड्रॉइड SQLite डेटाबेसचा वापर करतो.",
     guideTitle: "मार्गदर्शिका (Setup Guide)",
     step1Title: "१. एपीके (APK) डाउनलोड करा",
     step1Desc: "अँड्रॉइड पॅकेजची नवीनतम स्थिर आवृत्ती डाउनलोड करण्यासाठी खालील बटणावर क्लिक करा.",
@@ -67,7 +67,7 @@ const translations = {
     mockNavHome: "🏠 होम",
     mockNavStudents: "👥 विद्यार्थी",
     mockNavSettings: "⚙️ सेटिंग्ज",
-    footerText: "© २०२६ मायस्कूल प्रो. स्थानिक सीसीई (CCE) श्रेणी मानकांशी सुसंगत."
+    footerText: "© २०२६ वार्षिक मूल्यमापन प्रो. स्थानिक सीसीई (CCE) श्रेणी मानकांशी सुसंगत."
   }
 };
 

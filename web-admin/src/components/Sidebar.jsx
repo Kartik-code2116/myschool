@@ -15,7 +15,7 @@ export default function Sidebar() {
       <div className="sidebar-brand">
         <div className="sidebar-logo">MS</div>
         <div>
-          <h2>MySchool</h2>
+          <h2>Edu Report</h2>
           <span>Admin Console</span>
         </div>
       </div>
