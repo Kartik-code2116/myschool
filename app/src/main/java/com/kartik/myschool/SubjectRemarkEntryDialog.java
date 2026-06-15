@@ -206,9 +206,15 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
                 : SessionContext.selectedSchool != null ? SessionContext.selectedSchool.id : null;
         
         String className = classModel.className != null ? classModel.className : "5";
-        int semesterNumber = SessionContext.selectedSemester != null ? SessionContext.selectedSemester.number : 1;
+        int semesterNumber = 1;
+        if (existingMarks != null && existingMarks.semesterId != null && existingMarks.semesterId.equals("sem2")) {
+            semesterNumber = 2;
+        } else if (SessionContext.selectedSemester != null) {
+            semesterNumber = SessionContext.selectedSemester.number;
+        }
+        final int finalSemesterNumber = semesterNumber;
         
-        String cacheKey = className + "_sem_" + semesterNumber + "_" + subjectName;
+        String cacheKey = className + "_sem_" + finalSemesterNumber + "_" + subjectName;
         List<String> cached = AppCache.cachedRemarkBank.get(cacheKey);
         if (cached != null && !cached.isEmpty()) {
             bankOptions.clear();
@@ -220,7 +226,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
             return;
         }
 
-        FirebaseRepository.get().getRemarkBank(schoolId, className, semesterNumber, subjectName,
+        FirebaseRepository.get().getRemarkBank(schoolId, className, finalSemesterNumber, subjectName,
                 new FirebaseRepository.OnResult<List<String>>() {
                     @Override
                     public void onSuccess(List<String> options) {
@@ -239,7 +245,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
                     public void onError(Exception e) {
                         bankOptions.clear();
                         boolean isMale = isStudentMale();
-                        for (String opt : com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber)) {
+                        for (String opt : com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, finalSemesterNumber)) {
                             bankOptions.add(applyGenderReplacement(opt, isMale));
                         }
                         renderSelection();

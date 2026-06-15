@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="default_web_client_id" translatable="false">323006914636-t0v6uav8qrhjvf5du7re90gpae1j8qe5.apps.googleusercontent.com</string>
     <string name="app_name">वार्षिक मूल्यमापन</string>
     <string name="app_tagline">स्मार्ट परिणाम व्यवस्थापन</string>
@@ -147,7 +147,7 @@
     <string name="menu_formative_summative">आकारिक/संकलित नोंदी</string>
     <string name="menu_descriptive_entries">वर्णनात्मक नोंदी</string>
     <string name="menu_attendance">उपस्थिती</string>
-    <string name="menu_list_students">वर्ग आणि विभाग</string>
+    <string name="menu_list_students" tools:ignore="MissingTranslation">वर्ग आणि विभाग</string>
     <string name="menu_student_list">विद्यार्थी यादी</string>
     <string name="menu_subjects">विषय निश्चिती</string>
     <string name="menu_declare_weightage">भारांश निश्चिती</string>

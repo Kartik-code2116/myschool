@@ -108,7 +108,7 @@ public class InfoPrintSettingFragment extends Fragment {
         b.ivAnimReports.setOnClickListener(v -> playCombineAndLogoAnimation());
 
         b.btnGoToClass.setOnClickListener(v -> { UiAnimations.pulse(b.btnGoToClass); goToClassStudents(); });
-        b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_class_div); });
+        b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_profile); });
         b.btnHowToUse.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnHowToUse);
             new android.app.AlertDialog.Builder(requireContext())

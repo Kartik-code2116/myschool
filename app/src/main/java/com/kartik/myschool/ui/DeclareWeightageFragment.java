@@ -91,6 +91,10 @@ public class DeclareWeightageFragment extends Fragment {
         }
 
         List<Subject> activeList = activeClass.subjects;
+        if (activeList != null) {
+            com.kartik.myschool.model.Subject.sortSubjects(activeList);
+        }
+        
         if (activeList == null || activeList.isEmpty()) {
             b.layoutEmptyState.setVisibility(View.VISIBLE);
             b.rvWeightageSubjects.setVisibility(View.GONE);

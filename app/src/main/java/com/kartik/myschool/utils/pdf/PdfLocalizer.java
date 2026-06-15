@@ -60,16 +60,16 @@ public class PdfLocalizer {
             return isEn ? "History & Civics" : "इतिहास व नागरिकशास्त्र";
         }
         if (s.equals("social science") || s.equals("social sciences") || s.equals("सामाजिक शास्त्र") || s.equals("भूगोल व सामाजिक शास्त्र")) {
-            return isEn ? "Social Science" : "सामाजिक शास्त्र";
+            return isEn ? "Social Science" : "सामा. शास्त्र";
         }
         if (s.equals("general science") || s.equals("सामान्य विज्ञान")) {
             return isEn ? "General Science" : "सामान्य विज्ञान";
         }
         if (s.contains("परिसर अभ्यास १") || s.contains("परिसर अभ्यास 1") || s.contains("evs 1") || s.contains("evs i") || s.contains("environmental studies part 1")) {
-            return isEn ? "EVS 1" : "परिसर अभ्यास भाग 1";
+            return isEn ? "EVS 1" : "सा.वि./प.अ. 1";
         }
         if (s.contains("परिसर अभ्यास २") || s.contains("परिसर अभ्यास 2") || s.contains("evs 2") || s.contains("evs ii") || s.contains("environmental studies part 2")) {
-            return isEn ? "EVS 2" : "परिसर अभ्यास भाग 2";
+            return isEn ? "EVS 2" : "सा.वि./प.अ. 2";
         }
         if (s.contains("परिसर अभ्यास") || s.equals("environmental studies") || s.equals("evs")) {
             return isEn ? "EVS" : "परिसर अभ्यास";
@@ -81,7 +81,7 @@ public class PdfLocalizer {
             return isEn ? "Work Experience" : "कार्यानुभव";
         }
         if (s.equals("health and physical education") || s.equals("health & physical education") || s.equals("आरोग्य व शारीरिक शिक्षण")) {
-            return isEn ? "Health & Physical Education" : "आरोग्य व शारीरिक शिक्षण";
+            return isEn ? "Health & P.E." : "आ. व शा.शि.";
         }
         if (s.equals("physical education") || s.equals("p.e.") || s.equals("p.e") || s.equals("शारीरिक शिक्षण") || s.equals("शा.शि.") || s.equals("शा. शिक्षण")) {
             return isEn ? "Physical Education" : "शारीरिक शिक्षण";
@@ -109,7 +109,7 @@ public class PdfLocalizer {
         if (s.contains("play") || s.contains("do") && s.contains("learn") || s.contains("खेळू")) return isEn ? "Play, Do, Learn" : "खेळू, करू, शिकू";
         if (s.equals("art") || s.contains("drawing") || s.contains("कला")) return isEn ? "Art" : "कला";
         if (s.contains("work exp") || s.contains("workexp") || s.contains("कार्यानुभव")) return isEn ? "Work Experience" : "कार्यानुभव";
-        if (s.contains("health") && s.contains("physical")) return isEn ? "Health & Physical Education" : "आरोग्य व शारीरिक शिक्षण";
+        if (s.contains("health") && s.contains("physical")) return isEn ? "Health & P.E." : "आ. व शा.शि.";
         if (s.contains("physical") || s.contains("p.e.") || s.equals("pe") || s.contains("शारीरिक") || s.contains("शा.शि.")) return isEn ? "Physical Education" : "शारीरिक शिक्षण";
         if (s.contains("personality") || s.contains("व्यक्तित्व") || s.contains("व्यक्तिमत्त्व")) return isEn ? "Personality Development" : "व्यक्तिमत्त्व विकास";
         if (s.contains("ict") || s.contains("संप्रेषण")) return isEn ? "Information & Comm. Technology (ICT)" : "माहिती व संप्रेषण तंत्रज्ञान (ICT)";

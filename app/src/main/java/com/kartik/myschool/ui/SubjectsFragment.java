@@ -149,6 +149,7 @@ public class SubjectsFragment extends Fragment {
                 }
             }
             if (modified || cleanList.size() != SessionContext.selectedClass.subjects.size()) {
+                com.kartik.myschool.model.Subject.sortSubjects(cleanList);
                 SessionContext.selectedClass.subjects = cleanList;
                 SessionContext.save(getContext());
                 com.kartik.myschool.AppCache.selectedClass = SessionContext.selectedClass;
@@ -199,7 +200,9 @@ public class SubjectsFragment extends Fragment {
             }
         }
         
-        adapter.setData(deduplicateItems(predefined), activeSubjects);
+        List<SubjectAdapter.SubjectItem> finalPredefined = deduplicateItems(predefined);
+        sortSubjectItems(finalPredefined);
+        adapter.setData(finalPredefined, activeSubjects);
 
         // Fetch global subjects defined by Admin and merge
         FirebaseRepository.get().getGlobalSubjects(new FirebaseRepository.OnResult<List<Subject>>() {
@@ -228,7 +231,9 @@ public class SubjectsFragment extends Fragment {
                             currentList.add(new SubjectAdapter.SubjectItem(gSub.name, "", orderStr, "Global", gSub.maxMarks, "FE: " + fe, seStr, "", "#FF5722"));
                         }
                     }
-                    adapter.setData(deduplicateItems(currentList), activeSubjects);
+                    List<SubjectAdapter.SubjectItem> finalGlobal = deduplicateItems(currentList);
+                    sortSubjectItems(finalGlobal);
+                    adapter.setData(finalGlobal, activeSubjects);
                 }
             }
             @Override
@@ -253,6 +258,29 @@ public class SubjectsFragment extends Fragment {
             }
         }
         return clean;
+    }
+
+    private void sortSubjectItems(List<SubjectAdapter.SubjectItem> list) {
+        if (list == null || list.size() <= 1) return;
+        java.util.Collections.sort(list, new java.util.Comparator<SubjectAdapter.SubjectItem>() {
+            @Override
+            public int compare(SubjectAdapter.SubjectItem s1, SubjectAdapter.SubjectItem s2) {
+                String c1 = s1.code != null ? s1.code.trim() : "";
+                String c2 = s2.code != null ? s2.code.trim() : "";
+                
+                if (c1.isEmpty() && c2.isEmpty()) return 0;
+                if (c1.isEmpty()) return 1;
+                if (c2.isEmpty()) return -1;
+                
+                try {
+                    long n1 = Long.parseLong(c1.replaceAll("[^0-9]", ""));
+                    long n2 = Long.parseLong(c2.replaceAll("[^0-9]", ""));
+                    return Long.compare(n1, n2);
+                } catch (Exception e) {
+                    return c1.compareTo(c2);
+                }
+            }
+        });
     }
 
     private void showAddCustomSubjectDialog() {

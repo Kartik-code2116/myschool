@@ -3,7 +3,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import './Sidebar.css';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -11,7 +11,10 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
+      <button className="sidebar-close-btn" onClick={onClose} title="Close Sidebar">
+        &times;
+      </button>
       <div className="sidebar-brand">
         <div className="sidebar-logo">MS</div>
         <div>

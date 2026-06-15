@@ -1127,59 +1127,62 @@ public class FirebaseRepository {
     public void getRemarkBank(String schoolId, String className, int semesterNumber, String subjectName,
                               OnResult<java.util.List<String>> cb) {
         
-        java.util.List<String> combined = new java.util.ArrayList<>();
+        String classSemDocId = makeClassSemRemarkBankId(className, semesterNumber, subjectName);
         
-        String customDocId = makeRemarkBankId(schoolId, subjectName);
-        db.collection(COL_REMARK_BANKS).document(customDocId).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        com.kartik.myschool.model.RemarkBank bank =
-                                doc.toObject(com.kartik.myschool.model.RemarkBank.class);
-                        if (bank != null && bank.options != null && !bank.options.isEmpty()) {
-                            combined.addAll(bank.options);
+        db.collection(COL_REMARK_BANKS).document(classSemDocId).get()
+                .addOnSuccessListener(doc1 -> {
+                    if (doc1.exists()) {
+                        com.kartik.myschool.model.RemarkBank bank1 = doc1.toObject(com.kartik.myschool.model.RemarkBank.class);
+                        if (bank1 != null && bank1.options != null && !bank1.options.isEmpty()) {
+                            java.util.List<String> unique = new java.util.ArrayList<>(new java.util.LinkedHashSet<>(bank1.options));
+                            cb.onSuccess(unique);
+                            return;
                         }
                     }
                     
-                    String classSemDocId = makeClassSemRemarkBankId(className, semesterNumber, subjectName);
-                    db.collection(COL_REMARK_BANKS).document(classSemDocId).get()
+                    // Fallback to legacy global doc
+                    String legacyDocId = makeRemarkBankId(schoolId, subjectName);
+                    db.collection(COL_REMARK_BANKS).document(legacyDocId).get()
                             .addOnSuccessListener(doc2 -> {
                                 if (doc2.exists()) {
-                                    com.kartik.myschool.model.RemarkBank bank2 =
-                                            doc2.toObject(com.kartik.myschool.model.RemarkBank.class);
+                                    com.kartik.myschool.model.RemarkBank bank2 = doc2.toObject(com.kartik.myschool.model.RemarkBank.class);
                                     if (bank2 != null && bank2.options != null && !bank2.options.isEmpty()) {
-                                        combined.addAll(bank2.options);
+                                        java.util.List<String> unique = new java.util.ArrayList<>(new java.util.LinkedHashSet<>(bank2.options));
+                                        cb.onSuccess(unique);
+                                        return;
                                     }
                                 }
                                 
-                                String legacyDocId = makeRemarkBankId("default", subjectName);
-                                db.collection(COL_REMARK_BANKS).document(legacyDocId).get()
+                                // Fallback to "default" school global doc
+                                String defaultLegacyDocId = makeRemarkBankId("default", subjectName);
+                                db.collection(COL_REMARK_BANKS).document(defaultLegacyDocId).get()
                                         .addOnSuccessListener(doc3 -> {
                                             if (doc3.exists()) {
-                                                com.kartik.myschool.model.RemarkBank bank3 =
-                                                        doc3.toObject(com.kartik.myschool.model.RemarkBank.class);
+                                                com.kartik.myschool.model.RemarkBank bank3 = doc3.toObject(com.kartik.myschool.model.RemarkBank.class);
                                                 if (bank3 != null && bank3.options != null && !bank3.options.isEmpty()) {
-                                                    combined.addAll(bank3.options);
+                                                    java.util.List<String> unique = new java.util.ArrayList<>(new java.util.LinkedHashSet<>(bank3.options));
+                                                    cb.onSuccess(unique);
+                                                    return;
                                                 }
                                             }
                                             
-                                            combined.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
-                                            
-                                            java.util.List<String> unique = new java.util.ArrayList<>(new java.util.LinkedHashSet<>(combined));
-                                            cb.onSuccess(unique);
+                                            // Fallback to hardcoded defaults
+                                            java.util.List<String> def = com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber);
+                                            cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(def)));
                                         })
                                         .addOnFailureListener(e -> {
-                                            combined.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
-                                            cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(combined)));
+                                            java.util.List<String> def = com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber);
+                                            cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(def)));
                                         });
                             })
                             .addOnFailureListener(e -> {
-                                combined.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
-                                cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(combined)));
+                                java.util.List<String> def = com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber);
+                                cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(def)));
                             });
                 })
                 .addOnFailureListener(e -> {
-                    combined.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
-                    cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(combined)));
+                    java.util.List<String> def = com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber);
+                    cb.onSuccess(new java.util.ArrayList<>(new java.util.LinkedHashSet<>(def)));
                 });
     }
 

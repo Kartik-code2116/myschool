@@ -853,7 +853,7 @@
                     android:layout_height="52dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:text="@string/txt_all_classes"
+                    android:text="@string/nav_profile"
                     android:textColor="#5E35B1"
                     android:backgroundTint="#EDE7F6"
                     app:cornerRadius="16dp"
@@ -861,7 +861,7 @@
                     app:strokeWidth="0dp"
                     android:fontFamily="sans-serif-black"
                     android:textSize="12sp"
-                    app:icon="@drawable/ic_table_grid"
+                    app:icon="@drawable/ic_person"
                     app:iconTint="#5E35B1"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>

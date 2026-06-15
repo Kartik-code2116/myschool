@@ -215,6 +215,9 @@ public class FormativeSummativeFragment extends Fragment {
                         b.progressLoading.setVisibility(View.GONE);
                     if (swipeRefresh != null)
                         swipeRefresh.setRefreshing(false);
+                    if (activeClass != null && activeClass.subjects != null) {
+                        com.kartik.myschool.model.Subject.sortSubjects(activeClass.subjects);
+                    }
                     adapter.setData(cachedList, cachedMarks, true); // Reset animation for the first instant render
                 }
             }, 200);
@@ -390,6 +393,11 @@ public class FormativeSummativeFragment extends Fragment {
         if (isFirstLoad || classChanged || semesterChanged) {
             b.progressLoading.setVisibility(View.VISIBLE);
             loadEvaluationData();
+        } else {
+            // Always refresh adapter if coming back from Subjects page with modified subjects
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
         }
     }
 

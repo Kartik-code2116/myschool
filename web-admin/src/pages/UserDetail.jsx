@@ -73,6 +73,7 @@ export default function UserDetail() {
   const [error, setError] = useState(null);
   const [selectedScreenshot, setSelectedScreenshot] = useState(null);
   const [selectedClassId, setSelectedClassId] = useState('all');
+  const [schoolsMap, setSchoolsMap] = useState({});
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -91,12 +92,14 @@ export default function UserDetail() {
         const studentsQuery = query(collection(db, 'students'), where('teacherId', '==', id));
         const subsQuery1 = query(collection(db, 'subscriptions'), where('teacherId', '==', id));
         const subsQuery2 = query(collection(db, 'subscriptions'), where('userId', '==', id));
+        const schoolsQuery = query(collection(db, 'schools'), where('teacherId', '==', id));
 
-        const [classesSnap, studentsSnap, subsSnap1, subsSnap2] = await Promise.all([
+        const [classesSnap, studentsSnap, subsSnap1, subsSnap2, schoolsSnap] = await Promise.all([
           getDocs(classesQuery),
           getDocs(studentsQuery),
           getDocs(subsQuery1),
           getDocs(subsQuery2),
+          getDocs(schoolsQuery),
         ]);
 
         const classesData = [];
@@ -114,6 +117,13 @@ export default function UserDetail() {
         const subsData = Array.from(subsMap.values());
         subsData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         setSubscriptions(subsData);
+
+        const schoolsData = {};
+        schoolsSnap.forEach((schoolDoc) => {
+          schoolsData[schoolDoc.id] = schoolDoc.data();
+        });
+        setSchoolsMap(schoolsData);
+
         setError(null);
       } catch (err) {
         console.error('Error fetching user data:', err);
@@ -362,7 +372,9 @@ export default function UserDetail() {
                     onClick={() => setSelectedClassId(selectedClassId === classItem.id ? 'all' : classItem.id)}
                   >
                     <strong>Class {classItem.className} {classItem.division}</strong>
-                    <span className="subtitle">Year: {classItem.academicYearLabel || 'N/A'}</span>
+                    <span className="subtitle">
+                      Year: {classItem.academicYearLabel || 'N/A'} | School: {classItem.schoolId && schoolsMap[classItem.schoolId] ? schoolsMap[classItem.schoolId].name : 'Unknown/No School'}
+                    </span>
                   </li>
                 ))}
               </ul>

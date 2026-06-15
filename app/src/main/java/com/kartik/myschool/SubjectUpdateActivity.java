@@ -37,7 +37,7 @@ public class SubjectUpdateActivity extends AppCompatActivity {
             String localizedName = com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, name);
             b.etSubjectNameRegular.setText(localizedName);
             b.etSubjectNameShort.setText(localizedName);
-            b.etSubjectNameLong.setText("First Language: " + localizedName);
+            b.etSubjectNameLong.setText(localizedName);
         }
 
         // Determine CURRENT formative and summative values
@@ -161,6 +161,9 @@ public class SubjectUpdateActivity extends AppCompatActivity {
                     newSub.maxLekhi        = summative - newSub.maxTondi - newSub.maxPratyakshikB;
                     com.kartik.myschool.SessionContext.selectedClass.subjects.add(newSub);
                 }
+                
+                // Sort before saving so new subjectCode dictates order everywhere
+                com.kartik.myschool.model.Subject.sortSubjects(com.kartik.myschool.SessionContext.selectedClass.subjects);
                 
                 // Save to local cache and Firestore
                 com.kartik.myschool.SessionContext.save(this);

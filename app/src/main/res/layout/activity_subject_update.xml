@@ -220,7 +220,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
-                    android:text="@string/txt_first_language_marathi"
+                    android:text="@string/txt_marathi"
                     android:textColor="#222222"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>

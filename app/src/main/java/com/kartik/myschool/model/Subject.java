@@ -131,39 +131,32 @@ public class Subject {
     }
 
     public static void sortSubjects(java.util.List<Subject> subjects) {
-        if (subjects == null || subjects.isEmpty()) return;
-        
-        java.util.List<String> order = java.util.Arrays.asList(
-            "Marathi",
-            "English",
-            "Hindi",
-            "Sanskrit",
-            "Mathematics",
-            "Environmental Studies",
-            "Environmental Studies Part 1",
-            "Environmental Studies Part 2",
-            "Science",
-            "History and Civics",
-            "History",
-            "Geography",
-            "Social Science",
-            "Play, Do, Learn",
-            "Health & Physical Education",
-            "Physical Education",
-            "Work Experience",
-            "Art",
-            "Information & Comm. Technology (ICT)",
-            "Water Security & Environment Studies"
-        );
-        
-        subjects.sort((s1, s2) -> {
-            int i1 = order.indexOf(s1.name);
-            int i2 = order.indexOf(s2.name);
-            if (i1 == -1) i1 = 999;
-            if (i2 == -1) i2 = 999;
-            return Integer.compare(i1, i2);
+        if (subjects == null || subjects.size() <= 1) return;
+        java.util.Collections.sort(subjects, new java.util.Comparator<Subject>() {
+            @Override
+            public int compare(Subject s1, Subject s2) {
+                String c1 = s1.subjectCode != null ? s1.subjectCode.trim() : "";
+                String c2 = s2.subjectCode != null ? s2.subjectCode.trim() : "";
+                
+                // If both are empty, keep original order
+                if (c1.isEmpty() && c2.isEmpty()) return 0;
+                // Empty goes last
+                if (c1.isEmpty()) return 1;
+                if (c2.isEmpty()) return -1;
+                
+                try {
+                    // Try parsing as integer/long for correct numerical sorting (e.g. 2 before 10)
+                    long n1 = Long.parseLong(c1.replaceAll("[^0-9]", ""));
+                    long n2 = Long.parseLong(c2.replaceAll("[^0-9]", ""));
+                    return Long.compare(n1, n2);
+                } catch (Exception e) {
+                    // Fallback to string comparison if not purely numeric
+                    return c1.compareTo(c2);
+                }
+            }
         });
     }
+
 
     private static boolean isPhysicalEd(String sc) {
         return sc.contains("physical education") || sc.contains("शारीरिक") || sc.contains("शा.शि.") 
