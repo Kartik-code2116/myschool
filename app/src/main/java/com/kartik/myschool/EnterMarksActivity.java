@@ -439,7 +439,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         // ── Header chip (always visible, even when collapsed) ──────────────────
         row.tvSubjectTotal.setText(getString(R.string.label_marks_total) + grandTotal + "/" + maxMarks);
         row.tvSubjectGrade.setText(
-                getString(R.string.label_marks_grade) + GradeCalculator.getMyschoolGrade(grandTotal, maxMarks));
+                getString(R.string.label_marks_grade) + GradeCalculator.getEduReportGrade(grandTotal, maxMarks));
     }
 
     // ── Grand total footer card ────────────────────────────────────────────────
@@ -464,7 +464,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         b.tvTotalMax.setText(String.valueOf(maxTotal));
         b.tvTotalObtained.setText(formatMark(total));
         b.tvPercentage.setText(String.format("%.2f%%", pct));
-        b.tvGrade.setText(getString(R.string.label_marks_grade) + GradeCalculator.getMyschoolGrade(total, maxTotal));
+        b.tvGrade.setText(getString(R.string.label_marks_grade) + GradeCalculator.getEduReportGrade(total, maxTotal));
         String result = GradeCalculator.getResult(pct);
         b.tvResult.setText(result);
         b.tvResult.setBackgroundResource("PASS".equals(result)
@@ -597,7 +597,7 @@ public class EnterMarksActivity extends AppCompatActivity {
 
             d.grandTotal = d.akarikTotal + d.sanklit;
             d.maxMarks = sub.maxMarks;
-            d.grade = GradeCalculator.getMyschoolGrade(d.grandTotal, d.maxMarks);
+            d.grade = GradeCalculator.getEduReportGrade(d.grandTotal, d.maxMarks);
 
             String safeKey = MarksRecord.sanitizeKey(sub.name);
 
@@ -623,7 +623,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         m.totalObtained = total;
         m.totalMax = maxTotal;
         m.percentage = GradeCalculator.getPercentage(total, maxTotal);
-        m.grade = GradeCalculator.getMyschoolGrade(total, maxTotal);
+        m.grade = GradeCalculator.getEduReportGrade(total, maxTotal);
         m.result = GradeCalculator.getResult(m.percentage);
 
         Log.d("SAVE_MARKS", "totalObtained: " + total + " / " + maxTotal

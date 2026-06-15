@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/txt_today_5_12_pm"
-                android:textAppearance="@style/TextAppearance.Myschool.LabelLarge"
+                android:textAppearance="@style/TextAppearance.EduReport.LabelLarge"
                 android:textColor="@color/on_surface" />
 
             <com.google.android.material.chip.Chip
@@ -51,7 +51,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:text="@string/txt_12345_n98765"
-            android:textAppearance="@style/TextAppearance.Myschool.BodyMedium"
+            android:textAppearance="@style/TextAppearance.EduReport.BodyMedium"
             android:textColor="@color/on_surface_variant" />
     </LinearLayout>
 

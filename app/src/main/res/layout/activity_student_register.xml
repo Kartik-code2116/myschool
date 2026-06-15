@@ -37,7 +37,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilStudentName"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:hint="@string/label_student_name"
                     app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
@@ -48,7 +48,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilRollNo"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_roll_no"
                     app:startIconDrawable="@drawable/ic_reports" app:startIconTint="@color/primary">
@@ -59,7 +59,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilDob"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_dob"
                     app:startIconDrawable="@drawable/ic_calendar" app:startIconTint="@color/primary"
@@ -86,7 +86,7 @@
                 </RadioGroup>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilParentName"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_parent_name"
                     app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
@@ -117,7 +117,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveStudent"
-                    style="@style/Widget.Myschool.Button"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="24dp" android:text="@string/btn_save_student"
                     app:backgroundTint="@color/primary"/>

@@ -398,7 +398,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnProcessPromotion"
-                style="@style/Widget.Myschool.Button"
+                style="@style/Widget.EduReport.Button"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:textSize="16sp"

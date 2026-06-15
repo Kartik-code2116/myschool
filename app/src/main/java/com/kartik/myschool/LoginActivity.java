@@ -42,6 +42,11 @@ public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
 
     @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(com.kartik.myschool.MySchoolApplication.wrapContext(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         b = ActivityLoginBinding.inflate(getLayoutInflater());

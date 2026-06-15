@@ -1,18 +1,18 @@
-# MySchool (माझी शाळा)
+# Edu Report (माझी शाळा)
 
-MySchool is a premium, comprehensive Android application tailored for educators to manage student records, track attendance, perform academic grading, input descriptive remarks, and instantly generate official CCE-compliant report card PDFs. The app features localized support in both **English and Marathi**, seamless Firebase cloud synchronization, and offline-first performance caching.
+Edu Report is a premium, comprehensive Android application tailored for educators to manage student records, track attendance, perform academic grading, input descriptive remarks, and instantly generate official CCE-compliant report card PDFs. The app features localized support in both **English and Marathi**, seamless Firebase cloud synchronization, and offline-first performance caching.
 
 ---
 
 ## 📖 App Descriptions
 
 ### Short Description
-*MySchool is a bilingual (English & Marathi) Android app designed for teachers to efficiently manage class records, take attendance, perform CCE-compliant grading, and generate printable student progress report PDFs with offline-first caching and OCR scanning support.*
+*Edu Report is a bilingual (English & Marathi) Android app designed for teachers to efficiently manage class records, take attendance, perform CCE-compliant grading, and generate printable student progress report PDFs with offline-first caching and OCR scanning support.*
 
 ### Long Description
-*MySchool serves as an all-in-one digital assistant for primary and secondary school educators, specifically aligned with the Continuous and Comprehensive Evaluation (CCE) pattern of grading. Built to eliminate the burden of manual ledger calculations, the app automates class management by keeping track of student rosters, daily attendance metrics, and formative/summative marks.*
+*Edu Report serves as an all-in-one digital assistant for primary and secondary school educators, specifically aligned with the Continuous and Comprehensive Evaluation (CCE) pattern of grading. Built to eliminate the burden of manual ledger calculations, the app automates class management by keeping track of student rosters, daily attendance metrics, and formative/summative marks.*
 
-*Teachers can record grading marks across specific academic categories (like Oral, Practical, Project, and Written) and let the built-in grading engine automatically compute percentage ratios and standard alphabetical grades (A-1, A-2, B-1, etc.). In addition to numeric grades, the app provides a structured interface for recording descriptive remarks (strengths, interests, and areas of improvement) to provide holistic student feedback. All reports are compiled locally into print-ready, bilingual PDFs using a custom layout manager. To support varying network conditions in remote areas, MySchool operates on a dual-layer caching strategy that stores records locally for instant zero-latency loads and synchronizes changes to a Firestore database in the background when connectivity is available.*
+*Teachers can record grading marks across specific academic categories (like Oral, Practical, Project, and Written) and let the built-in grading engine automatically compute percentage ratios and standard alphabetical grades (A-1, A-2, B-1, etc.). In addition to numeric grades, the app provides a structured interface for recording descriptive remarks (strengths, interests, and areas of improvement) to provide holistic student feedback. All reports are compiled locally into print-ready, bilingual PDFs using a custom layout manager. To support varying network conditions in remote areas, Edu Report operates on a dual-layer caching strategy that stores records locally for instant zero-latency loads and synchronizes changes to a Firestore database in the background when connectivity is available.*
 
 ---
 
@@ -26,7 +26,7 @@ MySchool is a premium, comprehensive Android application tailored for educators 
 
 ## 📊 App Pages & Components Directory
 
-MySchool comprises a total of **36 distinct screens and overlay panels** (14 Activities, 14 Fragments, and 8 Dialog/Bottom Sheets). Below is the complete page directory:
+Edu Report comprises a total of **36 distinct screens and overlay panels** (14 Activities, 14 Fragments, and 8 Dialog/Bottom Sheets). Below is the complete page directory:
 
 ### 📱 1. Core Activities (14 Screens)
 | Screen Name | Description |

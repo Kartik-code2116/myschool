@@ -470,11 +470,19 @@ public class StudentListFragment extends Fragment {
         }
 
         if (b.tvCustomSubtitle != null) {
-            b.tvCustomSubtitle.setText("• Class: " + classVal + " • Div: " + divVal + " •");
+            if (SessionContext.selectedClass == null) {
+                b.tvCustomSubtitle.setText("• वर्ग निवडलेला नाही •");
+            } else {
+                b.tvCustomSubtitle.setText("• इयत्ता: " + classVal + " • तुकडी: " + divVal + " •");
+            }
         }
 
         if (b.tvHeaderSessionInfo != null) {
-            b.tvHeaderSessionInfo.setText("Year: " + yearLabel + " Class: " + classVal + ", Div: " + divVal);
+            if (SessionContext.selectedClass == null) {
+                b.tvHeaderSessionInfo.setText("वर्ष: " + yearLabel + " | वर्ग निवडलेला नाही");
+            } else {
+                b.tvHeaderSessionInfo.setText("वर्ष: " + yearLabel + " | इयत्ता: " + classVal + ", तुकडी: " + divVal);
+            }
         }
 
         if (SessionContext.selectedClass != null) {
@@ -540,11 +548,10 @@ public class StudentListFragment extends Fragment {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append(
-                    "ID,Student Name,Standard,Division,Roll No 1,Roll No 2,Gender,Caste,Registration No,Date of Birth,Mother's Name,Mother's Occupation,Mother's Phone,Father's Name,Father's Occupation,Father's Phone,Address,Account No,Branch,IFSC,Bank UID,Medium,Mother Tongue,Date of Admission,Student Id,UID\n");
+                    "Student Name,Standard,Division,Roll No 1,Roll No 2,Gender,Caste,Registration No,Date of Birth,Birth Place,Religion,Blood Group,Mother's Name,Mother's Occupation,Mother's Phone,Father's Name,Father's Occupation,Father's Phone,Address,Bank Name,Account No,Branch,IFSC,Bank UID,Medium,Mother Tongue,Date of Admission,Student Id,UID,Height Sem 1,Weight Sem 1,Height Sem 2,Weight Sem 2\n");
 
             for (Student s : filteredStudents) {
-                sb.append(escapeCsv(s.id != null ? s.id : "")).append(",")
-                        .append(escapeCsv(s.name != null ? s.name : "")).append(",")
+                sb.append(escapeCsv(s.name != null ? s.name : "")).append(",")
                         .append(escapeCsv(s.standard != null ? s.standard : "")).append(",")
                         .append(escapeCsv(s.division != null ? s.division : "")).append(",")
                         .append(escapeCsv(s.rollNo != null ? s.rollNo : "")).append(",")
@@ -553,6 +560,9 @@ public class StudentListFragment extends Fragment {
                         .append(escapeCsv(s.cast != null ? s.cast : "")).append(",")
                         .append(escapeCsv(s.registrationNo != null ? s.registrationNo : "")).append(",")
                         .append(escapeCsv(s.dob != null ? s.dob : "")).append(",")
+                        .append(escapeCsv(s.birthPlace != null ? s.birthPlace : "")).append(",")
+                        .append(escapeCsv(s.religion != null ? s.religion : "")).append(",")
+                        .append(escapeCsv(s.bloodGroup != null ? s.bloodGroup : "")).append(",")
                         .append(escapeCsv(s.motherName != null ? s.motherName : "")).append(",")
                         .append(escapeCsv(s.motherOccupation != null ? s.motherOccupation : "")).append(",")
                         .append(escapeCsv(s.motherPhone != null ? s.motherPhone : "")).append(",")
@@ -560,6 +570,7 @@ public class StudentListFragment extends Fragment {
                         .append(escapeCsv(s.fatherOccupation != null ? s.fatherOccupation : "")).append(",")
                         .append(escapeCsv(s.fatherPhone != null ? s.fatherPhone : "")).append(",")
                         .append(escapeCsv(s.address != null ? s.address : "")).append(",")
+                        .append(escapeCsv(s.bankName != null ? s.bankName : "")).append(",")
                         .append(escapeCsv(s.bankAccount != null ? s.bankAccount : "")).append(",")
                         .append(escapeCsv(s.bankBranch != null ? s.bankBranch : "")).append(",")
                         .append(escapeCsv(s.bankIfsc != null ? s.bankIfsc : "")).append(",")
@@ -568,7 +579,11 @@ public class StudentListFragment extends Fragment {
                         .append(escapeCsv(s.motherTongue != null ? s.motherTongue : "")).append(",")
                         .append(escapeCsv(s.dateOfAdmission != null ? s.dateOfAdmission : "")).append(",")
                         .append(escapeCsv(s.studentIdNumber != null ? s.studentIdNumber : "")).append(",")
-                        .append(escapeCsv(s.uid != null ? s.uid : "")).append("\n");
+                        .append(escapeCsv(s.uid != null ? s.uid : "")).append(",")
+                        .append(escapeCsv(s.heightSem1 != null ? s.heightSem1 : "")).append(",")
+                        .append(escapeCsv(s.weightSem1 != null ? s.weightSem1 : "")).append(",")
+                        .append(escapeCsv(s.heightSem2 != null ? s.heightSem2 : "")).append(",")
+                        .append(escapeCsv(s.weightSem2 != null ? s.weightSem2 : "")).append("\n");
             }
 
             File cachePath = new File(requireContext().getCacheDir(), "excel_exports");
@@ -675,7 +690,12 @@ public class StudentListFragment extends Fragment {
                 String[] cells = cellsList.toArray(new String[0]);
                 Student s = new Student();
 
-                s.id = getCell(cells, new String[] { "id", "ID" }, headerMap, "");
+                String parsedId = getCell(cells, new String[] { "id", "ID" }, headerMap, "");
+                parsedId = parsedId.trim();
+                
+                // ALWAYS generate a new Firebase ID to prevent cross-account Permission Denied errors
+                s.id = null; 
+                
                 s.name = getCell(cells, new String[] { "name", "student name", "student full name", "full name", "नाव",
                         "विद्यार्थ्याचे पूर्ण नाव", "studentname", "fullname" }, headerMap, "");
                 s.standard = getCell(cells, new String[] { "std", "standard", "मानक", "वर्ग", "class", "std/class" },
@@ -719,6 +739,7 @@ public class StudentListFragment extends Fragment {
                 s.fatherPhone = getCell(cells, new String[] { "fatherphone", "fphone", "father's phone", "father phone",
                         "वडिलांचा फोन", "fphone", "phone" }, headerMap, "");
                 s.address = getCell(cells, new String[] { "address", "home address", "पत्ता" }, headerMap, "");
+                s.bankName = getCell(cells, new String[] { "bankname", "bank name", "बँकेचे नाव", "bank_name" }, headerMap, "");
                 s.bankAccount = getCell(
                         cells, new String[] { "bankaccount", "account", "account no", "account number", "bank account",
                                 "bank account no", "खाते क्र", "खाते क्रमांक", "खाते क्र.", "account_no" },
@@ -736,6 +757,14 @@ public class StudentListFragment extends Fragment {
                         "date of admission", "date_of_admission", "प्रवेशाची तारीख", "प्रवेश तारीख" }, headerMap, "");
                 s.studentIdNumber = getCell(cells, new String[] { "studentidnumber", "studentid", "student id",
                         "student id number", "student_id", "saralid", "saral id", "saral_id", "विद्यार्थी आयडी", "विद्यार्थी आयडी क्र" }, headerMap, "");
+                
+                // If the 'id' column was a custom ID, use it for studentIdNumber
+                if (s.id == null && !parsedId.isEmpty()) {
+                    if (s.studentIdNumber == null || s.studentIdNumber.isEmpty()) {
+                        s.studentIdNumber = parsedId;
+                    }
+                }
+
                 s.uid = getCell(cells, new String[] { "uid", "aadhar", "aadhar no", "aadhar number", "uid",
                         "आधार कार्ड", "आधार नंबर", "आधार क्रमांक" }, headerMap, "");
                 s.birthPlace = getCell(cells, new String[] { "birthplace", "birth place", "जन्मस्थान", "जन्माचे ठिकाण" }, headerMap, "");
@@ -766,6 +795,7 @@ public class StudentListFragment extends Fragment {
 
                     @Override
                     public void onError(Exception e) {
+                        android.util.Log.e("IMPORT_ERROR", "Failed to save student: " + s.name + " - " + e.getMessage(), e);
                         int fVal = failedCount.incrementAndGet();
                         checkImportDone(savedCount.get(), fVal, count, pd);
                     }

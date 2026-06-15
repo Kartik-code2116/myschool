@@ -42,9 +42,16 @@ service cloud.firestore {
         isAdmin() ||
         (collection in ['schools', 'academic_years', 'semesters', 'classes', 'students', 'marks', 'attendance_records'] && request.resource.data.teacherId == request.auth.uid)
       );
-      allow update, delete: if request.auth != null && (
+      allow update: if request.auth != null && (
         isAdmin() ||
-        (collection in ['schools', 'academic_years', 'semesters', 'classes', 'students', 'marks', 'attendance_records'] && resource.data.teacherId == request.auth.uid)
+        (collection in ['schools', 'academic_years', 'semesters', 'classes', 'students', 'marks', 'attendance_records'] && 
+          (!('teacherId' in resource.data) || resource.data.teacherId == request.auth.uid) && 
+          request.resource.data.teacherId == request.auth.uid)
+      );
+      allow delete: if request.auth != null && (
+        isAdmin() ||
+        (collection in ['schools', 'academic_years', 'semesters', 'classes', 'students', 'marks', 'attendance_records'] && 
+          (!('teacherId' in resource.data) || resource.data.teacherId == request.auth.uid))
       );
     }
   }

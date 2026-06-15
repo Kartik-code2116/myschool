@@ -12,7 +12,7 @@ public class GradeCalculator {
         return "F";
     }
 
-    public static String getMyschoolGrade(double obtained, double max) {
+    public static String getEduReportGrade(double obtained, double max) {
         if (max <= 0) return "—";
         double pct = (obtained * 100.0) / max;
         if (pct >= 91) return "अ-1";

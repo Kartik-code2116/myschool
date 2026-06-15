@@ -40,7 +40,7 @@
     <color name="gradient_surface_end">#121212</color>
     <color name="scanner_frame">#90CAF9</color>
 
-    <!-- Myschool-style drawer & selectors -->
+    <!-- Edu Report-style drawer & selectors -->
     <color name="drawer_header">#2C2C2E</color>
     <color name="drawer_header_dark">#121212</color>
     <color name="class_card_selected">#3A3F58</color>

@@ -440,25 +440,14 @@ public class DescriptiveEntriesFragment extends Fragment {
         private final int[] lastPosition = new int[] { -1 };
         private final RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
 
+        public DescriptiveAdapter() {
+            viewPool.setMaxRecycledViews(0, 50);
+            viewPool.setMaxRecycledViews(1, 50);
+        }
+
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
-            final List<Student> oldStudents = new ArrayList<>(this.students);
             final List<Student> newStudents = new ArrayList<>(list);
             final Map<String, MarksRecord> newMarks = new HashMap<>(map);
-
-            androidx.recyclerview.widget.DiffUtil.DiffResult result = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
-                @Override
-                public int getOldListSize() { return oldStudents.size(); }
-                @Override
-                public int getNewListSize() { return newStudents.size(); }
-                @Override
-                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    return java.util.Objects.equals(oldStudents.get(oldItemPosition).id, newStudents.get(newItemPosition).id);
-                }
-                @Override
-                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    return false;
-                }
-            });
 
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                 this.students.clear();
@@ -468,7 +457,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                 if (resetAnimation) {
                     lastPosition[0] = -1;
                 }
-                result.dispatchUpdatesTo(this);
+                notifyDataSetChanged();
             });
         }
 
@@ -521,6 +510,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                 super(binding.getRoot());
                 this.binding = binding;
                 binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
+                binding.rvSubjectsHorizontal.setNestedScrollingEnabled(false);
             }
 
             public void bind(Student s, int index) {
@@ -540,10 +530,15 @@ public class DescriptiveEntriesFragment extends Fragment {
                 binding.layoutSubjectsGridContainer.setVisibility(View.GONE);
                 binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);
 
+                RecyclerView.LayoutManager currentLm = binding.rvSubjectsHorizontal.getLayoutManager();
                 if (isGridViewMode) {
-                    binding.rvSubjectsHorizontal.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(itemView.getContext(), 2));
+                    if (!(currentLm instanceof androidx.recyclerview.widget.GridLayoutManager)) {
+                        binding.rvSubjectsHorizontal.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(itemView.getContext(), 2));
+                    }
                 } else {
-                    binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                    if (currentLm instanceof androidx.recyclerview.widget.GridLayoutManager || currentLm == null) {
+                        binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                    }
                 }
 
                 SubjectInnerAdapter innerAdapter = (SubjectInnerAdapter) binding.rvSubjectsHorizontal.getAdapter();
@@ -801,23 +796,17 @@ public class DescriptiveEntriesFragment extends Fragment {
 
                 com.google.android.material.card.MaterialCardView cardRoot = (com.google.android.material.card.MaterialCardView) cardB.getRoot();
                 if (!remarks.isEmpty()) {
-                    cardB.cgRemarkChips.setVisibility(View.VISIBLE);
+                    cardB.tvRemarksList.setVisibility(View.VISIBLE);
                     cardB.layoutEmptyRemark.setVisibility(View.GONE);
-                    cardB.cgRemarkChips.removeAllViews();
                     StringBuilder sb = new StringBuilder();
                     for (int r = 0; r < remarks.size(); r++) {
                         if (r > 0) sb.append("\n");
                         sb.append("• ").append(remarks.get(r));
                     }
-                    TextView tv = new TextView(itemView.getContext());
-                    tv.setText(sb.toString());
-                    tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 10f);
-                    tv.setTextColor(0xFF455A64);
-                    tv.setLineSpacing(0f, 1.15f);
-                    cardB.cgRemarkChips.addView(tv);
+                    cardB.tvRemarksList.setText(sb.toString());
                     cardRoot.setStrokeColor(0xFF81C784);
                 } else {
-                    cardB.cgRemarkChips.setVisibility(View.GONE);
+                    cardB.tvRemarksList.setVisibility(View.GONE);
                     cardB.layoutEmptyRemark.setVisibility(View.VISIBLE);
                     cardRoot.setStrokeColor(0xFFFFB74D);
                 }
@@ -825,13 +814,15 @@ public class DescriptiveEntriesFragment extends Fragment {
                 cardB.getRoot().setOnClickListener(v -> parentHolder.openSubjectRemarkEntry(student, sub, number - 1));
 
                 float density = itemView.getResources().getDisplayMetrics().density;
-                RecyclerView.LayoutParams param;
+                ViewGroup.MarginLayoutParams param = (ViewGroup.MarginLayoutParams) cardB.getRoot().getLayoutParams();
                 if (isGridViewMode) {
-                    param = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+                    param.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    param.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                     int margin = (int) (3 * density);
                     param.setMargins(margin, margin, margin, margin);
                 } else {
-                    param = new RecyclerView.LayoutParams((int) (240 * density), RecyclerView.LayoutParams.WRAP_CONTENT);
+                    param.width = (int) (240 * density);
+                    param.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                     int margin = (int) (4 * density);
                     param.setMargins(margin, margin, margin, margin);
                 }

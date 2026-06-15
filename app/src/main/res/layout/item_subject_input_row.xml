@@ -5,7 +5,7 @@
     android:orientation="horizontal" android:gravity="center_vertical"
     android:layout_marginBottom="10dp">
     <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilSubjectName"
-        style="@style/Widget.Myschool.TextInputLayout"
+        style="@style/Widget.EduReport.TextInputLayout"
         android:layout_width="0dp" android:layout_height="wrap_content"
         android:layout_weight="2" android:layout_marginEnd="8dp"
         android:hint="@string/label_subject_name">
@@ -14,7 +14,7 @@
             android:inputType="textCapWords" android:singleLine="true"/>
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilMaxMarks"
-        style="@style/Widget.Myschool.TextInputLayout"
+        style="@style/Widget.EduReport.TextInputLayout"
         android:layout_width="0dp" android:layout_height="wrap_content"
         android:layout_weight="1" android:layout_marginEnd="8dp"
         android:hint="@string/label_max_marks">

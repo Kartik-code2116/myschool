@@ -6,7 +6,7 @@ import com.kartik.myschool.model.School;
 import com.kartik.myschool.model.Semester;
 
 /**
- * Global session for Year → Semester → Class selection (Myschool-style workflow).
+ * Global session for Year → Semester → Class selection (Edu Report-style workflow).
  */
 public final class SessionContext {
 
@@ -31,10 +31,10 @@ public final class SessionContext {
     }
 
     public static synchronized String getClassDivLabel() {
-        if (selectedClass == null) return "Class: 1, Div: -";
+        if (selectedClass == null) return "वर्ग निवडलेला नाही";
         String div = selectedClass.division != null && !selectedClass.division.isEmpty()
                 ? selectedClass.division : "-";
-        return "Class: " + selectedClass.className + ", Div: " + div;
+        return "इयत्ता: " + selectedClass.className + ", तुकडी: " + div;
     }
 
     public static synchronized void syncFromAppCache() {

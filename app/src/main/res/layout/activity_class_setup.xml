@@ -41,7 +41,7 @@
 
                 <!-- Exam name -->
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilExamName"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_exam_name"
                     android:visibility="gone"
@@ -53,7 +53,7 @@
 
                 <!-- Academic year -->
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilYear"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_academic_year"
                     android:visibility="gone"
@@ -85,7 +85,7 @@
                     android:visibility="gone"/>
 
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveClass"
-                    style="@style/Widget.Myschool.Button"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="24dp" android:text="@string/btn_save_class"
                     app:backgroundTint="@color/primary"/>

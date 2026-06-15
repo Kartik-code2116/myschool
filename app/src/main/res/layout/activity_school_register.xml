@@ -37,7 +37,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilSchoolName"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:hint="@string/label_school_name"
                     app:startIconDrawable="@drawable/ic_school" app:startIconTint="@color/primary">
@@ -48,7 +48,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilUdise"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_udise_code"
                     app:startIconDrawable="@drawable/ic_reports" app:startIconTint="@color/primary">
@@ -69,7 +69,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilAddress"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_address"
                     app:startIconDrawable="@drawable/ic_home" app:startIconTint="@color/primary">
@@ -80,7 +80,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilPrincipal"
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="14dp" android:hint="@string/label_principal_name"
                     app:startIconDrawable="@drawable/ic_person" app:startIconTint="@color/primary">
@@ -91,7 +91,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveSchool"
-                    style="@style/Widget.Myschool.Button"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="24dp" android:text="@string/btn_save_school"
                     app:backgroundTint="@color/primary"/>

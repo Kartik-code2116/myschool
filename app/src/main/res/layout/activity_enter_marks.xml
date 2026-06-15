@@ -147,7 +147,7 @@
 
             <!-- Save button -->
             <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveMarks"
-                style="@style/Widget.Myschool.Button"
+                style="@style/Widget.EduReport.Button"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="20dp" android:text="@string/btn_save_marks"
                 app:backgroundTint="@color/primary"/>

@@ -78,7 +78,7 @@
             <!-- Main Total Marks Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilMaxMarks"
-                style="@style/Widget.Myschool.TextInputLayout"
+                style="@style/Widget.EduReport.TextInputLayout"
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/str_empty_43"
@@ -145,7 +145,7 @@
                 android:layout_marginBottom="8dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -160,7 +160,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -183,7 +183,7 @@
                 android:layout_marginBottom="8dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -198,7 +198,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -221,7 +221,7 @@
                 android:layout_marginBottom="8dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -236,7 +236,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -259,7 +259,7 @@
                 android:layout_marginBottom="16dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -274,7 +274,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Myschool.TextInputLayout"
+                    style="@style/Widget.EduReport.TextInputLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -313,7 +313,7 @@
                     android:layout_marginBottom="8dp">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Myschool.TextInputLayout"
+                        style="@style/Widget.EduReport.TextInputLayout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -328,7 +328,7 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Myschool.TextInputLayout"
+                        style="@style/Widget.EduReport.TextInputLayout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -350,7 +350,7 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Myschool.TextInputLayout"
+                        style="@style/Widget.EduReport.TextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/str_empty_54">

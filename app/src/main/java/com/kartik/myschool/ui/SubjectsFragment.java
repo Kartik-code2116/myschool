@@ -375,26 +375,53 @@ public class SubjectsFragment extends Fragment {
         String p4 = String.format(java.util.Locale.US, "1%02d4", std); // State Board e.g. "1014"
 
         List<SubjectAdapter.SubjectItem> list = new ArrayList<>();
-        // ── Academic subjects ──────────────────────────────────────────────────
-        list.add(createItem("Marathi",            p1 + "01", "01", "Academic",    100, "#2196F3"));
-        list.add(createItem("Hindi",              p1 + "02", "02", "Academic",    100, "#2196F3"));
-        list.add(createItem("English",            p1 + "03", "03", "Academic",    100, "#2196F3"));
-        list.add(createItem("Sanskrit",           p1 + "04", "04", "Academic",    100, "#2196F3"));
-        list.add(createItem("Mathematics",        p1 + "05", "05", "Academic",    100, "#2196F3"));
-        list.add(createItem("Science",            p1 + "06", "06", "Academic",    100, "#2196F3"));
-        list.add(createItem("History",            p1 + "07", "07", "Academic",    100, "#2196F3"));
-        list.add(createItem("Geography",          p1 + "08", "08", "Academic",    100, "#2196F3"));
-        list.add(createItem("Social Science",     p1 + "09", "09", "Academic",    100, "#2196F3"));
-        // ── Activity subjects ──────────────────────────────────────────────────
-        list.add(createItem("Drawing",            p2 + "01", "09", "Activities",  100, "#4CAF50"));
-        list.add(createItem("Work Experience",    p2 + "02", "10", "Activities",  100, "#4CAF50"));
-        list.add(createItem("Physical Education", p2 + "03", "11", "Activities",  100, "#4CAF50"));
-        // ── Personality development ────────────────────────────────────────────
-        list.add(createItem("Special Development",p3 + "01", "12", "Personality", 100, "#009688"));
-        list.add(createItem("Personality Development",p3 + "02", "13", "Personality", 100, "#009688"));
-        // ── State Board Additions ──────────────────────────────────────────────
-        list.add(createItem("Information & Comm. Technology (ICT)", p4 + "01", "14", "State Board", 100, "#FF9800"));
-        list.add(createItem("Water Security & Environment Studies", p4 + "02", "15", "State Board", 100, "#FF9800"));
+        int academicIdx = 1;
+        int activityIdx = 1;
+        int totalIdx = 1;
+
+        // 1. First Language (Marathi)
+        list.add(createItem("Marathi", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        
+        // 2. Second Language (English)
+        list.add(createItem("English", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+
+        if (std >= 5) {
+            // 3. Third Language (Hindi)
+            list.add(createItem("Hindi", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+        }
+
+        // 4. Mathematics
+        list.add(createItem("Mathematics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+
+        if (std == 1 || std == 2) {
+            list.add(createItem("Play, Do, Learn", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        } else if (std == 3 || std == 4) {
+            list.add(createItem("Environmental Studies", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Play, Do, Learn", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        } else if (std == 5) {
+            list.add(createItem("Environmental Studies Part 1", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Environmental Studies Part 2", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        } else if (std >= 6 && std <= 8) {
+            list.add(createItem("Science", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("History and Civics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Geography", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+        } else {
+            list.add(createItem("Science", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("History and Civics", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Geography", String.format(java.util.Locale.US, "%s%02d", p1, academicIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Academic", 100, "#2196F3"));
+            list.add(createItem("Health & Physical Education", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Work Experience", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Art", String.format(java.util.Locale.US, "%s%02d", p2, activityIdx++), String.format(java.util.Locale.US, "%02d", totalIdx++), "Activities", 100, "#4CAF50"));
+            list.add(createItem("Information & Comm. Technology (ICT)", String.format(java.util.Locale.US, "%s%02d", p4, 1), String.format(java.util.Locale.US, "%02d", totalIdx++), "State Board", 100, "#FF9800"));
+            list.add(createItem("Water Security & Environment Studies", String.format(java.util.Locale.US, "%s%02d", p4, 2), String.format(java.util.Locale.US, "%02d", totalIdx++), "State Board", 100, "#FF9800"));
+        }
+        
         return list;
     }
 }

@@ -226,7 +226,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSaveRemark"
-                    style="@style/Widget.Myschool.Button"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="44dp"
                     android:minHeight="44dp"

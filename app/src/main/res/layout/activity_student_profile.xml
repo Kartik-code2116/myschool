@@ -564,7 +564,7 @@
                 <!-- CTA Action Buttons -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEditStudent"
-                    style="@style/Widget.Myschool.Button"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
@@ -580,7 +580,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSpecialCard"
-                    style="@style/Widget.Myschool.Button"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"

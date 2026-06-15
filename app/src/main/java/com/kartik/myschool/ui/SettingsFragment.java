@@ -87,7 +87,7 @@ public class SettingsFragment extends Fragment {
         });
 
         // 1. Initial State UI Restoration
-        int themeMode = settingsPrefs.getInt("theme_mode", 0);
+        int themeMode = settingsPrefs.getInt("theme_mode", 1);
         String lang = settingsPrefs.getString("language", "mr");
         updateThemeUi(themeMode);
         updateLanguageUi(lang);
@@ -152,7 +152,7 @@ public class SettingsFragment extends Fragment {
 
     private void selectLanguage(String lang) {
         String currentLang = settingsPrefs.getString("language", "mr");
-        if (currentLang.equals(lang)) return;
+        // Removed early return to allow forcing the locale update if system is out of sync
 
         settingsPrefs.edit().putString("language", lang).apply();
         com.kartik.myschool.utils.pdf.PdfLocalizer.clearCache();

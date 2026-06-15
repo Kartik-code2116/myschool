@@ -433,25 +433,14 @@ public class FormativeSummativeFragment extends Fragment {
         private final int[] lastPosition = new int[] { -1 };
         private final RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
 
+        public EvaluationAdapter() {
+            viewPool.setMaxRecycledViews(0, 50);
+            viewPool.setMaxRecycledViews(1, 50);
+        }
+
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
-            final List<Student> oldStudents = new ArrayList<>(this.students);
             final List<Student> newStudents = new ArrayList<>(list);
             final Map<String, MarksRecord> newMarks = new HashMap<>(map);
-
-            androidx.recyclerview.widget.DiffUtil.DiffResult result = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
-                @Override
-                public int getOldListSize() { return oldStudents.size(); }
-                @Override
-                public int getNewListSize() { return newStudents.size(); }
-                @Override
-                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    return java.util.Objects.equals(oldStudents.get(oldItemPosition).id, newStudents.get(newItemPosition).id);
-                }
-                @Override
-                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    return false;
-                }
-            });
 
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                 this.students.clear();
@@ -461,7 +450,7 @@ public class FormativeSummativeFragment extends Fragment {
                 if (resetAnimation) {
                     lastPosition[0] = -1;
                 }
-                result.dispatchUpdatesTo(this);
+                notifyDataSetChanged();
             });
         }
 
@@ -514,6 +503,8 @@ public class FormativeSummativeFragment extends Fragment {
                 this.binding = binding;
                 binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
                 binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
+                binding.rvSubjectsHorizontal.setHasFixedSize(true);
+                binding.rvSubjectsHorizontal.setNestedScrollingEnabled(false);
             }
 
             public void bind(Student s, int index) {

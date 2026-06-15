@@ -42,11 +42,13 @@
             android:background="#F0EAF9"
             android:layout_marginBottom="4dp" />
 
-        <LinearLayout
-            android:id="@+id/cgRemarkChips"
+        <TextView
+            android:id="@+id/tvRemarksList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:textSize="10sp"
+            android:textColor="#455A64"
+            android:lineSpacingMultiplier="1.15"
             android:visibility="gone"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="0dp" />

@@ -84,7 +84,7 @@
         android:elevation="8dp"
         android:padding="16dp">
         <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveRemarks"
-            style="@style/Widget.Myschool.Button"
+            style="@style/Widget.EduReport.Button"
             android:layout_width="match_parent" android:layout_height="54dp"
             android:text="@string/txt_save_remarks"
             app:backgroundTint="@color/primary"

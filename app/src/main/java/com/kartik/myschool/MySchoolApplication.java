@@ -30,13 +30,21 @@ public class MySchoolApplication extends Application {
 
         // 2. Load and apply persistent app theme
         android.content.SharedPreferences settingsPrefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
-        int themeMode = settingsPrefs.getInt("theme_mode", 0); // 0 = System, 1 = Light, 2 = Dark
+        int themeMode = settingsPrefs.getInt("theme_mode", 1); // 0 = System, 1 = Light, 2 = Dark
         applyTheme(themeMode);
 
         // 3. Load and apply persistent locale language
         String lang = settingsPrefs.getString("language", "mr"); // default Marathi
+        
+        // Force locale immediately for the application context
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = getResources().getConfiguration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        
         androidx.core.os.LocaleListCompat currentLocales = AppCompatDelegate.getApplicationLocales();
-        if (currentLocales.isEmpty()) {
+        if (currentLocales.isEmpty() || !currentLocales.toLanguageTags().equals(lang)) {
             AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(lang));
         }
     }
@@ -49,5 +57,15 @@ public class MySchoolApplication extends Application {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
+    }
+
+    public static android.content.Context wrapContext(android.content.Context context) {
+        android.content.SharedPreferences prefs = context.getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
+        String lang = prefs.getString("language", "mr");
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration(context.getResources().getConfiguration());
+        config.setLocale(locale);
+        return context.createConfigurationContext(config);
     }
 }

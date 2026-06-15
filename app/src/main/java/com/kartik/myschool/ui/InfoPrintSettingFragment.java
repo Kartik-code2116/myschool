@@ -118,7 +118,8 @@ public class InfoPrintSettingFragment extends Fragment {
         });
         b.btnOnlineHelp.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnOnlineHelp);
-            Toast.makeText(requireContext(), R.string.msg_opening_online_help_portal, Toast.LENGTH_SHORT).show();
+            android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://kartik-28deb.web.app/myschool_overview.mp4"));
+            startActivity(browserIntent);
         });
 
         setupInteractiveSwipeListener(b.cardYear, b.cardYear,

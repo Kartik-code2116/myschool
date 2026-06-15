@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Generates all 4 Myschool CCE report PDFs:
+ * Generates all 4 Edu Report CCE report PDFs:
  * 1. generateGunapattrak — per-student marks sheet (both semesters)
  * 2. generateDescriptive — per-student descriptive remarks
  * 3. generateProgressBook — whole-class landscape table
@@ -1031,7 +1031,7 @@ public class PdfGenerator {
             e.printStackTrace();
         }
 
-        Paragraph p = new Paragraph("MySchool", colored(fTitle, C_DARK));
+        Paragraph p = new Paragraph("Edu Report", colored(fTitle, C_DARK));
         p.setAlignment(Element.ALIGN_CENTER);
         c.addElement(p);
         t.addCell(c);

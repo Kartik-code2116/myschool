@@ -370,7 +370,7 @@ public class SingleSubjectMarksDialog extends DialogFragment {
 
                 d.grandTotal = d.akarikTotal + d.sanklit;
                 d.maxMarks = sub.maxMarks;
-                d.grade = GradeCalculator.getMyschoolGrade(d.grandTotal, d.maxMarks);
+                d.grade = GradeCalculator.getEduReportGrade(d.grandTotal, d.maxMarks);
 
                 // Preserve remark
                 d.remark = "";
@@ -402,7 +402,7 @@ public class SingleSubjectMarksDialog extends DialogFragment {
         m.totalObtained = overallObtained;
         m.totalMax = overallMax;
         m.percentage = GradeCalculator.getPercentage(overallObtained, overallMax);
-        m.grade = GradeCalculator.getMyschoolGrade(overallObtained, overallMax);
+        m.grade = GradeCalculator.getEduReportGrade(overallObtained, overallMax);
         m.result = GradeCalculator.getResult(m.percentage);
 
         showLoading(true);

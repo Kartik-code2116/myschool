@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="default_web_client_id" translatable="false">323006914636-t0v6uav8qrhjvf5du7re90gpae1j8qe5.apps.googleusercontent.com</string>
-    <string name="app_name">मायस्कूल</string>
+    <string name="app_name">वार्षिक मूल्यमापन</string>
     <string name="app_tagline">स्मार्ट परिणाम व्यवस्थापन</string>
     
     <string name="nav_home">घर</string>
@@ -108,9 +108,9 @@
     <string name="lang_bengali">बंगाली</string>
     
     <string name="home_greeting">शुभ दिवस,</string>
-    <string name="home_pick_session">वर्ष, सेमिस्टर आणि वर्ग निवडा</string>
+    <string name="home_pick_session">वर्ष, सत्र आणि वर्ग निवडा</string>
     <string name="label_year_short">शैक्षणिक वर्ष</string>
-    <string name="label_semester_short">सेमिस्टर</string>
+    <string name="label_semester_short">सत्र</string>
     <string name="label_class_short">वर्ग आणि विभागणी</string>
     <string name="btn_open_students">खुले विद्यार्थी</string>
     <string name="home_no_class_hint">अद्याप वर्ग नाही — एक जोडण्यासाठी विद्यार्थी उघडा वर टॅप करा.</string>
@@ -135,7 +135,7 @@
     <string name="logout">लॉगआउट करा</string>
     <string name="save_changes">बदल जतन करा</string>
     
-    <string name="drawer_app_name">मायस्कूल प्रो</string>
+    <string name="drawer_app_name">वार्षिक मूल्यमापन प्रो</string>
     <string name="drawer_stats">आकडेवारी</string>
     <string name="drawer_settings">सेटिंग्ज</string>
     <string name="drawer_print">छापा</string>
@@ -186,7 +186,7 @@
     <string name="subtitle_user_detail">तपशीलवार माहिती</string>
     <string name="user_information">वापरकर्ता माहिती</string>
     <string name="label_name_field">नाव</string>
-    <string name="label_udise_short">रोग</string>
+    <string name="label_udise_short">UDISE कोड</string>
     <string name="label_year_field">वर्ष</string>
     <string name="hint_paste_link">लिंक निकाल इथे पेस्ट करा..</string>
     <string name="your_classes">तुमचे वर्ग</string>
@@ -389,7 +389,7 @@
     <string name="str_empty_10">या वर्गासाठी कोणतेही विषय निवडलेले नाहीत. कृपया प्रथम \'विषय\' मेनूवर जाऊन या वर्गासाठी आवश्यक असलेले विषय निवडा.</string>
     <string name="str_empty_11">विषय निवडा</string>
     <string name="str_empty_12">गुण भारमान जतन करा</string>
-    <string name="txt_class_5_div_1_semester_2">• वर्ग: 5 • विभाग: 1 • सेमिस्टर: 2</string>
+    <string name="txt_class_5_div_1_semester_2">• वर्ग: 5 • विभाग: 1 • सत्र: 2</string>
     <string name="txt_year_2025_26_class_5_div_1_sem">वर्ष: 2025-26 वर्ग: 5, विभाग: 1, सेम: 2</string>
     <string name="txt_select_any_administration_modu">खालील कोणतेही प्रशासन मॉड्यूल निवडा</string>
     <string name="txt_school_information">शाळेची माहिती</string>
@@ -441,8 +441,8 @@
     <string name="txt_maharashtra">महाराष्ट्र</string>
     <string name="txt_save_default_settings">डीफॉल्ट सेटिंग्ज जतन करा</string>
     <string name="txt_working_days_log">कामकाजाचे दिवस लॉग</string>
-    <string name="txt_semester_1_total_working_days">सेमिस्टर 1 एकूण कामकाजाचे दिवस: 110 दिवस</string>
-    <string name="txt_semester_2_total_working_days">सेमिस्टर 2 एकूण कामकाजाचे दिवस: 120 दिवस</string>
+    <string name="txt_semester_1_total_working_days">सत्र 1 एकूण कामकाजाचे दिवस: 110 दिवस</string>
+    <string name="txt_semester_2_total_working_days">सत्र 2 एकूण कामकाजाचे दिवस: 120 दिवस</string>
     <string name="txt_assigned_holidays_45_days">नियुक्त सुट्ट्या: 45 दिवस</string>
     <string name="txt_calculates_average_student_att">सरासरी विद्यार्थी उपस्थिती बेसलाइन निकषांची स्वयंचलितपणे गणना करते.</string>
     <string name="txt_he_she_comment_helper">तो/ती टिप्पणी मदतनीस</string>
@@ -451,14 +451,14 @@
     <string name="txt_comment_descriptors_are_applie">अंतिम अहवाल कार्ड वर्णनात्मक नोंदी निर्मिती दरम्यान टिप्पणी वर्णनकर्ता गतिशीलपणे लागू केले जातात.</string>
     <string name="txt_evaluation">मूल्यमापन</string>
     <string name="str_empty_13">कोणतेही विद्यार्थी आढळले नाही</string>
-    <string name="txt_myschool_1_0">मायस्कूल 1.0</string>
+    <string name="txt_myschool_1_0">वार्षिक मूल्यमापन 1.0</string>
     <string name="txt_kartik_thorat">Kartik Thorat</string>
     <string name="welcome_back_name">स्वागत आहे,\n%1$s</string>
-    <string name="txt_myschool">मायस्कूल</string>
+    <string name="txt_myschool">वार्षिक मूल्यमापन</string>
     <string name="txt_smart_school_management">स्मार्ट शाळा व्यवस्थापन</string>
     <string name="txt_academic_year">शैक्षणिक वर्ष</string>
-    <string name="txt_semester">सेमिस्टर</string>
-    <string name="txt_first_semester">पहिले सेमिस्टर</string>
+    <string name="txt_semester">सत्र</string>
+    <string name="txt_first_semester">पहिले सत्र</string>
     <string name="txt_class_activation">वर्ग सक्रियकरण</string>
     <string name="txt_swipe">← स्वाइप करा →</string>
     <string name="txt_class_1_div_a">वर्ग: 1, विभाग: अ</string>
@@ -474,12 +474,12 @@
     <string name="txt_add_class">वर्ग जोडा</string>
     <string name="txt_year_2026_27">वर्ष: 2026-27</string>
     <string name="txt_app_theme">App Theme / अ‍ॅप थीम</string>
-    <string name="txt_choose_how_myschool_appears_on">तुमच्या डिव्हाइसवर MySchool कसे दिसते ते निवडा</string>
+    <string name="txt_choose_how_myschool_appears_on">तुमच्या डिव्हाइसवर Edu Report कसे दिसते ते निवडा</string>
     <string name="txt_system">प्रणाली</string>
     <string name="txt_light">प्रकाश</string>
     <string name="txt_dark">गडद</string>
     <string name="txt_app_language">App Language / भाषा</string>
-    <string name="txt_choose_your_preferred_language">मायस्कूलसाठी तुमची पसंतीची भाषा निवडा</string>
+    <string name="txt_choose_your_preferred_language">वार्षिक मूल्यमापनसाठी तुमची पसंतीची भाषा निवडा</string>
     <string name="txt_english">इंग्रजी</string>
     <string name="str_empty_14">मराठी</string>
     <string name="txt_student_backup_amp_restore">Full Account Backup &amp; Restore / संपूर्ण डेटा व्यवस्थापन</string>
@@ -490,7 +490,7 @@
     <string name="txt_troubleshoot_or_reset_app_sett">समस्यानिवारण करा किंवा ॲप सेटिंग्ज रीसेट करा</string>
     <string name="txt_reset_session">सत्र रीसेट करा</string>
     <string name="txt_clear_cache">कॅशे साफ करा</string>
-    <string name="txt_myschool_pro">मायस्कूल प्रो</string>
+    <string name="txt_myschool_pro">वार्षिक मूल्यमापन प्रो</string>
     <string name="txt_smart_erp_for_school_results_a">शालेय निकालांसाठी स्मार्ट ईआरपी &amp;amp; अहवाल</string>
     <string name="txt_version_1_0_0_build_2026_05">आवृत्ती 1.0.0 (बिल्ड 2026.05)</string>
     <string name="txt_2026_advanced_agentic_coding_a">© 2026 प्रगत एजंटिक कोडिंग. सर्व हक्क राखीव.</string>
@@ -661,7 +661,7 @@
     <string name="msg_activate_it">ते सक्रिय करा</string>
     <string name="msg_activated">✓ सक्रिय केले</string>
     <string name="msg_how_to_use">कसे वापरावे</string>
-    <string name="msg_select_semester">सेमिस्टर निवडा</string>
+    <string name="msg_select_semester">सत्र निवडा</string>
     <string name="msg_select_class">वर्ग निवडा</string>
     <string name="msg_empty_10">कृपया मुख्यपृष्ठावरून इयत्ता व तुकडी निवडा!</string>
     <string name="msg_empty_11">या वर्गात कोणतेही विद्यार्थी आढळले नाहीत</string>

@@ -19,7 +19,7 @@ public class MarksRecord {
     public String editedBy;
     public long updatedAt;
 
-    // Detailed Myschool grading structure
+    // Detailed Edu Report grading structure
     public Map<String, SubjectMarksDetail> detailedMarks = new HashMap<>();
     public int presentDays;    // हजर दिवस
     public int totalDays;      // एकूण दिवस

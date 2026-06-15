@@ -551,7 +551,7 @@ public class FirebaseRepository {
         if (uid != null) {
             s.teacherId = uid;
         }
-        DocumentReference ref = s.id != null
+        DocumentReference ref = (s.id != null && !s.id.trim().isEmpty())
                 ? db.collection(COL_STUDENTS).document(s.id)
                 : db.collection(COL_STUDENTS).document();
         s.id = ref.getId();

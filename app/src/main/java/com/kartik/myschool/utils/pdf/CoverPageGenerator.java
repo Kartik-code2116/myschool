@@ -179,7 +179,7 @@ public class CoverPageGenerator {
         addSpacer(doc, 10);
 
         // ── 10. Powered-by footer text ────────────────────────────────────────
-        addCentred(doc, "MySchool App — CCE Report",
+        addCentred(doc, "Edu Report App — CCE Report",
                 mkFont(8, Font.ITALIC, new BaseColor(160, 160, 180)), 0, 0);
     }
 

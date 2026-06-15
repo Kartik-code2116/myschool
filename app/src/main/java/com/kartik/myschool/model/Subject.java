@@ -54,7 +54,8 @@ public class Subject {
         String s = subName.toLowerCase();
         return s.contains("art") || s.contains("drawing") || s.contains("कला") 
             || s.contains("work experience") || s.contains("work exp") || s.contains("कार्यानुभव")
-            || s.contains("physical education") || s.contains("p.e.") || s.contains("शारीरिक") || s.contains("craft");
+            || s.contains("physical education") || s.contains("p.e.") || s.contains("शारीरिक") || s.contains("craft") || s.contains("health")
+            || s.contains("play") || s.contains("learn") || s.contains("खेळू");
     }
 
     public static java.util.List<Subject> getDefaultSubjectsForClass(String className) {
@@ -78,67 +79,51 @@ public class Subject {
             return list;
         }
 
-        // 1. Marathi (First Language) - All standards (1-10)
+        // 1. First Language (Marathi) - All standards
         list.add(new Subject("Marathi", 100));
 
-        // 2. Hindi (Second Language) - 5th to 10th
+        // 2. Second Language (English) - All standards
+        list.add(new Subject("English", 100));
+
         if (std >= 5) {
+            // 3. Third Language (Hindi) - 5th to 10th
             list.add(new Subject("Hindi", 100));
         }
 
-        // 3. English (Third Language) - All standards (1-10)
-        list.add(new Subject("English", 100));
-
-        // 4. Sanskrit - 5th to 10th
-        if (std >= 5) {
-            list.add(new Subject("Sanskrit", 100));
-        }
-
-        // 5. Mathematics (Semi-English) - All standards (1-10)
+        // 4. Mathematics - All standards
         list.add(new Subject("Mathematics", 100));
 
-        // 6. Science - All standards (1-10)
-        list.add(new Subject("Science", 100));
-
-        // 7. History - 5th to 10th
-        if (std >= 5) {
-            list.add(new Subject("History", 100));
-        }
-
-        // 8. Geography - 5th to 10th
-        if (std >= 5) {
+        if (std == 1 || std == 2) {
+            // Lower Primary (1-2)
+            list.add(new Subject("Play, Do, Learn", 100));
+        } else if (std == 3 || std == 4) {
+            // Primary (3-4)
+            list.add(new Subject("Environmental Studies", 100));
+            list.add(new Subject("Play, Do, Learn", 100));
+        } else if (std == 5) {
+            // Upper Primary Transition (5)
+            list.add(new Subject("Environmental Studies Part 1", 100));
+            list.add(new Subject("Environmental Studies Part 2", 100));
+            list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("Art", 100));
+        } else if (std >= 6 && std <= 8) {
+            // Middle School (6-8)
+            list.add(new Subject("Science", 100));
+            list.add(new Subject("History and Civics", 100));
             list.add(new Subject("Geography", 100));
-        }
-
-        // 9. Social Science - 5th to 10th
-        if (std >= 5) {
-            list.add(new Subject("Social Science", 100));
-        }
-
-        // 9. Drawing / Art Education - All standards (1-10)
-        list.add(new Subject("Drawing", 100));
-
-        // 10. Work Experience - All standards (1-10)
-        list.add(new Subject("Work Experience", 100));
-
-        // 11. Physical Education / Health - All standards (1-10)
-        list.add(new Subject("Physical Education", 100));
-
-        // 12. Personality Development - All standards (1-10)
-        list.add(new Subject("Personality Development", 100));
-
-        // 13. Special Development (Scout/Guide, etc.) - 5th to 10th
-        if (std >= 5) {
-            list.add(new Subject("Special Development", 100));
-        }
-
-        // 14. Information & Comm. Technology (ICT) - 9th & 10th
-        if (std >= 9) {
+            list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("Art", 100));
+        } else {
+            // High School (9-10)
+            list.add(new Subject("Science", 100));
+            list.add(new Subject("History and Civics", 100));
+            list.add(new Subject("Geography", 100));
+            list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("Art", 100));
             list.add(new Subject("Information & Comm. Technology (ICT)", 100));
-        }
-
-        // 15. Water Security & Environment Studies - 9th & 10th
-        if (std >= 9) {
             list.add(new Subject("Water Security & Environment Studies", 100));
         }
 
@@ -150,19 +135,23 @@ public class Subject {
         
         java.util.List<String> order = java.util.Arrays.asList(
             "Marathi",
-            "Hindi",
             "English",
+            "Hindi",
             "Sanskrit",
             "Mathematics",
+            "Environmental Studies",
+            "Environmental Studies Part 1",
+            "Environmental Studies Part 2",
             "Science",
+            "History and Civics",
             "History",
             "Geography",
             "Social Science",
-            "Drawing",
-            "Work Experience",
+            "Play, Do, Learn",
+            "Health & Physical Education",
             "Physical Education",
-            "Special Development",
-            "Personality Development",
+            "Work Experience",
+            "Art",
             "Information & Comm. Technology (ICT)",
             "Water Security & Environment Studies"
         );
@@ -179,7 +168,7 @@ public class Subject {
     private static boolean isPhysicalEd(String sc) {
         return sc.contains("physical education") || sc.contains("शारीरिक") || sc.contains("शा.शि.") 
             || sc.equals("p.e.") || sc.equals("p.e") || sc.equals("pe")
-            || sc.contains("shirik");
+            || sc.contains("shirik") || sc.contains("health & physical education");
     }
 
     private static boolean isSocialSci(String sc) {
@@ -210,6 +199,7 @@ public class Subject {
         if ((sc1.equals("art") || sc1.equals("drawing") || sc1.equals("कला")) && (sc2.equals("art") || sc2.equals("drawing") || sc2.equals("कला"))) return true;
         if ((sc1.equals("work experience") || sc1.equals("कार्यानुभव")) && (sc2.equals("work experience") || sc2.equals("कार्यानुभव"))) return true;
         if (isPhysicalEd(sc1) && isPhysicalEd(sc2)) return true;
+        if ((sc1.contains("play") || sc1.contains("खेळू")) && (sc2.contains("play") || sc2.contains("खेळू"))) return true;
         if ((sc1.equals("personality development") || sc1.equals("व्यक्तिमत्त्व विकास")) && (sc2.equals("personality development") || sc2.equals("व्यक्तिमत्त्व विकास"))) return true;
         if ((sc1.contains("information & comm") || sc1.contains("ict") || sc1.contains("संप्रेषण")) && (sc2.contains("information & comm") || sc2.contains("ict") || sc2.contains("संप्रेषण"))) return true;
         if ((sc1.contains("water security") || sc1.contains("जलसुरक्षा")) && (sc2.contains("water security") || sc2.contains("जलसुरक्षा"))) return true;

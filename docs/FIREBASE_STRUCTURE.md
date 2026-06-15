@@ -1,4 +1,4 @@
-# MySchool Pro — Firebase Data Structure
+# Edu Report Pro — Firebase Data Structure
 
 Place your `google-services.json` in **`app/google-services.json`** (already configured in Gradle).
 

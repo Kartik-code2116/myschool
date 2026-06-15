@@ -197,7 +197,7 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/tilName"
-                                style="@style/Widget.Myschool.TextInputLayout"
+                                style="@style/Widget.EduReport.TextInputLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/label_name_field">
@@ -212,7 +212,7 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/tilPhone"
-                                style="@style/Widget.Myschool.TextInputLayout"
+                                style="@style/Widget.EduReport.TextInputLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -228,7 +228,7 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/tilUdise"
-                                style="@style/Widget.Myschool.TextInputLayout"
+                                style="@style/Widget.EduReport.TextInputLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -244,7 +244,7 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnSaveProfile"
-                                style="@style/Widget.Myschool.Button"
+                                style="@style/Widget.EduReport.Button"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"

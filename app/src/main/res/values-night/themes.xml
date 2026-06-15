@@ -1,10 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Myschool" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.EduReport" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
     </style>
 
-    <style name="Theme.Myschool" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.EduReport" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/secondary</item>
