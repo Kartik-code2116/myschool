@@ -21,6 +21,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /class_default_subjects/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
     match /subscriptions/{docId} {
       allow read: if request.auth != null && (isAdmin() || resource.data.teacherId == request.auth.uid);
       allow create: if request.auth != null && request.resource.data.teacherId == request.auth.uid;

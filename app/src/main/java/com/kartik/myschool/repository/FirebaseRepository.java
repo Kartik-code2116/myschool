@@ -415,7 +415,7 @@ public class FirebaseRepository {
         });
     }
 
-    private void seedSemesters(String yearId, Runnable done) {
+    public void seedSemesters(String yearId, Runnable done) {
         Semester s1 = new Semester(1, "प्रथम सत्र", "Easy Reports");
         s1.yearId = yearId;
         Semester s2 = new Semester(2, "द्वितीय सत्र", "Final Reports");
@@ -464,6 +464,57 @@ public class FirebaseRepository {
                     });
                     cachedClassesForYearMap.put(yearId, classes);
                     cb.onSuccess(new ArrayList<>(classes));
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    private int parseMapInt(java.util.Map<String, Object> map, String key, int defVal) {
+        if (!map.containsKey(key)) return defVal;
+        Object val = map.get(key);
+        if (val instanceof Number) return ((Number) val).intValue();
+        if (val instanceof String) {
+            try { return Integer.parseInt((String) val); } catch (Exception ignored) {}
+        }
+        return defVal;
+    }
+
+    public void getClassDefaultSubjects(String className, OnResult<List<com.kartik.myschool.model.Subject>> cb) {
+        if (className == null) {
+            cb.onError(new IllegalArgumentException("Class name cannot be null"));
+            return;
+        }
+        db.collection("class_default_subjects").document("Class_" + className).get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && snap.exists()) {
+                        List<com.kartik.myschool.model.Subject> subjects = new ArrayList<>();
+                        List<java.util.Map<String, Object>> subs = (List<java.util.Map<String, Object>>) snap.get("subjects");
+                        if (subs != null) {
+                            for (java.util.Map<String, Object> map : subs) {
+                                String name = map.containsKey("name") ? (String) map.get("name") : "";
+                                int maxMarks = parseMapInt(map, "maxMarks", 100);
+                                com.kartik.myschool.model.Subject s = new com.kartik.myschool.model.Subject(name, maxMarks);
+                                if (map.containsKey("subjectCode")) s.subjectCode = (String) map.get("subjectCode");
+                                
+                                if (map.containsKey("maxNirikhshan")) s.maxNirikhshan = parseMapInt(map, "maxNirikhshan", s.maxNirikhshan);
+                                if (map.containsKey("maxTondiKam")) s.maxTondiKam = parseMapInt(map, "maxTondiKam", s.maxTondiKam);
+                                if (map.containsKey("maxPratyakshik")) s.maxPratyakshik = parseMapInt(map, "maxPratyakshik", s.maxPratyakshik);
+                                if (map.containsKey("maxUpkram")) s.maxUpkram = parseMapInt(map, "maxUpkram", s.maxUpkram);
+                                if (map.containsKey("maxPrakalp")) s.maxPrakalp = parseMapInt(map, "maxPrakalp", s.maxPrakalp);
+                                if (map.containsKey("maxChachani")) s.maxChachani = parseMapInt(map, "maxChachani", s.maxChachani);
+                                if (map.containsKey("maxSwadhyay")) s.maxSwadhyay = parseMapInt(map, "maxSwadhyay", s.maxSwadhyay);
+                                if (map.containsKey("maxItar")) s.maxItar = parseMapInt(map, "maxItar", s.maxItar);
+                                if (map.containsKey("maxTondi")) s.maxTondi = parseMapInt(map, "maxTondi", s.maxTondi);
+                                if (map.containsKey("maxPratyakshikB")) s.maxPratyakshikB = parseMapInt(map, "maxPratyakshikB", s.maxPratyakshikB);
+                                if (map.containsKey("maxLekhi")) s.maxLekhi = parseMapInt(map, "maxLekhi", s.maxLekhi);
+                                
+                                subjects.add(s);
+                            }
+                            com.kartik.myschool.model.Subject.sortSubjects(subjects);
+                            cb.onSuccess(subjects);
+                            return;
+                        }
+                    }
+                    cb.onSuccess(null);
                 })
                 .addOnFailureListener(cb::onError);
     }

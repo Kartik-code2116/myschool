@@ -29,6 +29,7 @@ public class SubjectsFragment extends Fragment {
 
     private FragmentSubjectsBinding b;
     private SubjectAdapter adapter;
+    private boolean showOnlyClassSubjects = false;
 
     @Nullable
     @Override
@@ -202,6 +203,9 @@ public class SubjectsFragment extends Fragment {
         
         List<SubjectAdapter.SubjectItem> finalPredefined = deduplicateItems(predefined);
         sortSubjectItems(finalPredefined);
+        if (showOnlyClassSubjects) {
+            finalPredefined = filterActiveItems(finalPredefined, activeSubjects);
+        }
         adapter.setData(finalPredefined, activeSubjects);
 
         // Fetch global subjects defined by Admin and merge
@@ -233,6 +237,9 @@ public class SubjectsFragment extends Fragment {
                     }
                     List<SubjectAdapter.SubjectItem> finalGlobal = deduplicateItems(currentList);
                     sortSubjectItems(finalGlobal);
+                    if (showOnlyClassSubjects) {
+                        finalGlobal = filterActiveItems(finalGlobal, activeSubjects);
+                    }
                     adapter.setData(finalGlobal, activeSubjects);
                 }
             }
@@ -241,6 +248,19 @@ public class SubjectsFragment extends Fragment {
                 // Ignore, just use predefined
             }
         });
+    }
+
+    private List<SubjectAdapter.SubjectItem> filterActiveItems(List<SubjectAdapter.SubjectItem> list, List<Subject> activeSubjects) {
+        List<SubjectAdapter.SubjectItem> filtered = new ArrayList<>();
+        for (SubjectAdapter.SubjectItem item : list) {
+            for (Subject active : activeSubjects) {
+                if (Subject.isSameSubject(item.name, active.name)) {
+                    filtered.add(item);
+                    break;
+                }
+            }
+        }
+        return filtered;
     }
 
     private List<SubjectAdapter.SubjectItem> deduplicateItems(List<SubjectAdapter.SubjectItem> list) {
@@ -363,18 +383,20 @@ public class SubjectsFragment extends Fragment {
                     v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(activity, "subjects"),
                     v -> {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
-                        popup.getMenu().add("Refresh Subjects");
+                        popup.getMenu().add(showOnlyClassSubjects ? "Show All Subjects" : "Show Only This Class Subjects");
                         popup.getMenu().add("Reset All to Default");
                         popup.setOnMenuItemClickListener(menuItem -> {
-                            if (menuItem.getTitle().toString().equals("Reset All to Default")) {
+                            String title = menuItem.getTitle().toString();
+                            if (title.equals("Show All Subjects") || title.equals("Show Only This Class Subjects")) {
+                                showOnlyClassSubjects = !showOnlyClassSubjects;
+                                loadSubjects();
+                            } else if (title.equals("Reset All to Default")) {
                                 new AlertDialog.Builder(getContext())
                                     .setTitle("Reset Subjects")
                                     .setMessage("Are you sure you want to reset subjects to their defaults for this class standard? This will replace your current selection.")
                                     .setPositiveButton("Reset", (d, w) -> resetSubjectsToDefault(false))
                                     .setNegativeButton("Cancel", null)
                                     .show();
-                            } else {
-                                loadSubjects();
                             }
                             return true;
                         });
@@ -400,14 +422,51 @@ public class SubjectsFragment extends Fragment {
     private void resetSubjectsToDefault(boolean silent) {
         if (SessionContext.selectedClass == null) return;
         ClassModel cls = SessionContext.selectedClass;
+        String className = cls.className != null ? cls.className : "1";
         
+        FirebaseRepository.get().getClassDefaultSubjects(className, new FirebaseRepository.OnResult<List<Subject>>() {
+            @Override
+            public void onSuccess(List<Subject> subjects) {
+                if (subjects != null && !subjects.isEmpty()) {
+                    applyResetAndSave(cls, subjects, silent);
+                } else {
+                    applyHardcodedResetAndSave(cls, className, silent);
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                applyHardcodedResetAndSave(cls, className, silent);
+            }
+        });
+    }
+
+    private void applyResetAndSave(ClassModel cls, List<Subject> subjects, boolean silent) {
+        cls.subjects = new ArrayList<>(subjects);
+        Subject.sortSubjects(cls.subjects);
+        SessionContext.save(getContext());
+        com.kartik.myschool.AppCache.selectedClass = cls;
+        
+        FirebaseRepository.get().saveClass(cls, new FirebaseRepository.OnResult<String>() {
+            @Override
+            public void onSuccess(String result) {
+                if (isAdded()) {
+                    loadSubjects();
+                    if (!silent) Toast.makeText(getContext(), "Subjects reset for Std " + cls.className, Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onError(Exception e) {
+                if (isAdded() && !silent) Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void applyHardcodedResetAndSave(ClassModel cls, String className, boolean silent) {
         int std = 1;
-        if (cls.className != null) {
-            try {
-                String clean = cls.className.replaceAll("[^0-9]", "");
-                if (!clean.isEmpty()) std = Integer.parseInt(clean);
-            } catch (Exception ignored) {}
-        }
+        try {
+            String clean = className.replaceAll("[^0-9]", "");
+            if (!clean.isEmpty()) std = Integer.parseInt(clean);
+        } catch (Exception ignored) {}
         
         List<SubjectAdapter.SubjectItem> predefined = getPredefinedSubjects();
         List<Subject> newSubjects = new ArrayList<>();
@@ -450,25 +509,7 @@ public class SubjectsFragment extends Fragment {
             }
         }
         
-        cls.subjects = newSubjects;
-        Subject.sortSubjects(cls.subjects);
-        SessionContext.save(getContext());
-        com.kartik.myschool.AppCache.selectedClass = cls;
-        
-        final int finalStd = std;
-        FirebaseRepository.get().saveClass(cls, new FirebaseRepository.OnResult<String>() {
-            @Override
-            public void onSuccess(String result) {
-                if (isAdded()) {
-                    loadSubjects();
-                    if (!silent) Toast.makeText(getContext(), "Subjects reset for Std " + finalStd, Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onError(Exception e) {
-                if (isAdded() && !silent) Toast.makeText(getContext(), "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        applyResetAndSave(cls, newSubjects, silent);
     }
 
     private SubjectAdapter.SubjectItem createItem(String name, String code, String serial, String category, int maxMarks, String color) {

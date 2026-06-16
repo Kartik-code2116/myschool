@@ -197,6 +197,12 @@ public class PdfGenerator {
         return new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
     }
 
+    public static void syncClassYear(ClassModel cls) {
+        if (cls != null && com.kartik.myschool.SessionContext.selectedYear != null && com.kartik.myschool.SessionContext.selectedYear.label != null) {
+            cls.academicYearLabel = com.kartik.myschool.SessionContext.selectedYear.label;
+        }
+    }
+
     // ═════════════════════════════════════════════════════════════════════════
     // BULK COMBINED PDF GENERATOR (One file, Multiple Pages)
     // ═════════════════════════════════════════════════════════════════════════
@@ -208,6 +214,7 @@ public class PdfGenerator {
             java.util.Map<String, MarksRecord> sem2Map,
             int reportPosition,
             PdfCallback cb) {
+        syncClassYear(cls);
         new Thread(() -> {
             try {
                 ensureFonts(ctx);
@@ -267,6 +274,7 @@ public class PdfGenerator {
             Map<String, MarksRecord> marksMap,
             boolean isSem2,
             PdfCallback cb) {
+        syncClassYear(cls);
         new Thread(() -> {
             try {
                 ensureFonts(ctx);
@@ -418,6 +426,7 @@ public class PdfGenerator {
             Map<String, MarksRecord> sem1Marks,
             Map<String, MarksRecord> sem2Marks,
             PdfCallback cb) {
+        syncClassYear(cls);
         new Thread(() -> {
             try {
                 ensureFonts(ctx);
@@ -856,6 +865,7 @@ public class PdfGenerator {
             MarksRecord sem1,
             MarksRecord sem2,
             PdfCallback cb) {
+        syncClassYear(cls);
         new Thread(() -> {
             try {
                 ensureFonts(ctx);
@@ -880,6 +890,7 @@ public class PdfGenerator {
     // ═════════════════════════════════════════════════════════════════════════
     public static void generate(Context ctx, School school, ClassModel cls,
             Student student, MarksRecord marks, PdfCallback cb) {
+        syncClassYear(cls);
         new Thread(() -> {
             try {
                 ensureFonts(ctx);

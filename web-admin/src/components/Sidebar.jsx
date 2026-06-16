@@ -40,6 +40,10 @@ export default function Sidebar({ isOpen, onClose }) {
           <span className="nav-icon">📚</span>
           <span>Subjects</span>
         </NavLink>
+        <NavLink to="/admin/weightage" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+          <span className="nav-icon">⚖️</span>
+          <span>Weightage</span>
+        </NavLink>
         <NavLink to="/admin/remarks" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
           <span className="nav-icon">R</span>
           <span>Remarks</span>

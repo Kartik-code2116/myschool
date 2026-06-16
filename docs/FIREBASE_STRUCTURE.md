@@ -100,6 +100,16 @@ Composite indexes may be required if you add `orderBy` on filtered queries. Curr
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /global_subjects/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /class_default_subjects/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
     match /{collection}/{docId} {
       allow read, write: if request.auth != null
         && (resource == null || resource.data.teacherId == request.auth.uid

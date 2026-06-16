@@ -661,6 +661,7 @@
     <string name="msg_activated">✓  Activated</string>
     <string name="msg_how_to_use">How to Use</string>
     <string name="msg_select_semester">Select Semester</string>
+    <string name="msg_select_year">Select Academic Year</string>
     <string name="msg_select_class">Select Class</string>
     <string name="msg_empty_10">कृपया मुख्यपृष्ठावरून इयत्ता व तुकडी निवडा!</string>
     <string name="msg_empty_11">या वर्गात कोणतेही विद्यार्थी आढळले नाहीत</string>

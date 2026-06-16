@@ -123,9 +123,7 @@ public class InfoPrintSettingFragment extends Fragment {
         });
 
         setupInteractiveSwipeListener(b.cardYear, b.cardYear,
-                () -> cycleYear(1), () -> cycleYear(-1), () -> {
-                    UiAnimations.pulse(b.cardYear);
-                });
+                () -> cycleYear(1), () -> cycleYear(-1), this::showYearPickerDialog);
         setupInteractiveSwipeListener(b.cardSemester, b.cardSemester,
                 () -> cycleSemester(1), () -> cycleSemester(-1), this::showSemesterPickerDialog);
         setupInteractiveSwipeListener(b.panelClass, b.panelClass,
@@ -307,22 +305,43 @@ public class InfoPrintSettingFragment extends Fragment {
     }
 
     private void bindYears(List<AcademicYear> list) {
-        if (list == null || list.isEmpty()) {
-            if (years.isEmpty()) {
-                years.add(new AcademicYear("2026-27", 2026, 2027));
-                AppCache.cachedYears = new ArrayList<>(years);
-                if (isViewActive()) { applyYear(0); loadSemesters(); }
-            } else {
-                if (isViewActive()) loadSemesters();
+        if (list == null) list = new ArrayList<>();
+        
+        // Filter out malformed/invalid years (like "2027" without a hyphen)
+        for (int i = list.size() - 1; i >= 0; i--) {
+            String lbl = list.get(i).label;
+            if (lbl == null || !lbl.contains("-")) {
+                list.remove(i);
             }
-            return;
         }
+        
+        int currentCalendarYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+        if (currentCalendarYear < 2024) currentCalendarYear = 2026;
+        
+        for (int i = -1; i <= 3; i++) {
+            int start = currentCalendarYear + i;
+            int end = start + 1;
+            String label = start + "-" + String.valueOf(end).substring(2);
+            boolean found = false;
+            for (AcademicYear y : list) {
+                if (y.label != null && y.label.equals(label)) { found = true; break; }
+            }
+            if (!found) {
+                list.add(new AcademicYear(label, start, end));
+            }
+        }
+        
+        java.util.Collections.sort(list, (a, b) -> Integer.compare(b.startYear, a.startYear));
+
         years.clear();
         years.addAll(list);
         AppCache.cachedYears = new ArrayList<>(years);
+        
         if (SessionContext.selectedYear != null) {
             for (int i = 0; i < years.size(); i++) {
                 if (years.get(i).id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
+                    yearIndex = i; break;
+                } else if (years.get(i).id == null && SessionContext.selectedYear.id == null && years.get(i).label != null && years.get(i).label.equals(SessionContext.selectedYear.label)) {
                     yearIndex = i; break;
                 }
             }
@@ -460,10 +479,33 @@ public class InfoPrintSettingFragment extends Fragment {
         return years.get(yearIndex);
     }
 
+    private void processYearSelection(int index, int animDelta) {
+        if (index < 0 || index >= years.size()) return;
+        yearIndex = index;
+        AcademicYear selected = years.get(index);
+        
+        if (selected.id == null) {
+            FirebaseRepository.get().saveAcademicYear(selected, new FirebaseRepository.OnResult<String>() {
+                @Override public void onSuccess(String newId) {
+                    selected.id = newId;
+                    FirebaseRepository.get().seedSemesters(newId, () -> {
+                        if (isViewActive()) { applyYear(animDelta); loadSemesters(); }
+                    });
+                }
+                @Override public void onError(Exception e) {
+                    if (isViewActive()) { applyYear(animDelta); loadSemesters(); }
+                }
+            });
+        } else {
+            applyYear(animDelta);
+            loadSemesters();
+        }
+    }
+
     private void cycleYear(int d) {
         if (years.isEmpty()) return;
-        yearIndex = (yearIndex + d + years.size()) % years.size();
-        applyYear(d); loadSemesters();
+        int nextIndex = (yearIndex + d + years.size()) % years.size();
+        processYearSelection(nextIndex, d);
     }
 
     private void cycleSemester(int d) {
@@ -1027,6 +1069,17 @@ public class InfoPrintSettingFragment extends Fragment {
     }
 
     // ── Picker dialogs ────────────────────────────────────────────────────────
+    private void showYearPickerDialog() {
+        if (years.isEmpty()) return;
+        String[] names = new String[years.size()];
+        for (int i = 0; i < years.size(); i++) {
+            names[i] = years.get(i).label != null ? years.get(i).label : "—";
+        }
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.msg_select_year)
+                .setItems(names, (d, w) -> processYearSelection(w, 0)).show();
+    }
+
     private void showSemesterPickerDialog() {
         if (semesters.isEmpty()) return;
         String[] names = new String[semesters.size()];

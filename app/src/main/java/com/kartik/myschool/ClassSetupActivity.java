@@ -88,9 +88,6 @@ public class ClassSetupActivity extends AppCompatActivity {
         if (c.subjects == null) {
             c.subjects = new ArrayList<>();
         }
-        if (!isEdit && c.subjects.isEmpty()) {
-            c.subjects.addAll(Subject.getDefaultSubjectsForClass(className));
-        }
         
         c.schoolId  = (AppCache.selectedSchool != null && AppCache.selectedSchool.id != null) ? AppCache.selectedSchool.id : "";
         c.className = className;
@@ -118,7 +115,24 @@ public class ClassSetupActivity extends AppCompatActivity {
                         c.schoolId = school.id;
                         SessionContext.selectedSchool = school;
                         AppCache.selectedSchool = school;
-                        persistClass(c);
+                        if (!isEdit && c.subjects.isEmpty()) {
+                            FirebaseRepository.get().getClassDefaultSubjects(className, new FirebaseRepository.OnResult<List<Subject>>() {
+                                @Override public void onSuccess(List<Subject> subjects) {
+                                    if (subjects != null && !subjects.isEmpty()) {
+                                        c.subjects.addAll(subjects);
+                                    } else {
+                                        c.subjects.addAll(Subject.getDefaultSubjectsForClass(className));
+                                    }
+                                    persistClass(c);
+                                }
+                                @Override public void onError(Exception e) {
+                                    c.subjects.addAll(Subject.getDefaultSubjectsForClass(className));
+                                    persistClass(c);
+                                }
+                            });
+                        } else {
+                            persistClass(c);
+                        }
                     }
                     @Override public void onError(Exception e) {
                         showLoading(false);
