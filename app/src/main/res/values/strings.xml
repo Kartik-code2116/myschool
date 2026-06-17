@@ -31,7 +31,9 @@
     <string name="label_full_name">पूर्ण नाव</string>
     <string name="label_phone">फोन नंबर</string>
     <string name="label_school_name">शाळेचे नाव</string>
+    <string name="label_school_name_optional">शाळेचे नाव (पर्यायी)</string>
     <string name="label_udise_code">UDISE कोड</string>
+    <string name="label_udise_code_optional">युडायस कोड (पर्यायी)</string>
     <string name="label_board">बोर्ड (CBSE/राज्य/ICSE)</string>
     <string name="label_address">शाळेचा पत्ता</string>
     <string name="label_principal_name">मुख्यद्यापक नाव</string>

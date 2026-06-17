@@ -672,6 +672,52 @@ public class StudentListFragment extends Fragment {
                 return;
             }
 
+            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+                @Override
+                public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
+                    if (teacher != null && !"active".equals(teacher.subscriptionStatus)) {
+                        FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
+                            @Override
+                            public void onSuccess(List<Student> students) {
+                                int currentCount = students != null ? students.size() : 0;
+                                if (currentCount + count > 3) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(() -> {
+                                            android.widget.Toast.makeText(requireContext(),
+                                                    "Free account limit exceeded. You can only have up to 3 students. Please subscribe to import more.",
+                                                    android.widget.Toast.LENGTH_LONG).show();
+                                            SubscriptionBottomSheet bottomSheet = new SubscriptionBottomSheet();
+                                            bottomSheet.show(getParentFragmentManager(), "SubscriptionBottomSheet");
+                                        });
+                                    }
+                                } else {
+                                    proceedWithImport(rows, count, headerMap);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                proceedWithImport(rows, count, headerMap);
+                            }
+                        });
+                    } else {
+                        proceedWithImport(rows, count, headerMap);
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    proceedWithImport(rows, count, headerMap);
+                }
+            });
+        } catch (Exception e) {
+            android.widget.Toast.makeText(requireContext(), "Failed to read file: " + e.getMessage(),
+                    android.widget.Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void proceedWithImport(List<List<String>> rows, int count, java.util.Map<String, Integer> headerMap) {
+        try {
             android.app.ProgressDialog pd = new android.app.ProgressDialog(requireContext());
             pd.setTitle(R.string.msg_restoring_students);
             pd.setMessage("Saving student records to Firestore...");
@@ -802,7 +848,7 @@ public class StudentListFragment extends Fragment {
                 });
             }
         } catch (Exception e) {
-            android.widget.Toast.makeText(requireContext(), "Failed to read file: " + e.getMessage(),
+            android.widget.Toast.makeText(requireContext(), "Failed to save student data: " + e.getMessage(),
                     android.widget.Toast.LENGTH_LONG).show();
         }
     }

@@ -128,11 +128,65 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-        android:maxLength="20"
                         android:id="@+id/etPhone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="phone"
+                        android:imeOptions="actionNext"
+                        android:maxLength="20"
+                        android:singleLine="true"
+                        android:textColor="@color/on_surface"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- School Name Input (Optional) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilSchoolName"
+                    style="@style/Widget.EduReport.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:hint="@string/label_school_name_optional"
+                    app:startIconDrawable="@drawable/ic_school"
+                    app:startIconTint="@color/primary"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:errorEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSchoolName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords"
+                        android:imeOptions="actionNext"
+                        android:singleLine="true"
+                        android:textColor="@color/on_surface"
+                        android:textSize="16sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- UDISE Code Input (Optional) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilUdiseCode"
+                    style="@style/Widget.EduReport.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:hint="@string/label_udise_code_optional"
+                    app:startIconDrawable="@drawable/ic_id_card"
+                    app:startIconTint="@color/primary"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:errorEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etUdiseCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
                         android:imeOptions="actionNext"
                         android:singleLine="true"
                         android:textColor="@color/on_surface"

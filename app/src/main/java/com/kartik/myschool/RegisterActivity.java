@@ -43,6 +43,8 @@ public class RegisterActivity extends AppCompatActivity {
         b.tvRegisterSubtitle.setAlpha(0f);
         b.tilFullName.setAlpha(0f);
         b.tilPhone.setAlpha(0f);
+        b.tilSchoolName.setAlpha(0f);
+        b.tilUdiseCode.setAlpha(0f);
         b.tilRegEmail.setAlpha(0f);
         b.tilRegPassword.setAlpha(0f);
         b.tilConfirmPassword.setAlpha(0f);
@@ -55,6 +57,8 @@ public class RegisterActivity extends AppCompatActivity {
                 b.tvRegisterSubtitle,
                 b.tilFullName,
                 b.tilPhone,
+                b.tilSchoolName,
+                b.tilUdiseCode,
                 b.tilRegEmail,
                 b.tilRegPassword,
                 b.tilConfirmPassword,
@@ -112,6 +116,22 @@ public class RegisterActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) {}
         });
 
+        b.etSchoolName.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                b.tilSchoolName.setError(null);
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        b.etUdiseCode.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                b.tilUdiseCode.setError(null);
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
         b.etRegEmail.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -140,6 +160,8 @@ public class RegisterActivity extends AppCompatActivity {
     private void doRegister() {
         String name  = str(b.etFullName);
         String phone = str(b.etPhone);
+        String schoolName = str(b.etSchoolName);
+        String udiseCode = str(b.etUdiseCode);
         String email = str(b.etRegEmail);
         boolean isGoogleSignIn = getIntent().getBooleanExtra("isGoogleSignIn", false);
         String pass  = isGoogleSignIn ? "dummy_pass" : str(b.etRegPassword);
@@ -163,6 +185,16 @@ public class RegisterActivity extends AppCompatActivity {
             valid = false;
         } else if (phone.length() > 20) {
             b.tilPhone.setError("Phone number too long (max 20 characters)");
+            valid = false;
+        }
+
+        if (!TextUtils.isEmpty(schoolName) && schoolName.length() > 200) {
+            b.tilSchoolName.setError("School name too long (max 200 characters)");
+            valid = false;
+        }
+
+        if (!TextUtils.isEmpty(udiseCode) && udiseCode.length() != 11) {
+            b.tilUdiseCode.setError("UDISE code must be exactly 11 digits");
             valid = false;
         }
 
@@ -199,7 +231,7 @@ public class RegisterActivity extends AppCompatActivity {
         showLoading(true);
 
         if (isGoogleSignIn) {
-            saveTeacherProfile(name, email, phone);
+            saveTeacherProfile(name, email, phone, schoolName, udiseCode);
             return;
         }
 
@@ -207,7 +239,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnSuccessListener(result -> {
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "createUserWithEmailAndPassword: SUCCESS uid=" +
                             (result.getUser() != null ? result.getUser().getUid() : "null")); }
-                    saveTeacherProfile(name, email, phone);
+                    saveTeacherProfile(name, email, phone, schoolName, udiseCode);
                 })
                 .addOnFailureListener(e -> {
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("AUTH", "createUserWithEmailAndPassword: FAILED", e); }
@@ -217,12 +249,14 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
-    private void saveTeacherProfile(String name, String email, String phone) {
+    private void saveTeacherProfile(String name, String email, String phone, String schoolName, String udiseCode) {
         SessionContext.clear(RegisterActivity.this);
         Teacher t = new Teacher();
         t.name  = name;
         t.email = email;
         t.phone = phone;
+        t.schoolName = schoolName;
+        t.udiseCode = udiseCode;
         repo.saveTeacher(t, new FirebaseRepository.OnResult<Void>() {
             @Override public void onSuccess(Void v) {
                 if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "saveTeacher: SUCCESS"); }
@@ -241,6 +275,8 @@ public class RegisterActivity extends AppCompatActivity {
     private void clearErrors() {
         b.tilFullName.setError(null);
         b.tilPhone.setError(null);
+        b.tilSchoolName.setError(null);
+        b.tilUdiseCode.setError(null);
         b.tilRegEmail.setError(null);
         b.tilRegPassword.setError(null);
         b.tilConfirmPassword.setError(null);

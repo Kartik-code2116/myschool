@@ -53,14 +53,29 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <com.kartik.myschool.utils.ZoomImageView
-            android:id="@+id/ivPdfPage"
+        <com.kartik.myschool.utils.zoom.ZoomLayout
+            android:id="@+id/zoomLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="6dp"
-            android:background="@drawable/bg_pdf_mock_border"
-            android:contentDescription="PDF Page Preview" />
-            
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivPdfPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_pdf_mock_border"
+                android:contentDescription="PDF Page Preview" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPdfPages"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:visibility="gone" />
+        </com.kartik.myschool.utils.zoom.ZoomLayout>
+
         <TextView
             android:id="@+id/tvPageIndicator"
             android:layout_width="wrap_content"
@@ -74,15 +89,6 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold" />
-            
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPdfPages"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:visibility="gone" />
     </FrameLayout>
 
     <!-- Controls -->

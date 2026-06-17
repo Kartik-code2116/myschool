@@ -31,7 +31,9 @@
     <string name="label_full_name">Full Name</string>
     <string name="label_phone">Phone Number</string>
     <string name="label_school_name">School Name</string>
+    <string name="label_school_name_optional">School Name (Optional)</string>
     <string name="label_udise_code">UDISE Code</string>
+    <string name="label_udise_code_optional">UDISE Code (Optional)</string>
     <string name="label_board">Board (CBSE / State / ICSE)</string>
     <string name="label_address">School Address</string>
     <string name="label_principal_name">Principal Name</string>

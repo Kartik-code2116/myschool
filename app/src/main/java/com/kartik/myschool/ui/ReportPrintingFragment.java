@@ -742,7 +742,7 @@ public class ReportPrintingFragment extends Fragment {
             
             android.widget.ImageButton btnBack = root.findViewById(R.id.btnBack);
             android.widget.ImageButton btnToggleView = root.findViewById(R.id.btnToggleView);
-            com.kartik.myschool.utils.ZoomImageView ivPdfPage = root.findViewById(R.id.ivPdfPage);
+            android.widget.ImageView ivPdfPage = root.findViewById(R.id.ivPdfPage);
             androidx.recyclerview.widget.RecyclerView rvPdfPages = root.findViewById(R.id.rvPdfPages);
             android.widget.TextView tvPageIndicator = root.findViewById(R.id.tvPageIndicator);
             com.google.android.material.button.MaterialButton btnPrev = root.findViewById(R.id.btnPrev);
@@ -757,13 +757,19 @@ public class ReportPrintingFragment extends Fragment {
 
             btnToggleView.setOnClickListener(v -> {
                 isScrollMode[0] = !isScrollMode[0];
+                com.kartik.myschool.utils.zoom.ZoomLayout zoomLayout = root.findViewById(R.id.zoomLayout);
+                if (zoomLayout != null) {
+                    zoomLayout.zoomTo(1.0f, 0f, 0f, false);
+                }
                 if (isScrollMode[0]) {
+                    btnToggleView.setImageResource(R.drawable.ic_document);
                     ivPdfPage.setVisibility(android.view.View.GONE);
                     tvPageIndicator.setVisibility(android.view.View.GONE);
                     btnPrev.setVisibility(android.view.View.GONE);
                     btnNext.setVisibility(android.view.View.GONE);
                     rvPdfPages.setVisibility(android.view.View.VISIBLE);
                 } else {
+                    btnToggleView.setImageResource(R.drawable.ic_list);
                     rvPdfPages.setVisibility(android.view.View.GONE);
                     ivPdfPage.setVisibility(android.view.View.VISIBLE);
                     tvPageIndicator.setVisibility(android.view.View.VISIBLE);
@@ -862,12 +868,20 @@ public class ReportPrintingFragment extends Fragment {
             btnPrev.setOnClickListener(v -> {
                 if (currentPage[0] > 0) {
                     currentPage[0]--;
+                    com.kartik.myschool.utils.zoom.ZoomLayout zoomLayout = root.findViewById(R.id.zoomLayout);
+                    if (zoomLayout != null) {
+                        zoomLayout.zoomTo(1.0f, 0f, 0f, false);
+                    }
                     renderPage.run();
                 }
             });
             btnNext.setOnClickListener(v -> {
                 if (currentPage[0] < totalPages - 1) {
                     currentPage[0]++;
+                    com.kartik.myschool.utils.zoom.ZoomLayout zoomLayout = root.findViewById(R.id.zoomLayout);
+                    if (zoomLayout != null) {
+                        zoomLayout.zoomTo(1.0f, 0f, 0f, false);
+                    }
                     renderPage.run();
                 }
             });

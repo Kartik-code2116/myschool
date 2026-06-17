@@ -194,11 +194,32 @@ public class InfoPrintSettingFragment extends Fragment {
     private void restoreYearsFromCache() {
         if (AppCache.cachedYears != null && !AppCache.cachedYears.isEmpty()) {
             years.clear(); years.addAll(AppCache.cachedYears);
+            boolean found = false;
             if (SessionContext.selectedYear != null) {
                 for (int i = 0; i < years.size(); i++) {
-                    if (years.get(i).id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
-                        yearIndex = i; break;
+                    if (years.get(i).id != null && SessionContext.selectedYear.id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
+                        yearIndex = i; found = true; break;
                     }
+                }
+                if (!found) {
+                    for (int i = 0; i < years.size(); i++) {
+                        if (years.get(i).label != null && SessionContext.selectedYear.label != null && years.get(i).label.equals(SessionContext.selectedYear.label)) {
+                            yearIndex = i; found = true; break;
+                        }
+                    }
+                }
+            }
+            if (!found) {
+                int foundIdx = 0;
+                for (int i = 0; i < years.size(); i++) {
+                    if (years.get(i).label != null && years.get(i).label.equals("2026-27")) {
+                        foundIdx = i; break;
+                    }
+                }
+                yearIndex = foundIdx;
+                if (yearIndex < years.size()) {
+                    SessionContext.selectedYear = years.get(yearIndex);
+                    SessionContext.save(getContext());
                 }
             }
         } else if (SessionContext.selectedYear != null) {
@@ -226,6 +247,10 @@ public class InfoPrintSettingFragment extends Fragment {
                         semesterIndex = i; break;
                     }
                 }
+            } else {
+                semesterIndex = 0;
+                SessionContext.selectedSemester = semesters.get(semesterIndex);
+                SessionContext.save(getContext());
             }
         } else if (SessionContext.selectedSemester != null) {
             if (SessionContext.selectedSemester.name == null || SessionContext.selectedSemester.name.trim().isEmpty()) {
@@ -236,7 +261,7 @@ public class InfoPrintSettingFragment extends Fragment {
         } else {
             seedFallbackSemesters();
             semesterIndex = 0;
-            SessionContext.selectedSemester = semesters.get(0);
+            SessionContext.selectedSemester = semesters.get(semesterIndex);
             SessionContext.save(getContext());
         }
         applySemester(0);
@@ -337,13 +362,33 @@ public class InfoPrintSettingFragment extends Fragment {
         years.addAll(list);
         AppCache.cachedYears = new ArrayList<>(years);
         
+        boolean found = false;
         if (SessionContext.selectedYear != null) {
             for (int i = 0; i < years.size(); i++) {
-                if (years.get(i).id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
-                    yearIndex = i; break;
-                } else if (years.get(i).id == null && SessionContext.selectedYear.id == null && years.get(i).label != null && years.get(i).label.equals(SessionContext.selectedYear.label)) {
-                    yearIndex = i; break;
+                if (years.get(i).id != null && SessionContext.selectedYear.id != null && years.get(i).id.equals(SessionContext.selectedYear.id)) {
+                    yearIndex = i; found = true; break;
                 }
+            }
+            if (!found) {
+                for (int i = 0; i < years.size(); i++) {
+                    if (years.get(i).label != null && SessionContext.selectedYear.label != null && years.get(i).label.equals(SessionContext.selectedYear.label)) {
+                        yearIndex = i; found = true; break;
+                    }
+                }
+            }
+        }
+        
+        if (!found) {
+            int foundIdx = 0;
+            for (int i = 0; i < years.size(); i++) {
+                if (years.get(i).label != null && years.get(i).label.equals("2026-27")) {
+                    foundIdx = i; break;
+                }
+            }
+            yearIndex = foundIdx;
+            if (yearIndex < years.size()) {
+                SessionContext.selectedYear = years.get(yearIndex);
+                SessionContext.save(getContext());
             }
         }
         if (isViewActive()) { applyYear(0); loadSemesters(); }
@@ -352,7 +397,12 @@ public class InfoPrintSettingFragment extends Fragment {
     private void loadSemesters() {
         AcademicYear y = getCurrentYear();
         if (y == null || y.id == null) {
-            if (semesters.isEmpty()) seedFallbackSemesters();
+            if (semesters.isEmpty()) {
+                seedFallbackSemesters();
+                semesterIndex = 0;
+                SessionContext.selectedSemester = semesters.get(semesterIndex);
+                SessionContext.save(getContext());
+            }
             loadClasses(); return;
         }
         FirebaseRepository.get().getSemestersForYear(y.id, new FirebaseRepository.OnResult<List<Semester>>() {
@@ -360,6 +410,9 @@ public class InfoPrintSettingFragment extends Fragment {
                 if (list == null || list.isEmpty()) {
                     if (semesters.isEmpty()) {
                         seedFallbackSemesters();
+                        semesterIndex = 0;
+                        SessionContext.selectedSemester = semesters.get(semesterIndex);
+                        SessionContext.save(getContext());
                         if (isViewActive()) { applySemester(0); loadClasses(); }
                     } else {
                         loadClasses();
@@ -379,6 +432,8 @@ public class InfoPrintSettingFragment extends Fragment {
                     }
                 } else {
                     semesterIndex = 0;
+                    SessionContext.selectedSemester = semesters.get(semesterIndex);
+                    SessionContext.save(getContext());
                 }
                 
                 if (isViewActive()) { applySemester(0); loadClasses(); }
@@ -386,6 +441,9 @@ public class InfoPrintSettingFragment extends Fragment {
             @Override public void onError(Exception e) {
                 if (semesters.isEmpty()) {
                     seedFallbackSemesters();
+                    semesterIndex = 0;
+                    SessionContext.selectedSemester = semesters.get(semesterIndex);
+                    SessionContext.save(getContext());
                     if (isViewActive()) { applySemester(0); loadClasses(); }
                 } else {
                     loadClasses();
@@ -503,19 +561,19 @@ public class InfoPrintSettingFragment extends Fragment {
     }
 
     private void cycleYear(int d) {
-        if (years.isEmpty()) return;
+        if (years.size() <= 1) return;
         int nextIndex = (yearIndex + d + years.size()) % years.size();
         processYearSelection(nextIndex, d);
     }
 
     private void cycleSemester(int d) {
-        if (semesters.isEmpty()) return;
+        if (semesters.size() <= 1) return;
         semesterIndex = (semesterIndex + d + semesters.size()) % semesters.size();
         applySemester(d);
     }
 
     private void cycleClass(int d) {
-        if (classes.isEmpty()) return;
+        if (classes.size() <= 1) return;
         classIndex = (classIndex + d + classes.size()) % classes.size();
         applyClass(d);
     }
@@ -526,6 +584,11 @@ public class InfoPrintSettingFragment extends Fragment {
         SessionContext.save(getContext());
         if (!isViewActive()) return;
         b.tvYearLabel.setText(y.label != null ? y.label : getString(R.string.year_label, "—"));
+        
+        boolean showArrows = years.size() > 1;
+        b.btnYearPrev.setVisibility(showArrows ? View.VISIBLE : View.INVISIBLE);
+        b.btnYearNext.setVisibility(showArrows ? View.VISIBLE : View.INVISIBLE);
+        
         if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.tvYearLabel, dir);
     }
 
@@ -545,6 +608,11 @@ public class InfoPrintSettingFragment extends Fragment {
             }
         }
         b.tvSemesterName.setText(semName != null ? semName : "");
+        
+        boolean showArrows = semesters.size() > 1;
+        b.btnSemesterPrev.setVisibility(showArrows ? View.VISIBLE : View.INVISIBLE);
+        b.btnSemesterNext.setVisibility(showArrows ? View.VISIBLE : View.INVISIBLE);
+        
         if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.panelSemester, dir);
     }
 
@@ -567,6 +635,9 @@ public class InfoPrintSettingFragment extends Fragment {
             b.tvClassStatusBadge.setBackground(
                     requireContext().getDrawable(R.drawable.bg_pill_activate));
             b.ivClassArrow.setImageTintList(ColorStateList.valueOf(Color.parseColor("#C5CAE9")));
+            
+            b.btnClassPrev.setVisibility(View.INVISIBLE);
+            b.btnClassNext.setVisibility(View.INVISIBLE);
             return;
         }
         classIndex = Math.max(0, Math.min(classIndex, classes.size() - 1));
@@ -598,6 +669,10 @@ public class InfoPrintSettingFragment extends Fragment {
         b.tvClassStatusBadge.setBackground(
                 requireContext().getDrawable(R.drawable.bg_pill_activated));
         b.ivClassArrow.setImageTintList(ColorStateList.valueOf(Color.parseColor("#66BB6A")));
+
+        boolean showArrows = classes.size() > 1;
+        b.btnClassPrev.setVisibility(showArrows ? View.VISIBLE : View.INVISIBLE);
+        b.btnClassNext.setVisibility(showArrows ? View.VISIBLE : View.INVISIBLE);
 
         if (dir != 0 && !isSwipeOngoing) UiAnimations.animateSelectorChange(b.panelClass, dir);
     }
@@ -1134,6 +1209,16 @@ public class InfoPrintSettingFragment extends Fragment {
                     case android.view.MotionEvent.ACTION_MOVE:
                         float deltaX = event.getRawX() - startX;
                         float deltaY = event.getRawY() - startY;
+
+                        // Check if we have enough items to drag/scroll
+                        boolean canSwipe = true;
+                        if (swipeTarget == b.cardYear && years.size() <= 1) canSwipe = false;
+                        if (swipeTarget == b.cardSemester && semesters.size() <= 1) canSwipe = false;
+                        if (swipeTarget == b.panelClass && classes.size() <= 1) canSwipe = false;
+
+                        if (!canSwipe) {
+                            return true;
+                        }
 
                         // Detect drag start if horizontal movement is prominent
                         if (!isDragging && Math.abs(deltaX) > 10 * density && Math.abs(deltaX) > Math.abs(deltaY)) {

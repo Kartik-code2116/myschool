@@ -30,6 +30,10 @@ const translations = {
     signupSub: "Register to manage classrooms on the mobile application",
     labelName: "Full Name",
     labelPhone: "Phone Number",
+    labelSchoolName: "School Name (Optional)",
+    labelUdise: "UDISE Code (Optional)",
+    placeholderSchoolName: "e.g., Z.P. Primary School",
+    placeholderUdise: "e.g., 27250100101",
     labelConfirmPass: "Confirm Password",
     btnRegister: "Register Profile",
     btnRegistering: "Registering...",
@@ -92,6 +96,10 @@ const translations = {
     signupSub: "मोबाईल ॲप्लिकेशनवर वर्ग व्यवस्थापित करण्यासाठी नोंदणी करा",
     labelName: "पूर्ण नाव",
     labelPhone: "मोबाईल नंबर",
+    labelSchoolName: "शाळेचे नाव (पर्यायी)",
+    labelUdise: "युडायस कोड (पर्यायी)",
+    placeholderSchoolName: "उदा. जि. प. प्राथमिक शाळा",
+    placeholderUdise: "उदा. २७२५०१००१०१",
     labelConfirmPass: "पासवर्डची पुष्टी करा",
     btnRegister: "नोंदणी करा",
     btnRegistering: "नोंदणी होत आहे...",
@@ -139,6 +147,8 @@ export default function LandingPage({ user, loading, lang }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [schoolName, setSchoolName] = useState('');
+  const [udiseCode, setUdiseCode] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -275,6 +285,8 @@ export default function LandingPage({ user, loading, lang }) {
         name: name,
         email: email,
         phone: phone,
+        schoolName: schoolName.trim(),
+        udiseCode: udiseCode.trim(),
         schoolIds: []
       });
 
@@ -596,6 +608,28 @@ export default function LandingPage({ user, loading, lang }) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label htmlFor="signup-school-name">{t.labelSchoolName}</label>
+                  <input
+                    id="signup-school-name"
+                    type="text"
+                    placeholder={t.placeholderSchoolName}
+                    value={schoolName}
+                    onChange={(e) => setSchoolName(e.target.value)}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label htmlFor="signup-udise">{t.labelUdise}</label>
+                  <input
+                    id="signup-udise"
+                    type="text"
+                    placeholder={t.placeholderUdise}
+                    value={udiseCode}
+                    onChange={(e) => setUdiseCode(e.target.value)}
                   />
                 </div>
 
