@@ -45,6 +45,7 @@ public final class SessionContext {
     public static synchronized void syncToAppCache() {
         AppCache.selectedSchool = selectedSchool;
         AppCache.selectedClass = selectedClass;
+        AppCache.cachedRemarkBank.clear();
     }
 
     public static synchronized void save(android.content.Context ctx) {

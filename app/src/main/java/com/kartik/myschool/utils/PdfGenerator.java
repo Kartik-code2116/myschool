@@ -1438,6 +1438,15 @@ public class PdfGenerator {
             }
         }
 
+        // Strategy 4: language-aware equivalence (English ↔ Marathi subject names).
+        // Handles cases where admin changed subject sequence or language after marks were saved.
+        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : rec.detailedMarks.entrySet()) {
+            String key = entry.getKey();
+            if (key != null && com.kartik.myschool.model.Subject.isSameSubject(key, subName)) {
+                return entry.getValue();
+            }
+        }
+
         return null;
     }
 

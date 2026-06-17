@@ -475,30 +475,53 @@ public class EnterMarksActivity extends AppCompatActivity {
     }
 
 
-    // ── Fill existing saved marks back into the form ───────────────────────────
     private void fillExistingMarks(MarksRecord m) {
         if (classModel.subjects == null)
             return;
 
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
-            String subName = MarksRecord.sanitizeKey(classModel.subjects.get(i).name);
+            Subject sub = classModel.subjects.get(i);
+            String subName = MarksRecord.sanitizeKey(sub.name);
             ItemSubjectMarksRowBinding row = marksRows.get(i);
 
-            if (m.detailedMarks != null && m.detailedMarks.containsKey(subName)) {
-                MarksRecord.SubjectMarksDetail d = m.detailedMarks.get(subName);
-                if (d != null) {
-                    if (d.nirikhshan > 0) row.etNirikhshan.setText(String.valueOf(d.nirikhshan));
-                    if (d.tondiKam > 0)   row.etTondiKam.setText(String.valueOf(d.tondiKam));
-                    if (d.pratyakshik > 0) row.etPratyakshik.setText(String.valueOf(d.pratyakshik));
-                    if (d.upkram > 0)     row.etUpkram.setText(String.valueOf(d.upkram));
-                    if (d.prakalp > 0)    row.etPrakalp.setText(String.valueOf(d.prakalp));
-                    if (d.chachani > 0)   row.etChachani.setText(String.valueOf(d.chachani));
-                    if (d.swadhyay > 0)   row.etSwadhyay.setText(String.valueOf(d.swadhyay));
-                    if (d.itar > 0)       row.etItar.setText(String.valueOf(d.itar));
-                    if (d.tondi > 0)      row.etTondiB.setText(String.valueOf(d.tondi));
-                    if (d.pratyakshikB > 0) row.etPratyakshikB.setText(String.valueOf(d.pratyakshikB));
-                    if (d.lekhi > 0)      row.etLekhi.setText(String.valueOf(d.lekhi));
+            MarksRecord.SubjectMarksDetail d = null;
+            if (m.detailedMarks != null) {
+                // Strategy 1: sanitized key (most common)
+                d = m.detailedMarks.get(subName);
+                // Strategy 2: raw name
+                if (d == null) d = m.detailedMarks.get(sub.name);
+                // Strategy 3: sanitized form of stored key
+                if (d == null) {
+                    for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : m.detailedMarks.entrySet()) {
+                        if (entry.getKey() != null && MarksRecord.sanitizeKey(entry.getKey()).equals(subName)) {
+                            d = entry.getValue();
+                            break;
+                        }
+                    }
                 }
+                // Strategy 4: language-aware equivalence (English ↔ Marathi)
+                if (d == null) {
+                    for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : m.detailedMarks.entrySet()) {
+                        if (entry.getKey() != null && com.kartik.myschool.model.Subject.isSameSubject(entry.getKey(), sub.name)) {
+                            d = entry.getValue();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (d != null) {
+                if (d.nirikhshan > 0) row.etNirikhshan.setText(String.valueOf(d.nirikhshan));
+                if (d.tondiKam > 0)   row.etTondiKam.setText(String.valueOf(d.tondiKam));
+                if (d.pratyakshik > 0) row.etPratyakshik.setText(String.valueOf(d.pratyakshik));
+                if (d.upkram > 0)     row.etUpkram.setText(String.valueOf(d.upkram));
+                if (d.prakalp > 0)    row.etPrakalp.setText(String.valueOf(d.prakalp));
+                if (d.chachani > 0)   row.etChachani.setText(String.valueOf(d.chachani));
+                if (d.swadhyay > 0)   row.etSwadhyay.setText(String.valueOf(d.swadhyay));
+                if (d.itar > 0)       row.etItar.setText(String.valueOf(d.itar));
+                if (d.tondi > 0)      row.etTondiB.setText(String.valueOf(d.tondi));
+                if (d.pratyakshikB > 0) row.etPratyakshikB.setText(String.valueOf(d.pratyakshikB));
+                if (d.lekhi > 0)      row.etLekhi.setText(String.valueOf(d.lekhi));
             } else if (m.subjectMarks != null && m.subjectMarks.containsKey(subName)) {
                 // Backward-compat: flat map → fill into लेखी
                 row.etLekhi.setText(formatMark(m.subjectMarks.get(subName)));

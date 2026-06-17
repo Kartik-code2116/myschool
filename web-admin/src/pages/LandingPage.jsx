@@ -7,11 +7,11 @@ import './LandingPage.css';
 
 const translations = {
   en: {
-    title: "Edu Report Pro",
+    title: "EduReport",
     subtitle: "Next-Gen Classroom Administration",
     heroBadge: "MOBILE-FIRST WORKFLOW",
     heroTitle: "Zero-Latency CCE Grading & Progress Reporting",
-    heroDesc: "Edu Report Pro enables teachers to record formative & summative scores, compile grades, track demographics, and generate print-ready progress cards instantly in the classroom.",
+    heroDesc: "EduReport enables teachers to record formative & summative scores, compile grades, track demographics, and generate print-ready progress cards instantly in the classroom.",
     feat1Title: "Demographics & Distribution",
     feat1Desc: "Track real-time distribution summaries by cast categories (SC, ST, OBC, Gen) and gender ratios.",
     feat2Title: "Multi-Semester Classrooms",
@@ -33,12 +33,12 @@ const translations = {
     labelConfirmPass: "Confirm Password",
     btnRegister: "Register Profile",
     btnRegistering: "Registering...",
-    footerCopy: "© 2026 Edu Report Pro Classroom Suite. All rights reserved.",
+    footerCopy: "© 2026 EduReport Classroom Suite. All rights reserved.",
     footerVersion: "Version 2.4.0 (Stable)",
     footerOperator: "🔒 Operator Console",
     
     // Interactive How it works Section
-    howItWorksTitle: "How Edu Report Pro Simplifies Your Day",
+    howItWorksTitle: "How EduReport Simplifies Your Day",
     howItWorksSubtitle: "Four simple steps to digitize classroom admin, designed for speed and reliability.",
     step1Title: "1. Class Setup",
     step1Desc: "Select standard and division. Link semesters and configure subjects with maximum mark weightages.",
@@ -50,7 +50,7 @@ const translations = {
     step4Desc: "Generate government-format school report cards. Save or share PDFs instantly without internet.",
     
     // Demo video section
-    videoTitle: "See Edu Report Pro in Action",
+    videoTitle: "See EduReport in Action",
     videoSubtitle: "Watch our 2-minute walkthrough to see how teachers manage grades offline in the classroom.",
     videoPlaceholder: "App Demo Video Preview",
     videoTag1: "Offline Syncing",
@@ -69,11 +69,11 @@ const translations = {
     mockReportTitle: "Maharashtra State Board Format"
   },
   mr: {
-    title: "वार्षिक मूल्यमापन प्रो (Edu Report Pro)",
+    title: "वार्षिक मूल्यमापन",
     subtitle: "पुढील पिढीचे वर्ग प्रशासन",
     heroBadge: "मोबाईल-प्रथम कार्यप्रवाह",
     heroTitle: "शून्य-विलंबता (0ms) मूल्यमापन आणि प्रगती अहवाल",
-    heroDesc: "वार्षिक मूल्यमापन प्रो शिक्षकांना वर्गात बसूनच आकारिक आणि संकलित गुण नोंदवण्यास, श्रेणी तयार करण्यास, लोकसंख्याशास्त्र (वर्गवारी) तपासण्यास आणि मुद्रणासाठी तयार प्रगतीपत्रके त्वरित जनरेट करण्यास सक्षम करते.",
+    heroDesc: "वार्षिक मूल्यमापन शिक्षकांना वर्गात बसूनच आकारिक आणि संकलित गुण नोंदवण्यास, श्रेणी तयार करण्यास, लोकसंख्याशास्त्र (वर्गवारी) तपासण्यास आणि मुद्रणासाठी तयार प्रगतीपत्रके त्वरित जनरेट करण्यास सक्षम करते.",
     feat1Title: "वर्गवारी आणि वितरण",
     feat1Desc: "जात प्रवर्ग (SC, ST, OBC, Gen) आणि लिंग गुणोत्तरानुसार रिअल-टाइम सारांश तपासा.",
     feat2Title: "बहु-सत्र (Multi-Semester) वर्ग",
@@ -95,12 +95,12 @@ const translations = {
     labelConfirmPass: "पासवर्डची पुष्टी करा",
     btnRegister: "नोंदणी करा",
     btnRegistering: "नोंदणी होत आहे...",
-    footerCopy: "© २०२६ वार्षिक मूल्यमापन प्रो क्लासरूम सूट. सर्व हक्क राखीव.",
+    footerCopy: "© २०२६ वार्षिक मूल्यमापन क्लासरूम सूट. सर्व हक्क राखीव.",
     footerVersion: "आवृत्ती २.४.० (स्थिर)",
     footerOperator: "🔒 ऑपरेटर कन्सोल",
     
     // Interactive How it works Section
-    howItWorksTitle: "वार्षिक मूल्यमापन प्रो तुमचे काम कसे सोपे करते?",
+    howItWorksTitle: "वार्षिक मूल्यमापन तुमचे काम कसे सोपे करते?",
     howItWorksSubtitle: "वर्गातील प्रशासकीय कामे डिजिटल करण्यासाठी ४ सोप्या पायऱ्या, जे वेग आणि विश्वासार्हतेसाठी डिझाइन केलेले आहेत.",
     step1Title: "१. वर्ग रचना (Class Setup)",
     step1Desc: "इयत्ता आणि तुकडी निवडा. सत्र लिंक करा आणि कमाल गुण भारांशांसह विषय सेट करा.",
@@ -112,7 +112,7 @@ const translations = {
     step4Desc: "शासकीय-नमुन्यात प्रगतीपत्रके जनरेट करा. इंटरनेटशिवाय पीडीएफ फाईल्स त्वरित जतन करा किंवा शेअर करा.",
     
     // Demo video section
-    videoTitle: "वार्षिक मूल्यमापन प्रो कार्यरत पहा",
+    videoTitle: "वार्षिक मूल्यमापन कार्यरत पहा",
     videoSubtitle: "शिक्षक वर्गात ऑफलाईन गुण कसे व्यवस्थापित करतात हे पाहण्यासाठी आमचा २-मिनिटांचा डेमो पहा.",
     videoPlaceholder: "ॲप डेमो व्हिडिओचे पूर्वावलोकन",
     videoTag1: "ऑफलाईन सिंकिंग",
@@ -426,7 +426,7 @@ export default function LandingPage({ user, loading, lang }) {
             <div className="mock-window-body">
               <div className="mock-report-card">
                 <div className="mock-report-header">
-                  <strong>Edu Report Pro</strong>
+                  <strong>EduReport</strong>
                   <span>{t.mockReportTitle}</span>
                 </div>
                 <div className="mock-report-body">

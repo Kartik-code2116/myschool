@@ -292,7 +292,25 @@ public class PromoteStudentsActivity extends AppCompatActivity {
 
     private void showAddNewYearDialog() {
         EditText input = new EditText(this);
-        input.setHint("e.g., 2027-28");
+
+        // Auto-suggest the next academic year label based on current years in list
+        int suggestedStart = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+        if (!academicYears.isEmpty()) {
+            // Find the highest startYear already in the list and add 1
+            int maxStart = 0;
+            for (AcademicYear ay : academicYears) {
+                if (ay.startYear > maxStart) maxStart = ay.startYear;
+            }
+            suggestedStart = maxStart + 1;
+        }
+        String suggestedEnd = String.valueOf((suggestedStart + 1) % 100).length() == 1
+                ? "0" + ((suggestedStart + 1) % 100)
+                : String.valueOf((suggestedStart + 1) % 100);
+        String suggestedLabel = suggestedStart + "-" + suggestedEnd;
+
+        input.setHint("e.g., " + suggestedLabel);
+        input.setText(suggestedLabel);
+        input.setSelectAllOnFocus(true);
         input.setSingleLine(true);
 
         new AlertDialog.Builder(this)
@@ -301,10 +319,22 @@ public class PromoteStudentsActivity extends AppCompatActivity {
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    String label = input.getText().toString().trim();
-                    if (TextUtils.isEmpty(label)) {
+                    String raw = input.getText() != null ? input.getText().toString().trim() : "";
+                    if (TextUtils.isEmpty(raw)) {
                         Toast.makeText(this, R.string.msg_year_empty, Toast.LENGTH_SHORT).show();
                         return;
+                    }
+                    // Auto-format: if user enters just "2027" expand to "2027-28"
+                    String label = raw;
+                    if (!label.contains("-")) {
+                        try {
+                            int startY = Integer.parseInt(label);
+                            int endY = (startY + 1) % 100;
+                            String endStr = endY < 10 ? "0" + endY : String.valueOf(endY);
+                            label = startY + "-" + endStr;
+                        } catch (NumberFormatException ignored) {
+                            // Not a plain number — keep as-is
+                        }
                     }
                     saveNewAcademicYear(label);
                 })

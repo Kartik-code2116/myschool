@@ -18,7 +18,7 @@ export default function Sidebar({ isOpen, onClose }) {
       <div className="sidebar-brand">
         <div className="sidebar-logo">MS</div>
         <div>
-          <h2>Edu Report</h2>
+          <h2>EduReport</h2>
           <span>Admin Console</span>
         </div>
       </div>

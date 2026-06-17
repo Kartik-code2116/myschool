@@ -248,7 +248,19 @@ public class StatsDashboardFragment extends Fragment {
                 
                 MarksRecord record = marksMap.get(student.id);
                 if (record != null && record.detailedMarks != null) {
+                    // 4-strategy lookup so reordered/language-swapped subjects still match
                     MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
+                    if (detail == null) detail = record.detailedMarks.get(subject.name);
+                    if (detail == null) {
+                        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : record.detailedMarks.entrySet()) {
+                            if (e.getKey() != null && MarksRecord.sanitizeKey(e.getKey()).equals(safeKey)) { detail = e.getValue(); break; }
+                        }
+                    }
+                    if (detail == null) {
+                        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : record.detailedMarks.entrySet()) {
+                            if (e.getKey() != null && Subject.isSameSubject(e.getKey(), subject.name)) { detail = e.getValue(); break; }
+                        }
+                    }
                     if (detail != null) {
                         if (detail.akarikTotal > 0) {
                             stat.formativeFilled++;

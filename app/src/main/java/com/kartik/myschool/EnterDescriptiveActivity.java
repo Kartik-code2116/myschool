@@ -296,31 +296,102 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
                 }
             }
         } else {
-            com.google.android.material.chip.ChipGroup cg = new com.google.android.material.chip.ChipGroup(this);
-            cg.setChipSpacingHorizontal((int)(8 * getResources().getDisplayMetrics().density));
-            cg.setChipSpacingVertical((int)(8 * getResources().getDisplayMetrics().density));
-            row.llCategoriesContainer.addView(cg);
+            String schoolId = classModel.schoolId != null ? classModel.schoolId : (com.kartik.myschool.SessionContext.selectedSchool != null ? com.kartik.myschool.SessionContext.selectedSchool.id : "");
+            int semNum = 1;
+            if (getActiveSemesterId().contains("2")) semNum = 2;
+            else if (com.kartik.myschool.SessionContext.selectedSemester != null) semNum = com.kartik.myschool.SessionContext.selectedSemester.number;
 
-            // Populate with all standard remarks as choice chips
-            for (String remark : STANDARD_REMARKS) {
-                Chip chip = new Chip(this);
-                chip.setText(remark);
-                chip.setCheckable(true);
-                chip.setChecked(false);
-
-                styleInteractiveChip(chip, false);
-
-                chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    styleInteractiveChip(chip, isChecked);
-                    updateSummaryText(row);
-                });
-
-                cg.addView(chip);
-            }
+            com.kartik.myschool.repository.FirebaseRepository.get().getRemarkBank(schoolId, classModel.className, semNum, sub.name, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.List<String>>() {
+                @Override
+                public void onSuccess(java.util.List<String> options) {
+                    if (options == null || options.isEmpty()) {
+                        addStandardOrEmptyRemarks(row, sub);
+                    } else {
+                        populateOptionsToChips(row, options);
+                    }
+                }
+                @Override
+                public void onError(Exception e) {
+                    addStandardOrEmptyRemarks(row, sub);
+                }
+            });
         }
 
         b.llRemarkRows.addView(row.getRoot());
         remarkRows.add(row);
+    }
+
+    private void addStandardOrEmptyRemarks(com.kartik.myschool.databinding.ItemSubjectRemarkRowBinding row, com.kartik.myschool.model.Subject sub) {
+        if (sub == null || sub.name == null) return;
+        String subLower = sub.name.toLowerCase();
+        boolean isClass5MathEnglish = "5".equals(classModel.className) && 
+            (subLower.contains("math") || subLower.contains("गणित") || subLower.contains("english") || subLower.contains("इंग्रजी"));
+            
+        if (isClass5MathEnglish) {
+            // Do not show any standard remarks as requested by user
+            return;
+        }
+        populateOptionsToChips(row, java.util.Arrays.asList(STANDARD_REMARKS));
+    }
+
+    private void populateOptionsToChips(com.kartik.myschool.databinding.ItemSubjectRemarkRowBinding row, java.util.List<String> options) {
+        java.util.Map<String, java.util.List<String>> categorized = new java.util.LinkedHashMap<>();
+        java.util.List<String> uncategorized = new java.util.ArrayList<>();
+        for (String opt : options) {
+            if (opt.startsWith("[") && opt.contains("]")) {
+                int idx = opt.indexOf("]");
+                String cat = opt.substring(1, idx).trim();
+                String text = opt.substring(idx + 1).trim();
+                if (!categorized.containsKey(cat)) categorized.put(cat, new java.util.ArrayList<>());
+                categorized.get(cat).add(text);
+            } else {
+                uncategorized.add(opt);
+            }
+        }
+
+        if (!categorized.isEmpty()) {
+            for (java.util.Map.Entry<String, java.util.List<String>> entry : categorized.entrySet()) {
+                android.widget.TextView tvCat = new android.widget.TextView(EnterDescriptiveActivity.this);
+                tvCat.setText(entry.getKey());
+                tvCat.setTextSize(14f);
+                tvCat.setTypeface(null, android.graphics.Typeface.BOLD);
+                tvCat.setTextColor(0xFF6C4CCF);
+                tvCat.setPadding(0, (int)(8 * getResources().getDisplayMetrics().density), 0, (int)(4 * getResources().getDisplayMetrics().density));
+                row.llCategoriesContainer.addView(tvCat);
+
+                com.google.android.material.chip.ChipGroup cg = new com.google.android.material.chip.ChipGroup(EnterDescriptiveActivity.this);
+                cg.setChipSpacingHorizontal((int)(8 * getResources().getDisplayMetrics().density));
+                cg.setChipSpacingVertical((int)(8 * getResources().getDisplayMetrics().density));
+                row.llCategoriesContainer.addView(cg);
+
+                for (String remark : entry.getValue()) {
+                    addChip(row, cg, remark);
+                }
+            }
+        }
+        
+        if (!uncategorized.isEmpty()) {
+            com.google.android.material.chip.ChipGroup cg = new com.google.android.material.chip.ChipGroup(EnterDescriptiveActivity.this);
+            cg.setChipSpacingHorizontal((int)(8 * getResources().getDisplayMetrics().density));
+            cg.setChipSpacingVertical((int)(8 * getResources().getDisplayMetrics().density));
+            row.llCategoriesContainer.addView(cg);
+            for (String remark : uncategorized) {
+                addChip(row, cg, remark);
+            }
+        }
+    }
+
+    private void addChip(com.kartik.myschool.databinding.ItemSubjectRemarkRowBinding row, com.google.android.material.chip.ChipGroup cg, String remark) {
+        Chip chip = new Chip(EnterDescriptiveActivity.this);
+        chip.setText(remark);
+        chip.setCheckable(true);
+        chip.setChecked(false);
+        styleInteractiveChip(chip, false);
+        chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            styleInteractiveChip(chip, isChecked);
+            updateSummaryText(row);
+        });
+        cg.addView(chip);
     }
 
     private void updateSummaryText(com.kartik.myschool.databinding.ItemSubjectRemarkRowBinding row) {

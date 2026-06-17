@@ -542,8 +542,19 @@ public class FormativeSummativeFragment extends Fragment {
                 List<String> gradesToDisplay = new ArrayList<>();
                 if (marks != null && marks.detailedMarks != null && activeClass.subjects != null) {
                     for (Subject sub : activeClass.subjects) {
-                        MarksRecord.SubjectMarksDetail detail = marks.detailedMarks
-                                .get(MarksRecord.sanitizeKey(sub.name));
+                        String sk = MarksRecord.sanitizeKey(sub.name);
+                        MarksRecord.SubjectMarksDetail detail = marks.detailedMarks.get(sk);
+                        if (detail == null) detail = marks.detailedMarks.get(sub.name);
+                        if (detail == null) {
+                            for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> e : marks.detailedMarks.entrySet()) {
+                                if (e.getKey() != null && MarksRecord.sanitizeKey(e.getKey()).equals(sk)) { detail = e.getValue(); break; }
+                            }
+                        }
+                        if (detail == null) {
+                            for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> e : marks.detailedMarks.entrySet()) {
+                                if (e.getKey() != null && com.kartik.myschool.model.Subject.isSameSubject(e.getKey(), sub.name)) { detail = e.getValue(); break; }
+                            }
+                        }
                         if (detail != null && detail.grade != null && !detail.grade.isEmpty()
                                 && hasEnteredMarks(detail)) {
                             gradesToDisplay.add(detail.grade);
@@ -757,19 +768,32 @@ public class FormativeSummativeFragment extends Fragment {
                 boolean hasMarks = false;
 
                 String safeKey = MarksRecord.sanitizeKey(sub.name);
-                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
-                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
-                    if (d != null && hasEnteredMarks(d)) {
-                        hasMarks = true;
-                        fe1 = String.valueOf(d.nirikhshan); fe2 = String.valueOf(d.tondiKam);
-                        fe3 = String.valueOf(d.pratyakshik); fe4 = String.valueOf(d.upkram);
-                        fe5 = String.valueOf(d.prakalp); fe6 = String.valueOf(d.chachani);
-                        fe7 = String.valueOf(d.swadhyay); fe8 = String.valueOf(d.itar);
-                        se1 = String.valueOf(d.tondi); se2 = String.valueOf(d.pratyakshikB); se3 = String.valueOf(d.lekhi);
-                        fet = String.valueOf(d.akarikTotal); set = String.valueOf(d.sanklit); tet = String.valueOf(d.grandTotal);
-                        if (d.grade != null && !d.grade.isEmpty()) gradeVal = d.grade;
+                MarksRecord.SubjectMarksDetail d = null;
+                if (record != null && record.detailedMarks != null) {
+                    d = record.detailedMarks.get(safeKey);
+                    if (d == null) d = record.detailedMarks.get(sub.name);
+                    if (d == null) {
+                        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> e : record.detailedMarks.entrySet()) {
+                            if (e.getKey() != null && MarksRecord.sanitizeKey(e.getKey()).equals(safeKey)) { d = e.getValue(); break; }
+                        }
+                    }
+                    if (d == null) {
+                        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> e : record.detailedMarks.entrySet()) {
+                            if (e.getKey() != null && com.kartik.myschool.model.Subject.isSameSubject(e.getKey(), sub.name)) { d = e.getValue(); break; }
+                        }
                     }
                 }
+                if (d != null && hasEnteredMarks(d)) {
+                    hasMarks = true;
+                    fe1 = String.valueOf(d.nirikhshan); fe2 = String.valueOf(d.tondiKam);
+                    fe3 = String.valueOf(d.pratyakshik); fe4 = String.valueOf(d.upkram);
+                    fe5 = String.valueOf(d.prakalp); fe6 = String.valueOf(d.chachani);
+                    fe7 = String.valueOf(d.swadhyay); fe8 = String.valueOf(d.itar);
+                    se1 = String.valueOf(d.tondi); se2 = String.valueOf(d.pratyakshikB); se3 = String.valueOf(d.lekhi);
+                    fet = String.valueOf(d.akarikTotal); set = String.valueOf(d.sanklit); tet = String.valueOf(d.grandTotal);
+                    if (d.grade != null && !d.grade.isEmpty()) gradeVal = d.grade;
+                }
+
 
                 cardB.tvFE1.setText(fe1); cardB.tvFE2.setText(fe2); cardB.tvFE3.setText(fe3); cardB.tvFE4.setText(fe4);
                 cardB.tvFE5.setText(fe5); cardB.tvFE6.setText(fe6); cardB.tvFE7.setText(fe7); cardB.tvFE8.setText(fe8);
@@ -860,16 +884,29 @@ public class FormativeSummativeFragment extends Fragment {
                 int totalMax = sub.maxMarks;
 
                 String safeKey = MarksRecord.sanitizeKey(sub.name);
-                if (record != null && record.detailedMarks != null && record.detailedMarks.containsKey(safeKey)) {
-                    MarksRecord.SubjectMarksDetail d = record.detailedMarks.get(safeKey);
-                    if (d != null && hasEnteredMarks(d)) {
-                        hasMarks = true;
-                        fet = String.valueOf(d.akarikTotal);
-                        set = String.valueOf(d.sanklit);
-                        tet = String.valueOf(d.grandTotal);
-                        if (d.grade != null && !d.grade.isEmpty()) gradeVal = d.grade;
+                MarksRecord.SubjectMarksDetail d = null;
+                if (record != null && record.detailedMarks != null) {
+                    d = record.detailedMarks.get(safeKey);
+                    if (d == null) d = record.detailedMarks.get(sub.name);
+                    if (d == null) {
+                        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> e : record.detailedMarks.entrySet()) {
+                            if (e.getKey() != null && MarksRecord.sanitizeKey(e.getKey()).equals(safeKey)) { d = e.getValue(); break; }
+                        }
+                    }
+                    if (d == null) {
+                        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> e : record.detailedMarks.entrySet()) {
+                            if (e.getKey() != null && com.kartik.myschool.model.Subject.isSameSubject(e.getKey(), sub.name)) { d = e.getValue(); break; }
+                        }
                     }
                 }
+                if (d != null && hasEnteredMarks(d)) {
+                    hasMarks = true;
+                    fet = String.valueOf(d.akarikTotal);
+                    set = String.valueOf(d.sanklit);
+                    tet = String.valueOf(d.grandTotal);
+                    if (d.grade != null && !d.grade.isEmpty()) gradeVal = d.grade;
+                }
+
 
                 cardB.tvFETObtained.setText(fet); cardB.tvSETObtained.setText(set); cardB.tvTETObtained.setText(tet);
                 cardB.tvFETMax.setText(String.valueOf(formativeMax)); cardB.tvSETMax.setText(String.valueOf(summativeMax)); cardB.tvTETMax.setText(String.valueOf(totalMax));

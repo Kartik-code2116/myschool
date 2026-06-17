@@ -67,7 +67,7 @@ export default function Login() {
     <div className="login-container animate-fade-in">
       <section className="login-hero">
         <div className="brand-mark">MS</div>
-        <h1>Edu Report Admin</h1>
+        <h1>EduReport Admin</h1>
         <p>
           Manage school subscriptions, teachers, classes, and payment approvals from one clean workspace.
         </p>

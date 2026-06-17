@@ -207,7 +207,11 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         
         String className = classModel.className != null ? classModel.className : "5";
         int semesterNumber = 1;
-        if (existingMarks != null && existingMarks.semesterId != null && existingMarks.semesterId.equals("sem2")) {
+        if (existingMarks != null && existingMarks.semesterId != null && 
+            (existingMarks.semesterId.equals("sem_2") || 
+             existingMarks.semesterId.equals("sem2") || 
+             existingMarks.semesterId.toLowerCase().contains("second") || 
+             (existingMarks.semesterId.length() < 10 && existingMarks.semesterId.contains("2")))) {
             semesterNumber = 2;
         } else if (SessionContext.selectedSemester != null) {
             semesterNumber = SessionContext.selectedSemester.number;
@@ -267,6 +271,11 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         
         List<Object> items = new ArrayList<>();
         Map<String, List<String>> categorized = new LinkedHashMap<>();
+        // Pre-populate to ensure explicit ordering
+        categorized.put("उत्कृष्ट", new ArrayList<>());
+        categorized.put("चांगली प्रगती", new ArrayList<>());
+        categorized.put("समाधानकारक", new ArrayList<>());
+
         List<String> uncategorized = new ArrayList<>();
         
         for (String option : bankOptions) {
@@ -284,6 +293,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         }
         
         for (Map.Entry<String, List<String>> entry : categorized.entrySet()) {
+            if (entry.getValue().isEmpty()) continue;
             items.add(new CategoryHeader(entry.getKey()));
             for (String val : entry.getValue()) {
                 items.add(new RemarkItem(val, entry.getKey()));

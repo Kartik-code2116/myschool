@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getDefaultSubjectsForClass } from '../utils/subjectUtils';
+
 import './AdminRemarks.css';
 
 const CLASSES = ['1', '2', '3', '4', '5', '6', '7', '8'];
@@ -14,72 +15,26 @@ const SPECIAL_CATEGORIES = [
 ];
 
 const getDefaultRemarks = (subjectName, semesterNumber) => {
-  const s = (subjectName || '').toLowerCase();
-  const isSem1 = parseInt(semesterNumber) === 1;
-  const defaults = [];
-
-  if (s.includes('marathi') || s.includes('hindi') || s.includes('english')) {
-    if (isSem1) {
-      defaults.push("प्रथम सत्रातील भाषिक प्रगती चांगली आहे.", "वाचन व लेखन उत्तम आहे.", "कविता गायन चांगल्या प्रकारे करतो.", "अक्षर सुंदर व वळणदार आहे.", "वाचनाचा सराव आवश्यक आहे.", "लेखनात सुधारणा करावी.");
-    } else {
-      defaults.push("द्वितीय सत्रात भाषिक कौशल्य वाढले आहे.", "वार्षिक प्रगती समाधानकारक आहे.", "निबंध लेखन उत्तम करतो.", "भाषण कौशल्य प्रभावी आहे.", "व्याकरणाचा अधिक सराव हवा.");
-    }
-  } else if (s.includes('math')) {
-    if (isSem1) {
-      defaults.push("प्रथम सत्रातील गणितात प्रगती उत्तम.", "बेरीज-वजाबाकी अचूक करतो.", "पाढे पाठांतर चांगले आहे.", "गणितात अधिक सराव आवश्यक.");
-    } else {
-      defaults.push("द्वितीय सत्रात गणितात चांगली समज आली आहे.", "गुणाकार-भागाकार चांगला जमतो.", "शाब्दिक उदाहरणे सहज सोडवतो.", "वार्षिक प्रगती उत्तम आहे.");
-    }
-  } else if (s.includes('science') || s.includes('history') || s.includes('geography')) {
-    if (isSem1) {
-      defaults.push("प्रथम सत्रात परिसराची माहिती उत्तम ठेवली आहे.", "प्रयोगात रस घेतो.", "निरीक्षण कौशल्य छान आहे.");
-    } else {
-      defaults.push("द्वितीय सत्रात विज्ञानातील प्रगती चांगली.", "शास्त्रीय विचारसरणीत वाढ झाली आहे.", "वार्षिक मूल्यमापनात छान कामगिरी.");
-    }
-  } else if (s.includes('art') || s.includes('work')) {
-    if (isSem1) {
-      defaults.push("प्रथम सत्रात कलाकुसरीत चांगली प्रगती.", "चित्रकलेची आवड आहे.");
-    } else {
-      defaults.push("द्वितीय सत्रात नवनिर्मिती छान केली.", "उपक्रमात उत्स्फूर्त सहभाग.");
-    }
-  } else if (s.includes('physical')) {
-    if (isSem1) {
-      defaults.push("प्रथम सत्रात खेळांमध्ये उत्साह दिसला.", "मैदानी खेळात चांगली चमक.");
-    } else {
-      defaults.push("द्वितीय सत्रात शारीरिक क्षमता वाढली.", "खेळाडूवृत्ती उत्तम आहे.");
-    }
-  } else if (s.includes('प्रगती') || s.includes('progress')) {
-    defaults.push("स्वच्छता व टापटीपपणा ठेवतो.", "इतरांना नेहमी मदत करतो.", "नियमित शाळेत उपस्थित असतो.", "गृहपाठ वेळेवर पूर्ण करतो.");
-  } else if (s.includes('सुधारणा') || s.includes('improvement')) {
-    defaults.push("अक्षरात सुधारणा करणे आवश्यक.", "गणितात अधिक सराव आवश्यक.", "वाचनाचा सराव हवा.", "नियमित उपस्थिती आवश्यक.");
-  } else if (s.includes('छंद') || s.includes('hobbies')) {
-    defaults.push("चित्रकलेची विशेष आवड आहे.", "खेळांमध्ये उत्तम गती आहे.", "वाचनाची खूप आवड आहे.", "गायन छान करतो.");
-  } else {
-    if (isSem1) {
-      defaults.push("प्रथम सत्रात अभ्यासात चांगली गती.", "वर्गकार्यात सक्रिय सहभाग.", "नियमित शाळेत उपस्थित असतो.", "प्रथम सत्रात अधिक लक्ष देणे गरजेचे.");
-    } else {
-      defaults.push("द्वितीय सत्रातील प्रगती समाधानकारक.", "संपूर्ण वर्षातील काम छान.", "पुढील वर्षासाठी शुभेच्छा.", "वार्षिक अभ्यासात अधिक मेहनत हवी.");
-    }
-  }
-  return defaults;
+  return [];
 };
 
 export default function AdminRemarks() {
   const [selectedClass, setSelectedClass] = useState('5');
   const [selectedSemester, setSelectedSemester] = useState('1');
   const [selectedSubject, setSelectedSubject] = useState('Marathi');
-  
+
   const [remarks, setRemarks] = useState([]);
+  const [applyToAll, setApplyToAll] = useState(false);
   const [newRemarkText, setNewRemarkText] = useState('');
   const [remarkCategory, setRemarkCategory] = useState('उत्कृष्ट');
-  
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
-  
+
   const [fetchedGlobalSubjects, setFetchedGlobalSubjects] = useState([]);
   const [allSubjects, setAllSubjects] = useState([]);
-  
+
   const [draggedItemIndex, setDraggedItemIndex] = useState(null);
 
   useEffect(() => {
@@ -103,14 +58,14 @@ export default function AdminRemarks() {
   useEffect(() => {
     const classSubjects = getDefaultSubjectsForClass(selectedClass).map(s => ({ value: s, label: s }));
     const merged = [...classSubjects, ...SPECIAL_CATEGORIES];
-    
+
     fetchedGlobalSubjects.forEach(fs => {
       if (!merged.find(s => s.value === fs.value)) {
         merged.push(fs);
       }
     });
     setAllSubjects(merged);
-    
+
     // Auto-select a valid subject if current selection is not in the new list
     if (merged.length > 0 && !merged.find(s => s.value === selectedSubject)) {
       setSelectedSubject(merged[0].value);
@@ -128,26 +83,26 @@ export default function AdminRemarks() {
     const newRemarks = [...remarks];
     let draggedItem = newRemarks[draggedItemIndex];
     let targetItem = newRemarks[index];
-    
+
     // Find what category we are dragging over
     let targetCat = 'Other';
     if (targetItem.startsWith('[') && targetItem.includes(']')) {
-       targetCat = targetItem.substring(1, targetItem.indexOf(']')).trim();
+      targetCat = targetItem.substring(1, targetItem.indexOf(']')).trim();
     }
-    
+
     // Find the pure text of the item being dragged
     let draggedText = draggedItem;
     if (draggedItem.startsWith('[') && draggedItem.includes(']')) {
-       draggedText = draggedItem.substring(draggedItem.indexOf(']') + 1).trim();
+      draggedText = draggedItem.substring(draggedItem.indexOf(']') + 1).trim();
     }
-    
+
     // Apply the new category tag to the dragged item
     let updatedDraggedItem = targetCat === 'Other' ? draggedText : `[${targetCat}] ${draggedText}`;
-    
+
     // Perform the swap
     newRemarks.splice(draggedItemIndex, 1);
     newRemarks.splice(index, 0, updatedDraggedItem);
-    
+
     setDraggedItemIndex(index);
     setRemarks(newRemarks);
   };
@@ -206,19 +161,80 @@ export default function AdminRemarks() {
     setSaving(true);
     setMessage({ text: '', type: '' });
     try {
-      const docId = getDocId();
-      const docRef = doc(db, 'remarkBanks', docId);
-      await setDoc(docRef, {
-        schoolId: 'default',
-        subjectName: selectedSubject,
-        options: remarks,
-        className: selectedClass,
-        semesterId: `sem_${selectedSemester}`
-      });
-      setMessage({ text: 'Remarks saved successfully!', type: 'success' });
+      const getDocIdFor = (cls, sem, subject) => {
+        const safe = subject ? subject.replace(/[^a-zA-Z0-9\u0900-\u097F]/g, '_') : 'general';
+        return `default_${cls}_sem_${sem}_${safe}`;
+      };
+
+      if (applyToAll) {
+        const promises = [];
+        for (const cls of CLASSES) {
+          for (const sem of SEMESTERS) {
+            const docId = getDocIdFor(cls, sem, selectedSubject);
+            const docRef = doc(db, 'remarkBanks', docId);
+            promises.push(setDoc(docRef, {
+              schoolId: 'default',
+              subjectName: selectedSubject,
+              options: remarks,
+              className: cls,
+              semesterId: `sem_${sem}`
+            }));
+          }
+        }
+        await Promise.all(promises);
+        setMessage({ text: 'Remarks saved successfully across all classes and semesters!', type: 'success' });
+      } else {
+        const docId = getDocIdFor(selectedClass, selectedSemester, selectedSubject);
+        const docRef = doc(db, 'remarkBanks', docId);
+        await setDoc(docRef, {
+          schoolId: 'default',
+          subjectName: selectedSubject,
+          options: remarks,
+          className: selectedClass,
+          semesterId: `sem_${selectedSemester}`
+        });
+        setMessage({ text: 'Remarks saved successfully!', type: 'success' });
+      }
     } catch (error) {
       console.error('Error saving remarks:', error);
       setMessage({ text: 'Error saving remarks: ' + error.message, type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleFixCorrupted = async () => {
+    if (!window.confirm("Are you sure you want to fix corrupted remarks across ALL subjects?")) return;
+    setSaving(true);
+    setMessage({ text: 'Fixing corrupted remarks...', type: 'info' });
+    try {
+      const banksRef = collection(db, 'remarkBanks');
+      const snap = await getDocs(banksRef);
+      let fixedCount = 0;
+      for (const docSnap of snap.docs) {
+        const data = docSnap.data();
+        if (data.options && Array.isArray(data.options)) {
+          let modified = false;
+          const newOptions = data.options.map(opt => {
+            if (typeof opt !== 'string') return opt;
+            let res = opt;
+            if (res.includes('à¤‰à¤¤à¥à¤•à¥ƒà¤·à¥à¤Ÿ')) { res = res.replace(/à¤‰à¤¤à¥à¤•à¥ƒà¤·à¥à¤Ÿ/g, 'उत्कृष्ट'); modified = true; }
+            if (res.includes('à¤šà¤¾à¤‚à¤—à¤²à¥€ à¤ªà¥à¤°à¤—à¤¤à¥€')) { res = res.replace(/à¤šà¤¾à¤‚à¤—à¤²à¥€ à¤ªà¥à¤°à¤—à¤¤à¥€/g, 'चांगली प्रगती'); modified = true; }
+            if (res.includes('à¤¸à¤®à¤¾à¤§à¤¾à¤¨à¤•à¤¾à¤°à¤•')) { res = res.replace(/à¤¸à¤®à¤¾à¤§à¤¾à¤¨à¤•à¤¾à¤°à¤•/g, 'समाधानकारक'); modified = true; }
+            return res;
+          });
+          if (modified) {
+            await setDoc(doc(db, 'remarkBanks', docSnap.id), { ...data, options: newOptions });
+            fixedCount++;
+          }
+        }
+      }
+      setMessage({ text: `Successfully fixed corrupted remarks in ${fixedCount} subjects!`, type: 'success' });
+      // Refresh current
+      fetchRemarks();
+    } catch (error) {
+      console.error(error);
+      setMessage({ text: 'Error fixing remarks: ' + error.message, type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -228,12 +244,12 @@ export default function AdminRemarks() {
     e.preventDefault();
     const txt = newRemarkText.trim();
     if (!txt) return;
-    
+
     let finalTxt = txt;
     if (remarkCategory !== 'Other') {
       finalTxt = `[${remarkCategory}] ${txt}`;
     }
-    
+
     if (remarks.includes(finalTxt)) {
       setMessage({ text: 'This remark already exists.', type: 'error' });
       return;
@@ -247,6 +263,10 @@ export default function AdminRemarks() {
     const updated = [...remarks];
     updated.splice(index, 1);
     setRemarks(updated);
+  };
+
+  const handleAutoFillAiRemarks = () => {
+    alert("api key is not join");
   };
 
   return (
@@ -264,7 +284,7 @@ export default function AdminRemarks() {
         <div className="glass-panel selectors-panel animate-fade-in">
           <h3>Target Selection</h3>
           <p className="helper-text">Select where these remarks will be applied.</p>
-          
+
           <div className="form-group">
             <label>Class</label>
             <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
@@ -315,13 +335,23 @@ export default function AdminRemarks() {
         <div className="glass-panel editor-panel animate-fade-in">
           <div className="editor-header">
             <h3>Remarks List</h3>
-            <button 
-              className="btn btn-primary" 
-              onClick={handleSave} 
-              disabled={loading || saving}
-            >
-              {saving ? 'Saving...' : '💾 Save Changes'}
-            </button>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={handleAutoFillAiRemarks}
+                disabled={loading || saving}
+                title="Automatically generate 30 highly specific remarks based on this subject's syllabus"
+              >
+                ✨ Auto-Fill AI Remarks
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleSave}
+                disabled={loading || saving}
+              >
+                {saving ? 'Saving...' : '💾 Save Changes'}
+              </button>
+            </div>
           </div>
 
           {message.text && (
@@ -331,8 +361,8 @@ export default function AdminRemarks() {
           )}
 
           <form onSubmit={addRemark} className="add-remark-form">
-            <select 
-              value={remarkCategory} 
+            <select
+              value={remarkCategory}
               onChange={(e) => setRemarkCategory(e.target.value)}
               disabled={loading}
               className="category-select"
@@ -342,9 +372,9 @@ export default function AdminRemarks() {
               <option value="समाधानकारक">समाधानकारक</option>
               <option value="Other">Other / None</option>
             </select>
-            <input 
+            <input
               type="text"
-              placeholder="Enter a new descriptive remark..." 
+              placeholder="Enter a new descriptive remark..."
               value={newRemarkText}
               onChange={(e) => setNewRemarkText(e.target.value)}
               disabled={loading}
@@ -368,7 +398,7 @@ export default function AdminRemarks() {
                     'समाधानकारक': [],
                     'Other': []
                   };
-                  
+
                   remarks.forEach((remark, index) => {
                     let cat = 'Other';
                     let text = remark;
@@ -390,8 +420,8 @@ export default function AdminRemarks() {
                           {items.map((item) => {
                             const index = item.originalIndex;
                             return (
-                              <div 
-                                key={index} 
+                              <div
+                                key={index}
                                 className={`remark-item ${draggedItemIndex === index ? 'dragging' : ''}`}
                                 draggable
                                 onDragStart={() => handleDragStart(index)}
@@ -403,8 +433,8 @@ export default function AdminRemarks() {
                                   <span className="drag-handle" title="Drag to reorder">↕️</span>
                                   <span className="remark-text">{item.text}</span>
                                 </div>
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="btn-delete-remark"
                                   onClick={() => removeRemark(index)}
                                   title="Remove"
@@ -420,6 +450,37 @@ export default function AdminRemarks() {
                   });
                 })()
               )}
+              <div className="form-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <input 
+                    type="checkbox" 
+                    id="applyToAll" 
+                    checked={applyToAll} 
+                    onChange={(e) => setApplyToAll(e.target.checked)} 
+                    style={{ width: '18px', height: '18px' }}
+                  />
+                  <label htmlFor="applyToAll" style={{ margin: 0, fontWeight: 'bold', cursor: 'pointer' }}>
+                    Apply these remarks to ALL Classes & Semesters
+                  </label>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={handleFixCorrupted} 
+                    disabled={loading || saving}
+                    title="Fix all corrupted remarks in the database across all classes and subjects"
+                  >
+                    {saving ? 'Processing...' : '🛠️ Fix Corrupted Data'}
+                  </button>
+                  <button 
+                    className="btn btn-primary btn-save" 
+                    onClick={handleSave} 
+                    disabled={loading || saving}
+                  >
+                    {saving ? 'Saving...' : '💾 Save Changes'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

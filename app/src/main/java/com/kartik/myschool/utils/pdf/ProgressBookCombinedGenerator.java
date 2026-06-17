@@ -414,6 +414,13 @@ public class ProgressBookCombinedGenerator {
         d = rec.detailedMarks.get(sanitizedKey.toLowerCase());
         if (d != null)
             return d;
+        // Language-aware equivalence (English ↔ Marathi subject names)
+        for (java.util.Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : rec.detailedMarks.entrySet()) {
+            String key = entry.getKey();
+            if (key != null && com.kartik.myschool.model.Subject.isSameSubject(key, subName)) {
+                return entry.getValue();
+            }
+        }
         return null;
     }
 

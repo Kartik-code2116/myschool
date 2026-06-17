@@ -304,9 +304,43 @@ public class FirebaseRepository {
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<AcademicYear> years = snap != null ? snap.toObjects(AcademicYear.class) : new ArrayList<>();
-                    Collections.sort(years, (a, b) -> Integer.compare(b.startYear, a.startYear));
-                    cachedYears = years;
-                    cb.onSuccess(new ArrayList<>(years));
+
+                    // Step 1: Normalize plain numeric labels (e.g. "2027" → "2027-28")
+                    for (AcademicYear ay : years) {
+                        if (ay.label != null && !ay.label.contains("-")) {
+                            try {
+                                int startY = Integer.parseInt(ay.label.trim());
+                                int endY = (startY + 1) % 100;
+                                String endStr = endY < 10 ? "0" + endY : String.valueOf(endY);
+                                ay.label = startY + "-" + endStr;
+                                if (ay.startYear == 0) ay.startYear = startY;
+                                if (ay.endYear == 0) ay.endYear = startY + 1;
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
+
+                    // Step 2: Deduplicate by startYear — keep the entry with the best label
+                    // (prefer "YYYY-YY" format over plain "YYYY")
+                    java.util.LinkedHashMap<Integer, AcademicYear> deduped = new java.util.LinkedHashMap<>();
+                    for (AcademicYear ay : years) {
+                        int key = ay.startYear;
+                        if (!deduped.containsKey(key)) {
+                            deduped.put(key, ay);
+                        } else {
+                            // Prefer the one whose label contains a dash (proper format)
+                            AcademicYear existing = deduped.get(key);
+                            boolean newHasDash = ay.label != null && ay.label.contains("-");
+                            boolean existHasDash = existing.label != null && existing.label.contains("-");
+                            if (newHasDash && !existHasDash) {
+                                deduped.put(key, ay);
+                            }
+                        }
+                    }
+                    List<AcademicYear> unique = new ArrayList<>(deduped.values());
+
+                    Collections.sort(unique, (a, b) -> Integer.compare(b.startYear, a.startYear));
+                    cachedYears = unique;
+                    cb.onSuccess(new ArrayList<>(unique));
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -1252,16 +1286,38 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    private String getStandardSubjectName(String name) {
+        if (name == null) return "general";
+        String s = name.trim().toLowerCase();
+        if (s.contains("marathi") || s.contains("मराठी") || s.contains("भाषा")) return "Marathi";
+        if (s.contains("english") || s.contains("इंग्रजी")) return "English";
+        if (s.contains("hindi") || s.contains("हिंदी")) return "Hindi";
+        if (s.contains("mathematics") || s.contains("maths") || s.contains("math") || s.contains("गणित")) return "Mathematics";
+        if (s.contains("science") || s.contains("विज्ञान")) return "Science";
+        if (s.contains("history") || s.contains("इतिहास") || s.contains("civics") || s.contains("नागरिकशास्त्र")) return "History and Civics";
+        if (s.contains("geography") || s.contains("भूगोल")) return "Geography";
+        if (s.contains("physical education") || s.contains("शारीरिक") || s.contains("p.e") || s.contains("pe")) return "Health & Physical Education";
+        if (s.contains("work experience") || s.contains("कार्यानुभव")) return "Work Experience";
+        if (s.contains("art") || s.contains("कला") || s.contains("drawing")) return "Art";
+        if (s.contains("play") || s.contains("learn") || s.contains("खेळू")) return "Play, Do, Learn";
+        if (s.contains("environmental studies part 1") || s.contains("परिसर अभ्यास १") || s.contains("परिसर अभ्यास भाग १")) return "Environmental Studies Part 1";
+        if (s.contains("environmental studies part 2") || s.contains("परिसर अभ्यास २") || s.contains("परिसर अभ्यास भाग २")) return "Environmental Studies Part 2";
+        if (s.contains("environmental studies") || s.contains("परिसर अभ्यास")) return "Environmental Studies";
+        return name;
+    }
+
     private String makeRemarkBankId(String schoolId, String subjectName) {
-        String safe = subjectName != null
-                ? subjectName.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
+        String normalized = getStandardSubjectName(subjectName);
+        String safe = normalized != null
+                ? normalized.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
                 : "general";
         return (schoolId != null ? schoolId : "default") + "_" + safe;
     }
 
     private String makeClassSemRemarkBankId(String className, int semesterNumber, String subjectName) {
-        String safe = subjectName != null
-                ? subjectName.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
+        String normalized = getStandardSubjectName(subjectName);
+        String safe = normalized != null
+                ? normalized.replaceAll("[^a-zA-Z0-9\\u0900-\\u097F]", "_")
                 : "general";
         return "default_" + className + "_sem_" + semesterNumber + "_" + safe;
     }

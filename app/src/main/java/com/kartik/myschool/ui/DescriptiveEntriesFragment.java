@@ -80,6 +80,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             AppCache.cachedDescriptiveClassId = null;
             AppCache.cachedDescriptiveSemesterId = null;
             AppCache.cachedDescriptiveMarksComplete = false;
+            AppCache.cachedRemarkBank.clear();
             FirebaseRepository.get().clearMarksCache();
             loadDescriptiveData();
         });
@@ -715,19 +716,27 @@ public class DescriptiveEntriesFragment extends Fragment {
     public static MarksRecord.SubjectMarksDetail getSubjectDetail(MarksRecord record, Subject sub, int subjectIndex) {
         if (record == null || record.detailedMarks == null || sub == null || sub.name == null) return null;
         String safeKey = MarksRecord.sanitizeKey(sub.name);
+        // Strategy 1: sanitized key (most common path)
         MarksRecord.SubjectMarksDetail detail = record.detailedMarks.get(safeKey);
         if (detail != null) return detail;
+        // Strategy 2: raw subject name (in case stored un-sanitized)
         detail = record.detailedMarks.get(sub.name);
         if (detail != null) return detail;
+        // Strategy 3: compare sanitized forms of all stored keys
         for (Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : record.detailedMarks.entrySet()) {
             String key = entry.getKey();
             if (key != null && MarksRecord.sanitizeKey(key).equals(safeKey)) return entry.getValue();
         }
-        if (subjectIndex >= 0 && subjectIndex < record.detailedMarks.size()) {
-            int i = 0;
-            for (MarksRecord.SubjectMarksDetail value : record.detailedMarks.values()) {
-                if (i == subjectIndex) return value;
-                i++;
+        // Strategy 4: language-aware equivalence (English ↔ Marathi subject names).
+        // This handles the case where the admin changes subject display language / sequence
+        // and the stored key no longer matches the current name exactly.
+        // NOTE: We intentionally do NOT fall back by index because HashMap has no
+        // guaranteed iteration order — an index-based lookup would return wrong data
+        // whenever subjects are reordered.
+        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> entry : record.detailedMarks.entrySet()) {
+            String key = entry.getKey();
+            if (key != null && com.kartik.myschool.model.Subject.isSameSubject(key, sub.name)) {
+                return entry.getValue();
             }
         }
         return null;
