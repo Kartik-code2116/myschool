@@ -69,7 +69,7 @@
                     android:shadowDy="2"
                     android:shadowRadius="4"
                     android:text="@string/txt_kartik_thorat"
-                    android:textColor="?attr/colorSurface"
+                    android:textColor="@android:color/white"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
