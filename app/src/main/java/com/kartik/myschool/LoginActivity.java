@@ -41,10 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private final FirebaseRepository repo = FirebaseRepository.get();
     private CredentialManager credentialManager;
 
-    @Override
-    protected void attachBaseContext(android.content.Context newBase) {
-        super.attachBaseContext(com.kartik.myschool.MySchoolApplication.wrapContext(newBase));
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

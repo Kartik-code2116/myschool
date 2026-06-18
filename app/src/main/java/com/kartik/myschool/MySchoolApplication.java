@@ -59,13 +59,4 @@ public class MySchoolApplication extends Application {
         }
     }
 
-    public static android.content.Context wrapContext(android.content.Context context) {
-        android.content.SharedPreferences prefs = context.getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);
-        String lang = prefs.getString("language", "mr");
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration(context.getResources().getConfiguration());
-        config.setLocale(locale);
-        return context.createConfigurationContext(config);
-    }
 }

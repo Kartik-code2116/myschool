@@ -58,22 +58,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/ivPdfPage"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="6dp"
-                android:background="@drawable/bg_pdf_mock_border"
-                android:contentDescription="PDF Page Preview" />
+                android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPdfPages"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/ivPdfPage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/bg_pdf_mock_border"
+                    android:contentDescription="PDF Page Preview" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPdfPages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:visibility="gone" />
+            </FrameLayout>
         </com.kartik.myschool.utils.zoom.ZoomLayout>
 
         <TextView

@@ -201,7 +201,7 @@ public class ProgressCardCoverGenerator {
         leftPanel.setBackgroundColor(BaseColor.WHITE);
         leftPanel.setBorder(Rectangle.NO_BORDER);
         leftPanel.setCellEvent(new PanelBorderEvent());
-        leftPanel.setPadding(25);
+        leftPanel.setPadding(15);
         leftPanel.setVerticalAlignment(Element.ALIGN_TOP);
 
         buildLeftPanel(leftPanel, ctx, student, sem1, sem2);
@@ -211,7 +211,7 @@ public class ProgressCardCoverGenerator {
         rightPanel.setBackgroundColor(BaseColor.WHITE);
         rightPanel.setBorder(Rectangle.NO_BORDER);
         rightPanel.setCellEvent(new PanelBorderEvent());
-        rightPanel.setPadding(25);
+        rightPanel.setPadding(15);
         rightPanel.setVerticalAlignment(Element.ALIGN_TOP);
         
         // Add a nested table with the background event to ensure borders draw over background
@@ -332,7 +332,7 @@ public class ProgressCardCoverGenerator {
         panel.addElement(healthTbl);
 
         // ── Grade scale at bottom ─────────────────────────────────────────────
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 5)));
 
         // Title with rounded background (left-aligned)
         PdfPTable gsTitleTbl = new PdfPTable(1);
@@ -375,7 +375,7 @@ public class ProgressCardCoverGenerator {
                                          ClassModel cls, Student student) throws Exception {
 
         // Push text down into the yellow area
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 30)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
 
         String udiseText = PdfLocalizer.get(ctx, "युडायस क्रमांक: ", "UDISE Code: ") + nvl(school != null ? school.udiseCode : null);
         try {
@@ -384,7 +384,7 @@ public class ProgressCardCoverGenerator {
             panel.addElement(udiseImg);
         } catch (Exception e) {}
 
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 4)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 2)));
 
         String zpText = PdfLocalizer.get(ctx, "जिल्हा परिषद प्राथमिक शाळा", "Zilla Parishad Primary School");
         try {
@@ -393,15 +393,15 @@ public class ProgressCardCoverGenerator {
             panel.addElement(zpImg);
         } catch (Exception e) {}
 
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 6)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 2)));
 
         try {
-            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : PdfLocalizer.get(ctx, "शाळेचे नाव", "SCHOOL NAME")), 22, true, C_DARK);
+            Image schoolImg = marathiImg(ctx, nvl(school != null ? school.name : PdfLocalizer.get(ctx, "शाळेचे नाव", "SCHOOL NAME")), 20, true, C_DARK);
             schoolImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(schoolImg);
         } catch (Exception e) {}
 
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 6)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 2)));
 
         if (school != null && school.address != null && !school.address.isEmpty()) {
             try {
@@ -418,16 +418,16 @@ public class ProgressCardCoverGenerator {
             panel.addElement(yearImg);
         } catch (Exception e) {}
 
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 15)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 8)));
 
         try {
-            Image titleImg = marathiImg(ctx, PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), 28, true, C_DARK);
+            Image titleImg = marathiImg(ctx, PdfLocalizer.get(ctx, "प्रगती पत्रक", "PROGRESS CARD"), 24, true, C_DARK);
             titleImg.setAlignment(Element.ALIGN_CENTER);
             panel.addElement(titleImg);
         } catch (Exception e) {}
 
         // Push student details grid below the yellow area
-        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 30)));
+        panel.addElement(new Phrase(" ", new Font(Font.FontFamily.HELVETICA, 10)));
 
         buildStudentDetails(panel, ctx, cls, student);
     }
@@ -548,7 +548,7 @@ public class ProgressCardCoverGenerator {
     private static PdfPCell noBorderCell(String text, Font font, int align) {
         PdfPCell c = PdfGenerator.rawCell(text, font, BaseColor.WHITE, C_DARK, align);
         c.setBorder(Rectangle.NO_BORDER);
-        c.setPaddingBottom(3);
+        c.setPaddingBottom(1);
         return c;
     }
 

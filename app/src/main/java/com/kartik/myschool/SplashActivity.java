@@ -11,10 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashActivity extends AppCompatActivity {
 
-    @Override
-    protected void attachBaseContext(android.content.Context newBase) {
-        super.attachBaseContext(com.kartik.myschool.MySchoolApplication.wrapContext(newBase));
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

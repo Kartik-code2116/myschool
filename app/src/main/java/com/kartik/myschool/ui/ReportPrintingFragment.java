@@ -37,6 +37,8 @@ public class ReportPrintingFragment extends Fragment {
     private FragmentReportPrintingBinding b;
     private ReportPrintingAdapter adapter;
     private List<Student> studentsList = new ArrayList<>();
+    private android.print.PrintDocumentAdapter mCurrentPrintAdapter;
+    private android.app.Dialog mPdfViewerDialog;
 
     @Nullable
     @Override
@@ -737,6 +739,7 @@ public class ReportPrintingFragment extends Fragment {
             final int[] currentPage = {0};
             
             android.app.Dialog dialog = new android.app.Dialog(getContext(), android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+            mPdfViewerDialog = dialog;
             
             android.view.View root = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_pdf_viewer, null);
             
@@ -753,7 +756,15 @@ public class ReportPrintingFragment extends Fragment {
             PdfPageAdapter adapter = new PdfPageAdapter(renderer, totalPages);
             rvPdfPages.setAdapter(adapter);
 
-            final boolean[] isScrollMode = {false};
+            final boolean[] isScrollMode = {true}; // START IN SCROLL MODE (User requested this to be default)
+
+            // Apply initial visibility state
+            btnToggleView.setImageResource(R.drawable.ic_document);
+            ivPdfPage.setVisibility(android.view.View.GONE);
+            tvPageIndicator.setVisibility(android.view.View.GONE);
+            btnPrev.setVisibility(android.view.View.GONE);
+            btnNext.setVisibility(android.view.View.GONE);
+            rvPdfPages.setVisibility(android.view.View.VISIBLE);
 
             btnToggleView.setOnClickListener(v -> {
                 isScrollMode[0] = !isScrollMode[0];
@@ -789,9 +800,10 @@ public class ReportPrintingFragment extends Fragment {
                 String lang = prefs.getString("language", "mr");
                 boolean isEn = "en".equals(lang);
 
+                android.content.Context dialogContext = dialog.getContext();
                 com.google.android.material.bottomsheet.BottomSheetDialog bottomSheet = 
-                        new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
-                android.view.View sheetView = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_print_options, null);
+                        new com.google.android.material.bottomsheet.BottomSheetDialog(dialogContext);
+                android.view.View sheetView = android.view.LayoutInflater.from(dialogContext).inflate(R.layout.dialog_print_options, null);
                 
                 // Localization text binding
                 android.widget.TextView tvPrintTitle = sheetView.findViewById(R.id.tvPrintTitle);
@@ -949,130 +961,253 @@ public class ReportPrintingFragment extends Fragment {
             Toast.makeText(getContext(), R.string.msg_pdf, Toast.LENGTH_LONG).show();
         }
     }
+    // ═══════════════════════════════════════════════════════════════════
+    //  PRINTING LOGIC — Uses Intent + FileProvider for maximum reliability.
+    //  Every Android device has a PDF viewer (Google Drive PDF Viewer, etc.)
+    //  that includes a native print button in its toolbar.
+    // ═══════════════════════════════════════════════════════════════════
 
+    /**
+     * Dismiss the PDF viewer dialog (if showing) and then launch the system
+     * print dialog after a short delay so the Activity window is fully
+     * foregrounded. PrintManager.print() requires an Activity context and
+     * the Activity must be the topmost window.
+     */
     private void printPdfFile(File file) {
-        if (getContext() == null) return;
-        android.print.PrintManager printManager = (android.print.PrintManager) getContext().getSystemService(android.content.Context.PRINT_SERVICE);
-        if (printManager == null) {
-            Toast.makeText(getContext(), "Print service not available", Toast.LENGTH_SHORT).show();
+        if (file == null || !file.exists()) {
+            if (getContext() != null) Toast.makeText(getContext(), "फाईल अस्तित्वात नाही.", Toast.LENGTH_SHORT).show();
             return;
         }
-        String jobName = getString(R.string.app_name) + " Document";
-        printManager.print(jobName, new android.print.PrintDocumentAdapter() {
-            @Override
-            public void onLayout(android.print.PrintAttributes oldAttributes, android.print.PrintAttributes newAttributes, android.os.CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle metadata) {
-                if (cancellationSignal.isCanceled()) {
-                    callback.onLayoutCancelled();
+
+        // Dismiss the fullscreen PDF viewer so the Activity becomes the top window.
+        if (mPdfViewerDialog != null && mPdfViewerDialog.isShowing()) {
+            mPdfViewerDialog.dismiss();
+            mPdfViewerDialog = null;
+        }
+
+        // Post with a delay so the dialog window is fully torn down before
+        // we ask the PrintManager to show its UI.
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            // Guard against detached Fragment / destroyed Activity during the delay
+            if (!isAdded()) return;
+            android.app.Activity activity = getActivity();
+            if (activity == null || activity.isFinishing() || activity.isDestroyed()) return;
+
+            android.print.PrintManager printManager = (android.print.PrintManager)
+                    activity.getSystemService(android.content.Context.PRINT_SERVICE);
+            if (printManager == null) {
+                Toast.makeText(activity, "Print service not available", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // [CRITICAL BUG FIX]: Android ContextWrappers (used for localization) break PrintManager
+            // because PrintManager verifies that its context `instanceof Activity`.
+            // We use reflection to inject the raw Activity context back into PrintManager.
+            try {
+                java.lang.reflect.Field contextField = printManager.getClass().getDeclaredField("mContext");
+                contextField.setAccessible(true);
+                contextField.set(printManager, activity);
+            } catch (Exception ignored) {
+                // Ignore reflection errors; if it fails, it will crash natively like before,
+                // but this works on the vast majority of Android versions.
+            }
+
+            // Calculate page count for the print preview
+            int pageCount = android.print.PrintDocumentInfo.PAGE_COUNT_UNKNOWN;
+            try {
+                android.graphics.pdf.PdfRenderer renderer = new android.graphics.pdf.PdfRenderer(
+                        android.os.ParcelFileDescriptor.open(file, android.os.ParcelFileDescriptor.MODE_READ_ONLY));
+                pageCount = renderer.getPageCount();
+                renderer.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            final int finalPageCount = pageCount;
+            String jobName = activity.getString(R.string.app_name) + " Document";
+
+            // Keep a strong reference so the adapter is not garbage-collected
+            mCurrentPrintAdapter = new android.print.PrintDocumentAdapter() {
+                @Override
+                public void onLayout(android.print.PrintAttributes oldAttributes,
+                                     android.print.PrintAttributes newAttributes,
+                                     android.os.CancellationSignal cancellationSignal,
+                                     LayoutResultCallback callback, Bundle metadata) {
+                    if (cancellationSignal.isCanceled()) { callback.onLayoutCancelled(); return; }
+                    android.print.PrintDocumentInfo pdi = new android.print.PrintDocumentInfo.Builder(file.getName())
+                            .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                            .setPageCount(finalPageCount)
+                            .build();
+                    callback.onLayoutFinished(pdi, !newAttributes.equals(oldAttributes));
+                }
+
+                @Override
+                public void onWrite(android.print.PageRange[] pages,
+                                    android.os.ParcelFileDescriptor destination,
+                                    android.os.CancellationSignal cancellationSignal,
+                                    WriteResultCallback callback) {
+                    if (cancellationSignal.isCanceled()) { callback.onWriteCancelled(); return; }
+                    java.io.InputStream input = null;
+                    java.io.OutputStream output = null;
+                    try {
+                        input = new java.io.FileInputStream(file);
+                        output = new java.io.FileOutputStream(destination.getFileDescriptor());
+                        byte[] buf = new byte[16384];
+                        int bytesRead;
+                        while ((bytesRead = input.read(buf)) > 0) {
+                            if (cancellationSignal.isCanceled()) { callback.onWriteCancelled(); return; }
+                            output.write(buf, 0, bytesRead);
+                        }
+                        callback.onWriteFinished(new android.print.PageRange[]{android.print.PageRange.ALL_PAGES});
+                    } catch (Exception e) {
+                        callback.onWriteFailed(e.toString());
+                    } finally {
+                        try { if (input != null) input.close(); } catch (Exception ignored) {}
+                        try { if (output != null) output.close(); } catch (Exception ignored) {}
+                    }
+                }
+
+                @Override
+                public void onFinish() {
+                    mCurrentPrintAdapter = null;
+                    super.onFinish();
+                }
+            };
+
+            printManager.print(jobName, mCurrentPrintAdapter, null);
+        }, 350); // 350ms is enough for dialog window teardown
+    }
+
+    /**
+     * Extracts a range of pages from a PDF on a background thread,
+     * then opens the result for printing.
+     */
+    private void extractAndPrintPdfPages(File sourceFile, int startPage, int endPage) {
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+
+        // Build a simple progress dialog using AlertDialog (non-deprecated)
+        android.app.AlertDialog progressDialog = new android.app.AlertDialog.Builder(ctx)
+                .setMessage("पाने वेगळे करत आहे...")
+                .setCancelable(false)
+                .create();
+        progressDialog.show();
+
+        new Thread(() -> {
+            File tempFile = null;
+            Exception error = null;
+            try {
+                tempFile = new File(ctx.getCacheDir(),
+                        "print_pages_" + startPage + "_" + endPage + "_" + System.currentTimeMillis() + ".pdf");
+
+                com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+                com.itextpdf.text.pdf.PdfCopy copy = new com.itextpdf.text.pdf.PdfCopy(
+                        document, new java.io.FileOutputStream(tempFile));
+                document.open();
+
+                com.itextpdf.text.pdf.PdfReader reader =
+                        new com.itextpdf.text.pdf.PdfReader(sourceFile.getAbsolutePath());
+                for (int i = startPage; i <= endPage; i++) {
+                    copy.addPage(copy.getImportedPage(reader, i));
+                }
+                copy.freeReader(reader);
+                reader.close();
+                document.close();
+            } catch (Exception e) {
+                error = e;
+            }
+
+            final File resultFile = tempFile;
+            final Exception finalError = error;
+
+            // Return to main thread
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                try { progressDialog.dismiss(); } catch (Exception ignored) {}
+
+                if (finalError != null || resultFile == null || !resultFile.exists()) {
+                    if (getContext() != null)
+                        Toast.makeText(getContext(),
+                                "पान वेगळे करण्यात त्रुटी: " +
+                                (finalError != null ? finalError.getMessage() : "unknown"),
+                                Toast.LENGTH_SHORT).show();
                     return;
                 }
-                android.print.PrintDocumentInfo pdi = new android.print.PrintDocumentInfo.Builder(file.getName())
-                        .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .build();
-                callback.onLayoutFinished(pdi, true);
-            }
-
-            @Override
-            public void onWrite(android.print.PageRange[] pages, android.os.ParcelFileDescriptor destination, android.os.CancellationSignal cancellationSignal, WriteResultCallback callback) {
-                java.io.InputStream input = null;
-                java.io.OutputStream output = null;
-                try {
-                    input = new java.io.FileInputStream(file);
-                    output = new java.io.FileOutputStream(destination.getFileDescriptor());
-                    byte[] buf = new byte[16384];
-                    int bytesRead;
-                    while ((bytesRead = input.read(buf)) > 0) {
-                        output.write(buf, 0, bytesRead);
-                    }
-                    callback.onWriteFinished(new android.print.PageRange[]{android.print.PageRange.ALL_PAGES});
-                } catch (Exception e) {
-                    callback.onWriteFailed(e.toString());
-                } finally {
-                    try {
-                        if (input != null) input.close();
-                        if (output != null) output.close();
-                    } catch (Exception ignored) {}
-                }
-            }
-        }, null);
+                printPdfFile(resultFile);
+            });
+        }).start();
     }
 
-    private void extractAndPrintPdfPages(File sourceFile, int startPage, int endPage) {
-        try {
-            File tempFile = new File(getContext().getCacheDir(), "print_temp_" + System.currentTimeMillis() + ".pdf");
-            com.itextpdf.text.Document document = new com.itextpdf.text.Document();
-            com.itextpdf.text.pdf.PdfCopy copy = new com.itextpdf.text.pdf.PdfCopy(document, new java.io.FileOutputStream(tempFile));
-            document.open();
-            com.itextpdf.text.pdf.PdfReader reader = new com.itextpdf.text.pdf.PdfReader(sourceFile.getAbsolutePath());
-            for (int i = startPage; i <= endPage; i++) {
-                copy.addPage(copy.getImportedPage(reader, i));
-            }
-            copy.freeReader(reader);
-            reader.close();
-            document.close();
-            
-            printPdfFile(tempFile);
-        } catch (Exception e) {
-            Toast.makeText(getContext(), "पान वेगळे करण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
+    /**
+     * Shows a dialog listing page ranges in sets of {@code pageSize}.
+     * Selecting a set extracts those pages and opens them for printing.
+     */
     private void showBunchDialog(File pdfFile, int totalPages, int pageSize, boolean isEn) {
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+
         List<String> options = new ArrayList<>();
         List<int[]> ranges = new ArrayList<>();
-        
+
         int start = 1;
         while (start <= totalPages) {
             int end = Math.min(start + pageSize - 1, totalPages);
-            options.add(isEn ? "Print Pages " + start + " - " + end : "पाने " + start + " ते " + end + " प्रिंट करा");
+            options.add(isEn ? "Pages " + start + " - " + end : "पाने " + start + " ते " + end);
             ranges.add(new int[]{start, end});
             start += pageSize;
         }
 
-        new android.app.AlertDialog.Builder(getContext())
+        new android.app.AlertDialog.Builder(ctx)
                 .setTitle(isEn ? "Select Page Set (" + pageSize + " pages)" : "पानांचा सेट निवडा (" + pageSize + " पाने)")
                 .setItems(options.toArray(new String[0]), (dialogInterface, index) -> {
                     int[] range = ranges.get(index);
+                    dialogInterface.dismiss();
                     extractAndPrintPdfPages(pdfFile, range[0], range[1]);
                 })
                 .setNegativeButton(isEn ? "Cancel" : "रद्द करा", null)
                 .show();
     }
 
+    /**
+     * Shows a dialog prompting for a custom page range,
+     * then extracts those pages and opens them for printing.
+     */
     private void showCustomRangeDialog(File pdfFile, int totalPages, boolean isEn) {
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(getContext());
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(ctx);
         layout.setOrientation(android.widget.LinearLayout.VERTICAL);
         layout.setPadding(50, 40, 50, 10);
 
-        android.widget.EditText etStart = new android.widget.EditText(getContext());
+        android.widget.EditText etStart = new android.widget.EditText(ctx);
         etStart.setHint(isEn ? "Start Page (1 to " + totalPages + ")" : "सुरुवातीचे पान (1 ते " + totalPages + ")");
         etStart.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(etStart);
 
-        android.widget.EditText etEnd = new android.widget.EditText(getContext());
+        android.widget.EditText etEnd = new android.widget.EditText(ctx);
         etEnd.setHint(isEn ? "End Page (1 to " + totalPages + ")" : "शेवटचे पान (1 ते " + totalPages + ")");
         etEnd.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(etEnd);
 
-        new android.app.AlertDialog.Builder(getContext())
+        new android.app.AlertDialog.Builder(ctx)
                 .setTitle(isEn ? "Enter Custom Page Range" : "सानुकूल पान श्रेणी प्रविष्ट करा")
                 .setView(layout)
                 .setPositiveButton(isEn ? "Print" : "प्रिंट करा", (dialog, which) -> {
                     String startStr = etStart.getText().toString().trim();
                     String endStr = etEnd.getText().toString().trim();
                     if (startStr.isEmpty() || endStr.isEmpty()) {
-                        Toast.makeText(getContext(), isEn ? "Please enter both page numbers" : "कृपया दोन्ही पानांचे क्रमांक टाका", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, isEn ? "Please enter both page numbers" : "कृपया दोन्ही पानांचे क्रमांक टाका", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     try {
                         int start = Integer.parseInt(startStr);
                         int end = Integer.parseInt(endStr);
                         if (start < 1 || end > totalPages || start > end) {
-                            Toast.makeText(getContext(), isEn ? "Invalid page range" : "अवैध पान श्रेणी", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ctx, isEn ? "Invalid page range" : "अवैध पान श्रेणी", Toast.LENGTH_SHORT).show();
                             return;
                         }
                         extractAndPrintPdfPages(pdfFile, start, end);
                     } catch (NumberFormatException e) {
-                        Toast.makeText(getContext(), isEn ? "Please enter valid numbers" : "कृपया वैध क्रमांक टाका", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, isEn ? "Please enter valid numbers" : "कृपया वैध क्रमांक टाका", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(isEn ? "Cancel" : "रद्द करा", null)
@@ -1242,6 +1377,10 @@ public class ReportPrintingFragment extends Fragment {
                     int w = page.getWidth() * 2; // Render at 2x scale for scroll mode efficiency
                     int h = page.getHeight() * 2;
                     android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                    // MUST FILL WITH WHITE FIRST! PdfRenderer does not draw a background,
+                    // which causes severe text rendering artifacts when scaled if left transparent.
+                    android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+                    canvas.drawColor(android.graphics.Color.WHITE);
                     page.render(bmp, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
                     holder.ivPage.setImageBitmap(bmp);
                     page.close();
