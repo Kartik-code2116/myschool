@@ -19,7 +19,7 @@
             android:layout_height="300dp"
             app:cardCornerRadius="24dp"
             app:cardElevation="16dp"
-            app:cardBackgroundColor="#FFFFFF">
+            app:cardBackgroundColor="?attr/colorSurface">
 
             <ImageView
                 android:id="@+id/ivLargeQr"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Tap anywhere to close"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorSurface"
             android:textSize="14sp"
             android:alpha="0.8"
             android:fontFamily="sans-serif-medium"/>

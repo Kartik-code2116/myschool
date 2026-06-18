@@ -1395,6 +1395,19 @@ public class ReportPrintingFragment extends Fragment {
             return totalPages;
         }
 
+        @Override
+        public void onViewRecycled(@androidx.annotation.NonNull PdfViewHolder holder) {
+            super.onViewRecycled(holder);
+            android.graphics.drawable.Drawable drawable = holder.ivPage.getDrawable();
+            if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                android.graphics.Bitmap bmp = ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
+                if (bmp != null && !bmp.isRecycled()) {
+                    bmp.recycle();
+                }
+            }
+            holder.ivPage.setImageDrawable(null);
+        }
+
         static class PdfViewHolder extends androidx.recyclerview.widget.RecyclerView.ViewHolder {
             android.widget.ImageView ivPage;
             public PdfViewHolder(@androidx.annotation.NonNull android.view.View itemView) {

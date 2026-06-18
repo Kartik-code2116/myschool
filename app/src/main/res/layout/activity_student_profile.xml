@@ -13,12 +13,12 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurface"
         app:navigationIcon="@drawable/ic_chevron_left"
-        app:navigationIconTint="#5A4FCF"
+        app:navigationIconTint="?attr/colorPrimary"
         app:title="@string/student_profile_title"
         app:titleTextColor="#2E2E2E"
-        app:subtitleTextColor="#757575"
+        app:subtitleTextColor="?attr/colorOnSurfaceVariant"
         app:titleCentered="false"
         app:elevation="2dp"/>
 
@@ -79,7 +79,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/txt_student_name"
-                            android:textColor="#FFFFFF"
+                            android:textColor="?attr/colorSurface"
                             android:textSize="24sp"
                             android:fontFamily="sans-serif-medium"
                             android:letterSpacing="0.02"
@@ -161,7 +161,7 @@
                     app:cardElevation="6dp"
                     app:strokeColor="#8BC34A"
                     app:strokeWidth="3.5dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="?attr/colorSurface">
 
                     <ImageView
                         android:id="@+id/ivStudentPhoto"
@@ -188,7 +188,7 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="?attr/colorSurface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -209,7 +209,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/txt_roll_no_1"
-                                android:textColor="#757575"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"
                                 android:fontFamily="sans-serif-medium"/>
 
@@ -242,7 +242,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/txt_roll_no_2"
-                                android:textColor="#757575"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"
                                 android:fontFamily="sans-serif-medium"/>
 
@@ -275,7 +275,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/txt_gender"
-                                android:textColor="#757575"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"
                                 android:fontFamily="sans-serif-medium"/>
 
@@ -308,7 +308,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/txt_cast"
-                                android:textColor="#757575"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"
                                 android:fontFamily="sans-serif-medium"/>
 
@@ -434,7 +434,7 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="?attr/colorSurface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -468,7 +468,7 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="?attr/colorSurface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -502,7 +502,7 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="?attr/colorSurface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -536,7 +536,7 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="?attr/colorSurface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -569,11 +569,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:text="@string/edit_student"
-                    android:textColor="#FFFFFF"
+                    android:textColor="?attr/colorSurface"
                     android:fontFamily="sans-serif-bold"
                     app:icon="@drawable/ic_edit_pencil"
                     app:iconGravity="textStart"
-                    app:iconTint="#FFFFFF"
+                    app:iconTint="?attr/colorSurface"
                     app:backgroundTint="#8BC34A"
                     android:elevation="2dp"/>
 
@@ -585,12 +585,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="@string/view_special_card"
-                    android:textColor="#FFFFFF"
+                    android:textColor="?attr/colorSurface"
                     android:fontFamily="sans-serif-bold"
                     app:icon="@drawable/ic_school"
                     app:iconGravity="textStart"
-                    app:iconTint="#FFFFFF"
-                    app:backgroundTint="#5A4FCF"
+                    app:iconTint="?attr/colorSurface"
+                    app:backgroundTint="?attr/colorPrimary"
                     android:elevation="2dp"
                     android:minHeight="56dp"/>
             </LinearLayout>

@@ -153,7 +153,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">9sp</item>
-        <item name="android:textColor">#5E35B1</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">4dp</item>
@@ -166,7 +166,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">9sp</item>
-        <item name="android:textColor">#333333</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
         <item name="android:singleLine">true</item>
@@ -175,15 +175,15 @@
     <style name="AttendanceDivider">
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">#D1C4E9</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
     </style>
 
     <!-- Navigation Drawer Custom Styling -->
     <style name="Widget.EduReport.NavigationView" parent="Widget.Material3.NavigationView">
         <item name="android:background">@drawable/bg_drawer_rounded</item>
         <item name="backgroundTint">@null</item>
-        <item name="itemIconTint">#455A64</item>
-        <item name="itemTextColor">#37474F</item>
+        <item name="itemIconTint">?attr/colorOnSurfaceVariant</item>
+        <item name="itemTextColor">?attr/colorOnSurface</item>
         <item name="itemIconSize">24dp</item>
         <item name="itemMinHeight">52dp</item>
         <item name="itemMaxLines">1</item>
@@ -196,13 +196,13 @@
     <style name="TextAppearance.EduReport.DrawerItem" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#37474F</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
     <style name="TextAppearance.EduReport.DrawerHeader" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">11sp</item>
-        <item name="android:textColor">#78909C</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
         <item name="android:textStyle">bold</item>
     </style>
 

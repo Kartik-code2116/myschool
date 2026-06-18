@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2"
+    android:background="?android:attr/colorBackground"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
@@ -11,9 +11,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurface"
         app:navigationIcon="@drawable/ic_close"
-        app:navigationIconTint="#5A4FCF"
+        app:navigationIconTint="?attr/colorPrimary"
         app:title="@string/title_promote_students"
         app:titleTextColor="#2E2E2E"
         app:titleCentered="false"
@@ -40,7 +40,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="12dp">
 
                 <LinearLayout
@@ -53,7 +53,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/lbl_previous_class_source"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="15sp"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="sans-serif-black"/>
@@ -74,7 +74,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/lbl_year"
-                                android:textColor="#888888"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"/>
                             <TextView
                                 android:id="@+id/tvSourceYear"
@@ -96,7 +96,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/lbl_class"
-                                android:textColor="#888888"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"/>
                             <TextView
                                 android:id="@+id/tvSourceClass"
@@ -118,7 +118,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/lbl_division"
-                                android:textColor="#888888"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp"/>
                             <TextView
                                 android:id="@+id/tvSourceDivision"
@@ -143,7 +143,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="12dp">
 
                 <LinearLayout
@@ -156,7 +156,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/lbl_new_target_class"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="15sp"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="sans-serif-black"/>
@@ -178,7 +178,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/lbl_target_academic_year"
-                                android:textColor="#888888"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="12sp"
                                 android:layout_marginBottom="4dp"/>
                             <Spinner
@@ -197,7 +197,7 @@
                             android:layout_marginStart="8dp"
                             android:src="@drawable/ic_add_circle"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            app:tint="#5A4FCF"
+                            app:tint="?attr/colorPrimary"
                             android:contentDescription="Add New Year"/>
 
                     </LinearLayout>
@@ -219,7 +219,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/lbl_target_class_std"
-                                android:textColor="#888888"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="12sp"
                                 android:layout_marginBottom="4dp"/>
                             <Spinner
@@ -240,7 +240,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/lbl_target_division"
-                                android:textColor="#888888"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="12sp"
                                 android:layout_marginBottom="4dp"/>
                             <Spinner
@@ -259,7 +259,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:textColor="#E65100"
+                        android:textColor="@color/warning"
                         android:textSize="12sp"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/status_class_not_exist"/>
@@ -274,7 +274,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="12dp">
 
                 <LinearLayout
@@ -287,7 +287,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/lbl_adjustment_mode"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="15sp"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="sans-serif-black"/>
@@ -303,7 +303,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="true"
-                            android:buttonTint="#5A4FCF"
+                            android:buttonTint="?attr/colorPrimary"
                             android:text="@string/lbl_promote_copy"
                             android:textColor="#222222"
                             android:textSize="14sp"
@@ -314,7 +314,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
                             android:layout_marginBottom="12dp"
-                            android:textColor="#777777"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp"
                             android:text="@string/lbl_promote_desc"/>
 
@@ -322,7 +322,7 @@
                             android:id="@+id/rbModeTransfer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:buttonTint="#5A4FCF"
+                            android:buttonTint="?attr/colorPrimary"
                             android:text="@string/lbl_transfer_move"
                             android:textColor="#222222"
                             android:textSize="14sp"
@@ -332,7 +332,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
-                            android:textColor="#777777"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp"
                             android:text="@string/lbl_transfer_desc"/>
 
@@ -348,7 +348,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -369,7 +369,7 @@
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:text="@string/lbl_select_students"
-                            android:textColor="#5A4FCF"
+                            android:textColor="?attr/colorPrimary"
                             android:textSize="15sp"
                             android:fontFamily="sans-serif-black"/>
 
@@ -379,9 +379,9 @@
                             android:layout_height="wrap_content"
                             android:text="@string/lbl_select_all"
                             android:checked="true"
-                            android:buttonTint="#5A4FCF"
+                            android:buttonTint="?attr/colorPrimary"
                             android:textSize="13sp"
-                            android:textColor="#555555"/>
+                            android:textColor="?attr/colorOnSurfaceVariant"/>
 
                     </LinearLayout>
 
@@ -404,7 +404,7 @@
                 android:textSize="16sp"
                 app:cornerRadius="30dp"
                 android:text="@string/btn_execute_adjustment"
-                app:backgroundTint="#5A4FCF"/>
+                app:backgroundTint="?attr/colorPrimary"/>
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progressIndicator"

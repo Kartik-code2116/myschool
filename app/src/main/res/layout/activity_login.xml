@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/login_title"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorSurface"
                 android:textSize="26sp"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.02"/>
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/login_subtitle"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorSurface"
                 android:textSize="14sp"
                 android:alpha="0.85"
                 android:letterSpacing="0.01"/>

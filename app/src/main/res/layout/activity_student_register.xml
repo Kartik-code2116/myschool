@@ -8,8 +8,8 @@
         android:orientation="vertical">
         <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
             android:layout_width="match_parent" android:layout_height="72dp"
-            android:background="#FFFFFF"
-            app:navigationIcon="@drawable/ic_close" app:navigationIconTint="#5A4FCF"
+            android:background="?attr/colorSurface"
+            app:navigationIcon="@drawable/ic_close" app:navigationIconTint="?attr/colorPrimary"
             app:title="@string/title_add_student" app:titleTextColor="#2E2E2E"
             app:titleCentered="false" app:elevation="2dp"/>
         <com.google.android.material.card.MaterialCardView

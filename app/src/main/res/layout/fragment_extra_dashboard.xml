@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA"
+    android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true">
 
     <androidx.core.widget.NestedScrollView
@@ -68,7 +68,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    app:cardBackgroundColor="#EDE7F6"
+                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -102,7 +102,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    app:cardBackgroundColor="#FCE4EC"
+                    app:cardBackgroundColor="@color/dash_bg_pink"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -144,7 +144,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    app:cardBackgroundColor="#FFF3E0"
+                    app:cardBackgroundColor="@color/dash_bg_orange"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -158,14 +158,14 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:src="@drawable/ic_id_card"
-                            app:tint="#E65100" />
+                            app:tint="@color/warning" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:fontFamily="sans-serif-medium"
                             android:text="@string/txt_cast_category"
-                            android:textColor="#E65100"
+                            android:textColor="@color/warning"
                             android:textSize="13sp"
                             android:gravity="center" />
                     </LinearLayout>
@@ -178,7 +178,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    app:cardBackgroundColor="#E8EAF6"
+                    app:cardBackgroundColor="@color/dash_bg_indigo"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -220,7 +220,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    app:cardBackgroundColor="#E0F2F1"
+                    app:cardBackgroundColor="@color/dash_bg_teal"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -254,7 +254,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    app:cardBackgroundColor="#E0F7FA"
+                    app:cardBackgroundColor="@color/dash_bg_cyan"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -296,7 +296,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    app:cardBackgroundColor="#ECEFF1"
+                    app:cardBackgroundColor="@color/dash_bg_bluegrey"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -330,7 +330,7 @@
                     android:layout_height="110dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    app:cardBackgroundColor="#E1F5FE"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
@@ -363,7 +363,7 @@
                 android:id="@+id/btnDashHeSheItems"
                 android:layout_width="match_parent"
                 android:layout_height="90dp"
-                app:cardBackgroundColor="#E8F5E9"
+                app:cardBackgroundColor="@color/dash_bg_green"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">

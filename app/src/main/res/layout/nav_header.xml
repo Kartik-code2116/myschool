@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:text="@string/txt_myschool"
-                android:textColor="@color/drawer_header_dark"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.02"/>
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:text="2116"
-                android:textColor="#2E7D32"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
                 android:letterSpacing="0.05"/>
@@ -77,10 +77,11 @@
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_surface_rounded"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/drawer_stats"
             android:padding="12dp"
             android:src="@drawable/ic_chart"
+            app:tint="?attr/colorOnSurface"
             android:scaleType="fitCenter"/>
 
         <ImageButton
@@ -89,10 +90,11 @@
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_surface_rounded"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/drawer_settings"
             android:padding="12dp"
             android:src="@drawable/ic_settings"
+            app:tint="?attr/colorOnSurface"
             android:scaleType="fitCenter"/>
 
         <ImageButton
@@ -101,10 +103,11 @@
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_surface_rounded"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/drawer_print"
             android:padding="12dp"
             android:src="@drawable/ic_print"
+            app:tint="?attr/colorOnSurface"
             android:scaleType="fitCenter"/>
 
         <ImageButton
@@ -112,10 +115,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/bg_surface_rounded"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/profile_title"
             android:padding="12dp"
             android:src="@drawable/ic_person"
+            app:tint="?attr/colorOnSurface"
             android:scaleType="fitCenter"/>
     </LinearLayout>
 </LinearLayout>

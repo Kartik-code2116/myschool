@@ -889,11 +889,27 @@ public class ProductTourHelper {
 
         // ── Tooltip card ─────────────────────────────────────────────
 
+        
+        private int getThemeColor(Context context, int attrResId, int defaultColor) {
+            android.content.res.TypedArray a = context.getTheme().obtainStyledAttributes(new int[]{attrResId});
+            try {
+                return a.getColor(0, defaultColor);
+            } finally {
+                a.recycle();
+            }
+        }
+
         private void buildTooltipCard(Context ctx) {
+            int cardBg = getThemeColor(ctx, com.google.android.material.R.attr.colorSurface, CARD_BG);
+            int textColorTitle = getThemeColor(ctx, com.google.android.material.R.attr.colorOnSurface, 0xFF1A237E);
+            int textColorDesc = getThemeColor(ctx, com.google.android.material.R.attr.colorOnSurfaceVariant, 0xFF455A64);
+            int dividerColor = getThemeColor(ctx, com.google.android.material.R.attr.colorOutlineVariant, 0xFFEEEEEE);
+            int primaryColor = getThemeColor(ctx, androidx.appcompat.R.attr.colorPrimary, CARD_ACCENT);
+
             tooltipCard = new CardView(ctx);
             tooltipCard.setRadius(dp(16));
             tooltipCard.setCardElevation(dp(12));
-            tooltipCard.setCardBackgroundColor(CARD_BG);
+            tooltipCard.setCardBackgroundColor(cardBg);
             tooltipCard.setPreventCornerOverlap(true);
 
             LinearLayout inner = new LinearLayout(ctx);
@@ -903,7 +919,7 @@ public class ProductTourHelper {
 
             // Progress indicator strip at top
             View accent = new View(ctx);
-            accent.setBackgroundColor(CARD_ACCENT);
+            accent.setBackgroundColor(primaryColor);
             LinearLayout.LayoutParams stripLp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(4));
             stripLp.bottomMargin = dp(12);
@@ -924,7 +940,7 @@ public class ProductTourHelper {
             TextView tvTitle = new TextView(ctx);
             tvTitle.setId(R.id.tvTourTitle);
             tvTitle.setTextSize(16);
-            tvTitle.setTextColor(0xFF1A237E);
+            tvTitle.setTextColor(textColorTitle);
             tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
             LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -936,7 +952,7 @@ public class ProductTourHelper {
             TextView tvDesc = new TextView(ctx);
             tvDesc.setId(R.id.tvTourDescription);
             tvDesc.setTextSize(13.5f);
-            tvDesc.setTextColor(0xFF455A64);
+            tvDesc.setTextColor(textColorDesc);
             tvDesc.setLineSpacing(dp(3), 1f);
             LinearLayout.LayoutParams descLp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -947,7 +963,7 @@ public class ProductTourHelper {
 
             // Divider
             View divider = new View(ctx);
-            divider.setBackgroundColor(0xFFEEEEEE);
+            divider.setBackgroundColor(dividerColor);
             inner.addView(divider, new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(1)));
 
@@ -982,7 +998,7 @@ public class ProductTourHelper {
             btnNext.setPadding(dp(20), dp(8), dp(20), dp(8));
             btnNext.setBackgroundResource(R.drawable.bg_pill_info);
             btnNext.setBackgroundTintList(
-                    android.content.res.ColorStateList.valueOf(CARD_ACCENT));
+                    android.content.res.ColorStateList.valueOf(primaryColor));
             btnNext.setClickable(true);
             btnNext.setOnClickListener(v -> nextStep());
             btnRow.addView(btnNext, new LinearLayout.LayoutParams(

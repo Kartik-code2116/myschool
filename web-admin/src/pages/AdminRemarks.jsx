@@ -5,7 +5,7 @@ import { getDefaultSubjectsForClass } from '../utils/subjectUtils';
 
 import './AdminRemarks.css';
 
-const CLASSES = ['1', '2', '3', '4', '5', '6', '7', '8'];
+const CLASSES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 const SEMESTERS = ['1', '2'];
 const SPECIAL_CATEGORIES = [
   { value: 'Vishesh pragati', label: 'Special Progress (विशेष प्रगती)' },

@@ -10,8 +10,8 @@
     app:cardCornerRadius="14dp"
     app:cardElevation="3dp"
     app:strokeWidth="0.8dp"
-    app:strokeColor="#E0E0E0"
-    app:cardBackgroundColor="@color/white">
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardBackgroundColor="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                 android:layout_centerVertical="true"
                 android:fontFamily="sans-serif-bold"
                 android:text="@string/txt_1"
-                android:textColor="#263238"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -50,7 +50,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_more_vert"
                 android:rotation="90"
-                app:tint="#78909C"
+                app:tint="?attr/colorOnSurfaceVariant"
                 android:contentDescription="Options Menu" />
         </RelativeLayout>
 

@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/register_title"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorSurface"
                 android:textSize="24sp"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.02"/>
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="@string/register_subtitle"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorSurface"
                 android:textSize="13sp"
                 android:alpha="0.85"
                 android:letterSpacing="0.01"/>

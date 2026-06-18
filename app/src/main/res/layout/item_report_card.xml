@@ -6,10 +6,10 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
-    app:cardBackgroundColor="@android:color/white"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:strokeColor="#F0F0F0"
+    app:strokeColor="?attr/colorOutlineVariant"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -27,7 +27,7 @@
             android:layout_height="52dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/bg_surface_rounded"
-            android:backgroundTint="#F0F0FF">
+            android:backgroundTint="?attr/colorSurfaceVariant">
 
             <ImageView
                 android:id="@+id/tvReportCategoryIcon"
@@ -66,7 +66,7 @@
                 android:layout_marginTop="6dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/txt_1_3"
-                android:textColor="#202124"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp" />
 
             <!-- Description Text -->
@@ -78,7 +78,7 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="@string/str_empty_28"
-                android:textColor="#5F6368"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="13sp"
                 android:lineSpacingExtra="2dp" />
         </LinearLayout>
@@ -98,7 +98,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_settings"
                 android:padding="12dp"
-                app:tint="#888888" />
+                app:tint="?attr/colorOnSurfaceVariant" />
 
             <ImageButton
                 android:id="@+id/btnReportAction"

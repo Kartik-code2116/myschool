@@ -21,31 +21,35 @@ export function getDefaultSubjectsForClass(className) {
   subjects.push("Mathematics");
 
   if (std === 1 || std === 2) {
-    subjects.push("Play, Do, Learn");
+    subjects.push("Health & Physical Education");
+    subjects.push("Work Experience");
+    subjects.push("Art Education");
   } else if (std === 3 || std === 4) {
     subjects.push("Environmental Studies");
-    subjects.push("Play, Do, Learn");
+    subjects.push("Health & Physical Education");
+    subjects.push("Work Experience");
+    subjects.push("Art Education");
   } else if (std === 5) {
     subjects.push("Environmental Studies Part 1");
     subjects.push("Environmental Studies Part 2");
     subjects.push("Health & Physical Education");
+    subjects.push("Art Education");
     subjects.push("Work Experience");
-    subjects.push("Art");
   } else if (std >= 6 && std <= 8) {
-    subjects.push("Science");
+    subjects.push("General Science");
     subjects.push("History and Civics");
     subjects.push("Geography");
     subjects.push("Health & Physical Education");
+    subjects.push("Art Education");
     subjects.push("Work Experience");
-    subjects.push("Art");
   } else {
     // 9-10
-    subjects.push("Science");
+    subjects.push("General Science");
     subjects.push("History and Civics");
     subjects.push("Geography");
     subjects.push("Health & Physical Education");
+    subjects.push("Art Education");
     subjects.push("Work Experience");
-    subjects.push("Art");
     subjects.push("Information & Comm. Technology (ICT)");
     subjects.push("Water Security & Environment Studies");
   }

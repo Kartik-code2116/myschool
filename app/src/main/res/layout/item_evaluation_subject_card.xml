@@ -8,8 +8,8 @@
     app:cardCornerRadius="14dp"
     app:cardElevation="2dp"
     app:strokeWidth="0.8dp"
-    app:strokeColor="#E0E0E0"
-    app:cardBackgroundColor="@color/white">
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardBackgroundColor="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                     android:maxLines="1"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/txt_1_2"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
                     android:textStyle="bold"
                     android:paddingHorizontal="6dp"
                     android:paddingVertical="1.5dp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="?attr/colorSurface"
                     android:background="@drawable/bg_badge_pill" />
             </LinearLayout>
 
@@ -67,7 +67,7 @@
                 android:layout_alignParentEnd="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_more_vert"
-                app:tint="#6C4CCF"
+                app:tint="?attr/colorOnSurface"
                 android:contentDescription="Subject Action" />
         </RelativeLayout>
 
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/txt_formative_evaluation_weightage"
-            android:textColor="#78909C"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="10sp"
             android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="4dp" />
@@ -99,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_16"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -109,7 +109,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -126,7 +126,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_17"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -136,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -153,7 +153,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_18"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -163,7 +163,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -180,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_19"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -190,7 +190,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -207,7 +207,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_20"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -217,7 +217,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -234,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_21"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -244,7 +244,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -261,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_22"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -271,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -288,7 +288,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/str_empty_23"
                     android:gravity="center"
-                    android:textColor="#78909C"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="9sp"
                     android:padding="2dp"
                     android:background="@drawable/bg_table_cell" />
@@ -298,7 +298,7 @@
                     android:layout_height="wrap_content"
                     android:text="-"
                     android:gravity="center"
-                    android:textColor="#37474F"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="11sp"
                     android:padding="3dp"
                     android:background="@drawable/bg_table_cell" />
@@ -310,7 +310,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/txt_summative_evaluation_weightage"
-            android:textColor="#78909C"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="10sp"
             android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="4dp" />
@@ -340,7 +340,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_empty_17"
                         android:gravity="center"
-                        android:textColor="#78909C"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="9sp"
                         android:padding="2dp"
                         android:background="@drawable/bg_table_cell" />
@@ -350,7 +350,7 @@
                         android:layout_height="wrap_content"
                         android:text="-"
                         android:gravity="center"
-                        android:textColor="#37474F"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="11sp"
                         android:padding="3dp"
                         android:background="@drawable/bg_table_cell" />
@@ -367,7 +367,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_empty_18"
                         android:gravity="center"
-                        android:textColor="#78909C"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="9sp"
                         android:padding="2dp"
                         android:background="@drawable/bg_table_cell" />
@@ -377,7 +377,7 @@
                         android:layout_height="wrap_content"
                         android:text="-"
                         android:gravity="center"
-                        android:textColor="#37474F"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="11sp"
                         android:padding="3dp"
                         android:background="@drawable/bg_table_cell" />
@@ -394,7 +394,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_empty_24"
                         android:gravity="center"
-                        android:textColor="#78909C"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="9sp"
                         android:padding="2dp"
                         android:background="@drawable/bg_table_cell" />
@@ -404,7 +404,7 @@
                         android:layout_height="wrap_content"
                         android:text="-"
                         android:gravity="center"
-                        android:textColor="#37474F"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="11sp"
                         android:padding="3dp"
                         android:background="@drawable/bg_table_cell" />
@@ -434,7 +434,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_empty_25"
                         android:gravity="center"
-                        android:textColor="#78909C"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="9sp"
                         android:padding="2dp"
                         android:background="@drawable/bg_table_cell" />
@@ -444,7 +444,7 @@
                         android:layout_height="wrap_content"
                         android:text="-"
                         android:gravity="center"
-                        android:textColor="#37474F"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="11sp"
                         android:padding="3dp"
                         android:background="@drawable/bg_table_cell" />
@@ -461,7 +461,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_empty_26"
                         android:gravity="center"
-                        android:textColor="#78909C"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="9sp"
                         android:padding="2dp"
                         android:background="@drawable/bg_table_cell" />
@@ -471,7 +471,7 @@
                         android:layout_height="wrap_content"
                         android:text="-"
                         android:gravity="center"
-                        android:textColor="#37474F"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="11sp"
                         android:padding="3dp"
                         android:background="@drawable/bg_table_cell" />
@@ -488,7 +488,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_empty_2"
                         android:gravity="center"
-                        android:textColor="#78909C"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="9sp"
                         android:padding="2dp"
                         android:background="@drawable/bg_table_cell" />
@@ -498,7 +498,7 @@
                         android:layout_height="wrap_content"
                         android:text="-"
                         android:gravity="center"
-                        android:textColor="#6C4CCF"
+                        android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold"
                         android:textSize="11sp"
                         android:padding="3dp"

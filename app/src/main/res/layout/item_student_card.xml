@@ -11,7 +11,7 @@
     app:cardElevation="2dp"
     app:strokeWidth="1dp"
     app:strokeColor="@color/outline_variant"
-    app:cardBackgroundColor="#FAF0F2"
+    app:cardBackgroundColor="?attr/colorSurfaceVariant"
     android:clickable="true"
     android:focusable="true">
 
@@ -35,8 +35,8 @@
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="2dp"
-                app:strokeColor="#5A4FCF"
-                app:cardBackgroundColor="#FCECEF">
+                app:strokeColor="?attr/colorPrimary"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
                 <ImageView
                     android:id="@+id/ivStudentAvatar"
@@ -44,7 +44,7 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_person"
                     android:padding="4dp"
-                    app:tint="#5A4FCF"
+                    app:tint="?attr/colorPrimary"
                     android:scaleType="fitCenter" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -65,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1011021645"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorSurface"
                     android:textSize="8.5sp"
                     android:fontFamily="sans-serif-medium"
                     android:singleLine="true"/>
@@ -75,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="4"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorSurface"
                     android:textSize="7.5sp"/>
 
             </LinearLayout>
@@ -103,7 +103,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_toStartOf="@id/btnOptions"
                     android:text="@string/txt_kartik"
-                    android:textColor="#5A4FCF"
+                    android:textColor="?attr/colorPrimary"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-bold"/>
 
@@ -115,7 +115,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Options"
                     android:src="@drawable/ic_more_vert"
-                    app:tint="#5A4FCF"
+                    app:tint="?attr/colorPrimary"
                     android:padding="2dp"/>
             </RelativeLayout>
 
@@ -123,7 +123,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#5A4FCF"
+                android:background="?attr/colorPrimary"
                 android:alpha="0.2"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="6dp"/>
@@ -202,7 +202,7 @@
                     android:layout_height="20dp"
                     app:cardCornerRadius="4dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#E6E6E6"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
                     android:layout_marginEnd="4dp">
                     <TextView
                         android:id="@+id/tvTag1"
@@ -211,7 +211,7 @@
                         android:text="1"
                         android:textSize="9sp"
                         android:gravity="center"
-                        android:textColor="#555555"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:fontFamily="sans-serif-bold"/>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -220,7 +220,7 @@
                     android:layout_height="20dp"
                     app:cardCornerRadius="4dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#E6E6E6">
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant">
                     <TextView
                         android:id="@+id/tvTag2"
                         android:layout_width="match_parent"
@@ -228,7 +228,7 @@
                         android:text="1"
                         android:textSize="9sp"
                         android:gravity="center"
-                        android:textColor="#555555"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:fontFamily="sans-serif-bold"/>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>

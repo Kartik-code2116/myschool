@@ -80,11 +80,19 @@ public class GunapattrakGenerator {
                 paint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
             }
 
-            float width = paint.measureText(text);
-            float height = paint.descent() - paint.ascent();
+            String[] lines = text.split("\n");
+            float maxLineWidth = 0;
+            for (String line : lines) {
+                float w = paint.measureText(line);
+                if (w > maxLineWidth) maxLineWidth = w;
+            }
+            
+            android.graphics.Paint.FontMetrics fm = paint.getFontMetrics();
+            float lineHeight = fm.descent - fm.ascent;
+            float totalHeight = lineHeight * lines.length;
 
-            int bitmapWidth = (int) height + 10;
-            int bitmapHeight = (int) width + 10;
+            int bitmapWidth = (int) totalHeight + 10;
+            int bitmapHeight = (int) maxLineWidth + 10;
 
             android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(bitmapWidth, bitmapHeight,
                     android.graphics.Bitmap.Config.ARGB_8888);
@@ -92,15 +100,20 @@ public class GunapattrakGenerator {
             canvas.translate(bitmapWidth / 2f, bitmapHeight / 2f);
             canvas.rotate(-90);
 
-            float textX = -width / 2f;
-            float textY = (height / 2f) - paint.descent();
-            canvas.drawText(text, textX, textY, paint);
+            float startY = -(totalHeight / 2f) - fm.ascent;
+            for (int i = 0; i < lines.length; i++) {
+                String line = lines[i];
+                float w = paint.measureText(line);
+                float textX = -w / 2f;
+                float textY = startY + (i * lineHeight);
+                canvas.drawText(line, textX, textY, paint);
+            }
 
             java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
             bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream);
             com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(stream.toByteArray());
             img.setAlignment(Element.ALIGN_CENTER);
-            img.scaleToFit(12f, 100f); // Scale down to fit column nicely
+            img.scaleToFit(18f * lines.length, 100f); // Adjust horizontal scale based on lines
             c.addElement(img);
         } catch (Exception e) {
             c.setPhrase(new Phrase(text, font)); // Fallback

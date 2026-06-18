@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2">
+    android:background="?android:attr/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="?attr/colorSurface"
             app:elevation="2dp">
 
             <androidx.appcompat.widget.Toolbar
@@ -23,7 +23,7 @@
                 android:layout_height="72dp"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
-                android:background="@color/white">
+                android:background="?attr/colorSurface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_menu"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
+                        app:tint="?attr/colorPrimary"
                         android:padding="12dp"
                         android:contentDescription="Open Drawer"/>
 
@@ -54,7 +54,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/txt_students"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="20sp"
                             android:fontFamily="sans-serif-black"
                             android:textStyle="bold"/>
@@ -77,7 +77,7 @@
                         android:layout_height="38dp"
                         android:src="@drawable/ic_help_outline"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
+                        app:tint="?attr/colorPrimary"
                         android:padding="8dp"
                         android:contentDescription="Help"/>
 
@@ -99,7 +99,7 @@
                         android:layout_height="38dp"
                         android:src="@drawable/ic_chart"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
+                        app:tint="?attr/colorPrimary"
                         android:padding="8dp"
                         android:contentDescription="Stats Dashboard"/>
 
@@ -110,7 +110,7 @@
                         android:layout_height="38dp"
                         android:src="@drawable/ic_more_vert"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#5A4FCF"
+                        app:tint="?attr/colorPrimary"
                         android:padding="8dp"
                         android:contentDescription="More"/>
                 </LinearLayout>
@@ -121,7 +121,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#E6E6E6"
+            android:background="?attr/colorSurfaceVariant"
             android:padding="16dp"
             android:orientation="vertical">
 
@@ -130,7 +130,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_year_2026_27_class_1_div_1"
-                android:textColor="#333333"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="15sp"
                 android:fontFamily="sans-serif-black"
                 android:textStyle="bold"/>
@@ -242,9 +242,9 @@
         android:layout_marginBottom="24dp"
         android:text="@string/action_add_student"
         app:icon="@drawable/ic_add_circle"
-        app:backgroundTint="#5A4FCF"
-        android:textColor="@color/white"
-        app:iconTint="@color/white"
+        app:backgroundTint="?attr/colorPrimary"
+        android:textColor="?attr/colorSurface"
+        app:iconTint="?attr/colorSurface"
         app:elevation="4dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F3F1F7">
+    android:background="?android:attr/colorBackground">
 
     <!-- Custom Top App Bar (72dp) -->
     <LinearLayout
@@ -16,7 +16,7 @@
         android:gravity="center_vertical"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        android:background="#F3F1F7">
+        android:background="?android:attr/colorBackground">
 
         <!-- Hamburger Icon -->
         <ImageButton
@@ -25,7 +25,7 @@
             android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_menu"
-            app:tint="#6C4CCF"
+            app:tint="?attr/colorPrimary"
             android:padding="10dp"
             android:contentDescription="Menu" />
 
@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_descriptive_entries"
-                android:textColor="#263238"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-black"
                 android:textStyle="bold" />
@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_class_5_div_1_semester_2"
-                android:textColor="#78909C"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-medium"
                 android:alpha="0.9"
@@ -74,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_help_outline"
-                app:tint="#37474F" />
+                app:tint="?attr/colorOnSurface" />
         </FrameLayout>
 
         <!-- Add Outlined Icon inside outlined square -->
@@ -91,7 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_add_box"
-                app:tint="#37474F" />
+                app:tint="?attr/colorOnSurface" />
         </FrameLayout>
 
 
@@ -103,7 +103,7 @@
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_more_vert"
-            app:tint="#37474F"
+            app:tint="?attr/colorOnSurface"
             android:padding="8dp"
             android:contentDescription="More" />
 
@@ -119,8 +119,8 @@
         app:cardCornerRadius="10dp"
         app:cardElevation="2dp"
         app:strokeWidth="0.8dp"
-        app:strokeColor="#E0E0E0"
-        app:cardBackgroundColor="@color/white">
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorSurface">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -137,7 +137,7 @@
                 android:layout_centerVertical="true"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/txt_year_2025_26_class_5_div_1_sem"
-                android:textColor="#37474F"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:maxLines="1"
@@ -151,7 +151,7 @@
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_list_bullet"
-                app:tint="#37474F"
+                app:tint="?attr/colorOnSurface"
                 android:contentDescription="Layout Grid/List" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>

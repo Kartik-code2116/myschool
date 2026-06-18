@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="?attr/colorSurfaceVariant">
 
     <!-- Header Strip -->
     <LinearLayout
@@ -21,7 +21,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_poll"
-            app:tint="@color/white"
+            app:tint="?attr/colorSurface"
             android:layout_marginEnd="8dp"/>
 
         <TextView
@@ -29,7 +29,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorSurface"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/txt_class_5_div_1_progress_dashboa" />
@@ -38,7 +38,7 @@
             android:id="@+id/tvTotalStudents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorSurface"
             android:textSize="14sp"
             android:fontFamily="sans-serif-bold"
             android:text="@string/txt_0_students"
@@ -51,7 +51,7 @@
             android:layout_height="36dp"
             android:src="@drawable/ic_students"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="@color/white"
+            app:tint="?attr/colorSurface"
             android:padding="6dp"
             android:contentDescription="Student Progress Dashboard" />
     </LinearLayout>

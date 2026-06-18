@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:background="#F5F5F7">
+    android:background="?android:attr/colorBackground">
 
     <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
+        android:background="?attr/colorSurface"
         android:elevation="4dp">
 
         <ImageButton
@@ -22,7 +22,7 @@
             android:layout_marginStart="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
-            app:tint="#5A4FCF"
+            app:tint="?attr/colorPrimary"
             android:contentDescription="Back" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/txt_preview"
-            android:textColor="#1C1C1E"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="18sp"
             android:textStyle="bold" />
             
@@ -44,7 +44,7 @@
             android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_list"
-            app:tint="#5A4FCF"
+            app:tint="?attr/colorPrimary"
             android:contentDescription="Toggle View Mode" />
     </RelativeLayout>
 
@@ -91,7 +91,7 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="6dp"
             android:text="@string/txt_1_1"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorSurface"
             android:textSize="14sp"
             android:textStyle="bold" />
     </FrameLayout>
@@ -100,7 +100,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="?attr/colorSurface"
         android:elevation="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -114,7 +114,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/str_empty_3"
-            android:textColor="#5A4FCF" />
+            android:textColor="?attr/colorPrimary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDownload"
@@ -125,10 +125,10 @@
             android:paddingHorizontal="24dp"
             android:paddingVertical="12dp"
             android:text="@string/str_empty_4"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorSurface"
             app:cornerRadius="24dp"
             app:icon="@drawable/ic_print"
-            app:iconTint="@color/white" />
+            app:iconTint="?attr/colorSurface" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
@@ -137,6 +137,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/str_empty_5"
-            android:textColor="#5A4FCF" />
+            android:textColor="?attr/colorPrimary" />
     </LinearLayout>
 </LinearLayout>

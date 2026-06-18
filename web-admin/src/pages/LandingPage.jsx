@@ -331,7 +331,17 @@ export default function LandingPage({ user, loading, lang }) {
                   <span>100</span>
                 </div>
                 <div className="mock-sub-row">
-                  <span>Play, Do, Learn</span>
+                  <span>Health & Physical Education</span>
+                  <div className="mock-slider"><div className="mock-slider-bar slide-w-100"></div></div>
+                  <span>100</span>
+                </div>
+                <div className="mock-sub-row">
+                  <span>Work Experience</span>
+                  <div className="mock-slider"><div className="mock-slider-bar slide-w-100"></div></div>
+                  <span>100</span>
+                </div>
+                <div className="mock-sub-row">
+                  <span>Art Education</span>
                   <div className="mock-slider"><div className="mock-slider-bar slide-w-100"></div></div>
                   <span>100</span>
                 </div>

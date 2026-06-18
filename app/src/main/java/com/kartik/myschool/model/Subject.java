@@ -95,34 +95,38 @@ public class Subject {
 
         if (std == 1 || std == 2) {
             // Lower Primary (1-2)
-            list.add(new Subject("Play, Do, Learn", 100));
+            list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("Art Education", 100));
         } else if (std == 3 || std == 4) {
             // Primary (3-4)
             list.add(new Subject("Environmental Studies", 100));
-            list.add(new Subject("Play, Do, Learn", 100));
+            list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("Art Education", 100));
         } else if (std == 5) {
             // Upper Primary Transition (5)
             list.add(new Subject("Environmental Studies Part 1", 100));
             list.add(new Subject("Environmental Studies Part 2", 100));
             list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Art Education", 100));
             list.add(new Subject("Work Experience", 100));
-            list.add(new Subject("Art", 100));
         } else if (std >= 6 && std <= 8) {
             // Middle School (6-8)
-            list.add(new Subject("Science", 100));
+            list.add(new Subject("General Science", 100));
             list.add(new Subject("History and Civics", 100));
             list.add(new Subject("Geography", 100));
             list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Art Education", 100));
             list.add(new Subject("Work Experience", 100));
-            list.add(new Subject("Art", 100));
         } else {
             // High School (9-10)
-            list.add(new Subject("Science", 100));
+            list.add(new Subject("General Science", 100));
             list.add(new Subject("History and Civics", 100));
             list.add(new Subject("Geography", 100));
             list.add(new Subject("Health & Physical Education", 100));
+            list.add(new Subject("Art Education", 100));
             list.add(new Subject("Work Experience", 100));
-            list.add(new Subject("Art", 100));
             list.add(new Subject("Information & Comm. Technology (ICT)", 100));
             list.add(new Subject("Water Security & Environment Studies", 100));
         }

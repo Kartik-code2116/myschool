@@ -13,7 +13,7 @@
         android:fontFamily="sans-serif-medium"
         android:text="Unlock Unlimited Students"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="22sp" />
 
     <TextView
@@ -23,7 +23,7 @@
         android:layout_marginTop="8dp"
         android:text="You have reached the free limit of 3 students. Upgrade to add unlimited students."
         android:textAlignment="center"
-        android:textColor="#555555"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="16sp" />
 
     <Button
@@ -34,7 +34,7 @@
         android:backgroundTint="@color/primary"
         android:text="Subscribe with Google Play"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="?attr/colorSurface"
         android:textSize="16sp" />
 
     <ProgressBar
@@ -51,7 +51,7 @@
         android:layout_marginTop="16dp"
         android:text="Secure billing powered by Google Play"
         android:textAlignment="center"
-        android:textColor="#888888"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="12sp" />
 
 </LinearLayout>

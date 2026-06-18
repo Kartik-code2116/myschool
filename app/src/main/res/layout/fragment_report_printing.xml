@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EFEFEF"
+    android:background="?android:attr/colorBackground"
     android:orientation="vertical">
 
     <!-- Header Section (White/light card strip below app bar) -->
@@ -17,8 +17,8 @@
         app:cardCornerRadius="10dp"
         app:cardElevation="2dp"
         app:strokeWidth="0.8dp"
-        app:strokeColor="#E0E0E0"
-        app:cardBackgroundColor="@color/white">
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorSurface">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,7 +34,7 @@
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/txt_year_2026_27"
-                android:textColor="#37474F"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:maxLines="1"
@@ -54,7 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_play"
-                    app:tint="#37474F" />
+                    app:tint="?attr/colorOnSurface" />
             </FrameLayout>
 
             <!-- Help Outlined Icon inside outlined square -->
@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_help_outline"
-                    app:tint="#37474F" />
+                    app:tint="?attr/colorOnSurface" />
             </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

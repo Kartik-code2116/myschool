@@ -9,7 +9,7 @@
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@android:color/white">
+    app:cardBackgroundColor="?attr/colorSurface">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
-            app:strokeColor="#E2E8F0"
+            app:strokeColor="?attr/colorOutlineVariant"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="#F1F5F9"/>
+                android:background="?attr/colorSurfaceVariant"/>
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
@@ -54,7 +54,7 @@
                 android:text="Payment Request"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#1E293B"/>
+                android:textColor="?attr/colorOnSurface"/>
 
             <TextView
                 android:id="@+id/tvDate"
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:textSize="13sp"
-                android:textColor="#64748B"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="May 28, 2026 at 10:30 AM"/>
 
             <TextView
@@ -75,7 +75,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:background="@drawable/bg_status"
-                android:textColor="#D97706"
+                android:textColor="@color/warning"
                 tools:text="PENDING"/>
                 
         </LinearLayout>

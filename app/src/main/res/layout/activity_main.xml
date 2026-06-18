@@ -36,7 +36,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:src="@drawable/ic_camera"
-                    app:tint="@color/white" />
+                    app:tint="?attr/colorSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
                     android:layout_marginTop="12dp"
                     android:text="@string/app_name"
                     android:textAppearance="@style/TextAppearance.EduReport.DisplaySmall"
-                    android:textColor="@color/white" />
+                    android:textColor="?attr/colorSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
                     android:layout_marginTop="4dp"
                     android:text="@string/txt_smart_ocr_scanner"
                     android:textAppearance="@style/TextAppearance.EduReport.BodyMedium"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorSurface"
                     android:alpha="0.9" />
             </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -249,8 +249,8 @@
                         android:layout_marginBottom="40dp"
                         android:text="@string/txt_align_text_within_the_frame"
                         android:textAppearance="@style/TextAppearance.EduReport.BodySmall"
-                        android:textColor="@color/white"
-                        android:shadowColor="@color/black"
+                        android:textColor="?attr/colorSurface"
+                        android:shadowColor="?attr/colorOnSurface"
                         android:shadowDx="1"
                         android:shadowDy="1"
                         android:shadowRadius="2" />
@@ -281,7 +281,7 @@
                         android:layout_height="32dp"
                         android:indeterminate="true"
                         app:indicatorColor="@color/primary"
-                        app:trackColor="@color/white" />
+                        app:trackColor="?attr/colorSurface" />
 
                     <TextView
                         android:id="@+id/statusText"
@@ -402,7 +402,7 @@
         android:text="@string/txt_capture"
         app:backgroundTint="@color/primary"
         app:icon="@drawable/ic_camera"
-        app:iconTint="@color/white"
+        app:iconTint="?attr/colorSurface"
         app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Large"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
 

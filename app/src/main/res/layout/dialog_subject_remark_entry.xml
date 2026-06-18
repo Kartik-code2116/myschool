@@ -38,7 +38,7 @@
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
-                android:background="#FAF8FF"
+                android:background="?attr/colorSurfaceVariant"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -212,7 +212,7 @@
                 android:gravity="end"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="10dp"
-                android:background="#FAF8FF"
+                android:background="?attr/colorSurfaceVariant"
                 app:layout_constraintBottom_toTopOf="@id/progress"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">

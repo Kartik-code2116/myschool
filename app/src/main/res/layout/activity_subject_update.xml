@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ECEDEF"
+    android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true">
 
     <!-- Top White Header Bar -->
@@ -11,11 +11,11 @@
         android:id="@+id/llHeaderBar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurface"
         app:navigationIcon="@drawable/ic_close"
-        app:navigationIconTint="#5A4FCF"
+        app:navigationIconTint="?attr/colorPrimary"
         app:title="@string/txt_update_subject"
-        app:titleTextColor="#2E2E2E"
+        app:titleTextColor="?attr/colorOnSurface"
         app:titleCentered="false"
         app:elevation="2dp"/>
 
@@ -53,8 +53,8 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="#8E8E8E"
-                    app:hintTextColor="#8E8E8E">
+                    app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etSubjectCode"
@@ -62,7 +62,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="text"
                         android:text="1"
-                        android:textColor="#222222"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -78,8 +78,8 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="#8E8E8E"
-                    app:hintTextColor="#8E8E8E">
+                    app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etTeacherId"
@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="text"
                         android:text="@string/txt_null"
-                        android:textColor="#222222"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -111,8 +111,8 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="#8E8E8E"
-                    app:hintTextColor="#8E8E8E">
+                    app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etFormativeEval"
@@ -120,7 +120,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="number"
                         android:text="70"
-                        android:textColor="#222222"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -136,8 +136,8 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="#8E8E8E"
-                    app:hintTextColor="#8E8E8E">
+                    app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                    app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etSummativeEval"
@@ -145,7 +145,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="number"
                         android:text="30"
-                        android:textColor="#222222"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -162,8 +162,8 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#8E8E8E"
-                app:hintTextColor="#8E8E8E">
+                app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSubjectNameRegular"
@@ -171,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:text="@string/txt_marathi"
-                    android:textColor="#222222"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -187,8 +187,8 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#8E8E8E"
-                app:hintTextColor="#8E8E8E">
+                app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSubjectNameShort"
@@ -196,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:text="@string/txt_marathi"
-                    android:textColor="#222222"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -212,8 +212,8 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#8E8E8E"
-                app:hintTextColor="#8E8E8E">
+                app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSubjectNameLong"
@@ -221,7 +221,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:text="@string/txt_marathi"
-                    android:textColor="#222222"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -237,8 +237,8 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#8E8E8E"
-                app:hintTextColor="#8E8E8E">
+                app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDropdownNotes"
@@ -246,7 +246,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:text="@string/txt_i_1"
-                    android:textColor="#222222"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -262,8 +262,8 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#8E8E8E"
-                app:hintTextColor="#8E8E8E">
+                app:boxStrokeColor="?attr/colorOnSurfaceVariant"
+                app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDropdownNoteMedium"
@@ -271,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:text="1"
-                    android:textColor="#222222"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -284,7 +284,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#ECEDEF"
+        android:background="?android:attr/colorBackground"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
@@ -297,10 +297,10 @@
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:text="@string/txt_cancel"
-            android:textColor="#5A43C2"
-            app:backgroundTint="#FFFFFF"
+            android:textColor="?attr/colorPrimary"
+            app:backgroundTint="?attr/colorSurface"
             app:cornerRadius="10dp"
-            app:strokeColor="#5A43C2"
+            app:strokeColor="?attr/colorPrimary"
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -311,10 +311,10 @@
             android:layout_weight="1"
             android:layout_marginHorizontal="6dp"
             android:text="@string/txt_clear"
-            android:textColor="#5A43C2"
-            app:backgroundTint="#FFFFFF"
+            android:textColor="?attr/colorPrimary"
+            app:backgroundTint="?attr/colorSurface"
             app:cornerRadius="10dp"
-            app:strokeColor="#5A43C2"
+            app:strokeColor="?attr/colorPrimary"
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -324,8 +324,8 @@
             android:layout_weight="1.2"
             android:layout_marginStart="6dp"
             android:text="@string/txt_update"
-            android:textColor="#FFFFFF"
-            app:backgroundTint="#5A43C2"
+            android:textColor="?attr/colorSurface"
+            app:backgroundTint="?attr/colorPrimary"
             app:cornerRadius="25dp" />
     </LinearLayout>
 

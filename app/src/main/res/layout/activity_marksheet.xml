@@ -2,13 +2,13 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#F2F2F2"
+    android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="?attr/colorSurface"
         app:elevation="4dp">
 
         <LinearLayout
@@ -101,7 +101,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp">
 
@@ -132,7 +132,7 @@
                             android:layout_height="wrap_content"
                             android:text="1/1"
                             android:textSize="18sp"
-                            android:textColor="@color/white"
+                            android:textColor="?attr/colorSurface"
                             android:fontFamily="sans-serif-medium"
                             android:textStyle="bold"/>
                             
@@ -153,7 +153,7 @@
                                     android:layout_height="20dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_check_circle"
-                                    app:tint="@color/white"/>
+                                    app:tint="?attr/colorSurface"/>
                             </FrameLayout>
                         </RelativeLayout>
                     </LinearLayout>
@@ -172,7 +172,7 @@
         app:layout_anchor="@id/toolbar"
         app:layout_anchorGravity="bottom|end"
         android:src="@drawable/ic_pdf"
-        app:tint="@color/white"
+        app:tint="?attr/colorSurface"
         app:backgroundTint="@color/pdf_blue"
         app:elevation="6dp"
         app:fabSize="normal"/>

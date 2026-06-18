@@ -25,7 +25,7 @@
         android:layout_marginBottom="18dp"
         android:fontFamily="sans-serif-medium"
         android:text="Print Options"
-        android:textColor="#1C1C1E"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
         android:foreground="?attr/selectableItemBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
-        app:strokeColor="#E5E5EA"
+        app:strokeColor="?attr/colorOutlineVariant"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -57,7 +57,7 @@
                 android:backgroundTint="#EAEAFF"
                 android:padding="8dp"
                 android:src="@drawable/ic_print"
-                app:tint="#5A4FCF" />
+                app:tint="?attr/colorPrimary" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Print All Pages"
-                    android:textColor="#1C1C1E"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Directly spools all pages to the printer."
-                    android:textColor="#8E8E93"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -98,7 +98,7 @@
         android:foreground="?attr/selectableItemBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
-        app:strokeColor="#E5E5EA"
+        app:strokeColor="?attr/colorOutlineVariant"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -129,7 +129,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Print in sets of 5 (5-5 Bunch)"
-                    android:textColor="#1C1C1E"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Displays a secondary dialog listing ranges in sets of 5 pages (e.g. Pages 1 - 5, Pages 6 - 10)."
-                    android:textColor="#8E8E93"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -156,7 +156,7 @@
         android:foreground="?attr/selectableItemBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
-        app:strokeColor="#E5E5EA"
+        app:strokeColor="?attr/colorOutlineVariant"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -187,7 +187,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Print in sets of 10 (10-10 Bunch)"
-                    android:textColor="#1C1C1E"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -197,7 +197,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Displays a secondary dialog listing ranges in sets of 10 pages (e.g. Pages 1 - 10, Pages 11 - 20)."
-                    android:textColor="#8E8E93"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -214,7 +214,7 @@
         android:foreground="?attr/selectableItemBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
-        app:strokeColor="#E5E5EA"
+        app:strokeColor="?attr/colorOutlineVariant"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -245,7 +245,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Custom Page Range"
-                    android:textColor="#1C1C1E"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -255,7 +255,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Prompts start and end page fields to enter a custom range of your choosing."
-                    android:textColor="#8E8E93"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

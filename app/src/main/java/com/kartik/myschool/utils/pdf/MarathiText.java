@@ -161,6 +161,16 @@ public class MarathiText {
                                     int androidColor) throws Exception {
         if (text == null || text.isEmpty()) text = " ";
 
+        if (text.contains("\n")) {
+            Paint paint = buildPaint(textSizePt, bold, androidColor);
+            float maxWidth = 0;
+            for (String line : text.split("\n")) {
+                float w = paint.measureText(line);
+                if (w > maxWidth) maxWidth = w;
+            }
+            return renderMultiLine(text, textSizePt, bold, androidColor, (maxWidth / SCALE) + 1f, Layout.Alignment.ALIGN_CENTER);
+        }
+
         Paint paint = buildPaint(textSizePt, bold, androidColor);
 
         float textWidth  = paint.measureText(text);
@@ -177,14 +187,20 @@ public class MarathiText {
         return bitmapToImage(bmp, textSizePt, bW, bH);
     }
 
-    /**
-     * Renders multi-line wrapped text using StaticLayout for proper Devanagari line breaking.
-     */
     public static Image renderMultiLine(String text,
                                           float textSizePt,
                                           boolean bold,
                                           int androidColor,
                                           float widthPt) throws Exception {
+        return renderMultiLine(text, textSizePt, bold, androidColor, widthPt, Layout.Alignment.ALIGN_NORMAL);
+    }
+
+    public static Image renderMultiLine(String text,
+                                          float textSizePt,
+                                          boolean bold,
+                                          int androidColor,
+                                          float widthPt,
+                                          Layout.Alignment alignment) throws Exception {
         if (text == null || text.isEmpty()) text = " ";
 
         TextPaint tp = buildTextPaint(textSizePt, bold, androidColor);
@@ -192,7 +208,7 @@ public class MarathiText {
 
         StaticLayout sl = new StaticLayout(
                 text, tp, widthPx,
-                Layout.Alignment.ALIGN_NORMAL,
+                alignment,
                 1.2f, 0f, false);
 
         int bW = widthPx;
@@ -211,6 +227,10 @@ public class MarathiText {
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, bs);
         Image img = Image.getInstance(bs.toByteArray());
+        
+        // CRITICAL FIX: Immediately recycle the bitmap to free native memory!
+        // Prevents OutOfMemory and severe GC pauses when generating PDFs for 100+ students.
+        bmp.recycle();
 
         // Scale from render-DPI back to PDF points:
         // rendered at SCALE × textSizePt px per pt, so divide by SCALE

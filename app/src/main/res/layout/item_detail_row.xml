@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1.1"
-        android:textColor="#757575"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="14sp"
         android:fontFamily="sans-serif"/>
 

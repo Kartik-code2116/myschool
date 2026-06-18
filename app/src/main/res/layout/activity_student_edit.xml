@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2"
+    android:background="?android:attr/colorBackground"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
@@ -11,9 +11,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurface"
         app:navigationIcon="@drawable/ic_close"
-        app:navigationIconTint="#5A4FCF"
+        app:navigationIconTint="?attr/colorPrimary"
         app:title="@string/edit_student"
         app:titleTextColor="#2E2E2E"
         app:titleCentered="false"
@@ -40,7 +40,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -53,7 +53,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Basic Information"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp"
                         android:fontFamily="sans-serif-black"/>
@@ -156,7 +156,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -169,7 +169,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/family_details"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp"
                         android:fontFamily="sans-serif-black"/>
@@ -212,7 +212,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -225,7 +225,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/bank_details"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp"
                         android:fontFamily="sans-serif-black"/>
@@ -260,7 +260,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="?attr/colorSurface"
                 android:layout_marginBottom="24dp">
 
                 <LinearLayout
@@ -273,7 +273,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Academic Records"
-                        android:textColor="#5A4FCF"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp"
                         android:fontFamily="sans-serif-black"/>

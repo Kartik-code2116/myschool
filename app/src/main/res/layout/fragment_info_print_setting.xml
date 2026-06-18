@@ -4,7 +4,7 @@
     android:id="@+id/scrollHome"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F2F8"
+    android:background="?android:attr/colorBackground"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:overScrollMode="never">
@@ -69,7 +69,7 @@
                     android:shadowDy="2"
                     android:shadowRadius="4"
                     android:text="@string/txt_kartik_thorat"
-                    android:textColor="#FFFFFF"
+                    android:textColor="?attr/colorSurface"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -177,7 +177,7 @@
                         android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_students"
-                        app:tint="#388E3C"/>
+                        app:tint="@color/success"/>
                 </FrameLayout>
 
                 <!-- Floating icon: Chart (bottom-left) -->
@@ -213,7 +213,7 @@
                         android:layout_height="18dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_calendar"
-                        app:tint="#E65100"/>
+                        app:tint="@color/warning"/>
                 </FrameLayout>
 
                 <!-- Sparkle dots -->
@@ -370,7 +370,7 @@
                         android:layout_height="18dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_print"
-                        app:tint="#E65100"/>
+                        app:tint="@color/warning"/>
                 </FrameLayout>
 
                 <!-- Sparkle dots -->
@@ -435,14 +435,14 @@
                     <View
                         android:layout_width="4dp"
                         android:layout_height="20dp"
-                        android:background="#5E35B1"
+                        android:background="?attr/colorPrimary"
                         android:layout_marginEnd="10dp"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txt_academic_year"
-                        android:textColor="#1A237E"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif-medium"
                         android:textAllCaps="true"
@@ -463,7 +463,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_previous"
                         android:src="@drawable/ic_chevron_left"
-                        app:tint="#90A4AE"
+                        app:tint="?attr/colorOnSurfaceVariant"
                         android:padding="10dp"/>
 
                     <com.google.android.material.card.MaterialCardView
@@ -472,10 +472,10 @@
                         android:layout_height="56dp"
                         android:layout_weight="1"
                         android:layout_marginHorizontal="6dp"
-                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardBackgroundColor="?attr/colorSurface"
                         app:cardCornerRadius="16dp"
                         app:strokeWidth="1dp"
-                        app:strokeColor="#E2E8F0"
+                        app:strokeColor="?attr/colorOutlineVariant"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -498,7 +498,7 @@
                                 android:fontFamily="sans-serif-black"
                                 android:gravity="center"
                                 android:text="2026-27"
-                                android:textColor="#1E293B"
+                                android:textColor="?attr/colorOnSurface"
                                 android:textSize="17sp"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -510,7 +510,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_next"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#90A4AE"
+                        app:tint="?attr/colorOnSurfaceVariant"
                         android:padding="10dp"/>
                 </LinearLayout>
 
@@ -518,7 +518,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#F0F0F6"
+                    android:background="?attr/colorOutlineVariant"
                     android:layout_marginBottom="20dp"/>
             </LinearLayout>
 
@@ -546,7 +546,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txt_semester"
-                        android:textColor="#1A237E"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif-medium"
                         android:textAllCaps="true"
@@ -568,7 +568,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_previous"
                         android:src="@drawable/ic_chevron_left"
-                        app:tint="#90A4AE"
+                        app:tint="?attr/colorOnSurfaceVariant"
                         android:padding="10dp"/>
 
                     <com.google.android.material.card.MaterialCardView
@@ -577,10 +577,10 @@
                         android:layout_height="56dp"
                         android:layout_weight="1"
                         android:layout_marginHorizontal="6dp"
-                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardBackgroundColor="?attr/colorSurface"
                         app:cardCornerRadius="16dp"
                         app:strokeWidth="1dp"
-                        app:strokeColor="#E2E8F0"
+                        app:strokeColor="?attr/colorOutlineVariant"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -603,7 +603,7 @@
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
                                 android:text="@string/txt_first_semester"
-                                android:textColor="#1E293B"
+                                android:textColor="?attr/colorOnSurface"
                                 android:textSize="16sp"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -615,7 +615,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_next"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#90A4AE"
+                        app:tint="?attr/colorOnSurfaceVariant"
                         android:padding="10dp"/>
                 </LinearLayout>
 
@@ -623,7 +623,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#F0F0F6"
+                    android:background="?attr/colorOutlineVariant"
                     android:layout_marginBottom="20dp"/>
             </LinearLayout>
 
@@ -651,7 +651,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txt_class_activation"
-                        android:textColor="#1A237E"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif-medium"
                         android:textAllCaps="true"
@@ -667,7 +667,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txt_swipe"
-                        android:textColor="#90A4AE"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="10sp"
                         android:fontFamily="sans-serif"
                         android:letterSpacing="0.06"/>
@@ -687,7 +687,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_previous"
                         android:src="@drawable/ic_chevron_left"
-                        app:tint="#90A4AE"
+                        app:tint="?attr/colorOnSurfaceVariant"
                         android:padding="10dp"/>
 
                     <!-- Class Activation Card -->
@@ -697,10 +697,10 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginHorizontal="6dp"
-                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardBackgroundColor="?attr/colorSurface"
                         app:cardCornerRadius="16dp"
                         app:strokeWidth="1dp"
-                        app:strokeColor="#E2E8F0"
+                        app:strokeColor="?attr/colorOutlineVariant"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -727,7 +727,7 @@
                                     android:fontFamily="sans-serif-black"
                                     android:gravity="center"
                                     android:text="1"
-                                    android:textColor="#5E35B1"
+                                    android:textColor="?attr/colorPrimary"
                                     android:textSize="22sp"
                                     android:textStyle="bold"/>
                             </FrameLayout>
@@ -747,7 +747,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
                                     android:text="@string/txt_class_1_div_a"
-                                    android:textColor="#1A237E"
+                                    android:textColor="?attr/colorPrimary"
                                     android:textSize="15sp"/>
 
                                 <TextView
@@ -756,7 +756,7 @@
                                     android:layout_marginTop="1dp"
                                     android:fontFamily="sans-serif"
                                     android:text="@string/txt_tap_to_manage_students"
-                                    android:textColor="#90A4AE"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="11sp"/>
 
                                 <!-- Status Badge Pill -->
@@ -771,7 +771,7 @@
                                     android:paddingTop="4dp"
                                     android:paddingBottom="4dp"
                                     android:text="@string/txt_activate_it"
-                                    android:textColor="#E65100"
+                                    android:textColor="@color/warning"
                                     android:textSize="12sp"
                                     android:fontFamily="sans-serif-medium"/>
                             </LinearLayout>
@@ -782,7 +782,7 @@
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
                                 android:src="@drawable/ic_chevron_right"
-                                app:tint="#C5CAE9"
+                                app:tint="?attr/colorOutlineVariant"
                                 android:contentDescription="Select"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -794,7 +794,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_next"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#90A4AE"
+                        app:tint="?attr/colorOnSurfaceVariant"
                         android:padding="10dp"/>
                 </LinearLayout>
 
@@ -805,7 +805,7 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center"
                     android:text="@string/home_no_class_hint"
-                    android:textColor="#90A4AE"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="12sp"
                     android:visibility="gone"/>
 
@@ -813,7 +813,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#F0F0F6"
+                    android:background="?attr/colorOutlineVariant"
                     android:layout_marginTop="22dp"
                     android:layout_marginBottom="22dp"/>
             </LinearLayout>
@@ -835,7 +835,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
                     android:text="@string/txt_go_to_class"
-                    android:textColor="#FFFFFF"
+                    android:textColor="?attr/colorSurface"
                     android:backgroundTint="#2E7D32"
                     app:cornerRadius="16dp"
                     app:elevation="2dp"
@@ -843,7 +843,7 @@
                     android:fontFamily="sans-serif-black"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_students"
-                    app:iconTint="#FFFFFF"
+                    app:iconTint="?attr/colorSurface"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>
 
@@ -854,15 +854,15 @@
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
                     android:text="@string/nav_profile"
-                    android:textColor="#5E35B1"
-                    android:backgroundTint="#EDE7F6"
+                    android:textColor="?attr/colorPrimary"
+                    android:backgroundTint="?attr/colorPrimaryContainer"
                     app:cornerRadius="16dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp"
                     android:fontFamily="sans-serif-black"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_person"
-                    app:iconTint="#5E35B1"
+                    app:iconTint="?attr/colorPrimary"
                     app:iconSize="16dp"
                     app:iconGravity="textStart"/>
             </LinearLayout>
@@ -882,7 +882,7 @@
                     android:layout_marginEnd="6dp"
                     android:text="@string/txt_how_to_use"
                     android:textColor="#475569"
-                    android:backgroundTint="#F1F5F9"
+                    android:backgroundTint="?attr/colorSurfaceVariant"
                     app:cornerRadius="16dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp"
@@ -901,7 +901,7 @@
                     android:layout_marginStart="6dp"
                     android:text="@string/txt_online_help"
                     android:textColor="#475569"
-                    android:backgroundTint="#F1F5F9"
+                    android:backgroundTint="?attr/colorSurfaceVariant"
                     app:cornerRadius="16dp"
                     app:elevation="0dp"
                     app:strokeWidth="0dp"
@@ -930,7 +930,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:text="@string/hint_fill_data"
-                    android:textColor="#90A4AE"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="11sp"
                     android:gravity="center"
                     android:layout_marginBottom="4dp"/>
@@ -941,7 +941,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:text="@string/hint_question_mark"
-                    android:textColor="#90A4AE"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="10sp"
                     android:gravity="center"/>
             </LinearLayout>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="?android:attr/colorBackground">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -88,10 +88,10 @@
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="16dp"/>
 
-                        <TextView android:id="@+id/tvSchoolInfoName" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_name" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvSchoolInfoUdise" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_udise" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvSchoolInfoBoard" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_board" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvSchoolInfoAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_address" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoName" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_name" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoUdise" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_udise" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoBoard" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_board" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvSchoolInfoAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fmt_school_address" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="16dp"/>
                         
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnEditSchoolInfo"
@@ -102,9 +102,9 @@
                             android:text="@string/btn_edit_school"
                             android:layout_marginBottom="16dp"/>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginBottom="16dp"/>
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_student_stats_summary" android:textSize="14sp" android:textColor="@color/primary" android:fontFamily="sans-serif-medium" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvSchoolInfoTotalStudents" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_total_enrolled_250_students" android:textSize="13sp" android:textColor="#666666"/>
+                        <TextView android:id="@+id/tvSchoolInfoTotalStudents" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_total_enrolled_250_students" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                     </LinearLayout>
 
                     <!-- 2. GENDER -->
@@ -151,8 +151,8 @@
                             </LinearLayout>
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
-                        <TextView android:id="@+id/tvGenderRatio" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_active_class_gender_ratio_45_4" android:textSize="13sp" android:textColor="#666666" android:gravity="center"/>
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginBottom="16dp"/>
+                        <TextView android:id="@+id/tvGenderRatio" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_active_class_gender_ratio_45_4" android:textSize="13sp" android:textColor="?attr/colorOnSurfaceVariant" android:gravity="center"/>
                     </LinearLayout>
 
                     <!-- 3. CAST CATEGORY -->
@@ -172,13 +172,13 @@
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="16dp"/>
 
-                        <TextView android:id="@+id/tvCastGeneral" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_general_open_10_students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvCastObc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_obc_category_12_students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvCastSc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_sc_category_6_students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:id="@+id/tvCastSt" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_st_category_5_students" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+                        <TextView android:id="@+id/tvCastGeneral" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_general_open_10_students" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvCastObc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_obc_category_12_students" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvCastSc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_sc_category_6_students" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:id="@+id/tvCastSt" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_st_category_5_students" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="16dp"/>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_category_distribution_is_calcu" android:textSize="12sp" android:textColor="#888888"/>
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_category_distribution_is_calcu" android:textSize="12sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                     </LinearLayout>
 
                     <!-- 4. CLASS TEACHER -->
@@ -336,8 +336,8 @@
                             android:orientation="vertical"
                             android:layout_marginBottom="16dp"/>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_select_profile_tab_in_sidebar" android:textSize="12sp" android:textColor="#888888"/>
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_select_profile_tab_in_sidebar" android:textSize="12sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                     </LinearLayout>
 
                     <!-- 6. SUBJECT -->
@@ -748,11 +748,11 @@
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="16dp"/>
 
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_male_student_comment_descripto" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="8dp"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_female_student_comment_descrip" android:textSize="14sp" android:textColor="#333333" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_male_student_comment_descripto" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="8dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/txt_female_student_comment_descrip" android:textSize="14sp" android:textColor="?attr/colorOnSurface" android:layout_marginBottom="16dp"/>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_comment_descriptors_are_applie" android:textSize="12sp" android:textColor="#888888"/>
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutlineVariant" android:layout_marginBottom="16dp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txt_comment_descriptors_are_applie" android:textSize="12sp" android:textColor="?attr/colorOnSurfaceVariant"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -787,7 +787,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
-                            android:textColor="#333333"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

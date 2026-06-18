@@ -8,8 +8,8 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
     app:strokeWidth="0.8dp"
-    app:strokeColor="#E0E0E0"
-    app:cardBackgroundColor="@color/white">
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardBackgroundColor="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 android:maxLines="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/txt_1_2"
-                android:textColor="#6C4CCF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </RelativeLayout>
@@ -39,7 +39,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="0.8dp"
-            android:background="#F0EAF9"
+            android:background="?attr/colorOutlineVariant"
             android:layout_marginBottom="4dp" />
 
         <TextView
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="10sp"
-            android:textColor="#455A64"
+            android:textColor="?attr/colorOnSurface"
             android:lineSpacingMultiplier="1.15"
             android:visibility="gone"
             android:layout_marginTop="0dp"
@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/str_empty_15"
-                android:textColor="#B0BEC5"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="italic" />

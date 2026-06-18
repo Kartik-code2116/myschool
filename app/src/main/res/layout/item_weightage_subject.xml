@@ -5,10 +5,10 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="8dp"
     android:layout_marginVertical="6dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:strokeColor="#E0E0E0"
+    app:strokeColor="?attr/colorOutlineVariant"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -34,7 +34,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="#EDE7F6">
+                app:cardBackgroundColor="?attr/colorPrimaryContainer">
 
                 <TextView
                     android:id="@+id/tvSubjectInitial"
@@ -42,7 +42,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="@string/txt_m"
-                    android:textColor="#5E35B1"
+                    android:textColor="?attr/colorPrimary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </com.google.android.material.card.MaterialCardView>
@@ -60,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_marathi"
-                    android:textColor="#333333"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium" />
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/txt_50_50"
-                    android:textColor="#666666"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -93,7 +93,7 @@
                     android:gravity="center"
                     android:maxLength="3"
                     android:singleLine="true"
-                    android:textColor="#333333"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -104,7 +104,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:src="@drawable/ic_expand_down"
-                app:tint="#5E35B1"
+                app:tint="?attr/colorPrimary"
                 android:padding="4dp"
                 android:layout_marginStart="8dp" />
         </LinearLayout>
@@ -114,7 +114,7 @@
             android:id="@+id/viewHeaderDivider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E0E0E0"
+            android:background="?attr/colorOutlineVariant"
             android:visibility="gone" />
 
         <!-- Collapsible Details Container (Sub-Subjects Inputs) -->
@@ -124,7 +124,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="#FBFBFC"
+            android:background="?attr/colorSurface"
             android:visibility="gone">
 
             <!-- Title: Formative (आकारिक) -->
@@ -132,7 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_formative_part_a"
-                android:textColor="#5E35B1"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
@@ -300,7 +300,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_summative_part_b"
-                    android:textColor="#E65100"
+                    android:textColor="@color/warning"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
