@@ -123,13 +123,20 @@ public class ProfileFragment extends Fragment {
 
         // Class list
         if (AppCache.cachedClasses != null && !AppCache.cachedClasses.isEmpty()) {
-            loadedClasses.clear();
-            loadedClasses.addAll(AppCache.cachedClasses);
-            Map<String, Integer> counts = AppCache.cachedStudentCountByClassId != null
-                    ? AppCache.cachedStudentCountByClassId : new HashMap<>();
-            List<ProfileClassItem> items = buildItems(loadedClasses, counts);
-            lastItems.clear(); lastItems.addAll(items);
-            bindClassList(items, buildDivisionsSummaryMap(items));
+            // Delay rendering slightly so the layout animation plays smoothly AFTER the fragment slide-in transition
+            b.rvProfileClasses.postDelayed(() -> {
+                if (b == null) return;
+                loadedClasses.clear();
+                loadedClasses.addAll(AppCache.cachedClasses);
+                Map<String, Integer> counts = AppCache.cachedStudentCountByClassId != null
+                        ? AppCache.cachedStudentCountByClassId : new HashMap<>();
+                List<ProfileClassItem> items = buildItems(loadedClasses, counts);
+                lastItems.clear(); lastItems.addAll(items);
+                bindClassList(items, buildDivisionsSummaryMap(items));
+                
+                // CRITICAL: Trigger the cascading animation explicitly after data is bound!
+                b.rvProfileClasses.scheduleLayoutAnimation();
+            }, 150);
         } else if (SessionContext.selectedClass != null) {
             int std = parseStd(SessionContext.selectedClass.className);
             ProfileClassItem activeItem = new ProfileClassItem(std, SessionContext.selectedClass);

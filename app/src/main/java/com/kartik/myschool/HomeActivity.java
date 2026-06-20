@@ -226,6 +226,7 @@ public class HomeActivity extends AppCompatActivity {
 
             if (id == R.id.nav_profile) {
                 b.btnToolbarPromote.setVisibility(View.VISIBLE);
+                b.ivProfilePic.setVisibility(View.GONE);
                 b.btnToolbarPromote.setOnClickListener(v -> {
                     if (SessionContext.selectedClass == null) {
                         Toast.makeText(this, "Please select an active class first.", Toast.LENGTH_LONG).show();
@@ -236,6 +237,7 @@ public class HomeActivity extends AppCompatActivity {
                 });
             } else {
                 b.btnToolbarPromote.setVisibility(View.GONE);
+                // ivProfilePic visibility is managed in the attendance check below or setupDrawerActions
             }
 
             if (id == R.id.nav_attendance) {
@@ -310,9 +312,9 @@ public class HomeActivity extends AppCompatActivity {
                 && navController.getCurrentDestination().getId() == id) {
             return true;
         }
-        // Bottom nav uses slide-up animation for tab switching
+        // Use consistent slide forward animation for bottom tab navigation
         if (navController != null) {
-            navController.navigate(id, null, UiAnimations.navBottomTab());
+            navController.navigate(id, null, UiAnimations.navSlideForward());
         }
         return true;
     }
@@ -590,11 +592,11 @@ public class HomeActivity extends AppCompatActivity {
         navController.navigate(destId, null, UiAnimations.navSlideForward());
     }
 
-    /** Navigate from drawer sidebar — scale + fade for premium feel. */
+    /** Navigate from drawer sidebar — use slide forward for consistency. */
     private void navigateFromDrawer(int destId) {
         if (navController == null)
             return;
-        navController.navigate(destId, null, UiAnimations.navDrawerOpen());
+        navController.navigate(destId, null, UiAnimations.navSlideForward());
     }
 
     @Override
