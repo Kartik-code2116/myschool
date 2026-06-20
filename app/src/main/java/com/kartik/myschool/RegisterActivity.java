@@ -69,6 +69,12 @@ public class RegisterActivity extends AppCompatActivity {
         // 2. Real-time dynamic input error clearing
         setupRealTimeValidation();
 
+        b.tvPrivacyPolicy.setOnClickListener(v -> {
+            UiAnimations.pulse(b.tvPrivacyPolicy);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://kartik-28deb.web.app/privacy_policy.html"));
+            startActivity(browserIntent);
+        });
+
         boolean isGoogleSignIn = getIntent().getBooleanExtra("isGoogleSignIn", false);
         if (isGoogleSignIn) {
             b.tilRegPassword.setVisibility(View.GONE);

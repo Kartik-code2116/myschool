@@ -237,6 +237,32 @@
                     android:fontFamily="sans-serif-medium"
                     android:padding="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="By continuing, you agree to our "
+                        android:textColor="@color/on_surface_variant"
+                        android:textSize="12sp" />
+                        
+                    <TextView
+                        android:id="@+id/tvPrivacyPolicy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Privacy Policy"
+                        android:textColor="@color/primary"
+                        android:textStyle="bold"
+                        android:padding="2dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:textSize="12sp" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

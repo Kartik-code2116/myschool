@@ -78,6 +78,12 @@ public class LoginActivity extends AppCompatActivity {
 
         setupRealTimeValidation();
 
+        b.tvPrivacyPolicy.setOnClickListener(v -> {
+            UiAnimations.pulse(b.tvPrivacyPolicy);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://kartik-28deb.web.app/privacy_policy.html"));
+            startActivity(browserIntent);
+        });
+
         b.btnLogin.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnLogin);
             doLogin();
