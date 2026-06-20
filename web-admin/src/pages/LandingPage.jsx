@@ -589,6 +589,9 @@ export default function LandingPage({ user, loading, lang }) {
                 >
                   {submitting ? t.btnSigningIn : t.btnSignIn}
                 </button>
+                <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  By continuing, you agree to our <a href="https://kartik-28deb.web.app/privacy_policy.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none', fontWeight: '600' }}>Privacy Policy</a>
+                </div>
               </form>
             ) : (
               <form onSubmit={handleSignup} className="auth-form">
@@ -686,6 +689,9 @@ export default function LandingPage({ user, loading, lang }) {
                 >
                   {submitting ? t.btnRegistering : t.btnRegister}
                 </button>
+                <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  By continuing, you agree to our <a href="https://kartik-28deb.web.app/privacy_policy.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none', fontWeight: '600' }}>Privacy Policy</a>
+                </div>
               </form>
             )}
           </div>
