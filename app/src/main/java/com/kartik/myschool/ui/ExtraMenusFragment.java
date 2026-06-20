@@ -680,7 +680,8 @@ public class ExtraMenusFragment extends Fragment {
             b.btnSaveTeacherInfo.setEnabled(true);
             populateSemesterSpinner(activeClass);
         } else {
-            FirebaseRepository.get().getClassesForYear(yearId, new FirebaseRepository.OnResult<List<ClassModel>>() {
+            if (SessionContext.selectedSchool == null) return;
+            FirebaseRepository.get().getClassesForSchool(SessionContext.selectedSchool.id, new FirebaseRepository.OnResult<List<ClassModel>>() {
                 @Override
                 public void onSuccess(List<ClassModel> list) {
                     if (list != null) {

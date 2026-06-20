@@ -131,6 +131,7 @@ public class DeclareWeightageFragment extends Fragment {
             public void onSuccess(String id) {
                 if (getContext() != null) {
                     SessionContext.syncToAppCache();
+                    SessionContext.save(getContext());
                     Toast.makeText(getContext(), R.string.msg_empty_9, Toast.LENGTH_SHORT).show();
                     b.btnSaveWeightage.setEnabled(true);
                     loadActiveSubjects();

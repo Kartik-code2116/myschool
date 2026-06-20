@@ -732,6 +732,17 @@ public class FirebaseRepository {
                 .addOnSuccessListener(snap -> {
                     List<Student> students = snap != null ? snap.toObjects(Student.class) : new ArrayList<>();
                     cachedStudentsForTeacher = students;
+                    
+                    cachedStudentsForClassMap.clear();
+                    for (Student s : students) {
+                        if (s.classId != null) {
+                            if (!cachedStudentsForClassMap.containsKey(s.classId)) {
+                                cachedStudentsForClassMap.put(s.classId, new ArrayList<>());
+                            }
+                            cachedStudentsForClassMap.get(s.classId).add(s);
+                        }
+                    }
+                    
                     cb.onSuccess(new ArrayList<>(students));
                 })
                 .addOnFailureListener(cb::onError);

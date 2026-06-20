@@ -460,31 +460,7 @@ public class InfoPrintSettingFragment extends Fragment {
     }
 
     private void loadClasses() {
-        AcademicYear y = getCurrentYear();
-        if (y == null || y.id == null) { loadClassesForSchool(); return; }
-        FirebaseRepository.get().getClassesForYear(y.id, new FirebaseRepository.OnResult<List<ClassModel>>() {
-            @Override public void onSuccess(List<ClassModel> list) {
-                if (list == null || list.isEmpty()) { loadClassesForSchool(); return; }
-                classes.clear(); classes.addAll(list);
-                AppCache.cachedClasses = new ArrayList<>(classes);
-                
-                // Preserve selection if possible
-                if (SessionContext.selectedClass != null) {
-                    boolean found = false;
-                    for (int i = 0; i < classes.size(); i++) {
-                        if (classes.get(i).id != null && classes.get(i).id.equals(SessionContext.selectedClass.id)) {
-                            classIndex = i; found = true; break;
-                        }
-                    }
-                    if (!found) classIndex = 0;
-                } else {
-                    classIndex = 0;
-                }
-                
-                if (isViewActive()) { applyClass(0); }
-            }
-            @Override public void onError(Exception e) { loadClassesForSchool(); }
-        });
+        loadClassesForSchool();
     }
 
     private void loadClassesForSchool() {
@@ -651,6 +627,10 @@ public class InfoPrintSettingFragment extends Fragment {
         SessionContext.selectedClass = c;
         SessionContext.syncToAppCache();
         SessionContext.save(getContext());
+
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).updateToolbar(getString(R.string.nav_home), SessionContext.getClassDivLabel());
+        }
 
         String num = c.className != null ? c.className : "—";
         String div = c.division  != null && !c.division.isEmpty() ? c.division : "-";

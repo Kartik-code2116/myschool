@@ -114,17 +114,7 @@ public class ClassDivListFragment extends Fragment {
     }
 
     private void loadClasses() {
-        AcademicYear y = SessionContext.selectedYear;
-        if (y != null && y.id != null) {
-            FirebaseRepository.get().getClassesForYear(y.id, new FirebaseRepository.OnResult<List<ClassModel>>() {
-                @Override public void onSuccess(List<ClassModel> list) {
-                    if (isAdded() && b != null) bindClasses(list);
-                }
-                @Override public void onError(Exception e) { loadBySchool(); }
-            });
-        } else {
-            loadBySchool();
-        }
+        loadBySchool();
     }
 
     private void loadBySchool() {

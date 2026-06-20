@@ -154,6 +154,7 @@ public class HomeActivity extends AppCompatActivity {
                 subtitle = getString(R.string.nav_reports);
             } else if (id == R.id.nav_info_print) {
                 title = getString(R.string.nav_home);
+                subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_profile) {
                 subtitle = getString(R.string.profile_subtitle);
             } else if (id == R.id.nav_subjects) {
