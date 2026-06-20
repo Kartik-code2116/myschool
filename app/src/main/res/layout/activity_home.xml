@@ -133,6 +133,16 @@
                         android:visibility="gone"/>
 
                     <!-- Promote Students Icon -->
+                    <ImageButton
+                        android:id="@+id/btnToolbarPromote"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_arrow_up"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="?attr/colorPrimary"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:contentDescription="@string/menu_promote_students"/>
 
                     <ImageButton
                         android:id="@+id/btnToolbarMore"

@@ -224,6 +224,20 @@ public class HomeActivity extends AppCompatActivity {
                 b.btnToolbarMore.setVisibility(View.GONE);
             }
 
+            if (id == R.id.nav_profile) {
+                b.btnToolbarPromote.setVisibility(View.VISIBLE);
+                b.btnToolbarPromote.setOnClickListener(v -> {
+                    if (SessionContext.selectedClass == null) {
+                        Toast.makeText(this, "Please select an active class first.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    startActivity(new Intent(this, com.kartik.myschool.PromoteStudentsActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+                });
+            } else {
+                b.btnToolbarPromote.setVisibility(View.GONE);
+            }
+
             if (id == R.id.nav_attendance) {
                 title = "उपस्थिती";
                 b.btnToolbarAdd.setVisibility(View.VISIBLE);
@@ -605,11 +619,6 @@ public class HomeActivity extends AppCompatActivity {
             popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 " + getString(R.string.menu_3dot_home));
             popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 " + getString(R.string.menu_3dot_classes));
             popup.getMenu().add(0, R.id.nav_students, 3, "👥 " + getString(R.string.menu_3dot_students));
-            
-            // Show Promote Students only if on the Profile page (or just globally since it's a student action)
-            // But if they are on profile, it makes sense to show it globally
-            popup.getMenu().add(0, 802, 4, "🎓 " + getString(R.string.menu_promote_students));
-            
             popup.getMenu().add(0, 801, 5, "💬 " + getString(R.string.menu_3dot_message));
 
             // Utility options
@@ -623,14 +632,6 @@ public class HomeActivity extends AppCompatActivity {
                 int id = item.getItemId();
                 if (id == 801) {
                     showAdminMessageDialog();
-                    return true;
-                } else if (id == 802) {
-                    if (SessionContext.selectedClass == null) {
-                        Toast.makeText(this, "Please select an active class first.", Toast.LENGTH_LONG).show();
-                        return true;
-                    }
-                    startActivity(new Intent(this, com.kartik.myschool.PromoteStudentsActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
                     return true;
                 } else if (id == 901) {
                     // Fully functional bilingual language selector dialog

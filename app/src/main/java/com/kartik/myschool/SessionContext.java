@@ -328,14 +328,23 @@ public final class SessionContext {
                     });
                 }
             }
-            String countsJson = prefs.getString("appcache_student_counts_json", null);
-            if (countsJson != null) {
-                java.lang.reflect.Type mapType = new com.google.gson.reflect.TypeToken<java.util.HashMap<String, Integer>>(){}.getType();
-                AppCache.cachedStudentCountByClassId = new com.google.gson.Gson().fromJson(countsJson, mapType);
+                String countsJson = prefs.getString("appcache_student_counts_json", null);
+                if (countsJson != null) {
+                    java.lang.reflect.Type mapType = new com.google.gson.reflect.TypeToken<java.util.HashMap<String, Integer>>(){}.getType();
+                    AppCache.cachedStudentCountByClassId = new com.google.gson.Gson().fromJson(countsJson, mapType);
+                }
+                
+                String studentsJson = prefs.getString("appcache_students_json", null);
+                if (studentsJson != null) {
+                    java.lang.reflect.Type studentListType = new com.google.gson.reflect.TypeToken<java.util.ArrayList<com.kartik.myschool.model.Student>>(){}.getType();
+                    AppCache.cachedStudents = new com.google.gson.Gson().fromJson(studentsJson, studentListType);
+                }
+                
+                AppCache.cachedClassIdForStudents = prefs.getString("appcache_class_id_students", null);
+
+            } catch (Exception e) {
+                android.util.Log.e("SessionContext", "Error deserializing AppCache", e);
             }
-        } catch (Exception e) {
-            android.util.Log.e("SessionContext", "Error deserializing AppCache", e);
-        }
 
         syncToAppCache();
     }
