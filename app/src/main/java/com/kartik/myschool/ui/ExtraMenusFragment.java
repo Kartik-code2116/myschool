@@ -1255,7 +1255,23 @@ public class ExtraMenusFragment extends Fragment {
                         public void onSuccess(School s) {
                             SessionContext.selectedSchool = s;
                             AppCache.selectedSchool = s;
-                 private void loadSchoolWideStatsForUdise(String udiseCode) {
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> loadSchoolWideStatsForUdise(s.udiseCode));
+                            }
+                        }
+                        @Override
+                        public void onError(Exception e) {}
+                    });
+                }
+                @Override
+                public void onError(Exception e) {}
+            });
+        } else {
+            loadSchoolWideStatsForUdise(school.udiseCode);
+        }
+    }
+
+    private void loadSchoolWideStatsForUdise(String udiseCode) {
         if (udiseCode == null || udiseCode.isEmpty()) {
             return;
         }
