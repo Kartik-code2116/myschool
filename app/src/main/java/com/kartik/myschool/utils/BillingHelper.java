@@ -176,26 +176,50 @@ public class BillingHelper {
         }
     }
 
+    /**
+     * Stores the purchase token in Firestore for server-side verification.
+     *
+     * Audit fix #10 (SECURITY): The previous version wrote subscriptionStatus: "active" directly
+     * from the client — a critical security vulnerability (any user could call this with a fake token).
+     *
+     * Current approach:
+     *   1. Client writes the purchaseToken and sets subscriptionVerified = false.
+     *   2. A Firebase Cloud Function (verifyPurchase) listens for new documents in "subscriptions",
+     *      calls the Google Play Developer API to verify the token, and ONLY then sets
+     *      subscriptionVerified = true and subscriptionStatus = "active" in "users/{uid}".
+     *   3. The app reads subscriptionVerified (not subscriptionStatus) to grant premium.
+     *
+     * TODO: Deploy the Firebase Cloud Function from /functions/verifyPurchase.js in Firebase Console.
+     *       Until deployed, subscriptionVerified will remain false and premium won't be granted.
+     */
     private void grantSubscriptionToUser(Purchase purchase) {
-        // Update user status in Firebase
-        String uid = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         if (uid != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            Map<String, Object> update = new HashMap<>();
-            update.put("subscriptionStatus", "active");
-            update.put("googlePlayPurchaseToken", purchase.getPurchaseToken());
-            
-            db.collection("users").document(uid)
-                    .update(update)
+
+            // Step 1: Write to "subscriptions" collection — Cloud Function picks this up for verification
+            Map<String, Object> subscriptionRequest = new HashMap<>();
+            subscriptionRequest.put("uid", uid);
+            subscriptionRequest.put("purchaseToken", purchase.getPurchaseToken());
+            subscriptionRequest.put("productId", SUBSCRIPTION_PRODUCT_ID);
+            subscriptionRequest.put("subscriptionVerified", false);  // Cloud Function sets this to true
+            subscriptionRequest.put("requestedAt", System.currentTimeMillis());
+
+            db.collection("subscriptions").document(uid)
+                    .set(subscriptionRequest)
                     .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Purchase token stored for server verification for uid=" + uid);
+                        // Notify UI that purchase was submitted — premium will be granted
+                        // once the Cloud Function verifies the token (subscriptionVerified = true)
                         if (listener != null) {
                             listener.onPurchaseSuccessful();
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to update subscription status in DB", e);
+                        Log.e(TAG, "Failed to store purchase token for verification", e);
                         if (listener != null) {
-                            listener.onPurchaseSuccessful(); // Still report successful purchase to UI
+                            listener.onPurchaseFailed("Purchase recorded but verification pending: " + e.getMessage());
                         }
                     });
         }

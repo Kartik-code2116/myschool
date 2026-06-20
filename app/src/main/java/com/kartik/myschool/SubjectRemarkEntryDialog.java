@@ -214,7 +214,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
              (existingMarks.semesterId.length() < 10 && existingMarks.semesterId.contains("2")))) {
             semesterNumber = 2;
         } else if (SessionContext.selectedSemester != null) {
-            semesterNumber = SessionContext.selectedSemester.number;
+            semesterNumber = SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1;
         }
         final int finalSemesterNumber = semesterNumber;
         
@@ -259,7 +259,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
 
     private void showRemarkDialog() {
         if (bankOptions.isEmpty()) {
-            int semesterNumber = com.kartik.myschool.SessionContext.selectedSemester != null ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
+            int semesterNumber = com.kartik.myschool.SessionContext.selectedSemester != null && com.kartik.myschool.SessionContext.selectedSemester.number > 0 ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
             bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
         }
 
@@ -431,7 +431,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
 
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             record.semesterId = SessionContext.selectedSemester.id;
-            record.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
+            record.semesterNumber = String.valueOf(SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1);
         } else {
             record.semesterId = classModel.semesterId != null ? classModel.semesterId : "sem_1";
             record.semesterNumber = record.semesterId.contains("2") ? "2" : "1";

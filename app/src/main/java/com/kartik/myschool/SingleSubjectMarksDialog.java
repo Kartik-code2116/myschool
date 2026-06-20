@@ -335,7 +335,7 @@ public class SingleSubjectMarksDialog extends DialogFragment {
         // Semester
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             m.semesterId = SessionContext.selectedSemester.id;
-            m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
+            m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1);
         } else {
             m.semesterId = classModel.semesterId != null ? classModel.semesterId : "sem_1";
             m.semesterNumber = m.semesterId.contains("2") ? "2" : "1";

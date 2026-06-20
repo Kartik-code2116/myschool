@@ -142,9 +142,9 @@ public class HomeActivity extends AppCompatActivity {
                 subtitle = "";
             } else if (id == R.id.nav_attendance) {
                 title = getString(R.string.menu_attendance);
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty())
                         ? SessionContext.selectedClass.className : "1";
-                int sem = (SessionContext.selectedSemester != null) ? SessionContext.selectedSemester.number : 1;
+                int sem = (SessionContext.selectedSemester != null && SessionContext.selectedSemester.number > 0) ? SessionContext.selectedSemester.number : 1;
                 subtitle = "Class: " + cls + " • Sem: " + sem;
             } else if (id == R.id.nav_students) {
                 subtitle = SessionContext.getClassDivLabel();
@@ -197,25 +197,21 @@ public class HomeActivity extends AppCompatActivity {
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_print_report) {
                 title = "Report Printing";
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
-                        ? SessionContext.selectedClass.className
-                        : "1";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null
-                        && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division
-                                : "1";
-                int sem = (SessionContext.selectedSemester != null) ? SessionContext.selectedSemester.number : 1;
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty())
+                        ? SessionContext.selectedClass.className : "1";
+                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty()) 
+                        ? SessionContext.selectedClass.division : "A";
+                int sem = (SessionContext.selectedSemester != null && SessionContext.selectedSemester.number > 0) ? SessionContext.selectedSemester.number : 1;
                 subtitle = "• Class: " + cls + " • Div: " + div + " • Semester: " + sem;
             } else if (id == R.id.nav_settings) {
                 title = getString(R.string.drawer_settings);
                 subtitle = "App Settings & Configurations";
             } else if (id == R.id.nav_dashboard) {
                 title = getString(R.string.title_stats_dashboard);
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null)
-                        ? SessionContext.selectedClass.className
-                        : "N/A";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null
-                        && !SessionContext.selectedClass.division.isEmpty()) ? SessionContext.selectedClass.division
-                                : "N/A";
+                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty())
+                        ? SessionContext.selectedClass.className : "1";
+                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty()) 
+                        ? SessionContext.selectedClass.division : "A";
                 subtitle = getString(R.string.subtitle_progress_tracker, cls, div);
             }
             updateToolbar(title, subtitle);

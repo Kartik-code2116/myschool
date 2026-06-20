@@ -32,9 +32,9 @@ public final class SessionContext {
 
     public static synchronized String getClassDivLabel() {
         if (selectedClass == null) return "वर्ग निवडलेला नाही";
-        String div = selectedClass.division != null && !selectedClass.division.isEmpty()
-                ? selectedClass.division : "-";
-        return "इयत्ता: " + selectedClass.className + ", तुकडी: " + div;
+        String cls = (selectedClass.className != null && !selectedClass.className.trim().isEmpty()) ? selectedClass.className : "1";
+        String div = (selectedClass.division != null && !selectedClass.division.trim().isEmpty()) ? selectedClass.division : "-";
+        return "इयत्ता: " + cls + ", तुकडी: " + div;
     }
 
     public static synchronized void syncFromAppCache() {
@@ -48,118 +48,140 @@ public final class SessionContext {
         AppCache.cachedRemarkBank.clear();
     }
 
+    /**
+     * Saves session to SharedPreferences.
+     *
+     * Audit fix #5: JSON serialization of subjects (15+ subjects × 12 fields) was running
+     * on the UI thread, causing 10–30ms jank. Now runs on a background thread.
+     * SharedPreferences.apply() is always called on a background thread internally anyway,
+     * so this is safe.
+     */
     public static synchronized void save(android.content.Context ctx) {
         if (ctx == null) return;
-        android.content.SharedPreferences.Editor editor = ctx.getSharedPreferences("myschool_session_prefs", android.content.Context.MODE_PRIVATE).edit();
-        
-        // Teacher name
-        if (AppCache.cachedTeacherName != null) {
-            editor.putString("teacher_name", AppCache.cachedTeacherName);
-        } else {
-            editor.remove("teacher_name");
-        }
 
-        // Year
-        if (selectedYear != null) {
-            editor.putString("year_id", selectedYear.id);
-            editor.putString("year_label", selectedYear.label);
-            editor.putInt("year_start", selectedYear.startYear);
-            editor.putInt("year_end", selectedYear.endYear);
-            editor.putBoolean("year_active", selectedYear.active);
-        } else {
-            editor.remove("year_id");
-        }
+        // Capture volatile fields under lock before handing to background thread
+        final AcademicYear year = selectedYear;
+        final Semester semester = selectedSemester;
+        final School school = selectedSchool;
+        final ClassModel cls = selectedClass;
+        final String teacherName = com.kartik.myschool.AppCache.cachedTeacherName;
 
-        // Semester
-        if (selectedSemester != null) {
-            editor.putString("semester_id", selectedSemester.id);
-            editor.putString("semester_year_id", selectedSemester.yearId);
-            editor.putInt("semester_number", selectedSemester.number);
-            editor.putString("semester_name", selectedSemester.name);
-            editor.putString("semester_subtitle", selectedSemester.subtitle);
-        } else {
-            editor.remove("semester_id");
-        }
+        // Audit fix #5: Run JSON serialization on a background thread to avoid UI jank
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+            android.content.SharedPreferences.Editor editor = ctx
+                    .getSharedPreferences("myschool_session_prefs", android.content.Context.MODE_PRIVATE).edit();
 
-        // School
-        if (selectedSchool != null) {
-            editor.putString("school_id", selectedSchool.id);
-            editor.putString("school_name", selectedSchool.name);
-            editor.putString("school_udise", selectedSchool.udiseCode);
-            editor.putString("school_board", selectedSchool.board);
-            editor.putString("school_address", selectedSchool.address);
-            editor.putString("school_principal", selectedSchool.principalName);
-        } else {
-            editor.remove("school_id");
-        }
-
-        // Class
-        if (selectedClass != null) {
-            editor.putString("class_id", selectedClass.id);
-            editor.putString("class_school_id", selectedClass.schoolId);
-            editor.putString("class_year_id", selectedClass.yearId);
-            editor.putString("class_year_label", selectedClass.academicYearLabel);
-            editor.putString("class_semester_id", selectedClass.semesterId);
-            editor.putString("class_name", selectedClass.className);
-            editor.putString("class_division", selectedClass.division);
-            editor.putString("class_exam_name", selectedClass.examName);
-            editor.putInt("class_year", selectedClass.year);
-            editor.putString("class_teacher", selectedClass.teacherName);
-            editor.putString("class_asst_teacher", selectedClass.assistantTeacherName);
-            editor.putString("class_teacher_email", selectedClass.teacherEmail);
-            editor.putString("class_teacher_phone", selectedClass.teacherPhone);
-            editor.putInt("class_student_count", selectedClass.studentCount);
-            
-            // Serialize subjects
-            if (selectedClass.subjects != null) {
-                try {
-                    org.json.JSONArray arr = new org.json.JSONArray();
-                    for (com.kartik.myschool.model.Subject s : selectedClass.subjects) {
-                        org.json.JSONObject obj = new org.json.JSONObject();
-                        obj.put("name", s.name);
-                        obj.put("maxMarks", s.maxMarks);
-                        obj.put("maxNirikhshan", s.maxNirikhshan);
-                        obj.put("maxTondiKam", s.maxTondiKam);
-                        obj.put("maxPratyakshik", s.maxPratyakshik);
-                        obj.put("maxUpkram", s.maxUpkram);
-                        obj.put("maxPrakalp", s.maxPrakalp);
-                        obj.put("maxChachani", s.maxChachani);
-                        obj.put("maxSwadhyay", s.maxSwadhyay);
-                        obj.put("maxItar", s.maxItar);
-                        obj.put("maxTondi", s.maxTondi);
-                        obj.put("maxPratyakshikB", s.maxPratyakshikB);
-                        obj.put("maxLekhi", s.maxLekhi);
-                        arr.put(obj);
-                    }
-                    editor.putString("class_subjects_json", arr.toString());
-                } catch (org.json.JSONException e) {
-                    android.util.Log.e("SessionContext", "Error serializing subjects", e);
-                }
+            // Teacher name
+            if (teacherName != null) {
+                editor.putString("teacher_name", teacherName);
             } else {
-                editor.remove("class_subjects_json");
+                editor.remove("teacher_name");
             }
 
-            // Serialize monthlyWorkingDays
-            if (selectedClass.monthlyWorkingDays != null) {
-                try {
-                    org.json.JSONObject mwd = new org.json.JSONObject();
-                    for (java.util.Map.Entry<String, Integer> entry : selectedClass.monthlyWorkingDays.entrySet()) {
-                        mwd.put(entry.getKey(), entry.getValue());
+            // Year
+            if (year != null) {
+                editor.putString("year_id", year.id);
+                editor.putString("year_label", year.label);
+                editor.putInt("year_start", year.startYear);
+                editor.putInt("year_end", year.endYear);
+                editor.putBoolean("year_active", year.active);
+            } else {
+                editor.remove("year_id");
+            }
+
+            // Semester
+            if (semester != null) {
+                editor.putString("semester_id", semester.id);
+                editor.putString("semester_year_id", semester.yearId);
+                editor.putInt("semester_number", semester.number);
+                editor.putString("semester_name", semester.name);
+                editor.putString("semester_subtitle", semester.subtitle);
+            } else {
+                editor.remove("semester_id");
+            }
+
+            // School
+            if (school != null) {
+                editor.putString("school_id", school.id);
+                editor.putString("school_name", school.name);
+                editor.putString("school_udise", school.udiseCode);
+                editor.putString("school_board", school.board);
+                editor.putString("school_address", school.address);
+                editor.putString("school_principal", school.principalName);
+            } else {
+                editor.remove("school_id");
+            }
+
+            // Class
+            if (cls != null) {
+                editor.putString("class_id", cls.id);
+                editor.putString("class_school_id", cls.schoolId);
+                editor.putString("class_year_id", cls.yearId);
+                editor.putString("class_year_label", cls.academicYearLabel);
+                editor.putString("class_semester_id", cls.semesterId);
+                editor.putString("class_name", cls.className);
+                editor.putString("class_division", cls.division);
+                editor.putString("class_exam_name", cls.examName);
+                editor.putInt("class_year", cls.year);
+                editor.putString("class_teacher", cls.teacherName);
+                editor.putString("class_asst_teacher", cls.assistantTeacherName);
+                editor.putString("class_teacher_email", cls.teacherEmail);
+                editor.putString("class_teacher_phone", cls.teacherPhone);
+                editor.putInt("class_student_count", cls.studentCount);
+
+                // Serialize subjects (JSON — this is why we need the background thread)
+                if (cls.subjects != null) {
+                    try {
+                        org.json.JSONArray arr = new org.json.JSONArray();
+                        for (com.kartik.myschool.model.Subject s : cls.subjects) {
+                            org.json.JSONObject obj = new org.json.JSONObject();
+                            obj.put("name", s.name);
+                            obj.put("maxMarks", s.maxMarks);
+                            obj.put("maxNirikhshan", s.maxNirikhshan);
+                            obj.put("maxTondiKam", s.maxTondiKam);
+                            obj.put("maxPratyakshik", s.maxPratyakshik);
+                            obj.put("maxUpkram", s.maxUpkram);
+                            obj.put("maxPrakalp", s.maxPrakalp);
+                            obj.put("maxChachani", s.maxChachani);
+                            obj.put("maxSwadhyay", s.maxSwadhyay);
+                            obj.put("maxItar", s.maxItar);
+                            obj.put("maxTondi", s.maxTondi);
+                            obj.put("maxPratyakshikB", s.maxPratyakshikB);
+                            obj.put("maxLekhi", s.maxLekhi);
+                            arr.put(obj);
+                        }
+                        editor.putString("class_subjects_json", arr.toString());
+                    } catch (org.json.JSONException e) {
+                        android.util.Log.e("SessionContext", "Error serializing subjects", e);
                     }
-                    editor.putString("class_monthly_working_days_json", mwd.toString());
-                } catch (org.json.JSONException e) {
-                    android.util.Log.e("SessionContext", "Error serializing monthly working days", e);
+                } else {
+                    editor.remove("class_subjects_json");
+                }
+
+                // Serialize monthlyWorkingDays
+                if (cls.monthlyWorkingDays != null) {
+                    try {
+                        org.json.JSONObject mwd = new org.json.JSONObject();
+                        for (java.util.Map.Entry<String, Integer> entry : cls.monthlyWorkingDays.entrySet()) {
+                            mwd.put(entry.getKey(), entry.getValue());
+                        }
+                        editor.putString("class_monthly_working_days_json", mwd.toString());
+                    } catch (org.json.JSONException e) {
+                        android.util.Log.e("SessionContext", "Error serializing monthly working days", e);
+                    }
+                } else {
+                    editor.remove("class_monthly_working_days_json");
                 }
             } else {
+                editor.remove("class_id");
+                editor.remove("class_subjects_json");
                 editor.remove("class_monthly_working_days_json");
             }
-        } else {
-            editor.remove("class_id");
-            editor.remove("class_subjects_json");
-            editor.remove("class_monthly_working_days_json");
-        }
 
-        editor.apply();
+            editor.apply();
+        });
+
+        // syncToAppCache is quick (no I/O) — keep on calling thread
         syncToAppCache();
     }
 
@@ -188,6 +210,7 @@ public final class SessionContext {
             selectedSemester.id = semesterId;
             selectedSemester.yearId = prefs.getString("semester_year_id", "");
             selectedSemester.number = prefs.getInt("semester_number", 1);
+            if (selectedSemester.number <= 0) selectedSemester.number = 1;
             selectedSemester.name = prefs.getString("semester_name", "");
             selectedSemester.subtitle = prefs.getString("semester_subtitle", "");
         }

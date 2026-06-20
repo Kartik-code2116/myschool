@@ -576,7 +576,7 @@ public class EnterMarksActivity extends AppCompatActivity {
         // Semester
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             m.semesterId = SessionContext.selectedSemester.id;
-            m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
+            m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1);
         } else {
             m.semesterId = "sem_1";
             m.semesterNumber = "1";

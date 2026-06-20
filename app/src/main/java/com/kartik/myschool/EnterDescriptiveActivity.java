@@ -299,7 +299,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
             String schoolId = classModel.schoolId != null ? classModel.schoolId : (com.kartik.myschool.SessionContext.selectedSchool != null ? com.kartik.myschool.SessionContext.selectedSchool.id : "");
             int semNum = 1;
             if (getActiveSemesterId().contains("2")) semNum = 2;
-            else if (com.kartik.myschool.SessionContext.selectedSemester != null) semNum = com.kartik.myschool.SessionContext.selectedSemester.number;
+            else if (com.kartik.myschool.SessionContext.selectedSemester != null && com.kartik.myschool.SessionContext.selectedSemester.number > 0) semNum = com.kartik.myschool.SessionContext.selectedSemester.number;
 
             com.kartik.myschool.repository.FirebaseRepository.get().getRemarkBank(schoolId, classModel.className, semNum, sub.name, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.List<String>>() {
                 @Override
@@ -567,7 +567,7 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
 
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             m.semesterId = SessionContext.selectedSemester.id;
-            m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number);
+            m.semesterNumber = String.valueOf(SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1);
         } else {
             m.semesterId = "sem_1";
             m.semesterNumber = "1";

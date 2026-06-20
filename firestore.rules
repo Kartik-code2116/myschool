@@ -1,0 +1,128 @@
+rules_version = '2';
+
+// =============================================================================
+// MySchool App — Firestore Security Rules
+// =============================================================================
+// Audit fix #9: No Firestore security rules were found. Without these, if the
+// Firebase Console has default open rules ("allow read, write: if true"), ANY
+// authenticated user can read ALL teachers' data.
+//
+// HOW TO DEPLOY:
+//   1. Go to Firebase Console → Firestore → Rules tab
+//   2. Replace the current rules with the content below
+//   3. Click "Publish"
+//   4. Test with the Rules Playground before publishing
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ────────────────────────────────────────────────────
+
+    // Check that the requesting user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check that the document being read belongs to the current teacher
+    function isOwner() {
+      return isAuthenticated() && resource.data.teacherId == request.auth.uid;
+    }
+
+    // Check that the data being written will belong to the current teacher
+    function isWritingAsOwner() {
+      return isAuthenticated() && request.resource.data.teacherId == request.auth.uid;
+    }
+
+    // ─── Teachers collection ─────────────────────────────────────────────────
+    // Each teacher can only read/write their own profile document
+    match /teachers/{uid} {
+      allow read, write: if isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // ─── Schools ─────────────────────────────────────────────────────────────
+    match /schools/{schoolId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Academic Years ───────────────────────────────────────────────────────
+    match /academic_years/{yearId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Semesters ────────────────────────────────────────────────────────────
+    match /semesters/{semesterId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Classes ─────────────────────────────────────────────────────────────
+    match /classes/{classId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Students ────────────────────────────────────────────────────────────
+    match /students/{studentId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Marks ───────────────────────────────────────────────────────────────
+    match /marks/{markId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Attendance Records ───────────────────────────────────────────────────
+    match /attendance_records/{recordId} {
+      allow read:   if isOwner();
+      allow create: if isWritingAsOwner();
+      allow update: if isOwner() && isWritingAsOwner();
+      allow delete: if isOwner();
+    }
+
+    // ─── Subscriptions ───────────────────────────────────────────────────────
+    // Teachers write their own subscription requests; only Cloud Functions can update
+    // subscriptionVerified = true (Cloud Function runs as admin, bypasses these rules)
+    match /subscriptions/{uid} {
+      allow read:   if isAuthenticated() && request.auth.uid == uid;
+      allow create: if isAuthenticated() && request.auth.uid == uid
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.subscriptionVerified == false;
+      allow update: if false; // Only Cloud Function (admin SDK) can update
+      allow delete: if false;
+    }
+
+    // ─── Admin Settings (read-only for all authenticated users) ──────────────
+    match /admin_settings/{doc} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only writable from Firebase Console / Admin SDK
+    }
+
+    // ─── Class Default Subjects (read-only reference data) ───────────────────
+    match /class_default_subjects/{doc} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only writable from Firebase Console / Admin SDK
+    }
+
+    // ─── Deny everything else ─────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

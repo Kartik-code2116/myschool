@@ -48,6 +48,7 @@ public class StudentListFragment extends Fragment {
     private List<ClassModel> classes = new ArrayList<>();
     private School selectedSchool = null;
     private ClassModel selectedClass = null;
+    private String lastLoadedClassId = null; // Fix 2: Cache class ID to prevent redundant fetches
 
     private final androidx.activity.result.ActivityResultLauncher<String> csvPickerLauncher = registerForActivityResult(
             new androidx.activity.result.contract.ActivityResultContracts.GetContent(), uri -> {
@@ -153,6 +154,12 @@ public class StudentListFragment extends Fragment {
     private void applySessionFilterIfAny() {
         SessionContext.syncFromAppCache();
         if (SessionContext.selectedClass != null && SessionContext.selectedClass.id != null) {
+            // Fix 2: Check if we already loaded this class's students
+            if (SessionContext.selectedClass.id.equals(lastLoadedClassId) && !allStudents.isEmpty()) {
+                filterStudents(b.etSearch.getText().toString());
+                return;
+            }
+            lastLoadedClassId = SessionContext.selectedClass.id;
             FirebaseRepository.get().getStudentsForClass(SessionContext.selectedClass.id,
                     new FirebaseRepository.OnResult<List<Student>>() {
                         @Override
@@ -331,6 +338,14 @@ public class StudentListFragment extends Fragment {
 
     private void loadAllStudents() {
         b.emptyState.setVisibility(View.GONE);
+        
+        // Fix 2: Check if we already loaded all students
+        if ("ALL".equals(lastLoadedClassId) && !allStudents.isEmpty()) {
+            filterStudents(b.etSearch.getText().toString());
+            return;
+        }
+        lastLoadedClassId = "ALL";
+        
         FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> list) {
@@ -463,8 +478,8 @@ public class StudentListFragment extends Fragment {
         String classVal = "1";
         String divVal = "1";
         if (SessionContext.selectedClass != null) {
-            classVal = SessionContext.selectedClass.className != null ? SessionContext.selectedClass.className : "1";
-            divVal = SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty()
+            classVal = (SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty()) ? SessionContext.selectedClass.className : "1";
+            divVal = (SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty())
                     ? SessionContext.selectedClass.division
                     : "-";
         }

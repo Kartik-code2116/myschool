@@ -70,7 +70,7 @@ public class FormativeSummativeFragment extends Fragment {
         activeClass = SessionContext.selectedClass;
         if (SessionContext.selectedSemester != null) {
             activeSemesterId = SessionContext.selectedSemester.id;
-            activeSemesterNumber = SessionContext.selectedSemester.number;
+            activeSemesterNumber = SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1;
         }
 
         setupCustomAppBar();
@@ -335,7 +335,7 @@ public class FormativeSummativeFragment extends Fragment {
 
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
             activeSemesterId = SessionContext.selectedSemester.id;
-            activeSemesterNumber = SessionContext.selectedSemester.number;
+            activeSemesterNumber = SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1;
         } else {
             activeSemesterId = "sem_1";
             activeSemesterNumber = 1;

@@ -1089,6 +1089,20 @@ public class ExtraMenusFragment extends Fragment {
             showClassesError("UDISE Code is empty. Please set it in profile.");
             return;
         }
+
+        if (AppCache.cachedClasses != null && !AppCache.cachedClasses.isEmpty()) {
+            String currentYearLabel = SessionContext.getYearLabel();
+            List<ClassModel> filtered = new ArrayList<>();
+            for (ClassModel c : AppCache.cachedClasses) {
+                if (currentYearLabel.equals(c.academicYearLabel)) {
+                    filtered.add(c);
+                }
+            }
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> renderClassesList(filtered));
+            }
+            return;
+        }
         
         b.llClassesListContainer.removeAllViews();
         android.widget.TextView tvLoading = new android.widget.TextView(requireContext());
@@ -1103,6 +1117,7 @@ public class ExtraMenusFragment extends Fragment {
             public void onSuccess(List<ClassModel> list) {
                 if (!isAdded() || b == null) return;
                 
+                AppCache.cachedClasses = list;
                 String currentYearLabel = SessionContext.getYearLabel();
                 List<ClassModel> filtered = new ArrayList<>();
                 for (ClassModel c : list) {
@@ -1240,126 +1255,100 @@ public class ExtraMenusFragment extends Fragment {
                         public void onSuccess(School s) {
                             SessionContext.selectedSchool = s;
                             AppCache.selectedSchool = s;
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> loadSchoolWideStatsForUdise(s.udiseCode));
-                            }
-                        }
-                        @Override
-                        public void onError(Exception e) {}
-                    });
-                }
-                @Override
-                public void onError(Exception e) {}
-            });
-        } else {
-            loadSchoolWideStatsForUdise(school.udiseCode);
-        }
-    }
-
-    private void loadSchoolWideStatsForUdise(String udiseCode) {
+                 private void loadSchoolWideStatsForUdise(String udiseCode) {
         if (udiseCode == null || udiseCode.isEmpty()) {
             return;
         }
 
-        FirebaseRepository.get().getClassesForUdiseCode(udiseCode, new FirebaseRepository.OnResult<List<ClassModel>>() {
+        ClassModel activeClass = SessionContext.selectedClass;
+        if (activeClass == null || activeClass.id == null) return;
+
+        if (AppCache.cachedStudents != null && activeClass.id.equals(AppCache.cachedClassIdForStudents)) {
+            calculateAndShowStats(AppCache.cachedStudents);
+            return;
+        }
+
+        FirebaseRepository.get().getStudentsForClass(activeClass.id, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
-            public void onSuccess(List<ClassModel> classes) {
+            public void onSuccess(List<Student> students) {
                 if (!isAdded() || b == null) return;
-                
-                ClassModel activeClass = SessionContext.selectedClass;
-                java.util.Set<String> activeClassIds = new java.util.HashSet<>();
-                if (activeClass != null && activeClass.id != null) {
-                    activeClassIds.add(activeClass.id);
-                }
-
-                FirebaseRepository.get().getStudentsForUdiseCode(udiseCode, new FirebaseRepository.OnResult<List<Student>>() {
-                    @Override
-                    public void onSuccess(List<Student> students) {
-                        if (!isAdded() || b == null) return;
-
-                        List<Student> activeStudents = new ArrayList<>();
-                        for (Student s : students) {
-                            if (s.classId != null && activeClassIds.contains(s.classId)) {
-                                activeStudents.add(s);
-                            }
-                        }
-
-                        int boys = 0;
-                        int girls = 0;
-                        int generalCount = 0;
-                        int obcCount = 0;
-                        int scCount = 0;
-                        int stCount = 0;
-
-                        for (Student s : activeStudents) {
-                            if (s.gender != null && (s.gender.equalsIgnoreCase("Female") 
-                                    || s.gender.equals("2") 
-                                    || s.gender.equalsIgnoreCase("स्त्री") 
-                                    || s.gender.equalsIgnoreCase("मुलगी"))) {
-                                girls++;
-                            } else {
-                                boys++;
-                            }
-
-                            if (s.cast != null) {
-                                String c = s.cast.toUpperCase().trim();
-                                if (c.contains("OBC") || c.equals("5")) obcCount++;
-                                else if (c.contains("SC") || c.equals("1") || c.equals("0")) scCount++;
-                                else if (c.contains("ST") || c.equals("2")) stCount++;
-                                else generalCount++;
-                            } else {
-                                generalCount++;
-                            }
-                        }
-
-                        final int finalBoys = boys;
-                        final int finalGirls = girls;
-                        final int finalGen = generalCount;
-                        final int finalObc = obcCount;
-                        final int finalSc = scCount;
-                        final int finalSt = stCount;
-                        final int finalTotal = activeStudents.size();
-
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                b.tvGenderBoysCount.setText(String.valueOf(finalBoys));
-                                b.tvGenderGirlsCount.setText(String.valueOf(finalGirls));
-                                boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
-                                if (finalTotal > 0) {
-                                    double boysPercent = (finalBoys * 100.0) / finalTotal;
-                                    double girlsPercent = (finalGirls * 100.0) / finalTotal;
-                                    String ratioText = isMr 
-                                        ? String.format("वर्ग लिंग गुणोत्तर: %.1f%% मुले / %.1f%% मुली", boysPercent, girlsPercent)
-                                        : String.format("Class Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent);
-                                    b.tvGenderRatio.setText(ratioText);
-                                } else {
-                                    b.tvGenderRatio.setText(isMr ? "या वर्गात विद्यार्थी आढळले नाहीत." : "No students in this class.");
-                                }
-
-                                if (isMr) {
-                                    b.tvCastGeneral.setText("सर्वसाधारण (खुला प्रवर्ग) : " + finalGen + " विद्यार्थी");
-                                    b.tvCastObc.setText("इतर मागासवर्ग (OBC) : " + finalObc + " विद्यार्थी");
-                                    b.tvCastSc.setText("अनुसूचित जाती (SC) : " + finalSc + " विद्यार्थी");
-                                    b.tvCastSt.setText("अनुसूचित जमाती (ST) : " + finalSt + " विद्यार्थी");
-                                    b.tvSchoolInfoTotalStudents.setText("वर्ग एकूण पटसंख्या: " + finalTotal + " विद्यार्थी");
-                                } else {
-                                    b.tvCastGeneral.setText("General (Open) : " + finalGen + " students");
-                                    b.tvCastObc.setText("OBC Category : " + finalObc + " students");
-                                    b.tvCastSc.setText("SC Category : " + finalSc + " students");
-                                    b.tvCastSt.setText("ST Category : " + finalSt + " students");
-                                    b.tvSchoolInfoTotalStudents.setText("Class total enrollment: " + finalTotal + " students");
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onError(Exception e) {}
-                });
+                AppCache.cachedStudents = students;
+                AppCache.cachedClassIdForStudents = activeClass.id;
+                calculateAndShowStats(students);
             }
 
             @Override
             public void onError(Exception e) {}
         });
+    }
+
+    private void calculateAndShowStats(List<Student> activeStudents) {
+        int boys = 0;
+        int girls = 0;
+        int generalCount = 0;
+        int obcCount = 0;
+        int scCount = 0;
+        int stCount = 0;
+
+        for (Student s : activeStudents) {
+            if (s.gender != null && (s.gender.equalsIgnoreCase("Female") 
+                    || s.gender.equals("2") 
+                    || s.gender.equalsIgnoreCase("स्त्री") 
+                    || s.gender.equalsIgnoreCase("मुलगी"))) {
+                girls++;
+            } else {
+                boys++;
+            }
+
+            if (s.cast != null) {
+                String c = s.cast.toUpperCase().trim();
+                if (c.contains("OBC") || c.equals("5")) obcCount++;
+                else if (c.contains("SC") || c.equals("1") || c.equals("0")) scCount++;
+                else if (c.contains("ST") || c.equals("2")) stCount++;
+                else generalCount++;
+            } else {
+                generalCount++;
+            }
+        }
+
+        final int finalBoys = boys;
+        final int finalGirls = girls;
+        final int finalGen = generalCount;
+        final int finalObc = obcCount;
+        final int finalSc = scCount;
+        final int finalSt = stCount;
+        final int finalTotal = activeStudents.size();
+
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                b.tvGenderBoysCount.setText(String.valueOf(finalBoys));
+                b.tvGenderGirlsCount.setText(String.valueOf(finalGirls));
+                boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+                if (finalTotal > 0) {
+                    double boysPercent = (finalBoys * 100.0) / finalTotal;
+                    double girlsPercent = (finalGirls * 100.0) / finalTotal;
+                    String ratioText = isMr 
+                        ? String.format("वर्ग लिंग गुणोत्तर: %.1f%% मुले / %.1f%% मुली", boysPercent, girlsPercent)
+                        : String.format("Class Gender Ratio: %.1f%% Boys / %.1f%% Girls", boysPercent, girlsPercent);
+                    b.tvGenderRatio.setText(ratioText);
+                } else {
+                    b.tvGenderRatio.setText(isMr ? "या वर्गात विद्यार्थी आढळले नाहीत." : "No students in this class.");
+                }
+
+                if (isMr) {
+                    b.tvCastGeneral.setText("सर्वसाधारण (खुला प्रवर्ग) : " + finalGen + " विद्यार्थी");
+                    b.tvCastObc.setText("इतर मागासवर्ग (OBC) : " + finalObc + " विद्यार्थी");
+                    b.tvCastSc.setText("अनुसूचित जाती (SC) : " + finalSc + " विद्यार्थी");
+                    b.tvCastSt.setText("अनुसूचित जमाती (ST) : " + finalSt + " विद्यार्थी");
+                    b.tvSchoolInfoTotalStudents.setText("वर्ग एकूण पटसंख्या: " + finalTotal + " विद्यार्थी");
+                } else {
+                    b.tvCastGeneral.setText("General (Open) : " + finalGen + " students");
+                    b.tvCastObc.setText("OBC Category : " + finalObc + " students");
+                    b.tvCastSc.setText("SC Category : " + finalSc + " students");
+                    b.tvCastSt.setText("ST Category : " + finalSt + " students");
+                    b.tvSchoolInfoTotalStudents.setText("Class total enrollment: " + finalTotal + " students");
+                }
+            });
+        }
     }
 }
