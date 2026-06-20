@@ -44,12 +44,7 @@ public class DeclareWeightageFragment extends Fragment {
         setupRecyclerView();
         displayHeaderInfo();
 
-        // Defer load slightly to allow smooth fragment transition, then animate in
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (isAdded()) {
-                loadActiveSubjects();
-            }
-        }, 150);
+        loadActiveSubjects();
 
         setupActions();
     }
@@ -57,12 +52,7 @@ public class DeclareWeightageFragment extends Fragment {
     private void setupRecyclerView() {
         b.rvWeightageSubjects.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Add layout animation to list items
-        if (getContext() != null) {
-            android.view.animation.LayoutAnimationController animation = android.view.animation.AnimationUtils
-                    .loadLayoutAnimation(getContext(), R.anim.layout_fade_in_slide_up);
-            b.rvWeightageSubjects.setLayoutAnimation(animation);
-        }
+        // Layout animations removed to improve perceived load speed
 
         adapter = new DeclareWeightageAdapter();
         b.rvWeightageSubjects.setAdapter(adapter);
@@ -104,7 +94,6 @@ public class DeclareWeightageFragment extends Fragment {
             b.rvWeightageSubjects.setVisibility(View.VISIBLE);
             b.btnSaveWeightage.setEnabled(true);
             adapter.setData(activeList);
-            b.rvWeightageSubjects.scheduleLayoutAnimation();
         }
     }
 

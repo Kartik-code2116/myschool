@@ -95,8 +95,25 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
             b.layoutSummative.setVisibility(View.VISIBLE);
         }
 
+        if (holder.mainWatcher != null) {
+            b.etMaxMarks.removeTextChangedListener(holder.mainWatcher);
+        }
+        if (holder.subWatcher != null) {
+            b.etNirikhshanMax.removeTextChangedListener(holder.subWatcher);
+            b.etTondiKamMax.removeTextChangedListener(holder.subWatcher);
+            b.etPratyakshikMax.removeTextChangedListener(holder.subWatcher);
+            b.etUpkramMax.removeTextChangedListener(holder.subWatcher);
+            b.etPrakalpMax.removeTextChangedListener(holder.subWatcher);
+            b.etChachaniMax.removeTextChangedListener(holder.subWatcher);
+            b.etSwadhyayMax.removeTextChangedListener(holder.subWatcher);
+            b.etItarMax.removeTextChangedListener(holder.subWatcher);
+            b.etTondiMax.removeTextChangedListener(holder.subWatcher);
+            b.etPratyakshikBMax.removeTextChangedListener(holder.subWatcher);
+            b.etLekhiMax.removeTextChangedListener(holder.subWatcher);
+        }
+
         // ── Main total watch ──────────────────────────────────────────────────
-        b.etMaxMarks.addTextChangedListener(new TextWatcher() {
+        holder.mainWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override public void afterTextChanged(Editable s) {
@@ -147,10 +164,11 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
 
                 } catch (NumberFormatException ignored) {}
             }
-        });
+        };
+        b.etMaxMarks.addTextChangedListener(holder.mainWatcher);
 
         // ── Sub-fields watches ────────────────────────────────────────────────
-        TextWatcher subWatcher = new TextWatcher() {
+        holder.subWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override public void afterTextChanged(Editable s) {
@@ -192,17 +210,17 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
             }
         };
 
-        b.etNirikhshanMax.addTextChangedListener(subWatcher);
-        b.etTondiKamMax.addTextChangedListener(subWatcher);
-        b.etPratyakshikMax.addTextChangedListener(subWatcher);
-        b.etUpkramMax.addTextChangedListener(subWatcher);
-        b.etPrakalpMax.addTextChangedListener(subWatcher);
-        b.etChachaniMax.addTextChangedListener(subWatcher);
-        b.etSwadhyayMax.addTextChangedListener(subWatcher);
-        b.etItarMax.addTextChangedListener(subWatcher);
-        b.etTondiMax.addTextChangedListener(subWatcher);
-        b.etPratyakshikBMax.addTextChangedListener(subWatcher);
-        b.etLekhiMax.addTextChangedListener(subWatcher);
+        b.etNirikhshanMax.addTextChangedListener(holder.subWatcher);
+        b.etTondiKamMax.addTextChangedListener(holder.subWatcher);
+        b.etPratyakshikMax.addTextChangedListener(holder.subWatcher);
+        b.etUpkramMax.addTextChangedListener(holder.subWatcher);
+        b.etPrakalpMax.addTextChangedListener(holder.subWatcher);
+        b.etChachaniMax.addTextChangedListener(holder.subWatcher);
+        b.etSwadhyayMax.addTextChangedListener(holder.subWatcher);
+        b.etItarMax.addTextChangedListener(holder.subWatcher);
+        b.etTondiMax.addTextChangedListener(holder.subWatcher);
+        b.etPratyakshikBMax.addTextChangedListener(holder.subWatcher);
+        b.etLekhiMax.addTextChangedListener(holder.subWatcher);
     }
 
     private void setVal(EditText et, int val) {
@@ -240,6 +258,8 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
 
     static class VH extends RecyclerView.ViewHolder {
         final ItemWeightageSubjectBinding b;
+        TextWatcher mainWatcher;
+        TextWatcher subWatcher;
         VH(ItemWeightageSubjectBinding b) {
             super(b.getRoot());
             this.b = b;

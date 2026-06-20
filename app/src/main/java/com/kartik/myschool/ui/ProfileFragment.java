@@ -162,6 +162,11 @@ public class ProfileFragment extends Fragment {
      * Each result updates the UI independently as soon as it arrives.
      */
     private void loadAllParallel() {
+        final boolean schoolKnown = SessionContext.selectedSchool != null && SessionContext.selectedSchool.id != null;
+        if (schoolKnown) {
+            fetchClassesAndCounts(SessionContext.selectedSchool.id);
+        }
+
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
             @Override public void onSuccess(Teacher t) {
                 if (!isViewActive()) return;
@@ -177,11 +182,13 @@ public class ProfileFragment extends Fragment {
                             if (!isViewActive()) return;
                             SessionContext.selectedSchool = s;
                             AppCache.selectedSchool = s;
-                            fetchClassesAndCounts(s.id);
+                            if (!schoolKnown) {
+                                fetchClassesAndCounts(s.id);
+                            }
                         }
                         @Override public void onError(Exception e) {
                             if (!isViewActive()) return;
-                            if (SessionContext.selectedSchool != null) {
+                            if (!schoolKnown && SessionContext.selectedSchool != null) {
                                 fetchClassesAndCounts(SessionContext.selectedSchool.id);
                             }
                         }
@@ -190,7 +197,7 @@ public class ProfileFragment extends Fragment {
             }
             @Override public void onError(Exception e) {
                 if (!isViewActive()) return;
-                if (SessionContext.selectedSchool != null) {
+                if (!schoolKnown && SessionContext.selectedSchool != null) {
                     fetchClassesAndCounts(SessionContext.selectedSchool.id);
                 }
             }
