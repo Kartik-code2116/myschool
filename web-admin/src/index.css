@@ -85,6 +85,15 @@ textarea {
   box-shadow: var(--shadow-sm);
 }
 
+.page-kicker {
+  margin-bottom: 8px;
+  color: var(--accent-color);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

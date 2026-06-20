@@ -4,15 +4,6 @@
   padding: 38px 32px 56px;
 }
 
-.page-kicker {
-  margin-bottom: 8px;
-  color: var(--accent-color);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
 .header-actions {
   margin-bottom: 30px;
 }
