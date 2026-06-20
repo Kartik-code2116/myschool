@@ -245,6 +245,7 @@ public class ProfileFragment extends Fragment {
                     }
                 }
                 AppCache.cachedStudentCountByClassId = counts;
+                SessionContext.save(getContext());
                 if (isViewActive()) buildAndBindList(classes, counts);
             }
             @Override public void onError(Exception e) {

@@ -178,6 +178,18 @@ public final class SessionContext {
                 editor.remove("class_monthly_working_days_json");
             }
 
+            // Save full cached lists for 0ms instant load
+            try {
+                if (AppCache.cachedClasses != null) {
+                    editor.putString("appcache_classes_json", new com.google.gson.Gson().toJson(AppCache.cachedClasses));
+                }
+                if (AppCache.cachedStudentCountByClassId != null) {
+                    editor.putString("appcache_student_counts_json", new com.google.gson.Gson().toJson(AppCache.cachedStudentCountByClassId));
+                }
+            } catch (Exception e) {
+                android.util.Log.e("SessionContext", "Error serializing AppCache", e);
+            }
+
             editor.apply();
         });
 
@@ -284,8 +296,8 @@ public final class SessionContext {
                     selectedClass.monthlyWorkingDays = new java.util.HashMap<>();
                     java.util.Iterator<String> keys = mwd.keys();
                     while (keys.hasNext()) {
-                        String key = keys.next();
-                        selectedClass.monthlyWorkingDays.put(key, mwd.getInt(key));
+                        String k = keys.next();
+                        selectedClass.monthlyWorkingDays.put(k, mwd.getInt(k));
                     }
                 } catch (org.json.JSONException e) {
                     android.util.Log.e("SessionContext", "Error deserializing monthly working days", e);
@@ -293,6 +305,28 @@ public final class SessionContext {
             }
         }
         
+        // Load full cached lists for 0ms instant load
+        try {
+            String classesJson = prefs.getString("appcache_classes_json", null);
+            if (classesJson != null) {
+                java.lang.reflect.Type listType = new com.google.gson.reflect.TypeToken<java.util.ArrayList<com.kartik.myschool.model.ClassModel>>(){}.getType();
+                AppCache.cachedClasses = new com.google.gson.Gson().fromJson(classesJson, listType);
+                if (AppCache.cachedClasses != null && selectedSchool != null) {
+                    com.kartik.myschool.repository.FirebaseRepository.get().getClassesForSchool(selectedSchool.id, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.List<com.kartik.myschool.model.ClassModel>>() {
+                        @Override public void onSuccess(java.util.List<com.kartik.myschool.model.ClassModel> list) {}
+                        @Override public void onError(Exception e) {}
+                    });
+                }
+            }
+            String countsJson = prefs.getString("appcache_student_counts_json", null);
+            if (countsJson != null) {
+                java.lang.reflect.Type mapType = new com.google.gson.reflect.TypeToken<java.util.HashMap<String, Integer>>(){}.getType();
+                AppCache.cachedStudentCountByClassId = new com.google.gson.Gson().fromJson(countsJson, mapType);
+            }
+        } catch (Exception e) {
+            android.util.Log.e("SessionContext", "Error deserializing AppCache", e);
+        }
+
         syncToAppCache();
     }
 
