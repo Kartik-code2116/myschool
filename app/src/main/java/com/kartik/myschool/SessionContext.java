@@ -186,6 +186,16 @@ public final class SessionContext {
                 if (AppCache.cachedStudentCountByClassId != null) {
                     editor.putString("appcache_student_counts_json", new com.google.gson.Gson().toJson(AppCache.cachedStudentCountByClassId));
                 }
+                if (AppCache.cachedStudents != null) {
+                    editor.putString("appcache_students_json", new com.google.gson.Gson().toJson(AppCache.cachedStudents));
+                } else {
+                    editor.remove("appcache_students_json");
+                }
+                if (AppCache.cachedClassIdForStudents != null) {
+                    editor.putString("appcache_class_id_students", AppCache.cachedClassIdForStudents);
+                } else {
+                    editor.remove("appcache_class_id_students");
+                }
             } catch (Exception e) {
                 android.util.Log.e("SessionContext", "Error serializing AppCache", e);
             }

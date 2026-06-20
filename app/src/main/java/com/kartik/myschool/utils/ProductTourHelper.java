@@ -579,10 +579,7 @@ public class ProductTourHelper {
                         m ? "६. सर्व वर्गांची यादी 📋" : "6. All Classes List 📋",
                         m ? "शाळेतील सर्व वर्गांची यादी येथे दिसते. वर्गावर टॅप केल्यास तो सक्रिय होतो."
                           : "All classes in the school are listed here. Tap a class to make it active."));
-                s.add(new TourStep(R.id.fabPromoteStudents,
-                        m ? "७. विद्यार्थी वर्गोन्नती 🎓" : "7. Promote Students 🎓",
-                        m ? "नवीन शैक्षणिक वर्षात किंवा तुकडीमध्ये एकाच वेळी अनेक विद्यार्थ्यांची वर्गोन्नती किंवा बदली करण्यासाठी येथे टॅप करा."
-                          : "Tap here to batch promote or transfer students into a new academic year or division."));
+
                 s.add(new TourStep(R.id.fabAddClass,
                         m ? "८. नवीन वर्ग जोडा +" : "8. Add New Class +",
                         m ? "'+' FAB दाबून नवीन वर्ग व तुकडी (उदा. ५-A) तयार करा. लगेच यादीत दिसेल."

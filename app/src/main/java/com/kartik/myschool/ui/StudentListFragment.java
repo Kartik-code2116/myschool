@@ -154,22 +154,33 @@ public class StudentListFragment extends Fragment {
     private void applySessionFilterIfAny() {
         SessionContext.syncFromAppCache();
         if (SessionContext.selectedClass != null && SessionContext.selectedClass.id != null) {
-            // Fix 2: Check if we already loaded this class's students
-            if (SessionContext.selectedClass.id.equals(lastLoadedClassId) && !allStudents.isEmpty()) {
+            // Fix 2: Instant 0ms load if cached persistently
+            if (SessionContext.selectedClass.id.equals(AppCache.cachedClassIdForStudents) && AppCache.cachedStudents != null && !AppCache.cachedStudents.isEmpty()) {
+                allStudents.clear();
+                allStudents.addAll(AppCache.cachedStudents);
+                filterStudents(b.etSearch.getText().toString());
+                // Continue with network call in background to catch any updates silently
+            } else if (SessionContext.selectedClass.id.equals(lastLoadedClassId) && !allStudents.isEmpty()) {
                 filterStudents(b.etSearch.getText().toString());
                 return;
             }
+            
             lastLoadedClassId = SessionContext.selectedClass.id;
             FirebaseRepository.get().getStudentsForClass(SessionContext.selectedClass.id,
                     new FirebaseRepository.OnResult<List<Student>>() {
                         @Override
                         public void onSuccess(List<Student> list) {
+                            AppCache.cachedStudents = list;
+                            AppCache.cachedClassIdForStudents = SessionContext.selectedClass.id;
+                            SessionContext.save(requireContext());
+                            
                             allStudents.clear();
                             allStudents.addAll(list);
                             filteredStudents.clear();
                             filteredStudents.addAll(list);
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
+                                    if (b == null) return;
                                     studentAdapter.setData(filteredStudents);
                                     b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
                                 });
@@ -236,6 +247,7 @@ public class StudentListFragment extends Fragment {
                                 public void onSuccess(Void v) {
                                     if (getActivity() != null) {
                                         getActivity().runOnUiThread(() -> {
+                                            if (b == null) return;
                                             allStudents.remove(student);
                                             filteredStudents.remove(student);
                                             studentAdapter.setData(filteredStudents);
@@ -339,8 +351,13 @@ public class StudentListFragment extends Fragment {
     private void loadAllStudents() {
         b.emptyState.setVisibility(View.GONE);
         
-        // Fix 2: Check if we already loaded all students
-        if ("ALL".equals(lastLoadedClassId) && !allStudents.isEmpty()) {
+        // Instant 0ms load if cached persistently
+        if ("ALL".equals(AppCache.cachedClassIdForStudents) && AppCache.cachedStudents != null && !AppCache.cachedStudents.isEmpty()) {
+            allStudents.clear();
+            allStudents.addAll(AppCache.cachedStudents);
+            filterStudents(b.etSearch.getText().toString());
+            // Continue with background load
+        } else if ("ALL".equals(lastLoadedClassId) && !allStudents.isEmpty()) {
             filterStudents(b.etSearch.getText().toString());
             return;
         }
@@ -349,12 +366,17 @@ public class StudentListFragment extends Fragment {
         FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> list) {
+                AppCache.cachedStudents = list;
+                AppCache.cachedClassIdForStudents = "ALL";
+                SessionContext.save(requireContext());
+                
                 allStudents.clear();
                 allStudents.addAll(list);
                 filteredStudents.clear();
                 filteredStudents.addAll(list);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
+                        if (b == null) return;
                         studentAdapter.setData(filteredStudents);
                         b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
                     });
@@ -364,7 +386,9 @@ public class StudentListFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> b.emptyState.setVisibility(View.VISIBLE));
+                    getActivity().runOnUiThread(() -> {
+                        if (b != null) b.emptyState.setVisibility(View.VISIBLE);
+                    });
                 }
             }
         });

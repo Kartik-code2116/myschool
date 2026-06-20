@@ -605,19 +605,32 @@ public class HomeActivity extends AppCompatActivity {
             popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 " + getString(R.string.menu_3dot_home));
             popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 " + getString(R.string.menu_3dot_classes));
             popup.getMenu().add(0, R.id.nav_students, 3, "👥 " + getString(R.string.menu_3dot_students));
-            popup.getMenu().add(0, 801, 4, "💬 " + getString(R.string.menu_3dot_message));
+            
+            // Show Promote Students only if on the Profile page (or just globally since it's a student action)
+            // But if they are on profile, it makes sense to show it globally
+            popup.getMenu().add(0, 802, 4, "🎓 " + getString(R.string.menu_promote_students));
+            
+            popup.getMenu().add(0, 801, 5, "💬 " + getString(R.string.menu_3dot_message));
 
             // Utility options
-            popup.getMenu().add(0, 901, 5, "🌐 " + getString(R.string.menu_3dot_language));
-            popup.getMenu().add(0, 902, 6, "⭐ " + getString(R.string.menu_3dot_rate));
-            popup.getMenu().add(0, 903, 7, "📱 " + getString(R.string.menu_3dot_more_apps));
-            popup.getMenu().add(0, 904, 8, "ℹ️ " + getString(R.string.menu_3dot_about));
-            popup.getMenu().add(0, 999, 9, "🚪 " + getString(R.string.logout));
+            popup.getMenu().add(0, 901, 6, "🌐 " + getString(R.string.menu_3dot_language));
+            popup.getMenu().add(0, 902, 7, "⭐ " + getString(R.string.menu_3dot_rate));
+            popup.getMenu().add(0, 903, 8, "📱 " + getString(R.string.menu_3dot_more_apps));
+            popup.getMenu().add(0, 904, 9, "ℹ️ " + getString(R.string.menu_3dot_about));
+            popup.getMenu().add(0, 999, 10, "🚪 " + getString(R.string.logout));
 
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
                 if (id == 801) {
                     showAdminMessageDialog();
+                    return true;
+                } else if (id == 802) {
+                    if (SessionContext.selectedClass == null) {
+                        Toast.makeText(this, "Please select an active class first.", Toast.LENGTH_LONG).show();
+                        return true;
+                    }
+                    startActivity(new Intent(this, com.kartik.myschool.PromoteStudentsActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
                     return true;
                 } else if (id == 901) {
                     // Fully functional bilingual language selector dialog

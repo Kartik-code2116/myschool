@@ -390,20 +390,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- FAB: Promote Students -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabPromoteStudents"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
-        android:text="Promote Students"
-        app:icon="@drawable/ic_students"
-        app:backgroundTint="?attr/colorPrimary"
-        android:textColor="?attr/colorSurface"
-        app:iconTint="?attr/colorSurface"/>
-
     <!-- FAB: Add Class -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddClass"
@@ -411,7 +397,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="92dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/txt_add_class"
         app:icon="@drawable/ic_add_circle"
         app:backgroundTint="@color/primary"

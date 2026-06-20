@@ -132,6 +132,8 @@
                         app:tint="?attr/colorPrimary"
                         android:visibility="gone"/>
 
+                    <!-- Promote Students Icon -->
+
                     <ImageButton
                         android:id="@+id/btnToolbarMore"
                         android:layout_width="40dp"

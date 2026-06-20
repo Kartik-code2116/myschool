@@ -96,21 +96,11 @@ public class ProfileFragment extends Fragment {
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
 
-        b.fabPromoteStudents.setOnClickListener(v -> {
-            UiAnimations.pulse(b.fabPromoteStudents);
-            if (SessionContext.selectedClass == null) {
-                Toast.makeText(requireContext(), "Please select an active class first.", Toast.LENGTH_LONG).show();
-                return;
-            }
-            startActivity(new Intent(requireContext(), com.kartik.myschool.PromoteStudentsActivity.class));
-            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
-        });
-
         // ── Phase 1: show whatever is already in cache instantly ───────────────
         showCachedDataImmediately();
 
         setViewMode(false);
-        UiAnimations.staggerFadeIn(b.cardProfileInfo, b.rvProfileClasses, b.btnLogout, b.fabPromoteStudents, b.fabAddClass);
+        UiAnimations.staggerFadeIn(b.cardProfileInfo, b.rvProfileClasses, b.btnLogout, b.fabAddClass);
 
         // ── Phase 2: load fresh data in parallel ───────────────────────────────
         loadAllParallel();
