@@ -78,7 +78,7 @@
         android:id="@+id/nav_dropdown"
         android:name="com.kartik.myschool.ui.ExtraMenusFragment"
         android:label="@string/menu_dropdown_list">
-        <argument android:name="menu_type" app:argType="string" android:defaultValue="subject"/>
+        <argument android:name="menu_type" app:argType="string" android:defaultValue="remarks"/>
     </fragment>
 
     <fragment

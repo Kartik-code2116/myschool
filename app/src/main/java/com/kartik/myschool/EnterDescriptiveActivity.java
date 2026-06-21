@@ -253,69 +253,68 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
     }
 
     private void addRemarkRow(Subject sub) {
-        ItemSubjectRemarkRowBinding row = ItemSubjectRemarkRowBinding.inflate(LayoutInflater.from(this), b.llRemarkRows,
-                false);
+        ItemSubjectRemarkRowBinding row = ItemSubjectRemarkRowBinding.inflate(LayoutInflater.from(this), b.llRemarkRows, false);
         row.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, sub.name));
 
         // Hide "Select" button as we are showing the choices directly for fast action!
         row.btnAddRemark.setVisibility(View.GONE);
         row.tvNoRemarks.setVisibility(View.GONE);
-
-        // Check if there are category specific remarks
-        java.util.Map<String, java.util.List<String>> categoryRemarks = com.kartik.myschool.utils.DescriptiveRemarksData.getRemarksForClassAndSubject(classModel.className, sub.name);
+        
+        // Setup expand/collapse logic
+        row.llDetailsContainer.setVisibility(View.GONE);
+        row.ivExpand.setRotation(0f);
+        
+        row.llHeader.setOnClickListener(v -> {
+            boolean isExpanded = row.llDetailsContainer.getVisibility() == View.VISIBLE;
+            if (isExpanded) {
+                row.llDetailsContainer.setVisibility(View.GONE);
+                row.ivExpand.animate().rotation(0f).setDuration(200).start();
+            } else {
+                row.llDetailsContainer.setVisibility(View.VISIBLE);
+                row.ivExpand.animate().rotation(180f).setDuration(200).start();
+            }
+        });
 
         row.llCategoriesContainer.setVisibility(View.VISIBLE);
-        if (categoryRemarks != null && !categoryRemarks.isEmpty()) {
-            for (java.util.Map.Entry<String, java.util.List<String>> entry : categoryRemarks.entrySet()) {
-                // Add Category Title
-                android.widget.TextView tvCat = new android.widget.TextView(this);
-                tvCat.setText(entry.getKey());
-                tvCat.setTextSize(14f);
-                tvCat.setTypeface(null, android.graphics.Typeface.BOLD);
-                tvCat.setTextColor(0xFF6C4CCF);
-                tvCat.setPadding(0, (int)(8 * getResources().getDisplayMetrics().density), 0, (int)(4 * getResources().getDisplayMetrics().density));
-                row.llCategoriesContainer.addView(tvCat);
 
-                // Add ChipGroup
-                com.google.android.material.chip.ChipGroup cg = new com.google.android.material.chip.ChipGroup(this);
-                cg.setChipSpacingHorizontal((int)(8 * getResources().getDisplayMetrics().density));
-                cg.setChipSpacingVertical((int)(8 * getResources().getDisplayMetrics().density));
-                row.llCategoriesContainer.addView(cg);
+        String schoolId = classModel.schoolId != null ? classModel.schoolId : (com.kartik.myschool.SessionContext.selectedSchool != null ? com.kartik.myschool.SessionContext.selectedSchool.id : "");
+        int semNum = 1;
+        if (getActiveSemesterId().contains("2")) semNum = 2;
+        else if (com.kartik.myschool.SessionContext.selectedSemester != null && com.kartik.myschool.SessionContext.selectedSemester.number > 0) semNum = com.kartik.myschool.SessionContext.selectedSemester.number;
 
-                for (String remark : entry.getValue()) {
-                    Chip chip = new Chip(this);
-                    chip.setText(remark);
-                    chip.setCheckable(true);
-                    chip.setChecked(false);
-                    styleInteractiveChip(chip, false);
-                    chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        styleInteractiveChip(chip, isChecked);
-                        updateSummaryText(row);
-                    });
-                    cg.addView(chip);
+        com.kartik.myschool.repository.FirebaseRepository.get().getRemarkBank(schoolId, classModel.className, semNum, sub.name, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.List<String>>() {
+            @Override
+            public void onSuccess(java.util.List<String> options) {
+                java.util.List<String> mergedOptions = new java.util.ArrayList<>();
+                if (options != null) {
+                    mergedOptions.addAll(options);
                 }
-            }
-        } else {
-            String schoolId = classModel.schoolId != null ? classModel.schoolId : (com.kartik.myschool.SessionContext.selectedSchool != null ? com.kartik.myschool.SessionContext.selectedSchool.id : "");
-            int semNum = 1;
-            if (getActiveSemesterId().contains("2")) semNum = 2;
-            else if (com.kartik.myschool.SessionContext.selectedSemester != null && com.kartik.myschool.SessionContext.selectedSemester.number > 0) semNum = com.kartik.myschool.SessionContext.selectedSemester.number;
 
-            com.kartik.myschool.repository.FirebaseRepository.get().getRemarkBank(schoolId, classModel.className, semNum, sub.name, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.List<String>>() {
-                @Override
-                public void onSuccess(java.util.List<String> options) {
-                    if (options == null || options.isEmpty()) {
-                        addStandardOrEmptyRemarks(row, sub);
-                    } else {
-                        populateOptionsToChips(row, options);
+                // Merge hardcoded category remarks so they don't get lost
+                java.util.Map<String, java.util.List<String>> categoryRemarks = com.kartik.myschool.utils.DescriptiveRemarksData.getRemarksForClassAndSubject(classModel.className, sub.name);
+                if (categoryRemarks != null && !categoryRemarks.isEmpty()) {
+                    for (java.util.Map.Entry<String, java.util.List<String>> entry : categoryRemarks.entrySet()) {
+                        for (String remark : entry.getValue()) {
+                            String formatted = "[" + entry.getKey() + "] " + remark;
+                            // Add only if not already present
+                            if (!mergedOptions.contains(formatted) && !mergedOptions.contains(remark)) {
+                                mergedOptions.add(formatted);
+                            }
+                        }
                     }
                 }
-                @Override
-                public void onError(Exception e) {
+
+                if (mergedOptions.isEmpty()) {
                     addStandardOrEmptyRemarks(row, sub);
+                } else {
+                    populateOptionsToChips(row, mergedOptions);
                 }
-            });
-        }
+            }
+            @Override
+            public void onError(Exception e) {
+                addStandardOrEmptyRemarks(row, sub);
+            }
+        });
 
         b.llRemarkRows.addView(row.getRoot());
         remarkRows.add(row);
@@ -398,9 +397,22 @@ public class EnterDescriptiveActivity extends AppCompatActivity {
         List<String> selected = getSelectedRemarksFromChips(row);
         if (selected.isEmpty()) {
             row.tvSummary.setVisibility(android.view.View.GONE);
+            row.tvSummary.setText("");
         } else {
             row.tvSummary.setVisibility(android.view.View.VISIBLE);
-            row.tvSummary.setText(selected.size() + " selected");
+            StringBuilder summary = new StringBuilder();
+            for (int i = 0; i < selected.size(); i++) {
+                // Strip bracket tags for the summary
+                String text = selected.get(i);
+                if (text.startsWith("[") && text.contains("]")) {
+                    text = text.substring(text.indexOf("]") + 1).trim();
+                }
+                summary.append("• ").append(text);
+                if (i < selected.size() - 1) summary.append("\n");
+            }
+            row.tvSummary.setText(summary.toString());
+            row.tvSummary.setTextColor(0xFF333333); // Darker text for readability
+            row.tvSummary.setTextSize(12f);
         }
     }
 

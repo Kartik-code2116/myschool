@@ -90,7 +90,6 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         renderSelection();
         loadRemarkBank();
 
-        b.btnChooseRemarks.setOnClickListener(v -> showRemarkDialog());
         b.btnSaveRemark.setOnClickListener(v -> saveSubjectRemark());
         b.btnCancel.setOnClickListener(v -> dismiss());
         b.btnBack.setOnClickListener(v -> dismiss());
@@ -133,6 +132,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
             b.etCustomRemark.setText(applyGenderReplacement(customRemark, isMale));
         }
         
+        setupRemarksList();
         renderSelection();
     }
 
@@ -226,48 +226,65 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
             for (String opt : cached) {
                 bankOptions.add(applyGenderReplacement(opt, isMale));
             }
+            setupRemarksList();
             renderSelection();
             return;
         }
+
+        if (b != null) b.progress.setVisibility(View.VISIBLE);
 
         FirebaseRepository.get().getRemarkBank(schoolId, className, finalSemesterNumber, subjectName,
                 new FirebaseRepository.OnResult<List<String>>() {
                     @Override
                     public void onSuccess(List<String> options) {
-                        bankOptions.clear();
-                        if (options != null) {
-                            AppCache.cachedRemarkBank.put(cacheKey, new ArrayList<>(options));
-                            boolean isMale = isStudentMale();
-                            for (String opt : options) {
-                                bankOptions.add(applyGenderReplacement(opt, isMale));
+                        if (b != null) b.progress.setVisibility(View.GONE);
+                        List<String> mergedOptions = new ArrayList<>();
+                        if (options != null) mergedOptions.addAll(options);
+                        
+                        java.util.Map<String, java.util.List<String>> categoryRemarks = com.kartik.myschool.utils.DescriptiveRemarksData.getRemarksForClassAndSubject(className, subjectName);
+                        if (categoryRemarks != null && !categoryRemarks.isEmpty()) {
+                            for (java.util.Map.Entry<String, java.util.List<String>> entry : categoryRemarks.entrySet()) {
+                                for (String remark : entry.getValue()) {
+                                    String formatted = "[" + entry.getKey() + "] " + remark;
+                                    if (!mergedOptions.contains(formatted) && !mergedOptions.contains(remark)) {
+                                        mergedOptions.add(formatted);
+                                    }
+                                }
                             }
                         }
+
+                        bankOptions.clear();
+                        AppCache.cachedRemarkBank.put(cacheKey, new ArrayList<>(mergedOptions));
+                        boolean isMale = isStudentMale();
+                        for (String opt : mergedOptions) {
+                            bankOptions.add(applyGenderReplacement(opt, isMale));
+                        }
+                        
+                        setupRemarksList();
                         renderSelection();
                     }
 
                     @Override
                     public void onError(Exception e) {
+                        if (b != null) b.progress.setVisibility(View.GONE);
                         bankOptions.clear();
                         boolean isMale = isStudentMale();
                         for (String opt : com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, finalSemesterNumber)) {
                             bankOptions.add(applyGenderReplacement(opt, isMale));
                         }
+                        setupRemarksList();
                         renderSelection();
                     }
                 });
     }
 
-    private void showRemarkDialog() {
+    private void setupRemarksList() {
         if (bankOptions.isEmpty()) {
             int semesterNumber = com.kartik.myschool.SessionContext.selectedSemester != null && com.kartik.myschool.SessionContext.selectedSemester.number > 0 ? com.kartik.myschool.SessionContext.selectedSemester.number : 1;
             bankOptions.addAll(com.kartik.myschool.model.RemarkBank.defaultOptionsFor(subjectName, semesterNumber));
         }
 
-        BottomSheetDialog sheet = new BottomSheetDialog(requireContext());
-        View sheetView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_categorized_remarks, null);
-        
-        RecyclerView rv = sheetView.findViewById(R.id.rvRemarks);
-        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        b.rvRemarks.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         List<Object> items = new ArrayList<>();
         Map<String, List<String>> categorized = new LinkedHashMap<>();
@@ -309,10 +326,7 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         CategorizedRemarkAdapter adapter = new CategorizedRemarkAdapter(items, selectedRemarks, () -> {
             renderSelection();
         });
-        rv.setAdapter(adapter);
-
-        sheet.setContentView(sheetView);
-        sheet.show();
+        b.rvRemarks.setAdapter(adapter);
     }
 
     private static class CategoryHeader {
@@ -394,23 +408,10 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
 
     private void renderSelection() {
         if (getContext() == null || b == null) return;
-        b.cgSelectedRemarks.removeAllViews();
         if (selectedRemarks.isEmpty()) {
             b.tvSelectedSummary.setText("No remarks selected");
         } else {
             b.tvSelectedSummary.setText(selectedRemarks.size() + " remark(s) selected");
-        }
-
-        for (String remark : selectedRemarks) {
-            Chip chip = new Chip(requireContext());
-            chip.setText(remark);
-            chip.setCloseIconVisible(true);
-            chip.setOnCloseIconClickListener(v -> {
-                selectedRemarks.remove(remark);
-                renderSelection();
-            });
-            chip.setEnsureMinTouchTargetSize(false);
-            b.cgSelectedRemarks.addView(chip);
         }
     }
 
@@ -553,7 +554,6 @@ public class SubjectRemarkEntryDialog extends DialogFragment {
         if (b == null) return;
         b.progress.setVisibility(show ? View.VISIBLE : View.GONE);
         b.btnSaveRemark.setEnabled(!show);
-        b.btnChooseRemarks.setEnabled(!show);
         b.btnCancel.setEnabled(!show);
         b.btnBack.setEnabled(!show);
     }
