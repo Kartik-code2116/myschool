@@ -790,4 +790,11 @@
     <string name="menu_import_students">📥 Import Students (Excel / CSV)</string>
     <string name="menu_switch_class">🏫 Switch Class / Division</string>
     <string name="menu_app_wide_main">🌐 App-Wide Main Menu</string>
+    <string name="cd_open_menu">Open navigation menu</string>
+    <string name="cd_profile">View profile</string>
+    <string name="cd_help">Help for this page</string>
+    <string name="cd_add_attendance">Add attendance entry</string>
+    <string name="cd_calculate">Calculate totals</string>
+    <string name="cd_notifications">Notifications</string>
+    <string name="cd_more_options">More options</string>
 </resources>

@@ -90,6 +90,13 @@ public class FirebaseRepository {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        com.google.firebase.firestore.FirebaseFirestoreSettings settings =
+                new com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
+                        .setPersistenceEnabled(true)
+                        .setCacheSizeBytes(com.google.firebase.firestore.FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                        .build();
+        db.setFirestoreSettings(settings);
+
         // Diagnostic: confirm which Firebase project this instance is connected to
         try {
             com.google.firebase.FirebaseApp app = com.google.firebase.FirebaseApp.getInstance();

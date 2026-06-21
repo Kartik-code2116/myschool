@@ -119,9 +119,7 @@ public class ReportPrintingFragment extends Fragment {
             return;
         }
         
-        android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
-        pd.setMessage("सत्र माहिती लोड होत आहे...");
-        pd.setCancelable(false);
+        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(requireContext(), null, "सत्र माहिती लोड होत आहे...");
         pd.show();
         
         FirebaseRepository.get().getSemestersForYear(yearId, new FirebaseRepository.OnResult<List<com.kartik.myschool.model.Semester>>() {
@@ -592,9 +590,7 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = -1; // Use global margins for master report
-        android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
-        pd.setMessage("सर्व 18 रिपोर्ट तयार होत आहेत. कृपया प्रतीक्षा करा (यास काही मिनिटे लागू शकतात)...");
-        pd.setCancelable(false);
+        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(requireContext(), null, "सर्व 18 रिपोर्ट तयार होत आहेत. कृपया प्रतीक्षा करा (यास काही मिनिटे लागू शकतात)...");
         pd.show();
 
         String classId = SessionContext.selectedClass.id;

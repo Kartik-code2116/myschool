@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.kartik.myschool.repository.FirebaseRepository;
 import com.kartik.myschool.utils.zoom.ZoomHelper;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.Locale;
 
@@ -19,6 +20,10 @@ public class MySchoolApplication extends Application {
 
         // Initialize Global Zoom Helper
         ZoomHelper.initialize(this);
+
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(
+            !BuildConfig.DEBUG
+        );
 
         // Force FirebaseRepository to re-initialize so it always uses
         // the current google-services.json project (not a stale cached instance)

@@ -757,10 +757,7 @@ public class StudentListFragment extends Fragment {
 
     private void proceedWithImport(List<List<String>> rows, int count, java.util.Map<String, Integer> headerMap) {
         try {
-            android.app.ProgressDialog pd = new android.app.ProgressDialog(requireContext());
-            pd.setTitle(R.string.msg_restoring_students);
-            pd.setMessage("Saving student records to Firestore...");
-            pd.setCancelable(false);
+            com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(requireContext(), getString(R.string.msg_restoring_students), "Saving student records to Firestore...");
             pd.show();
 
             ClassModel currentClass = SessionContext.selectedClass;
@@ -906,7 +903,7 @@ public class StudentListFragment extends Fragment {
         return fallback;
     }
 
-    private void checkImportDone(int saved, int failed, int total, android.app.ProgressDialog pd) {
+    private void checkImportDone(int saved, int failed, int total, com.kartik.myschool.utils.LoadingDialog pd) {
         if (saved + failed == total) {
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {

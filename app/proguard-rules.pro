@@ -25,3 +25,34 @@
 
 # Keep Room database, entities, and DAOs
 -keep class com.kartik.myschool.data.** { *; }
+
+# Firebase Firestore — model serialization
+-keepattributes Signature
+-keepattributes *Annotation*
+
+# Firebase Auth + Firestore
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+
+# iText PDF engine
+-keep class com.itextpdf.** { *; }
+-dontwarn com.itextpdf.**
+
+# Google Play Billing
+-keep class com.android.billingclient.** { *; }
+
+# Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep class com.bumptech.glide.** { *; }
+
+# RecyclerView adapters
+-keep class com.kartik.myschool.adapter.** { *; }
+-keep class com.kartik.myschool.ui.** { *; }
+
+# Repository + utils
+-keep class com.kartik.myschool.repository.** { *; }
+-keep class com.kartik.myschool.utils.** { *; }
+
+# Gson serialization (used in SessionContext)
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken

@@ -1,0 +1,844 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:1rem 0}
+.cat-header{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;cursor:pointer;user-select:none}
+.cat-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.cat-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.cat-score{font-size:12px;color:var(--color-text-secondary);margin-left:auto;white-space:nowrap}
+.cat-arrow{font-size:12px;color:var(--color-text-tertiary);transition:transform 0.2s}
+.cat-arrow.open{transform:rotate(180deg)}
+.points-list{display:none;flex-direction:column;gap:8px;margin-bottom:1rem}
+.points-list.open{display:flex}
+.point-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+.point-header{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.point-num{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.point-title{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
+.point-impact{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.point-chevron{font-size:11px;color:var(--color-text-tertiary);transition:transform 0.2s}
+.point-chevron.open{transform:rotate(180deg)}
+.point-body{display:none;padding:0 14px 14px;border-top:0.5px solid var(--color-border-tertiary)}
+.point-body.open{display:block}
+.point-why{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin:10px 0 8px}
+.code-block{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);line-height:1.6;overflow-x:auto;white-space:pre;margin-top:6px;border:0.5px solid var(--color-border-tertiary)}
+.tag-hi{background:#EAF3DE;color:#27500A}
+.tag-med{background:#FAEEDA;color:#633806}
+.tag-fix{background:#FCEBEB;color:#791F1F}
+.num-hi{background:#EAF3DE;color:#27500A}
+.num-med{background:#FAEEDA;color:#633806}
+.num-fix{background:#FCEBEB;color:#791F1F}
+@media(prefers-color-scheme:dark){
+  .tag-hi{background:#173404;color:#C0DD97}
+  .tag-med{background:#412402;color:#FAC775}
+  .tag-fix{background:#501313;color:#F7C1C1}
+  .num-hi{background:#173404;color:#C0DD97}
+  .num-med{background:#412402;color:#FAC775}
+  .num-fix{background:#501313;color:#F7C1C1}
+}
+.progress-bar{height:4px;border-radius:2px;background:var(--color-border-tertiary);margin-top:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px}
+.done-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);margin-left:auto;cursor:pointer}
+.done-toggle input{cursor:pointer}
+.point-card.done .point-title{text-decoration:line-through;opacity:0.5}
+.score-bar{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary)}
+.score-label{font-size:12px;color:var(--color-text-secondary);min-width:100px}
+.score-num{font-size:20px;font-weight:500;min-width:44px}
+.score-track{flex:1;height:8px;background:var(--color-border-tertiary);border-radius:4px;overflow:hidden}
+.score-fill{height:100%;background:#639922;border-radius:4px;transition:width 0.5s}
+</style>
+
+<div class="wrap">
+
+<div class="score-bar">
+  <span class="score-label">Current score</span>
+  <span class="score-num" id="cur-score">70</span>
+  <div class="score-track"><div class="score-fill" id="cur-bar" style="width:70%"></div></div>
+  <span class="score-num" style="text-align:right;color:var(--color-text-secondary);font-size:13px">/ 100</span>
+</div>
+
+<div id="cats"></div>
+</div>
+
+<script>
+const data = [
+  {
+    id:'arch', label:'Architecture & Code Quality', icon:'🏗', fromScore:60, toScore:95,
+    color:'#185FA5',
+    points:[
+      {
+        title:'Extract ViewModel for every Activity and Fragment',
+        impact:'fix', impactLabel:'Critical',
+        why:'HomeActivity.java is 500+ lines doing navigation, data fetching, locale changes, toolbar updates and back-press all in one class. On screen rotation, your Firestore callbacks post results back to a destroyed Activity — causing NullPointerExceptions. A ViewModel holds data across rotations and keeps the Activity purely for UI rendering.',
+        code:`// Step 1: Create HomeViewModel.java
+public class HomeViewModel extends ViewModel {
+    private final MutableLiveData<Teacher> teacher = new MutableLiveData<>();
+    private final FirebaseRepository repo = FirebaseRepository.get();
+
+    public LiveData<Teacher> getTeacher() { return teacher; }
+
+    public void loadTeacher() {
+        repo.getTeacher(new FirebaseRepository.OnResult<Teacher>() {
+            @Override public void onSuccess(Teacher t) { teacher.postValue(t); }
+            @Override public void onError(Exception e) { teacher.postValue(null); }
+        });
+    }
+}
+
+// Step 2: In HomeActivity.onCreate():
+HomeViewModel vm = new ViewModelProvider(this).get(HomeViewModel.class);
+vm.getTeacher().observe(this, t -> {
+    if (t != null) b.tvToolbarSubtitle.setText(t.name);
+});
+vm.loadTeacher();`
+      },
+      {
+        title:'Replace static AppCache with ViewModel-scoped state',
+        impact:'fix', impactLabel:'Critical',
+        why:'AppCache has 15+ public static fields. When Android kills your app process (happens in 60 seconds on low-RAM phones), ALL these fields become null. Then when the user returns, any Fragment that reads AppCache.cachedStudents without a null check crashes silently. The fix is to move cached data into a shared ViewModel that re-fetches from SharedPreferences on process restore.',
+        code:`// Before (DANGEROUS):
+List<Student> students = AppCache.cachedStudents; // can be null after process kill!
+adapter.setStudents(students);
+
+// After (SAFE — in Fragment):
+SharedViewModel vm = new ViewModelProvider(requireActivity())
+    .get(SharedViewModel.class);
+vm.getStudents().observe(getViewLifecycleOwner(), students -> {
+    if (students != null) adapter.setStudents(students);
+});`
+      },
+      {
+        title:'Replace all callbacks with a consistent Result<T> wrapper',
+        impact:'med', impactLabel:'Important',
+        why:'FirebaseRepository uses a custom OnResult<T> interface. Every caller writes separate onSuccess/onError blocks. This pattern causes deeply nested "callback hell" especially in PromoteStudentsActivity. A simple Result wrapper lets you chain operations cleanly.',
+        code:`// Create: Result.java
+public class Result<T> {
+    public final T data;
+    public final Exception error;
+    private Result(T data, Exception error) { this.data=data; this.error=error; }
+    public static <T> Result<T> success(T d) { return new Result<>(d, null); }
+    public static <T> Result<T> error(Exception e) { return new Result<>(null, e); }
+    public boolean isSuccess() { return error == null; }
+}
+
+// Usage in ViewModel:
+MutableLiveData<Result<List<Student>>> studentsResult = new MutableLiveData<>();
+repo.getStudentsForClass(classId, new OnResult<List<Student>>() {
+    @Override public void onSuccess(List<Student> s) {
+        studentsResult.postValue(Result.success(s));
+    }
+    @Override public void onError(Exception e) {
+        studentsResult.postValue(Result.error(e));
+    }
+});`
+      },
+      {
+        title:'Add null-safety guards everywhere AppCache is read',
+        impact:'fix', impactLabel:'Critical',
+        why:'Search your entire codebase for "AppCache." — every single read needs a null check. Process death makes all fields null. Until you migrate to ViewModel fully, add defensive guards to prevent crashes on cold restart.',
+        code:`// Pattern to apply everywhere:
+List<Student> students = AppCache.cachedStudents;
+if (students == null) {
+    // Reload from Firebase — show loading state
+    showLoading(true);
+    FirebaseRepository.get().getStudentsForClass(
+        SessionContext.selectedClass.id, this::onStudentsLoaded
+    );
+    return;
+}
+// Safe to use students here`
+      },
+      {
+        title:'Separate concerns in HomeActivity — extract helper classes',
+        impact:'med', impactLabel:'Important',
+        why:'HomeActivity handles drawer setup, toolbar updates, locale changes, bottom nav, and navigation all together. Extract DrawerManager.java, ToolbarManager.java and NavigationManager.java as plain Java classes that receive binding as constructor argument.',
+        code:`// Extract DrawerManager.java
+public class DrawerManager {
+    private final ActivityHomeBinding b;
+    private final NavController nav;
+    public DrawerManager(ActivityHomeBinding b, NavController nav) {
+        this.b = b; this.nav = nav;
+    }
+    public void setup(boolean isMr) { /* move all drawer code here */ }
+    public void open() { b.drawerLayout.openDrawer(GravityCompat.START); }
+}
+
+// In HomeActivity:
+DrawerManager drawer = new DrawerManager(b, navController);
+drawer.setup(isMr);`
+      },
+      {
+        title:'Add unit tests for GradeCalculator and PDF generators',
+        impact:'med', impactLabel:'Important',
+        why:'GradeCalculator.java has zero tests. If the grading formula breaks in a release, teachers print wrong grades for hundreds of students before anyone notices. JUnit tests take 30 minutes to write and catch this permanently.',
+        code:`// test/java/.../GradeCalculatorTest.java
+@RunWith(JUnit4.class)
+public class GradeCalculatorTest {
+    @Test public void testGradeA1() {
+        assertEquals("A-1", GradeCalculator.getGrade(95, 100));
+    }
+    @Test public void testGradeD_boundary() {
+        assertEquals("D", GradeCalculator.getGrade(33, 100));
+        assertEquals("E-1", GradeCalculator.getGrade(32, 100));
+    }
+    @Test public void testZeroMarks() {
+        assertEquals("E-2", GradeCalculator.getGrade(0, 100));
+    }
+}`
+      },
+      {
+        title:'Move SessionContext.load() off the main thread',
+        impact:'med', impactLabel:'Important',
+        why:'load() is called inside HomeActivity.onCreate() BEFORE super.onCreate(). It runs JSON deserialization (Gson parsing of student lists) on the main thread. On cold start with 50+ students this causes 40–80ms jank — visible as a dropped frame on the splash-to-home transition.',
+        code:`// In MySchoolApplication.onCreate():
+ExecutorService bgThread = Executors.newSingleThreadExecutor();
+bgThread.execute(() -> {
+    SessionContext.load(this); // runs JSON parsing off main thread
+    new Handler(Looper.getMainLooper()).post(() -> {
+        // Notify any waiting components that session is ready
+        sessionReady.setValue(true);
+    });
+});`
+      }
+    ]
+  },
+  {
+    id:'ux', label:'UX & Accessibility', icon:'🎨', fromScore:65, toScore:96,
+    color:'#3B6D11',
+    points:[
+      {
+        title:'Add contentDescription to every icon button',
+        impact:'fix', impactLabel:'Critical',
+        why:'Your toolbar has btnMenu, btnToolbarHelp, btnToolbarMore, btnToolbarAdd, btnToolbarCalc, ivProfilePic — none have contentDescription. TalkBack users (visually impaired teachers) cannot use your app at all. Play Store accessibility review flags this. Also required for passing Google Play\'s accessibility pre-launch report.',
+        code:`<!-- In activity_home.xml — add to EVERY icon button: -->
+<ImageButton
+    android:id="@+id/btnMenu"
+    android:contentDescription="@string/cd_open_menu"
+    ... />
+
+<!-- In strings.xml: -->
+<string name="cd_open_menu">Open navigation menu</string>
+<string name="cd_profile">View profile</string>
+<string name="cd_help">Help for this page</string>
+<string name="cd_add_attendance">Add attendance entry</string>
+<string name="cd_calculate">Calculate totals</string>`
+      },
+      {
+        title:'Replace deprecated onBackPressed() with OnBackPressedCallback',
+        impact:'fix', impactLabel:'Critical',
+        why:'HomeActivity.java overrides onBackPressed() which is deprecated from API 33. On Android 14+ devices with predictive back gesture enabled, your drawer close logic is skipped. Users see a broken back animation where the drawer stays open as the app closes.',
+        code:`// In HomeActivity.onCreate() — REMOVE onBackPressed() override, ADD:
+getOnBackPressedDispatcher().addCallback(this,
+    new OnBackPressedCallback(true) {
+        @Override public void handleOnBackPressed() {
+            if (b.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                b.drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+        }
+    }
+);`
+      },
+      {
+        title:'Add shimmer loading placeholders for all list screens',
+        impact:'med', impactLabel:'Important',
+        why:'StudentListFragment, FormativeSummativeFragment, and AttendanceFragment show blank white screens for 300–800ms while Firestore loads. This feels like a crash to new users. Shimmer placeholders communicate that content is loading and match the final layout shape.',
+        code:`// build.gradle.kts — add:
+implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+<!-- fragment_student_list.xml — wrap list in shimmer: -->
+<com.facebook.shimmer.ShimmerFrameLayout
+    android:id="@+id/shimmerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <!-- include shimmer_student_row.xml repeated 6 times -->
+</com.facebook.shimmer.ShimmerFrameLayout>
+
+// In Fragment — show shimmer, hide on data:
+shimmerLayout.startShimmer();
+shimmerLayout.setVisibility(View.VISIBLE);
+// When data arrives:
+shimmerLayout.stopShimmer();
+shimmerLayout.setVisibility(View.GONE);`
+      },
+      {
+        title:'Add empty state illustrations for zero-data screens',
+        impact:'med', impactLabel:'Important',
+        why:'When a teacher has no students, no marks entered, or no classes set up, the app shows a blank RecyclerView. Top apps like Notion, Google Classroom, and ClassDojo show friendly illustrated empty states with a clear call to action. This directly reduces abandonment from new users.',
+        code:`<!-- fragment_student_list.xml -->
+<LinearLayout
+    android:id="@+id/emptyState"
+    android:visibility="gone"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:src="@drawable/ic_empty_students"
+        android:contentDescription="No students added yet" />
+    <TextView android:text="@string/empty_students_title"
+        style="@style/EmptyStateTitle"/>
+    <TextView android:text="@string/empty_students_body"
+        style="@style/EmptyStateBody"/>
+    <Button android:text="@string/add_first_student"
+        android:onClick="onAddStudentClicked"/>
+</LinearLayout>`
+      },
+      {
+        title:'Add haptic feedback on key user actions',
+        impact:'hi', impactLabel:'Polish',
+        why:'Saving marks, toggling attendance, and completing a PDF generation are key moments. A short vibration confirms the action was registered — this is standard in Google Classroom, Duolingo, and all premium edu apps. Takes 3 lines of code per action.',
+        code:`// In EnterMarksActivity — after successful save:
+private void onMarksSaved() {
+    // Haptic confirmation
+    b.btnSave.performHapticFeedback(
+        HapticFeedbackConstants.CONFIRM,  // API 30+
+        HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+    );
+    // Or for older APIs:
+    Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+    if (v != null) v.vibrate(VibrationEffect.createOneShot(50,
+        VibrationEffect.DEFAULT_AMPLITUDE));
+}`
+      },
+      {
+        title:'Implement proper focus order and keyboard navigation',
+        impact:'med', impactLabel:'Important',
+        why:'In EnterMarksActivity, the marks entry grid has no nextFocusDown/nextFocusRight set. Teachers using an external keyboard (common on tablets used in classrooms) cannot Tab through the grid. Each EditText needs explicit focus chain defined in XML.',
+        code:`<!-- In marks_row_item.xml — chain focus between fields: -->
+<EditText
+    android:id="@+id/etNirikhshan"
+    android:nextFocusRight="@+id/etTondiKam"
+    android:nextFocusDown="@+id/etNirikhshan_next_row"
+    android:imeOptions="actionNext"
+    android:inputType="numberDecimal"
+    ... />`
+      },
+      {
+        title:'Replace ProgressDialog with Material3 loading indicators',
+        impact:'fix', impactLabel:'Critical',
+        why:'ProgressDialog is deprecated since API 26. You use it in HomeActivity.showAdminMessageDialog(). On Android 12+ it renders with wrong theming and can cause window leak warnings. Replace with a MaterialAlertDialog containing a CircularProgressIndicator.',
+        code:`// Create a reusable LoadingDialogHelper:
+public class LoadingDialogHelper {
+    private MaterialAlertDialogBuilder builder;
+    private AlertDialog dialog;
+
+    public LoadingDialogHelper(Context ctx, String message) {
+        View view = LayoutInflater.from(ctx)
+            .inflate(R.layout.dialog_loading, null);
+        ((TextView)view.findViewById(R.id.tvMessage)).setText(message);
+        dialog = new MaterialAlertDialogBuilder(ctx)
+            .setView(view)
+            .setCancelable(false)
+            .create();
+    }
+    public void show() { dialog.show(); }
+    public void dismiss() { if(dialog.isShowing()) dialog.dismiss(); }
+}`
+      },
+      {
+        title:'Add minimum touch target size (48dp) to all interactive elements',
+        impact:'med', impactLabel:'Important',
+        why:'Google Material guidelines require 48dp minimum touch targets. Your toolbar icon buttons (btnToolbarHelp, btnMenu etc.) appear to be icon-only at ~24dp. On small phones, teachers tap them repeatedly because the touch area is too small. Wrap with padding or use minWidth/minHeight.',
+        code:`<!-- In your icon button styles — set minimum touch size: -->
+<style name="IconButton">
+    <item name="android:minWidth">48dp</item>
+    <item name="android:minHeight">48dp</item>
+    <item name="android:padding">12dp</item>
+</style>
+
+<!-- Apply: -->
+<ImageButton
+    style="@style/IconButton"
+    android:id="@+id/btnMenu"
+    android:src="@drawable/ic_menu" />`
+      }
+    ]
+  },
+  {
+    id:'perf', label:'Performance & Smoothness', icon:'⚡', fromScore:72, toScore:95,
+    color:'#854F0B',
+    points:[
+      {
+        title:'Add Firebase Crashlytics for production crash visibility',
+        impact:'fix', impactLabel:'Critical',
+        why:'You have zero crash visibility in production right now. Every BuildConfig.DEBUG log is stripped in release. A single crash in PDF generation or marks save affects all your users and you\'ll never know. Crashlytics is free and takes 15 minutes to add.',
+        code:`// build.gradle.kts — add:
+implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+implementation("com.google.firebase:firebase-crashlytics")
+
+// In MySchoolApplication.onCreate():
+FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(
+    !BuildConfig.DEBUG
+);
+
+// In FirebaseRepository — replace silent error logs:
+@Override public void onError(Exception e) {
+    FirebaseCrashlytics.getInstance().recordException(e);
+    cb.onError(e);
+}`
+      },
+      {
+        title:'Add Firebase Performance Monitoring',
+        impact:'med', impactLabel:'Important',
+        why:'You have no idea how long PDF generation takes for users on slow phones (Redmi, Samsung M-series). Firebase Performance shows p50/p90/p99 latency broken down by device model. This tells you exactly which feature to optimize first.',
+        code:`// Add to build.gradle.kts:
+implementation("com.google.firebase:firebase-perf")
+
+// In PdfGenerator.java — trace expensive operations:
+FirebasePerformance perf = FirebasePerformance.getInstance();
+Trace pdfTrace = perf.newTrace("pdf_generation");
+pdfTrace.start();
+pdfTrace.putAttribute("report_type", reportType);
+pdfTrace.putAttribute("student_count", String.valueOf(count));
+
+// ... PDF generation code ...
+
+pdfTrace.stop(); // Now visible in Firebase console with device breakdown`
+      },
+      {
+        title:'Upgrade Google Play Billing to 7.1.1',
+        impact:'fix', impactLabel:'Critical',
+        why:'You use billing:6.2.0. Google Play has required Billing Library 7+ for all new submissions since May 2024. If you try to update your app on the Play Store right now, it will be REJECTED. The API changed — BillingFlowParams and PurchasesUpdatedListener have new method signatures.',
+        code:`// build.gradle.kts — change:
+implementation("com.android.billingclient:billing:7.1.1")  // was 6.2.0
+
+// BillingHelper.java — update deprecated calls:
+// OLD:
+BillingFlowParams.newBuilder()
+    .setSkuDetails(skuDetails)  // REMOVED in v7
+    .build();
+
+// NEW:
+QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+    .setProductList(List.of(
+        QueryProductDetailsParams.Product.newBuilder()
+            .setProductId("premium_yearly")
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()))
+    .build();`
+      },
+      {
+        title:'Lazy-load fragments — don\'t initialize all at startup',
+        impact:'med', impactLabel:'Important',
+        why:'Navigation graph initializes fragments eagerly. When HomeActivity starts, it potentially creates StatsDashboardFragment even if the teacher never visits it this session. Use fragmentManager lazy loading and defer heavy Firestore calls to onResume rather than onCreateView.',
+        code:`// In Fragment — defer data loading to onResume:
+@Override
+public void onResume() {
+    super.onResume();
+    // Only load if we haven't loaded yet, or data is stale
+    if (viewModel.getStudents().getValue() == null) {
+        viewModel.loadStudents();
+    }
+}
+
+// NOT in onCreateView — that runs even for background fragments:
+// WRONG: loadStudents(); // in onCreateView`
+      },
+      {
+        title:'Use RecyclerView.RecycledViewPool for shared adapters',
+        impact:'hi', impactLabel:'Polish',
+        why:'FormativeSummativeFragment and DescriptiveEntriesFragment both show student lists with very similar row layouts. Sharing a RecycledViewPool between them means ViewHolders are reused across fragments — dramatically reducing inflation time when switching between tabs.',
+        code:`// In HomeActivity:
+RecyclerView.RecycledViewPool sharedPool = new RecyclerView.RecycledViewPool();
+sharedPool.setMaxRecycledViews(0, 20);
+
+// Pass to each fragment via ViewModel or constructor:
+studentRecyclerView.setRecycledViewPool(sharedPool);`
+      },
+      {
+        title:'Paginate student lists with Paging 3 for large classes',
+        impact:'med', impactLabel:'Important',
+        why:'A school with 500+ students (common in Maharashtra) loads ALL students into memory at once via getStudentsForClass(). On a Redmi 9 with 2GB RAM, this triggers GC pauses mid-scroll. Paging 3 loads 30 students at a time and prefetches the next page as the teacher scrolls.',
+        code:`// PagingSource for students — StudentPagingSource.java:
+public class StudentPagingSource
+    extends PagingSource<DocumentSnapshot, Student> {
+
+    @Override
+    public ListenableFuture<LoadResult<DocumentSnapshot, Student>>
+        loadFuture(LoadParams<DocumentSnapshot> params) {
+
+        Query query = db.collection("students")
+            .whereEqualTo("classId", classId)
+            .orderBy("rollNo")
+            .limit(params.getLoadSize());
+
+        if (params.getKey() != null)
+            query = query.startAfter(params.getKey());
+
+        // Return paginated result...
+    }
+}`
+      }
+    ]
+  },
+  {
+    id:'prod', label:'Production Readiness', icon:'🚀', fromScore:58, toScore:95,
+    color:'#791F1F',
+    points:[
+      {
+        title:'Fix ProGuard — add missing keep rules',
+        impact:'fix', impactLabel:'Critical',
+        why:'Your proguard-rules.pro only keeps model.** and data.**. In release builds, R8 minification will likely rename or strip FirebaseRepository, your adapters, BillingHelper, and iText internal classes. The result: Firestore deserialization returns null objects silently, PDF generation crashes.',
+        code:`# Add to proguard-rules.pro:
+
+# Firebase Firestore — model serialization
+-keep class com.kartik.myschool.model.** { *; }
+-keep class com.kartik.myschool.data.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+
+# Firebase Auth + Firestore
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+
+# iText PDF engine
+-keep class com.itextpdf.** { *; }
+-dontwarn com.itextpdf.**
+
+# Google Play Billing
+-keep class com.android.billingclient.** { *; }
+
+# Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep class com.bumptech.glide.** { *; }
+
+# RecyclerView adapters
+-keep class com.kartik.myschool.adapter.** { *; }
+-keep class com.kartik.myschool.ui.** { *; }
+
+# Repository + utils
+-keep class com.kartik.myschool.repository.** { *; }
+-keep class com.kartik.myschool.utils.** { *; }
+
+# Gson serialization (used in SessionContext)
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken`
+      },
+      {
+        title:'Add App Check to protect Firebase from abuse',
+        impact:'med', impactLabel:'Important',
+        why:'Right now, anyone who decompiles your APK can extract your google-services.json and make direct Firestore calls to your database — bypassing your Firestore rules only protects reading other teachers\' data, but costs you Firestore read/write quota. Firebase App Check with Play Integrity blocks all non-app traffic.',
+        code:`// build.gradle.kts:
+implementation("com.google.firebase:firebase-appcheck-playintegrity")
+
+// In MySchoolApplication.onCreate():
+FirebaseApp.initializeApp(this);
+FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+    PlayIntegrityAppCheckProviderFactory.getInstance()
+);
+
+// For debug builds, use debug provider:
+if (BuildConfig.DEBUG) {
+    FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+        DebugAppCheckProviderFactory.getInstance()
+    );
+}`
+      },
+      {
+        title:'Add Google Play In-App Review prompt',
+        impact:'hi', impactLabel:'Polish',
+        why:'The rate app menu item in your 3-dot menu shows a Toast saying "thank you for rating". It does nothing — no Play Store opens, no review dialog appears. Implementing the In-App Review API means teachers can leave reviews without leaving the app, increasing your Play Store rating.',
+        code:`// In build.gradle.kts:
+implementation("com.google.android.play:review:2.0.1")
+
+// In HomeActivity — trigger after 3rd PDF generation:
+private void maybeAskForReview() {
+    SharedPreferences p = getSharedPreferences("app_prefs", MODE_PRIVATE);
+    int pdfCount = p.getInt("pdf_count", 0);
+    if (pdfCount == 3) {
+        ReviewManager manager = ReviewManagerFactory.create(this);
+        manager.requestReviewFlow().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                manager.launchReviewFlow(this, task.getResult());
+            }
+        });
+    }
+}`
+      },
+      {
+        title:'Add FCM push notifications for key events',
+        impact:'med', impactLabel:'Important',
+        why:'Teachers forget to enter marks before deadlines. FCM notifications sent from Cloud Functions ("Marks entry closes in 3 days") bring teachers back to the app. This is a top retention driver in every education app. Requires a Cloud Function trigger.',
+        code:`// In MySchoolApplication.onCreate() — register FCM:
+FirebaseMessaging.getInstance().getToken()
+    .addOnSuccessListener(token -> {
+        // Save token to teacher's Firestore document
+        if (token != null && FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseRepository.get().saveTeacher(...); // add fcmToken field
+        }
+    });
+
+// Handle incoming message:
+public class MyFirebaseMessagingService
+    extends FirebaseMessagingService {
+    @Override
+    public void onMessageReceived(RemoteMessage msg) {
+        String title = msg.getNotification().getTitle();
+        String body = msg.getNotification().getBody();
+        showNotification(title, body);
+    }
+}`
+      },
+      {
+        title:'Set up Play Store staged rollout pipeline',
+        impact:'med', impactLabel:'Important',
+        why:'When you release a fix, deploy to 5% of users first, monitor Crashlytics for 24 hours, then expand to 100%. This prevents a bad release from affecting all your users. Configure in Play Console under Release > Production > Manage rollout.',
+        code:`// In your release checklist (README_M.md):
+// 1. Build signed release APK / AAB
+// 2. Run Firebase Test Lab on 5 device profiles
+// 3. Upload AAB to Play Console
+// 4. Set rollout to 5% — monitor Crashlytics for 24h
+// 5. Expand to 20% — monitor for 24h
+// 6. Expand to 100%
+
+// Critical: Always test these screens before release:
+// - Login flow (fresh install)
+// - First PDF generation
+// - Marks save → verify in Firestore console
+// - Language switch English ↔ Marathi`
+      }
+    ]
+  },
+  {
+    id:'offline', label:'Offline & Reliability', icon:'📡', fromScore:70, toScore:96,
+    color:'#0F6E56',
+    points:[
+      {
+        title:'Enable Firestore offline persistence',
+        impact:'fix', impactLabel:'Critical',
+        why:'Rural Maharashtra schools often have poor connectivity. Right now if a teacher\'s internet drops while entering marks, the save fails and data is lost. Firestore offline persistence queues writes and syncs them when connectivity returns. One line to enable.',
+        code:`// In FirebaseRepository constructor — ADD:
+FirebaseFirestoreSettings settings =
+    new FirebaseFirestoreSettings.Builder()
+        .setPersistenceEnabled(true)
+        .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+        .build();
+db.setFirestoreSettings(settings);
+
+// That's it — Firestore now:
+// 1. Serves reads from local cache when offline
+// 2. Queues writes and syncs when back online
+// 3. Notifies listeners with cached data immediately`
+      },
+      {
+        title:'Show connectivity status banner when offline',
+        impact:'med', impactLabel:'Important',
+        why:'When offline, the teacher gets no feedback — the app just silently fails to load new data from cache (or crashes if cache is empty). Show a non-blocking "Offline mode — changes will sync when connected" banner in HomeActivity using ConnectivityManager.',
+        code:`// In HomeActivity — monitor network:
+ConnectivityManager cm = (ConnectivityManager)
+    getSystemService(CONNECTIVITY_SERVICE);
+NetworkCallback cb = new NetworkCallback() {
+    @Override public void onAvailable(Network n) {
+        runOnUiThread(() -> b.offlineBanner.setVisibility(GONE));
+    }
+    @Override public void onLost(Network n) {
+        runOnUiThread(() -> b.offlineBanner.setVisibility(VISIBLE));
+    }
+};
+cm.registerDefaultNetworkCallback(cb);
+
+<!-- In activity_home.xml — add above the main content: -->
+<TextView android:id="@+id/offlineBanner"
+    android:text="Offline — syncing when connected"
+    android:background="@color/amber_100"
+    android:visibility="gone" />`
+      },
+      {
+        title:'Add data export / backup to Google Drive',
+        impact:'hi', impactLabel:'Polish',
+        why:'Top edu apps like iDoceo and TeacherKit let teachers export their data as CSV or PDF to Google Drive. Your BackupRestoreHelper.java exists but may not be connected to a UI flow. Add an Export to Drive button in Settings — this is a key trust signal for teachers storing a full year of student data.',
+        code:`// In BackupRestoreHelper.java — export all data:
+public void exportToJson(Context ctx, OnResult<Uri> cb) {
+    ExecutorService bg = Executors.newSingleThreadExecutor();
+    bg.execute(() -> {
+        try {
+            JsonObject export = new JsonObject();
+            // Add students, marks, attendance...
+            String json = new Gson().toJson(export);
+            File f = new File(ctx.getCacheDir(), "myschool_backup.json");
+            FileWriter fw = new FileWriter(f);
+            fw.write(json);
+            fw.close();
+            Uri uri = FileProvider.getUriForFile(ctx,
+                ctx.getPackageName() + ".fileprovider", f);
+            new Handler(Looper.getMainLooper()).post(
+                () -> cb.onSuccess(uri));
+        } catch (Exception e) {
+            new Handler(Looper.getMainLooper()).post(
+                () -> cb.onError(e));
+        }
+    });
+}`
+      }
+    ]
+  },
+  {
+    id:'features', label:'Feature Completeness', icon:'✨', fromScore:85, toScore:100,
+    color:'#534AB7',
+    points:[
+      {
+        title:'Add parent-facing read-only portal',
+        impact:'med', impactLabel:'Important',
+        why:'ClassDojo, Google Classroom and every top edu app has parent communication. A parent can log in with a student code and see attendance, marks, and remarks in read-only mode. This feature alone can 5x your user base — every school with 200 students has 200 parents.',
+        code:`// Add parent role to Teacher model:
+// Parent logs in → sees only their child's data
+// Firestore rules for parent access:
+
+match /students/{studentId} {
+    allow read: if isAuthenticated()
+        && (isOwner()  // teacher
+        || isParentOf(studentId));  // parent
+}
+
+function isParentOf(studentId) {
+    return exists(/databases/$(database)/documents
+        /parentLinks/$(request.auth.uid + "_" + studentId));
+}`
+      },
+      {
+        title:'Add homescreen widget showing today\'s attendance',
+        impact:'hi', impactLabel:'Polish',
+        why:'Teachers unlock their phone and want to instantly see "attendance not taken today — 28 students". A homescreen widget is a daily reminder to open the app. Duolingo\'s streak widget is the benchmark. Android widgets are built with RemoteViews.',
+        code:`// AttendanceWidget.java:
+public class AttendanceWidget extends AppWidgetProvider {
+    @Override
+    public void onUpdate(Context ctx, AppWidgetManager mgr, int[] ids) {
+        for (int id : ids) {
+            RemoteViews views = new RemoteViews(ctx.getPackageName(),
+                R.layout.widget_attendance);
+
+            // Load today's attendance count from SharedPreferences
+            SharedPreferences p = ctx.getSharedPreferences(
+                "widget_prefs", MODE_PRIVATE);
+            int count = p.getInt("today_attendance", 0);
+            views.setTextViewText(R.id.tvCount,
+                count + " present today");
+
+            mgr.updateAppWidget(id, views);
+        }
+    }
+}`
+      },
+      {
+        title:'Add Analytics events to understand feature usage',
+        impact:'med', impactLabel:'Important',
+        why:'You have Firebase Analytics added but likely no custom events. Without events, you\'re flying blind — you don\'t know if teachers use descriptive remarks, which PDF report types are most popular, or where they drop off. Events drive your roadmap decisions.',
+        code:`// Create AnalyticsHelper.java:
+public class AnalyticsHelper {
+    private static FirebaseAnalytics fa;
+    public static void init(Context ctx) {
+        fa = FirebaseAnalytics.getInstance(ctx);
+    }
+    public static void logPdfGenerated(String type, int students) {
+        Bundle b = new Bundle();
+        b.putString("report_type", type);
+        b.putInt("student_count", students);
+        fa.logEvent("pdf_generated", b);
+    }
+    public static void logMarksEntered(String subject) {
+        Bundle b = new Bundle();
+        b.putString("subject", subject);
+        fa.logEvent("marks_entered", b);
+    }
+    // Usage: AnalyticsHelper.logPdfGenerated("progress_card", 30);
+}`
+      }
+    ]
+  }
+];
+
+let doneSet = new Set();
+
+function buildUI() {
+  const container = document.getElementById('cats');
+  data.forEach(cat => {
+    const catDiv = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.innerHTML = `
+      <div class="cat-icon" style="background:${cat.color}22;color:${cat.color}">${cat.icon}</div>
+      <span class="cat-title">${cat.label}</span>
+      <span class="cat-score">${cat.fromScore} → ${cat.toScore}/100</span>
+      <span class="cat-arrow" id="arr-${cat.id}">▼</span>`;
+    header.onclick = () => toggleCat(cat.id);
+    catDiv.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'points-list open';
+    list.id = `list-${cat.id}`;
+
+    cat.points.forEach((pt, i) => {
+      const pNum = `${cat.id}-${i}`;
+      const impClass = pt.impact === 'fix' ? 'tag-fix num-fix' : pt.impact === 'med' ? 'tag-med num-med' : 'tag-hi num-hi';
+      const numClass = pt.impact === 'fix' ? 'num-fix' : pt.impact === 'med' ? 'num-med' : 'num-hi';
+      const tagClass = pt.impact === 'fix' ? 'tag-fix' : pt.impact === 'med' ? 'tag-med' : 'tag-hi';
+
+      const card = document.createElement('div');
+      card.className = 'point-card';
+      card.id = `card-${pNum}`;
+
+      const codeHtml = pt.code ? `<div class="code-block">${escHtml(pt.code.trim())}</div>` : '';
+
+      card.innerHTML = `
+        <div class="point-header" onclick="togglePoint('${pNum}')">
+          <div class="point-num ${numClass}">${i+1}</div>
+          <span class="point-title">${pt.title}</span>
+          <span class="point-impact ${tagClass}">${pt.impactLabel}</span>
+          <label class="done-toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="done-${pNum}" onchange="markDone('${pNum}',this.checked)"> Done
+          </label>
+          <span class="point-chevron" id="chev-${pNum}">▼</span>
+        </div>
+        <div class="point-body" id="body-${pNum}">
+          <p class="point-why">${pt.why}</p>
+          ${codeHtml}
+        </div>`;
+      list.appendChild(card);
+    });
+
+    catDiv.appendChild(list);
+    container.appendChild(catDiv);
+  });
+
+  const firstArr = document.getElementById('arr-' + data[0].id);
+  if (firstArr) firstArr.classList.add('open');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleCat(id) {
+  const list = document.getElementById('list-'+id);
+  const arr = document.getElementById('arr-'+id);
+  const open = list.classList.toggle('open');
+  arr.classList.toggle('open', open);
+}
+
+function togglePoint(pNum) {
+  const body = document.getElementById('body-'+pNum);
+  const chev = document.getElementById('chev-'+pNum);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+}
+
+function markDone(pNum, checked) {
+  const card = document.getElementById('card-'+pNum);
+  if (checked) { doneSet.add(pNum); card.classList.add('done'); }
+  else { doneSet.delete(pNum); card.classList.remove('done'); }
+  updateScore();
+}
+
+function updateScore() {
+  const totalPoints = data.reduce((s,c)=>s+c.points.length, 0);
+  const done = doneSet.size;
+  const newScore = Math.round(70 + (done / totalPoints) * 30);
+  document.getElementById('cur-score').textContent = Math.min(100, newScore);
+  document.getElementById('cur-bar').style.width = Math.min(100, newScore) + '%';
+}
+
+buildUI();
+</script>

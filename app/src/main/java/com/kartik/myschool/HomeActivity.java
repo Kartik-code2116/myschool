@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.kartik.myschool.databinding.ActivityHomeBinding;
 import com.kartik.myschool.model.Teacher;
 import com.kartik.myschool.repository.FirebaseRepository;
+import com.kartik.myschool.ui.HomeViewModel;
 import com.kartik.myschool.utils.UiAnimations;
 
 import java.util.HashSet;
@@ -43,6 +44,19 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         b = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
+
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override public void handleOnBackPressed() {
+                        if (b.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                            b.drawerLayout.closeDrawer(GravityCompat.START);
+                        } else {
+                            setEnabled(false);
+                            getOnBackPressedDispatcher().onBackPressed();
+                        }
+                    }
+                }
+        );
 
         NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navHostFragment);
@@ -252,7 +266,14 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        loadTeacherInfo();
+        HomeViewModel vm = new androidx.lifecycle.ViewModelProvider(this).get(HomeViewModel.class);
+        vm.getTeacher().observe(this, t -> {
+            if (t != null && t.name != null) {
+                AppCache.cachedTeacherName = t.name;
+                b.tvToolbarSubtitle.setText(t.name);
+            }
+        });
+        vm.loadTeacher();
         SessionContext.syncFromAppCache();
         handleNavigationIntent(getIntent());
     }
@@ -526,24 +547,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void loadTeacherInfo() {
-        if (AppCache.cachedTeacherName != null) {
-            b.tvToolbarSubtitle.setText(AppCache.cachedTeacherName);
-        }
-        FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<Teacher>() {
-            @Override
-            public void onSuccess(Teacher t) {
-                if (t != null && t.name != null) {
-                    AppCache.cachedTeacherName = t.name;
-                    runOnUiThread(() -> b.tvToolbarSubtitle.setText(t.name));
-                }
-            }
 
-            @Override
-            public void onError(Exception e) {
-            }
-        });
-    }
 
     public void updateToolbar(String title, String subtitle) {
         if (title != null && !title.isEmpty())
@@ -604,14 +608,7 @@ public class HomeActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfig) || super.onSupportNavigateUp();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (b.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            b.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+
 
     public void showHomeMoreMenu(View anchor) {
         if (navController != null) {
@@ -679,9 +676,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showAdminMessageDialog() {
-        android.app.ProgressDialog pd = new android.app.ProgressDialog(this);
-        pd.setMessage(getString(R.string.msg_checking_messages));
-        pd.setCancelable(false);
+        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(this, null, getString(R.string.msg_checking_messages));
         pd.show();
 
         FirebaseRepository.get().getTeacherFresh(new FirebaseRepository.OnResult<Teacher>() {

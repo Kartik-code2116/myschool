@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.firebase.crashlytics")
 }
 
 java {
@@ -61,6 +62,7 @@ dependencies {
 
     // Firebase - using BoM for version consistency
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
@@ -105,7 +107,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     // Google Play Billing
-    implementation("com.android.billingclient:billing:6.2.0")
+    implementation("com.android.billingclient:billing:7.1.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
