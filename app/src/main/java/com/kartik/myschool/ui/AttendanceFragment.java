@@ -98,19 +98,47 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
         }
         String classId = SessionContext.selectedClass.id;
         
+        if (b != null) {
+            b.rvAttendanceStudents.setVisibility(View.GONE);
+            b.shimmerViewContainer.setVisibility(View.VISIBLE);
+            b.shimmerViewContainer.startShimmer();
+        }
+        
         // Fetch Students
         FirebaseRepository.get().getStudentsForClass(classId, new FirebaseRepository.OnResult<List<Student>>() {
             @Override
             public void onSuccess(List<Student> list) {
-                if (list != null) {
-                    studentsList = list;
-                    adapter.updateData(studentsList);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (b != null) {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            b.rvAttendanceStudents.setVisibility(View.VISIBLE);
+                        }
+                        if (list != null) {
+                            studentsList = list;
+                            adapter.updateData(studentsList);
+                        }
+                        if (b != null) {
+                            b.emptyState.setVisibility(studentsList.isEmpty() ? View.VISIBLE : View.GONE);
+                        }
+                    });
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), R.string.msg_failed_to_load_students, Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (b != null) {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            b.rvAttendanceStudents.setVisibility(View.VISIBLE);
+                            b.emptyState.setVisibility(studentsList.isEmpty() ? View.VISIBLE : View.GONE);
+                        }
+                        Toast.makeText(getContext(), R.string.msg_failed_to_load_students, Toast.LENGTH_SHORT).show();
+                    });
+                }
             }
         });
     }

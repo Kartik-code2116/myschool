@@ -30,8 +30,14 @@ public class MySchoolApplication extends Application {
         FirebaseRepository.resetInstance();
         Log.d("APP_INIT", "FirebaseRepository reset — will use google-services.json project on next call");
 
-        // 1. Restore active selections from session SharedPreferences
-        SessionContext.load(this);
+        // 1. Restore active selections from session SharedPreferences off the main thread
+        java.util.concurrent.ExecutorService bgThread = java.util.concurrent.Executors.newSingleThreadExecutor();
+        bgThread.execute(() -> {
+            SessionContext.load(this);
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                SessionContext.sessionReady.setValue(true);
+            });
+        });
 
         // 2. Load and apply persistent app theme
         android.content.SharedPreferences settingsPrefs = getSharedPreferences("myschool_settings_prefs", MODE_PRIVATE);

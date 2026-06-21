@@ -64,15 +64,16 @@
                 android:textStyle="bold" />
 
             <!-- Horizontal 3-dot action menu in purple -->
-            <ImageView
+            <ImageButton
                 android:id="@+id/btnStudentMore"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_more_vert"
                 app:tint="#6C4CCF"
+                android:padding="12dp"
                 android:contentDescription="Action Menu" />
         </RelativeLayout>
 

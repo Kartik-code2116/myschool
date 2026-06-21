@@ -219,6 +219,28 @@
                 android:textColor="@color/on_surface_variant"/>
         </LinearLayout>
 
+        <!-- Shimmer Placeholder for Loading State -->
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <include layout="@layout/shimmer_placeholder_student" />
+                <include layout="@layout/shimmer_placeholder_student" />
+                <include layout="@layout/shimmer_placeholder_student" />
+                <include layout="@layout/shimmer_placeholder_student" />
+                <include layout="@layout/shimmer_placeholder_student" />
+                <include layout="@layout/shimmer_placeholder_student" />
+                <include layout="@layout/shimmer_placeholder_student" />
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <!-- Students RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStudents"

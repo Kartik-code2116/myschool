@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
     id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
 }
 
 java {
@@ -59,11 +60,13 @@ dependencies {
     implementation(libs.swiperefreshlayout)
     implementation(libs.coordinatorlayout)
     implementation("androidx.fragment:fragment:1.8.8")
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
 
     // Firebase - using BoM for version consistency
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-perf")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")

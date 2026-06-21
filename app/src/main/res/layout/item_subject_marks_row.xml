@@ -143,6 +143,7 @@
                         <EditText android:id="@+id/etNirikhshan"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etTondiKam" android:nextFocusDown="@+id/etTondiKam"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvNirikhshanMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -163,6 +164,7 @@
                         <EditText android:id="@+id/etTondiKam"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etPratyakshik" android:nextFocusDown="@+id/etPratyakshik"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvTondiKamMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -190,6 +192,7 @@
                         <EditText android:id="@+id/etPratyakshik"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etUpkram" android:nextFocusDown="@+id/etUpkram"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvPratyakshikAMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -209,6 +212,7 @@
                         <EditText android:id="@+id/etUpkram"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etPrakalp" android:nextFocusDown="@+id/etPrakalp"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvUpkramMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -236,6 +240,7 @@
                         <EditText android:id="@+id/etPrakalp"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etChachani" android:nextFocusDown="@+id/etChachani"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvPrakalpMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -255,6 +260,7 @@
                         <EditText android:id="@+id/etChachani"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etSwadhyay" android:nextFocusDown="@+id/etSwadhyay"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvChachaniMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -282,6 +288,7 @@
                         <EditText android:id="@+id/etSwadhyay"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etItar" android:nextFocusDown="@+id/etItar"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvSwadhyayMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -301,6 +308,7 @@
                         <EditText android:id="@+id/etItar"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etTondiB" android:nextFocusDown="@+id/etTondiB"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvItarMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -398,6 +406,7 @@
                         <EditText android:id="@+id/etTondiB"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etPratyakshikB" android:nextFocusDown="@+id/etPratyakshikB"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvTondiBMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -417,6 +426,7 @@
                         <EditText android:id="@+id/etPratyakshikB"
                             android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
                             android:inputType="number" android:textSize="14sp" android:gravity="center"
+                            android:imeOptions="actionNext" android:nextFocusForward="@+id/etLekhi" android:nextFocusDown="@+id/etLekhi"
                             android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                         <TextView android:id="@+id/tvPratyakshikBMax"
                             android:layout_width="30dp" android:layout_height="wrap_content"
@@ -442,6 +452,7 @@
                     <EditText android:id="@+id/etLekhi"
                         android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1"
                         android:inputType="number" android:textSize="15sp" android:gravity="center"
+                        android:imeOptions="actionNext"
                         android:background="@drawable/bg_surface_rounded" android:hint="0"/>
                     <TextView android:id="@+id/tvLekhiMax"
                         android:layout_width="34dp" android:layout_height="wrap_content"

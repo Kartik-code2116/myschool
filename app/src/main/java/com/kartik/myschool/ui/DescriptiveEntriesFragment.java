@@ -86,7 +86,11 @@ public class DescriptiveEntriesFragment extends Fragment {
         });
 
         b.rvDescriptiveStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new DescriptiveAdapter();
+        RecyclerView.RecycledViewPool pool = null;
+        if (getActivity() instanceof HomeActivity) {
+            pool = ((HomeActivity) getActivity()).sharedPool;
+        }
+        adapter = new DescriptiveAdapter(pool);
         b.rvDescriptiveStudents.setAdapter(adapter);
 
         // Play smooth layout enter animation
@@ -439,11 +443,12 @@ public class DescriptiveEntriesFragment extends Fragment {
         private final List<Student> students = new ArrayList<>();
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
         private final int[] lastPosition = new int[] { -1 };
-        private final RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
+        private final RecyclerView.RecycledViewPool viewPool;
 
-        public DescriptiveAdapter() {
-            viewPool.setMaxRecycledViews(0, 50);
-            viewPool.setMaxRecycledViews(1, 50);
+        public DescriptiveAdapter(RecyclerView.RecycledViewPool sharedPool) {
+            this.viewPool = sharedPool != null ? sharedPool : new RecyclerView.RecycledViewPool();
+            this.viewPool.setMaxRecycledViews(0, 50);
+            this.viewPool.setMaxRecycledViews(1, 50);
         }
 
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {

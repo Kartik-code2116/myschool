@@ -54,6 +54,20 @@ public class PdfGenerator {
         void onError(Exception e);
     }
 
+    private static void triggerVibration(Context ctx) {
+        if (ctx == null) return;
+        try {
+            android.os.Vibrator v = (android.os.Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
+            if (v != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    v.vibrate(android.os.VibrationEffect.createOneShot(50, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    v.vibrate(50);
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
     // ── Colours ───────────────────────────────────────────────────────────────
     public static final BaseColor C_PRIMARY = new BaseColor(21, 101, 192);
     public static final BaseColor C_PRIMARY_LIGHT = new BaseColor(187, 222, 251);
@@ -216,6 +230,10 @@ public class PdfGenerator {
             PdfCallback cb) {
         syncClassYear(cls);
         new Thread(() -> {
+            com.google.firebase.perf.metrics.Trace pdfTrace = com.google.firebase.perf.FirebasePerformance.getInstance().newTrace("pdf_generation_bulk");
+            pdfTrace.putAttribute("report_position", String.valueOf(reportPosition));
+            pdfTrace.putAttribute("student_count", String.valueOf(students.size()));
+            pdfTrace.start();
             try {
                 ensureFonts(ctx);
                 String rName;
@@ -257,8 +275,11 @@ public class PdfGenerator {
                 }
 
                 doc.close();
+                pdfTrace.stop();
+                triggerVibration(ctx);
                 cb.onSuccess(out);
             } catch (Exception e) {
+                pdfTrace.stop();
                 cb.onError(e);
             }
         }).start();
@@ -276,6 +297,9 @@ public class PdfGenerator {
             PdfCallback cb) {
         syncClassYear(cls);
         new Thread(() -> {
+            com.google.firebase.perf.metrics.Trace pdfTrace = com.google.firebase.perf.FirebasePerformance.getInstance().newTrace("pdf_generation_grade_chart");
+            pdfTrace.putAttribute("student_count", String.valueOf(students.size()));
+            pdfTrace.start();
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "GradeChart_" + ts() + ".pdf");
@@ -409,8 +433,11 @@ public class PdfGenerator {
 
                 doc.add(tbl);
                 doc.close();
+                pdfTrace.stop();
+                triggerVibration(ctx);
                 cb.onSuccess(out);
             } catch (Exception e) {
+                pdfTrace.stop();
                 cb.onError(e);
             }
         }).start();
@@ -428,6 +455,9 @@ public class PdfGenerator {
             PdfCallback cb) {
         syncClassYear(cls);
         new Thread(() -> {
+            com.google.firebase.perf.metrics.Trace pdfTrace = com.google.firebase.perf.FirebasePerformance.getInstance().newTrace("pdf_generation_progress_book");
+            pdfTrace.putAttribute("student_count", String.valueOf(students.size()));
+            pdfTrace.start();
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Pragati_" + ts() + ".pdf");
@@ -469,8 +499,11 @@ public class PdfGenerator {
                 }
 
                 doc.close();
+                pdfTrace.stop();
+                triggerVibration(ctx);
                 cb.onSuccess(out);
             } catch (Exception e) {
+                pdfTrace.stop();
                 cb.onError(e);
             }
         }).start();
@@ -878,6 +911,7 @@ public class PdfGenerator {
                 doc.setMargins(30, 30, 30, 30);
                 addPersonalityContent(doc, ctx, school, cls, student, sem1, sem2);
                 doc.close();
+                triggerVibration(ctx);
                 cb.onSuccess(out);
             } catch (Exception e) {
                 cb.onError(e);
@@ -920,6 +954,7 @@ public class PdfGenerator {
                 addPersonalityContent(doc, ctx, school, cls, student, marks, null);
 
                 doc.close();
+                triggerVibration(ctx);
                 cb.onSuccess(out);
             } catch (Exception e) {
                 cb.onError(e);

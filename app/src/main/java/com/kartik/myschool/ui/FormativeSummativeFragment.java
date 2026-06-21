@@ -90,7 +90,11 @@ public class FormativeSummativeFragment extends Fragment {
         });
 
         updateLayoutManager();
-        adapter = new EvaluationAdapter();
+        RecyclerView.RecycledViewPool pool = null;
+        if (getActivity() instanceof HomeActivity) {
+            pool = ((HomeActivity) getActivity()).sharedPool;
+        }
+        adapter = new EvaluationAdapter(pool);
         b.rvEvaluationStudents.setAdapter(adapter);
 
         // Play smooth layout enter animation
@@ -182,7 +186,8 @@ public class FormativeSummativeFragment extends Fragment {
         }
         if (activeClass.subjects.isEmpty()) {
             if (b != null) {
-                b.progressLoading.setVisibility(View.GONE);
+                b.shimmerViewContainer.stopShimmer();
+                b.shimmerViewContainer.setVisibility(View.GONE);
                 b.tvEmptyState.setVisibility(View.VISIBLE);
                 b.tvEmptyState
                         .setText(R.string.msg_no_subjects_configured_ngo_to);
@@ -194,7 +199,9 @@ public class FormativeSummativeFragment extends Fragment {
 
         // Show progress spinner while fetching
         if (b != null) {
-            b.progressLoading.setVisibility(View.VISIBLE);
+            b.swipeRefreshLayout.setVisibility(View.GONE);
+            b.shimmerViewContainer.setVisibility(View.VISIBLE);
+            b.shimmerViewContainer.startShimmer();
             b.tvEmptyState.setVisibility(View.GONE);
         }
 
@@ -211,8 +218,11 @@ public class FormativeSummativeFragment extends Fragment {
             renderedFromCache = true;
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                 if (isAdded() && b != null) {
-                    if (b != null)
-                        b.progressLoading.setVisibility(View.GONE);
+                    if (b != null) {
+                        b.shimmerViewContainer.stopShimmer();
+                        b.shimmerViewContainer.setVisibility(View.GONE);
+                        b.swipeRefreshLayout.setVisibility(View.VISIBLE);
+                    }
                     if (swipeRefresh != null)
                         swipeRefresh.setRefreshing(false);
                     if (activeClass != null && activeClass.subjects != null) {
@@ -260,7 +270,9 @@ public class FormativeSummativeFragment extends Fragment {
             AppCache.cachedSemesterIdForMarks = activeSemesterId;
 
             if (isAdded() && b != null) {
-                b.progressLoading.setVisibility(View.GONE);
+                b.shimmerViewContainer.stopShimmer();
+                b.shimmerViewContainer.setVisibility(View.GONE);
+                b.swipeRefreshLayout.setVisibility(View.VISIBLE);
                 if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
                 if (finalList.isEmpty()) {
@@ -391,7 +403,9 @@ public class FormativeSummativeFragment extends Fragment {
         boolean semesterChanged = !java.util.Objects.equals(activeSemesterId, lastLoadedSemesterId);
 
         if (isFirstLoad || classChanged || semesterChanged) {
-            b.progressLoading.setVisibility(View.VISIBLE);
+            b.swipeRefreshLayout.setVisibility(View.GONE);
+            b.shimmerViewContainer.setVisibility(View.VISIBLE);
+            b.shimmerViewContainer.startShimmer();
             loadEvaluationData();
         } else {
             // Always refresh adapter if coming back from Subjects page with modified subjects
@@ -439,11 +453,12 @@ public class FormativeSummativeFragment extends Fragment {
         private final List<Student> students = new ArrayList<>();
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
         private final int[] lastPosition = new int[] { -1 };
-        private final RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
+        private final RecyclerView.RecycledViewPool viewPool;
 
-        public EvaluationAdapter() {
-            viewPool.setMaxRecycledViews(0, 50);
-            viewPool.setMaxRecycledViews(1, 50);
+        public EvaluationAdapter(RecyclerView.RecycledViewPool sharedPool) {
+            this.viewPool = sharedPool != null ? sharedPool : new RecyclerView.RecycledViewPool();
+            this.viewPool.setMaxRecycledViews(0, 50);
+            this.viewPool.setMaxRecycledViews(1, 50);
         }
 
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {

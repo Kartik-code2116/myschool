@@ -166,6 +166,11 @@ public class StudentListFragment extends Fragment {
             }
             
             lastLoadedClassId = SessionContext.selectedClass.id;
+            
+            b.rvStudents.setVisibility(View.GONE);
+            b.shimmerViewContainer.setVisibility(View.VISIBLE);
+            b.shimmerViewContainer.startShimmer();
+            
             FirebaseRepository.get().getStudentsForClass(SessionContext.selectedClass.id,
                     new FirebaseRepository.OnResult<List<Student>>() {
                         @Override
@@ -181,6 +186,9 @@ public class StudentListFragment extends Fragment {
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
                                     if (b == null) return;
+                                    b.shimmerViewContainer.stopShimmer();
+                                    b.shimmerViewContainer.setVisibility(View.GONE);
+                                    b.rvStudents.setVisibility(View.VISIBLE);
                                     studentAdapter.setData(filteredStudents);
                                     b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
                                 });
@@ -189,6 +197,15 @@ public class StudentListFragment extends Fragment {
 
                         @Override
                         public void onError(Exception e) {
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    if (b != null) {
+                                        b.shimmerViewContainer.stopShimmer();
+                                        b.shimmerViewContainer.setVisibility(View.GONE);
+                                        b.rvStudents.setVisibility(View.VISIBLE);
+                                    }
+                                });
+                            }
                             loadAllStudents();
                         }
                     });
@@ -377,6 +394,9 @@ public class StudentListFragment extends Fragment {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         if (b == null) return;
+                        b.shimmerViewContainer.stopShimmer();
+                        b.shimmerViewContainer.setVisibility(View.GONE);
+                        b.rvStudents.setVisibility(View.VISIBLE);
                         studentAdapter.setData(filteredStudents);
                         b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
                     });
@@ -387,7 +407,12 @@ public class StudentListFragment extends Fragment {
             public void onError(Exception e) {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        if (b != null) b.emptyState.setVisibility(View.VISIBLE);
+                        if (b != null) {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            b.rvStudents.setVisibility(View.VISIBLE);
+                            b.emptyState.setVisibility(View.VISIBLE);
+                        }
                     });
                 }
             }

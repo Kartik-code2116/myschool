@@ -18,6 +18,8 @@ public final class SessionContext {
     public static volatile com.kartik.myschool.model.Student currentStudentForAttendance;
     public static volatile com.kartik.myschool.model.AttendanceRecord currentRecordForAttendance;
 
+    public static final androidx.lifecycle.MutableLiveData<Boolean> sessionReady = new androidx.lifecycle.MutableLiveData<>(false);
+
     private SessionContext() {}
 
     public static synchronized String getYearLabel() {

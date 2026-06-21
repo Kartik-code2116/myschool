@@ -30,6 +30,8 @@ public class HomeActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfig;
     private boolean isSchoolLevelExpanded = false;
 
+    public androidx.recyclerview.widget.RecyclerView.RecycledViewPool sharedPool = new androidx.recyclerview.widget.RecyclerView.RecycledViewPool();
+
     public void openDrawer() {
         if (b != null && b.drawerLayout != null) {
             b.drawerLayout.openDrawer(GravityCompat.START);
@@ -40,7 +42,6 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SessionContext.load(this);
         super.onCreate(savedInstanceState);
         b = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());

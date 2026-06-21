@@ -658,6 +658,7 @@ public class EnterMarksActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String id) {
                 Log.d("SAVE_MARKS", "SUCCESS — Firestore doc id: " + id);
+                triggerVibration();
                 m.id = id;
                 AppCache.selectedMarks = m;
 
@@ -733,6 +734,18 @@ public class EnterMarksActivity extends AppCompatActivity {
                         "❌ जतन अयशस्वी: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void triggerVibration() {
+        android.os.Vibrator v = (android.os.Vibrator) getSystemService(android.content.Context.VIBRATOR_SERVICE);
+        if (v != null) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                v.vibrate(android.os.VibrationEffect.createOneShot(50, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                // deprecated in API 26 
+                v.vibrate(50);
+            }
+        }
     }
 
     // ── OCR ───────────────────────────────────────────────────────────────────
