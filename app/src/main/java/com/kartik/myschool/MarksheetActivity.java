@@ -171,6 +171,8 @@ public class MarksheetActivity extends AppCompatActivity {
                     view.setDataAndType(uri, "application/pdf");
                     view.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivity(Intent.createChooser(view, "Open PDF"));
+                    com.kartik.myschool.utils.AnalyticsHelper.logPdfGenerated("marksheet");
+                    com.kartik.myschool.utils.ReviewHelper.incrementPdfCountAndCheck(MarksheetActivity.this);
                 });
             }
             @Override public void onError(Exception e) {

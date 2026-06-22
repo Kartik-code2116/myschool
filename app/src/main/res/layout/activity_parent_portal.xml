@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F9FA">
+
+    <!-- 1. CODE ENTRY / LOGIN PANEL -->
+    <LinearLayout
+        android:id="@+id/panelCodeEntry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_person"
+            app:tint="#8BC34A"
+            android:contentDescription="Parent Portal Icon"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MySchool Parent Portal"
+            android:textColor="#2E2E2E"
+            android:textSize="24sp"
+            android:fontFamily="sans-serif-bold"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="पालक प्रगतीपुस्तक पोर्टल"
+            android:textColor="#8BC34A"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enter the 6-digit connection code provided by the class teacher to link your child.\nपाल्याची माहिती पाहण्यासाठी शिक्षकांनी दिलेला ६ अंकी जोडणी कोड प्रविष्ट करा."
+            android:textColor="#757575"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginBottom="32dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="६ अंकी जोडणी कोड / 6-Digit Code"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#8BC34A"
+            app:hintTextColor="#8BC34A"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            android:layout_marginBottom="24dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etParentCodeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:letterSpacing="0.2"
+                android:textColor="#2E2E2E"
+                android:fontFamily="sans-serif-bold"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerifyCode"
+            style="@style/Widget.EduReport.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="जोडणी करा / Link Student"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif-bold"
+            app:backgroundTint="#8BC34A"
+            android:elevation="2dp"
+            android:minHeight="56dp"/>
+    </LinearLayout>
+
+    <!-- 2. PARENT DASHBOARD PANEL -->
+    <LinearLayout
+        android:id="@+id/panelDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Toolbar Header with Student Info -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="#8BC34A">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvParentStudentName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="विद्यार्थ्याचे नाव"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:fontFamily="sans-serif-bold"/>
+
+                    <ImageButton
+                        android:id="@+id/btnRefreshParent"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentEnd="true"
+                        android:src="@drawable/ic_filter_list"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="#FFFFFF"
+                        android:contentDescription="Refresh Data"/>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tvParentStudentClass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="इयत्ता: - | तुकडी: -"
+                    android:textColor="#E8F5E9"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif"/>
+
+                <TextView
+                    android:id="@+id/tvParentSchoolName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="शाळेचे नाव"
+                    android:textColor="#E8F5E9"
+                    android:textSize="13sp"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- 2.1 Attendance Overview Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="उपस्थिती अहवाल / Attendance Report"
+                            android:textColor="#8BC34A"
+                            android:textSize="15sp"
+                            android:fontFamily="sans-serif-bold"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/tvAttendancePct"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0%"
+                                android:textColor="#2E2E2E"
+                                android:textSize="32sp"
+                                android:fontFamily="sans-serif-black"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <com.google.android.material.progressindicator.LinearProgressIndicator
+                                    android:id="@+id/pbAttendance"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:progress="0"
+                                    app:trackColor="#F1F8E9"
+                                    app:indicatorColor="#8BC34A"
+                                    app:trackCornerRadius="4dp"
+                                    app:trackThickness="8dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvAttendanceFraction"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="एकूण हजर दिवस: 0 / 0"
+                                    android:textColor="#757575"
+                                    android:textSize="12sp"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="sans-serif"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Expandable Month Wise Grid Container -->
+                        <LinearLayout
+                            android:id="@+id/layoutMonthlyDetails"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="16dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 2.2 Marks Sheet Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="गुण पत्रक / Academic Performance"
+                                android:textColor="#8BC34A"
+                                android:textSize="15sp"
+                                android:fontFamily="sans-serif-bold"/>
+
+                            <com.google.android.material.tabs.TabLayout
+                                android:id="@+id/tabLayoutSem"
+                                android:layout_width="160dp"
+                                android:layout_height="32dp"
+                                android:layout_alignParentEnd="true"
+                                android:background="#F1F8E9"
+                                app:tabBackground="@drawable/bg_sync_status_online"
+                                app:tabSelectedTextColor="#FFFFFF"
+                                app:tabTextColor="#8BC34A"
+                                app:tabIndicatorHeight="0dp"
+                                app:tabMode="fixed"
+                                app:tabGravity="fill">
+                                <com.google.android.material.tabs.TabItem
+                                    android:text="Sem 1"/>
+                                <com.google.android.material.tabs.TabItem
+                                    android:text="Sem 2"/>
+                            </com.google.android.material.tabs.TabLayout>
+                        </RelativeLayout>
+
+                        <!-- No Marks Alert -->
+                        <TextView
+                            android:id="@+id/tvNoMarksParentAlert"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="निवडलेल्या सत्राचे गुण अद्याप शिक्षकांकडून भरले गेलेले नाहीत.\nMarks for the selected semester have not been entered by the teacher yet."
+                            android:textColor="#E65100"
+                            android:textSize="13sp"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:background="#FFF3E0"
+                            android:layout_marginTop="16dp"
+                            android:visibility="gone"/>
+
+                        <!-- Marks list dynamic table -->
+                        <LinearLayout
+                            android:id="@+id/layoutMarksTable"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="16dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 2.3 General Remarks Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardParentRemarks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="वर्णनात्मक नोंदी / Remarks"
+                            android:textColor="#8BC34A"
+                            android:textSize="15sp"
+                            android:fontFamily="sans-serif-bold"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvParentGeneralRemarks"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="-"
+                            android:textColor="#424242"
+                            android:textSize="14sp"
+                            android:lineSpacingMultiplier="1.2"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 2.4 Action Buttons -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnParentGeneratePdf"
+                    style="@style/Widget.EduReport.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="प्रगतीपुस्तक PDF / View Report Card"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif-bold"
+                    app:icon="@drawable/ic_school"
+                    app:iconTint="#FFFFFF"
+                    app:iconGravity="textStart"
+                    app:backgroundTint="#8BC34A"
+                    android:elevation="2dp"
+                    android:minHeight="56dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUnlinkStudent"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="विद्यार्थी बदला / Change Student"
+                    android:textColor="#E53935"
+                    app:strokeColor="#E53935"
+                    android:fontFamily="sans-serif-bold"
+                    android:minHeight="56dp"
+                    android:layout_marginBottom="24dp"/>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</FrameLayout>

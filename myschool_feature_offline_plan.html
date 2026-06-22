@@ -1,0 +1,835 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.tab-bar{display:flex;gap:6px;margin-bottom:1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0}
+.tab{font-size:13px;padding:8px 16px;cursor:pointer;border-bottom:2px solid transparent;color:var(--color-text-secondary);margin-bottom:-0.5px;user-select:none;transition:color .15s}
+.tab.active{color:var(--color-text-primary);font-weight:500;border-bottom-color:var(--color-text-primary)}
+.tab:hover:not(.active){color:var(--color-text-primary)}
+.panel{display:none}.panel.active{display:block}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin:1.5rem 0 .75rem}
+.already-done{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.done-icon{font-size:14px;flex-shrink:0}
+.done-text{font-size:13px;color:var(--color-text-secondary)}
+.done-text strong{color:var(--color-text-primary);font-weight:500}
+.item{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px;overflow:hidden;background:var(--color-background-primary)}
+.item-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
+.step-num{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.s-crit{background:#FCEBEB;color:#791F1F}
+.s-imp{background:#FAEEDA;color:#633806}
+.s-pol{background:#EAF3DE;color:#27500A}
+@media(prefers-color-scheme:dark){.s-crit{background:#501313;color:#F7C1C1}.s-imp{background:#412402;color:#FAC775}.s-pol{background:#173404;color:#C0DD97}}
+.item-title{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
+.badge{font-size:10px;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.b-crit{background:#FCEBEB;color:#791F1F}
+.b-imp{background:#FAEEDA;color:#633806}
+.b-pol{background:#EAF3DE;color:#27500A}
+@media(prefers-color-scheme:dark){.b-crit{background:#501313;color:#F7C1C1}.b-imp{background:#412402;color:#FAC775}.b-pol{background:#173404;color:#C0DD97}}
+.chev{font-size:11px;color:var(--color-text-tertiary);transition:transform .2s}
+.chev.open{transform:rotate(180deg)}
+.item-body{display:none;padding:0 14px 14px;border-top:0.5px solid var(--color-border-tertiary)}
+.item-body.open{display:block}
+.why{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin:10px 0 8px}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);line-height:1.6;overflow-x:auto;white-space:pre;margin-top:6px}
+.done-cb{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);margin-left:auto;cursor:pointer}
+.item.done .item-title{text-decoration:line-through;opacity:.5}
+.progress-wrap{margin-bottom:1.5rem;display:flex;align-items:center;gap:12px}
+.progress-track{flex:1;height:6px;background:var(--color-border-tertiary);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#639922;border-radius:3px;transition:width .4s}
+.progress-label{font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
+.timeline-row{display:grid;grid-template-columns:80px 1fr;gap:12px;margin-bottom:10px;font-size:12px}
+.tl-week{color:var(--color-text-secondary);padding-top:2px;font-weight:500}
+.tl-tasks{color:var(--color-text-primary);line-height:1.6}
+.tl-tasks li{margin-left:14px;margin-bottom:2px}
+.schema-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;font-family:var(--font-mono);font-size:11px;line-height:1.7;color:var(--color-text-primary);margin:8px 0}
+</style>
+
+<div class="wrap">
+
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('offline')">📡 Offline & Reliability</div>
+  <div class="tab" onclick="showTab('features')">✨ Feature Completeness</div>
+  <div class="tab" onclick="showTab('timeline')">📅 Timeline</div>
+</div>
+
+<!-- ══════════════════════════ OFFLINE TAB ══════════════════════════ -->
+<div id="tab-offline" class="panel active">
+
+  <div id="prog-offline" class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="fill-offline" style="width:0%"></div></div>
+    <span class="progress-label" id="lbl-offline">0 / 6 done</span>
+  </div>
+
+  <div class="section-label">✅ Already done in your code</div>
+
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>Firestore offline persistence is ON</strong> — FirebaseRepository constructor already calls <code>setPersistenceEnabled(true)</code> with <code>CACHE_SIZE_UNLIMITED</code>. Reads work offline. You're ahead of most apps here.</span>
+  </div>
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>Multi-layer in-memory cache</strong> — FirebaseRepository has 8 cache maps. Student lists, marks, classes and semesters are all served instantly after first load. Cold-start latency is already optimized.</span>
+  </div>
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>FileProvider configured</strong> — AndroidManifest.xml has FileProvider declared for PDF sharing. Backup/export infrastructure can be wired up directly.</span>
+  </div>
+
+  <div class="section-label">🔧 What's still missing — 6 items</div>
+
+  <div id="list-offline"></div>
+</div>
+
+<!-- ══════════════════════════ FEATURES TAB ══════════════════════════ -->
+<div id="tab-features" class="panel">
+
+  <div id="prog-features" class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="fill-features" style="width:0%"></div></div>
+    <span class="progress-label" id="lbl-features">0 / 8 done</span>
+  </div>
+
+  <div class="section-label">✅ Already done in your code</div>
+
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>Bilingual PDF generation</strong> — Marathi + English report cards with iText. This is a genuine differentiator for Maharashtra market. No competitor has this.</span>
+  </div>
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>OCR scan-to-marks</strong> — ML Kit integration for scanning handwritten marks. Unique feature in the category.</span>
+  </div>
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>In-app subscription + billing</strong> — BillingHelper with Play Billing (needs upgrade to v7, but the logic exists).</span>
+  </div>
+  <div class="already-done">
+    <span class="done-icon">✅</span>
+    <span class="done-text"><strong>Remark bank system</strong> — FirebaseRepository.getRemarkBank() with per-class, per-semester, per-subject dropdown remarks. Sophisticated feature.</span>
+  </div>
+
+  <div class="section-label">🔧 What's still missing — 8 items</div>
+
+  <div id="list-features"></div>
+</div>
+
+<!-- ══════════════════════════ TIMELINE TAB ══════════════════════════ -->
+<div id="tab-timeline" class="panel">
+  <div class="section-label">Implementation timeline</div>
+
+  <div class="timeline-row">
+    <div class="tl-week">Week 1</div>
+    <ul class="tl-tasks">
+      <li>Offline banner (ConnectivityManager) — 2 hrs</li>
+      <li>Firestore write-conflict resolver in saveMarks() — 3 hrs</li>
+      <li>FCM token registration in MySchoolApplication — 1 hr</li>
+    </ul>
+  </div>
+  <div class="timeline-row">
+    <div class="tl-week">Week 2</div>
+    <ul class="tl-tasks">
+      <li>JSON backup export wired to Settings menu — 3 hrs</li>
+      <li>FCM notification handler + local notification — 2 hrs</li>
+      <li>Google Drive export (optional, needs OAuth scope) — 4 hrs</li>
+    </ul>
+  </div>
+  <div class="timeline-row">
+    <div class="tl-week">Week 3–4</div>
+    <ul class="tl-tasks">
+      <li>Analytics events — logPdfGenerated, logMarksEntered — 2 hrs</li>
+      <li>In-App Review prompt after 3rd PDF — 1 hr</li>
+      <li>Firebase App Check (Play Integrity) — 2 hrs</li>
+      <li>Empty states for all list screens — 4 hrs</li>
+    </ul>
+  </div>
+  <div class="timeline-row">
+    <div class="tl-week">Month 2</div>
+    <ul class="tl-tasks">
+      <li>Parent read-only portal (new Activity + Firestore rules) — 2 days</li>
+      <li>Homescreen widget for attendance — 1 day</li>
+      <li>Stats dashboard improvements (charts with MPAndroidChart) — 2 days</li>
+    </ul>
+  </div>
+  <div class="timeline-row">
+    <div class="tl-week">Month 3</div>
+    <ul class="tl-tasks">
+      <li>Deep links for student profile sharing — 1 day</li>
+      <li>Class-level PDF batch export — 2 days</li>
+      <li>Marks entry keyboard shortcuts (tablet support) — 1 day</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Firestore data model — parent portal addition</div>
+  <div class="schema-box">// New collections to add for parent portal:
+
+parentLinks/{linkId}
+  teacherId: string       // who created the link
+  studentId: string       // which student
+  parentUid: string       // Firebase Auth uid of parent
+  createdAt: timestamp
+  expiresAt: timestamp    // optional, 30-day links
+
+// Updated Firestore rules — add to firestore.rules:
+match /students/{studentId} {
+  allow read: if isOwner()                    // teacher
+           || isParentOf(studentId);          // parent
+  allow write: if isOwner();                  // teacher only
+}
+
+function isParentOf(studentId) {
+  return exists(
+    /databases/$(database)/documents
+    /parentLinks/$(request.auth.uid + "_" + studentId)
+  );
+}</div>
+</div>
+
+</div>
+
+<script>
+const offlineItems = [
+  {
+    title: 'Show offline/online status banner',
+    badge: 'Critical', badgeClass: 'b-crit', numClass: 's-crit',
+    why: 'Right now when internet drops, the app silently fails. Teachers in rural schools have patchy connectivity. A yellow banner ("Offline — your changes will sync when back online") tells them saves are queued and nothing is lost. ConnectivityManager NetworkCallback is the right API.',
+    code: `// In HomeActivity.onCreate() — add network monitor:
+ConnectivityManager cm = (ConnectivityManager)
+    getSystemService(Context.CONNECTIVITY_SERVICE);
+
+NetworkRequest req = new NetworkRequest.Builder()
+    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    .build();
+
+ConnectivityManager.NetworkCallback cb =
+    new ConnectivityManager.NetworkCallback() {
+        @Override
+        public void onAvailable(Network net) {
+            runOnUiThread(() -> {
+                b.offlineBanner.animate().alpha(0).setDuration(300)
+                    .withEndAction(() ->
+                        b.offlineBanner.setVisibility(View.GONE));
+            });
+        }
+        @Override
+        public void onLost(Network net) {
+            runOnUiThread(() -> {
+                b.offlineBanner.setVisibility(View.VISIBLE);
+                b.offlineBanner.setAlpha(0);
+                b.offlineBanner.animate().alpha(1).setDuration(300);
+            });
+        }
+    };
+cm.registerNetworkCallback(req, cb);
+
+// In onDestroy():
+cm.unregisterNetworkCallback(cb);
+
+<!-- In activity_home.xml — add ABOVE the main NavHostFragment: -->
+<TextView
+    android:id="@+id/offlineBanner"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Offline — changes will sync when connected"
+    android:gravity="center"
+    android:padding="8dp"
+    android:textSize="12sp"
+    android:background="@color/amber_100"
+    android:textColor="@color/amber_800"
+    android:visibility="gone" />`
+  },
+  {
+    title: 'Handle Firestore write conflicts when coming back online',
+    badge: 'Critical', badgeClass: 'b-crit', numClass: 's-crit',
+    why: 'You have offline persistence ON, but if two teachers edit the same record while offline (shared school scenario), Firestore will silently last-write-wins. For marks and attendance, this is data loss. Add a server timestamp to every write and check for stale writes before saving.',
+    code: `// In FirebaseRepository.saveMarks() — add conflict protection:
+public void saveMarks(MarksRecord m, OnResult<String> cb) {
+    // ... existing uid check ...
+    m.updatedAt = System.currentTimeMillis();
+
+    // Use set() with merge so offline writes don't stomp concurrent edits
+    // For attendance and marks — use a WriteBatch with precondition:
+    ref.set(m, com.google.firebase.firestore.SetOptions.merge())
+        .addOnSuccessListener(v -> {
+            cachedClassSemesterMarksMap.clear();
+            cb.onSuccess(m.id);
+        })
+        .addOnFailureListener(e -> {
+            // If failed due to network — Firestore queues it automatically
+            // with persistence enabled. Still call onSuccess so UI isn't blocked.
+            if (e instanceof com.google.firebase.firestore.FirebaseFirestoreException) {
+                com.google.firebase.firestore.FirebaseFirestoreException fe =
+                    (com.google.firebase.firestore.FirebaseFirestoreException) e;
+                if (fe.getCode() ==
+                    com.google.firebase.firestore.FirebaseFirestoreException.Code.UNAVAILABLE) {
+                    // Offline — queued for sync. Treat as success.
+                    cb.onSuccess(m.id);
+                    return;
+                }
+            }
+            cb.onError(e);
+        });
+}`
+  },
+  {
+    title: 'Add JSON backup export to Settings',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'BackupRestoreHelper.java exists but is not wired to any Settings menu item. Teachers storing a full year of marks data need to be able to export it. This is a major trust signal. Wire it to a "Export Data" option in ProfileActivity or settings drawer.',
+    code: `// In BackupRestoreHelper.java — wire existing logic to UI:
+public void exportAllData(Context ctx, OnResult<Uri> cb) {
+    ExecutorService bg = Executors.newSingleThreadExecutor();
+    bg.execute(() -> {
+        try {
+            FirebaseRepository repo = FirebaseRepository.get();
+            // 1) Fetch all data (parallel):
+            AtomicReference<List<Student>> students = new AtomicReference<>();
+            AtomicReference<List<MarksRecord>> marks = new AtomicReference<>();
+            CountDownLatch latch = new CountDownLatch(2);
+
+            repo.getAllStudentsForTeacher(new OnResult<List<Student>>() {
+                @Override public void onSuccess(List<Student> s) {
+                    students.set(s); latch.countDown(); }
+                @Override public void onError(Exception e) {
+                    students.set(new ArrayList<>()); latch.countDown(); }
+            });
+            repo.getAllMarksForTeacher(new OnResult<List<MarksRecord>>() {
+                @Override public void onSuccess(List<MarksRecord> m) {
+                    marks.set(m); latch.countDown(); }
+                @Override public void onError(Exception e) {
+                    marks.set(new ArrayList<>()); latch.countDown(); }
+            });
+            latch.await(30, TimeUnit.SECONDS);
+
+            // 2) Serialize to JSON:
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonObject export = new JsonObject();
+            export.add("students", gson.toJsonTree(students.get()));
+            export.add("marks", gson.toJsonTree(marks.get()));
+            export.addProperty("exportedAt",
+                new java.text.SimpleDateFormat("yyyy-MM-dd",
+                    java.util.Locale.getDefault()).format(new java.util.Date()));
+
+            // 3) Write to cache dir:
+            File f = new File(ctx.getCacheDir(), "myschool_backup.json");
+            try (FileWriter fw = new FileWriter(f)) { fw.write(gson.toJson(export)); }
+
+            // 4) Return FileProvider URI:
+            Uri uri = FileProvider.getUriForFile(ctx,
+                ctx.getPackageName() + ".fileprovider", f);
+            new Handler(Looper.getMainLooper()).post(
+                () -> cb.onSuccess(uri));
+        } catch (Exception e) {
+            new Handler(Looper.getMainLooper()).post(
+                () -> cb.onError(e));
+        }
+    });
+}
+
+// In ProfileActivity — add menu item:
+case R.id.menu_export_data:
+    showLoading("Preparing export...");
+    new BackupRestoreHelper().exportAllData(this, new OnResult<Uri>() {
+        @Override public void onSuccess(Uri uri) {
+            dismissLoading();
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("application/json");
+            share.putExtra(Intent.EXTRA_STREAM, uri);
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, "Export backup via"));
+        }
+        @Override public void onError(Exception e) { dismissLoading(); showError(e); }
+    });`
+  },
+  {
+    title: 'Add sync status indicator on marks and attendance screens',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'When offline, Firestore queues the write silently. The teacher doesn\'t know if their marks save actually reached the server or is waiting to sync. A tiny "Saved locally, syncing..." chip in the toolbar tells them exactly what\'s happening.',
+    code: `// Create SyncStatusChip in EnterMarksActivity toolbar:
+
+// After calling repo.saveMarks():
+boolean isOnline = isNetworkAvailable();
+if (isOnline) {
+    showSyncChip("✓ Saved", R.color.green_100);
+} else {
+    showSyncChip("Saved offline — will sync", R.color.amber_100);
+}
+
+// Helper:
+private void showSyncChip(String msg, @ColorRes int bg) {
+    b.tvSyncStatus.setText(msg);
+    b.tvSyncStatus.setBackgroundResource(bg);
+    b.tvSyncStatus.setVisibility(View.VISIBLE);
+    b.tvSyncStatus.postDelayed(
+        () -> b.tvSyncStatus.setVisibility(View.GONE), 3000);
+}
+
+private boolean isNetworkAvailable() {
+    ConnectivityManager cm = (ConnectivityManager)
+        getSystemService(CONNECTIVITY_SERVICE);
+    Network net = cm.getActiveNetwork();
+    if (net == null) return false;
+    NetworkCapabilities caps = cm.getNetworkCapabilities(net);
+    return caps != null &&
+        caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+}`
+  },
+  {
+    title: 'Add Room database for offline-only data (OCR history, drafts)',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'You use Room for OCR scan history. Extend it for marks drafts — when a teacher starts entering marks but doesn\'t finish, save a draft to Room locally. On next open, prompt "You have unsaved marks for Class 5A — continue?" This prevents data loss on app crash mid-entry.',
+    code: `// MarksDraft.java — Room entity:
+@Entity(tableName = "marks_drafts")
+public class MarksDraft {
+    @PrimaryKey(autoGenerate = true) public int id;
+    public String classId;
+    public String semesterId;
+    public String marksJson;   // Gson-serialized MarksRecord
+    public long savedAt;
+    public boolean uploaded;   // false = pending upload
+}
+
+// In EnterMarksActivity — auto-save draft every 30 seconds:
+private void startDraftAutoSave() {
+    handler.postDelayed(new Runnable() {
+        @Override public void run() {
+            saveDraftLocally();
+            handler.postDelayed(this, 30_000); // repeat every 30s
+        }
+    }, 30_000);
+}
+
+private void saveDraftLocally() {
+    MarksRecord draft = buildCurrentMarksRecord();
+    MarksDraft entity = new MarksDraft();
+    entity.classId = SessionContext.selectedClass.id;
+    entity.semesterId = SessionContext.selectedSemester.id;
+    entity.marksJson = new Gson().toJson(draft);
+    entity.savedAt = System.currentTimeMillis();
+    entity.uploaded = false;
+    AppDatabase.get(this).marksDraftDao().insertOrReplace(entity);
+}`
+  },
+  {
+    title: 'Implement crash-safe PDF generation with temp file',
+    badge: 'Polish', badgeClass: 'b-pol', numClass: 's-pol',
+    why: 'If the app crashes or is killed mid-PDF generation (common on low-RAM phones), the partial PDF file is left on disk and the teacher gets a corrupt file next time. Write to a temp file first, then atomically rename to the final path on success.',
+    code: `// In your PDF generation class — atomic file write pattern:
+private File generatePdfSafe(String finalName, PDFGeneratorCallback work)
+    throws Exception {
+
+    File outputDir = getExternalFilesDir("PDFs");
+    File tempFile = File.createTempFile("pdf_tmp_", ".pdf", outputDir);
+    File finalFile = new File(outputDir, finalName);
+
+    try {
+        // Write to temp file:
+        work.writeTo(tempFile);
+
+        // Atomic rename — all-or-nothing:
+        boolean renamed = tempFile.renameTo(finalFile);
+        if (!renamed) {
+            // Fallback: copy + delete
+            copyFile(tempFile, finalFile);
+            tempFile.delete();
+        }
+        return finalFile;
+
+    } catch (Exception e) {
+        // Clean up partial file:
+        if (tempFile.exists()) tempFile.delete();
+        if (finalFile.exists()) finalFile.delete();
+        throw e;
+    }
+}
+
+interface PDFGeneratorCallback {
+    void writeTo(File target) throws Exception;
+}`
+  }
+];
+
+const featuresItems = [
+  {
+    title: 'Parent read-only portal',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'ClassDojo, Google Classroom, and every top-10 edu app has parent communication. A parent logs in with a 6-digit code generated by the teacher and sees their child\'s attendance %, marks summary, and remarks. This is a completely separate login flow in your existing app — you just need a ParentHomeActivity, updated Firestore rules (already partially designed in your firestore.rules), and a link generator for teachers.',
+    code: `// Step 1: ParentLink model
+public class ParentLink {
+    public String id;
+    public String teacherId;
+    public String studentId;
+    public String code;       // 6-digit code teacher shares
+    public String parentUid;  // set when parent claims it
+    public long createdAt;
+}
+
+// Step 2: Generate link in teacher flow (StudentProfileActivity)
+public void generateParentLink(String studentId, OnResult<String> cb) {
+    String code = String.valueOf(100000 +
+        new Random().nextInt(900000)); // 6-digit code
+    ParentLink link = new ParentLink();
+    link.teacherId = currentUid();
+    link.studentId = studentId;
+    link.code = code;
+    link.createdAt = System.currentTimeMillis();
+    db.collection("parentLinks").add(link)
+        .addOnSuccessListener(ref -> cb.onSuccess(code))
+        .addOnFailureListener(cb::onError);
+}
+
+// Step 3: Updated Firestore rules (add to firestore.rules):
+// match /students/{studentId} {
+//   allow read: if isOwner() || isParentOf(studentId);
+// }
+// function isParentOf(sid) {
+//   return get(/databases/$(database)/documents
+//     /parentLinks/$(request.auth.uid + "_" + sid))
+//     .data.parentUid == request.auth.uid;
+// }`
+  },
+  {
+    title: 'FCM push notifications',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'You have no FCM token registration. Teachers forget to enter marks before semester end. A notification sent from Cloud Functions ("Marks entry for Semester 1 closes in 3 days — 12 students missing") brings them back. Also useful for: "New admin message", subscription expiry warnings.',
+    code: `// Step 1: Register FCM token in MySchoolApplication.onCreate():
+FirebaseMessaging.getInstance().getToken()
+    .addOnSuccessListener(token -> {
+        if (token != null && FirebaseAuth.getInstance().getCurrentUser() != null) {
+            // Save token to teacher's Firestore document:
+            Map<String, Object> update = new HashMap<>();
+            update.put("fcmToken", token);
+            update.put("fcmTokenUpdatedAt", System.currentTimeMillis());
+            FirebaseFirestore.getInstance()
+                .collection("teachers")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .update(update);
+        }
+    });
+
+// Step 2: Add MyFirebaseMessagingService to AndroidManifest.xml:
+// <service android:name=".MyFirebaseMessagingService"
+//          android:exported="false">
+//   <intent-filter>
+//     <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+//   </intent-filter>
+// </service>
+
+// Step 3: MyFirebaseMessagingService.java:
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    @Override
+    public void onMessageReceived(RemoteMessage msg) {
+        String title = msg.getNotification() != null ?
+            msg.getNotification().getTitle() : msg.getData().get("title");
+        String body = msg.getNotification() != null ?
+            msg.getNotification().getBody() : msg.getData().get("body");
+        showNotification(title, body);
+    }
+
+    private void showNotification(String title, String body) {
+        NotificationCompat.Builder builder =
+            new NotificationCompat.Builder(this, "default")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        NotificationManagerCompat.from(this)
+            .notify((int) System.currentTimeMillis(), builder.build());
+    }
+}`
+  },
+  {
+    title: 'In-App Review API — replace the broken "Rate App" toast',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'Your 3-dot menu has a "Rate App" option that shows a Toast saying "Thank you!". It does NOT open the Play Store. This is a missed opportunity — every Play Store rating helps your ranking. The Google Play In-App Review API shows a native dialog inside your app. Trigger it after the 3rd PDF is successfully generated.',
+    code: `// build.gradle.kts — add:
+// implementation("com.google.android.play:review:2.0.1")
+
+// In MySchoolApplication or a ReviewHelper class:
+public class ReviewHelper {
+    private static final String PREF_PDF_COUNT = "pdf_gen_count";
+    private static final int REVIEW_THRESHOLD = 3;
+
+    public static void incrementPdfCount(Context ctx) {
+        SharedPreferences p = ctx.getSharedPreferences(
+            "app_prefs", Context.MODE_PRIVATE);
+        int count = p.getInt(PREF_PDF_COUNT, 0) + 1;
+        p.edit().putInt(PREF_PDF_COUNT, count).apply();
+
+        if (count == REVIEW_THRESHOLD) {
+            requestReview((Activity) ctx);
+        }
+    }
+
+    private static void requestReview(Activity activity) {
+        ReviewManager manager = ReviewManagerFactory.create(activity);
+        manager.requestReviewFlow().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                manager.launchReviewFlow(activity, task.getResult())
+                    .addOnCompleteListener(t -> {
+                        // Flow complete — don't show again for 90 days
+                        activity.getSharedPreferences("app_prefs",
+                            Context.MODE_PRIVATE).edit()
+                            .putLong("last_review_prompt",
+                                System.currentTimeMillis()).apply();
+                    });
+            }
+        });
+    }
+}
+
+// Call after PDF saved:
+ReviewHelper.incrementPdfCount(this);`
+  },
+  {
+    title: 'Firebase Analytics custom events',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'You likely have Firebase Analytics added but no custom events. Without events you can\'t answer: which PDF report is most generated? Which class size is most common? Where do teachers drop off? This data drives every feature decision. 4 core events cover 80% of what you need.',
+    code: `// Create AnalyticsHelper.java:
+public class AnalyticsHelper {
+    private static FirebaseAnalytics fa;
+
+    public static void init(Context ctx) {
+        fa = FirebaseAnalytics.getInstance(ctx);
+    }
+
+    // Track PDF generation — most important metric
+    public static void logPdfGenerated(String reportType, int studentCount) {
+        Bundle b = new Bundle();
+        b.putString("report_type", reportType);  // "progress_card","marksheet" etc
+        b.putInt("student_count", studentCount);
+        fa.logEvent("pdf_generated", b);
+    }
+
+    // Track marks entry — tells you which subjects are most used
+    public static void logMarksEntered(String classId, String subjectName) {
+        Bundle b = new Bundle();
+        b.putString("class_id", classId);
+        b.putString("subject", subjectName);
+        fa.logEvent("marks_entered", b);
+    }
+
+    // Track attendance — frequency tells you daily active users
+    public static void logAttendanceMarked(int studentCount) {
+        Bundle b = new Bundle();
+        b.putInt("students_marked", studentCount);
+        fa.logEvent("attendance_marked", b);
+    }
+
+    // Track feature discovery
+    public static void logFeatureUsed(String featureName) {
+        Bundle b = new Bundle();
+        b.putString("feature", featureName);
+        fa.logEvent("feature_used", b);
+    }
+}
+
+// Usage — in PdfGenerator after success:
+AnalyticsHelper.logPdfGenerated("progress_card", students.size());`
+  },
+  {
+    title: 'Firebase App Check (Play Integrity)',
+    badge: 'Important', badgeClass: 'b-imp', numClass: 's-imp',
+    why: 'Anyone who decompiles your APK can find your google-services.json and make Firestore API calls directly. Your security rules protect data isolation between teachers, but a bot can drain your Firestore quota by making thousands of read requests. App Check with Play Integrity blocks all non-app traffic for free.',
+    code: `// build.gradle.kts:
+// implementation("com.google.firebase:firebase-appcheck-playintegrity")
+// implementation("com.google.firebase:firebase-appcheck-debug") // debug only
+
+// In MySchoolApplication.onCreate() — BEFORE any other Firebase call:
+FirebaseApp.initializeApp(this);
+
+if (BuildConfig.DEBUG) {
+    // Debug builds use debug provider (no Play Integrity needed):
+    FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+        DebugAppCheckProviderFactory.getInstance()
+    );
+} else {
+    // Release builds use Play Integrity:
+    FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+        PlayIntegrityAppCheckProviderFactory.getInstance()
+    );
+}
+
+// In Firebase Console:
+// App Check → Firebase services → Firestore → Enforce
+// (Don't enforce until you've tested debug provider works!)`
+  },
+  {
+    title: 'Homescreen widget — today\'s attendance count',
+    badge: 'Polish', badgeClass: 'b-pol', numClass: 's-pol',
+    why: 'Teachers unlock their phone and see "Class 5A: 28/30 present today" on their homescreen. It\'s a daily reminder, a status check, and a re-engagement hook. Duolingo\'s streak widget is the gold standard — this is the edu equivalent. Also shows "Marks not entered yet" if today\'s attendance is missing.',
+    code: `// 1. AttendanceWidget.java:
+public class AttendanceWidget extends AppWidgetProvider {
+    @Override
+    public void onUpdate(Context ctx, AppWidgetManager mgr, int[] ids) {
+        for (int id : ids) updateWidget(ctx, mgr, id);
+    }
+
+    static void updateWidget(Context ctx, AppWidgetManager mgr, int id) {
+        RemoteViews v = new RemoteViews(
+            ctx.getPackageName(), R.layout.widget_attendance);
+
+        SharedPreferences p = ctx.getSharedPreferences(
+            "widget_prefs", Context.MODE_PRIVATE);
+        String className = p.getString("widget_class_name", "Class");
+        int present = p.getInt("widget_present_today", -1);
+        int total = p.getInt("widget_total_students", 0);
+
+        if (present < 0) {
+            v.setTextViewText(R.id.tvWidgetStatus, "Tap to mark attendance");
+        } else {
+            v.setTextViewText(R.id.tvWidgetTitle, className);
+            v.setTextViewText(R.id.tvWidgetCount, present + "/" + total);
+            v.setTextViewText(R.id.tvWidgetLabel, "present today");
+        }
+
+        // Tap opens HomeActivity:
+        Intent intent = new Intent(ctx, HomeActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        v.setOnClickPendingIntent(R.id.widgetRoot, pi);
+        mgr.updateAppWidget(id, v);
+    }
+}
+
+// 2. Add to AndroidManifest.xml:
+// <receiver android:name=".AttendanceWidget" android:exported="true">
+//   <intent-filter>
+//     <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+//   </intent-filter>
+//   <meta-data android:name="android.appwidget.provider"
+//     android:resource="@xml/attendance_widget_info"/>
+// </receiver>`
+  },
+  {
+    title: 'Deep links for student profile sharing',
+    badge: 'Polish', badgeClass: 'b-pol', numClass: 's-pol',
+    why: 'Teachers want to share a specific student\'s progress report link with parents via WhatsApp. A deep link like myschool://student/STUDENT_ID opens directly to StudentProfileActivity. Combined with the parent portal, this becomes a one-tap parent-share flow that ClassDojo charges ₹500/month for.',
+    code: `// 1. Add intent-filter to StudentProfileActivity in AndroidManifest.xml:
+// <activity android:name=".StudentProfileActivity">
+//   <intent-filter android:autoVerify="true">
+//     <action android:name="android.intent.action.VIEW"/>
+//     <category android:name="android.intent.category.DEFAULT"/>
+//     <category android:name="android.intent.category.BROWSABLE"/>
+//     <data android:scheme="https"
+//           android:host="myschool.page.link"/>  <!-- Firebase Dynamic Links -->
+//   </intent-filter>
+// </activity>
+
+// 2. Handle in StudentProfileActivity.onCreate():
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    // Check for deep link intent:
+    Uri data = getIntent().getData();
+    if (data != null) {
+        String studentId = data.getQueryParameter("studentId");
+        if (studentId != null) {
+            loadStudentById(studentId);
+            return;
+        }
+    }
+    // Normal flow from intent extras:
+    loadStudentFromExtras();
+}
+
+// 3. Generate shareable link in StudentProfileActivity:
+private void shareStudentProfile(String studentId) {
+    String url = "https://myschool.page.link/?studentId=" + studentId;
+    Intent share = new Intent(Intent.ACTION_SEND);
+    share.setType("text/plain");
+    share.putExtra(Intent.EXTRA_TEXT, "View " +
+        student.name + "'s progress: " + url);
+    startActivity(Intent.createChooser(share, "Share via"));
+}`
+  },
+  {
+    title: 'Stats dashboard with charts (MPAndroidChart)',
+    badge: 'Polish', badgeClass: 'b-pol', numClass: 's-pol',
+    why: 'Your StatsDashboard fragment likely shows just numbers. Top edu apps show: class average over time (line chart), subject-wise performance (bar chart), attendance trend (area chart). MPAndroidChart is the standard library — free, no deps, performant on Redmi phones.',
+    code: `// build.gradle.kts:
+// implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+// In settings.gradle.kts repos: maven { url "https://jitpack.io" }
+
+// In StatsDashboardFragment — add bar chart for subject averages:
+private void renderSubjectAverages(Map<String, Double> averages) {
+    List<BarEntry> entries = new ArrayList<>();
+    List<String> labels = new ArrayList<>();
+    int i = 0;
+    for (Map.Entry<String, Double> e : averages.entrySet()) {
+        entries.add(new BarEntry(i, e.getValue().floatValue()));
+        labels.add(e.getKey());
+        i++;
+    }
+    BarDataSet dataSet = new BarDataSet(entries, "Class average");
+    dataSet.setColor(ContextCompat.getColor(requireContext(), R.color.teal_500));
+    dataSet.setValueTextSize(10f);
+
+    b.barChart.setData(new BarData(dataSet));
+    b.barChart.getXAxis().setValueFormatter(
+        new IndexAxisValueFormatter(labels));
+    b.barChart.getXAxis().setGranularity(1f);
+    b.barChart.getDescription().setEnabled(false);
+    b.barChart.animateY(600);
+    b.barChart.invalidate();
+}`
+  }
+];
+
+function buildList(containerId, items, groupId) {
+  const container = document.getElementById(containerId);
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = `${groupId}-${i}`;
+    div.innerHTML = `
+      <div class="item-head" onclick="toggle('${groupId}-${i}')">
+        <div class="step-num ${item.numClass}">${i+1}</div>
+        <span class="item-title">${item.title}</span>
+        <span class="badge ${item.badgeClass}">${item.badge}</span>
+        <label class="done-cb" onclick="event.stopPropagation()">
+          <input type="checkbox" onchange="markDone('${groupId}-${i}','${groupId}',this.checked)"> Done
+        </label>
+        <span class="chev" id="chev-${groupId}-${i}">▼</span>
+      </div>
+      <div class="item-body" id="body-${groupId}-${i}">
+        <p class="why">${item.why}</p>
+        <div class="code">${escHtml(item.code.trim())}</div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function toggle(id) {
+  const body = document.getElementById('body-'+id);
+  const chev = document.getElementById('chev-'+id);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+const doneSets = { offline: new Set(), features: new Set() };
+const totals = { offline: offlineItems.length, features: featuresItems.length };
+
+function markDone(id, group, checked) {
+  const el = document.getElementById(id);
+  if (checked) { doneSets[group].add(id); el.classList.add('done'); }
+  else { doneSets[group].delete(id); el.classList.remove('done'); }
+  const pct = Math.round(doneSets[group].size / totals[group] * 100);
+  document.getElementById('fill-'+group).style.width = pct + '%';
+  document.getElementById('lbl-'+group).textContent =
+    doneSets[group].size + ' / ' + totals[group] + ' done';
+}
+
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+buildList('list-offline', offlineItems, 'offline');
+buildList('list-features', featuresItems, 'features');
+</script>

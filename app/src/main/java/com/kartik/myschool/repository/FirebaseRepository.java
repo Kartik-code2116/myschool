@@ -782,9 +782,20 @@ public class FirebaseRepository {
                 .addOnSuccessListener(v -> {
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "SUCCESS: doc written at " + ref.getPath()); }
                     cachedClassSemesterMarksMap.clear();
+                    com.kartik.myschool.utils.AnalyticsHelper.logMarksEntered(m.classId, m.studentId);
                     cb.onSuccess(m.id);
                 })
                 .addOnFailureListener(e -> {
+                    if (e instanceof com.google.firebase.firestore.FirebaseFirestoreException) {
+                        com.google.firebase.firestore.FirebaseFirestoreException ffe = (com.google.firebase.firestore.FirebaseFirestoreException) e;
+                        if (ffe.getCode() == com.google.firebase.firestore.FirebaseFirestoreException.Code.UNAVAILABLE) {
+                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "OFFLINE SUCCESS (queued): doc written at " + ref.getPath()); }
+                            cachedClassSemesterMarksMap.clear();
+                            com.kartik.myschool.utils.AnalyticsHelper.logMarksEntered(m.classId, m.studentId);
+                            cb.onSuccess(m.id);
+                            return;
+                        }
+                    }
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "FAILURE writing marks: " + e.getMessage(), e); }
                     cb.onError(e);
                 });
@@ -1115,7 +1126,16 @@ public class FirebaseRepository {
         r.id = ref.getId();
         ref.set(r)
                 .addOnSuccessListener(v -> cb.onSuccess(r.id))
-                .addOnFailureListener(cb::onError);
+                .addOnFailureListener(e -> {
+                    if (e instanceof com.google.firebase.firestore.FirebaseFirestoreException) {
+                        com.google.firebase.firestore.FirebaseFirestoreException ffe = (com.google.firebase.firestore.FirebaseFirestoreException) e;
+                        if (ffe.getCode() == com.google.firebase.firestore.FirebaseFirestoreException.Code.UNAVAILABLE) {
+                            cb.onSuccess(r.id);
+                            return;
+                        }
+                    }
+                    cb.onError(e);
+                });
     }
 
     public void deleteAttendanceRecord(String id, OnResult<Void> cb) {
@@ -1217,6 +1237,171 @@ public class FirebaseRepository {
                     // Sort descending by timestamp
                     Collections.sort(list, (a, b) -> Long.compare(b.timestamp, a.timestamp));
                     cb.onSuccess(list);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    // ---------- Parent Portal ----------
+    public void getParentLinkForStudent(String studentId, OnResult<com.kartik.myschool.model.ParentLink> cb) {
+        if (studentId == null) {
+            cb.onError(new IllegalArgumentException("Student ID cannot be null"));
+            return;
+        }
+        db.collection("parent_links").document(studentId).get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && snap.exists()) {
+                        cb.onSuccess(snap.toObject(com.kartik.myschool.model.ParentLink.class));
+                    } else {
+                        cb.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void createParentLink(String studentId, String studentName, String className, String schoolName, String teacherId, OnResult<com.kartik.myschool.model.ParentLink> cb) {
+        if (studentId == null) {
+            cb.onError(new IllegalArgumentException("Student ID cannot be null"));
+            return;
+        }
+        // Generate random 6-digit code
+        String code = String.valueOf(100000 + new java.util.Random().nextInt(900000));
+        com.kartik.myschool.model.ParentLink link = new com.kartik.myschool.model.ParentLink();
+        link.id = studentId;
+        link.studentId = studentId;
+        link.teacherId = teacherId;
+        link.code = code;
+        link.studentName = studentName;
+        link.className = className;
+        link.schoolName = schoolName;
+        link.createdAt = System.currentTimeMillis();
+
+        db.collection("parent_links").document(studentId).set(link)
+                .addOnSuccessListener(v -> cb.onSuccess(link))
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void claimParentLink(String code, OnResult<com.kartik.myschool.model.ParentLink> cb) {
+        if (code == null || code.trim().isEmpty()) {
+            cb.onError(new IllegalArgumentException("Code cannot be empty"));
+            return;
+        }
+
+        Runnable proceedWithClaim = () -> {
+            String uid = currentUid();
+            if (uid == null) {
+                cb.onError(new IllegalStateException("Auth failed — user not signed in"));
+                return;
+            }
+
+            db.collection("parent_links")
+                    .whereEqualTo("code", code.trim())
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(snap -> {
+                        if (snap == null || snap.isEmpty()) {
+                            cb.onError(new Exception("Invalid code / कोड चुकीचा आहे"));
+                            return;
+                        }
+                        com.google.firebase.firestore.DocumentSnapshot doc = snap.getDocuments().get(0);
+                        com.kartik.myschool.model.ParentLink link = doc.toObject(com.kartik.myschool.model.ParentLink.class);
+                        if (link == null) {
+                            cb.onError(new Exception("Invalid data / डेटा अपूर्ण आहे"));
+                            return;
+                        }
+                        if (link.parentUid != null && !link.parentUid.isEmpty() && !link.parentUid.equals(uid)) {
+                            cb.onError(new Exception("Code already claimed / हा कोड आधीच वापरला गेला आहे"));
+                            return;
+                        }
+
+                        // Update parentUid and claimedAt
+                        link.parentUid = uid;
+                        link.claimedAt = System.currentTimeMillis();
+
+                        db.collection("parent_links").document(link.studentId).set(link)
+                                .addOnSuccessListener(v -> cb.onSuccess(link))
+                                .addOnFailureListener(cb::onError);
+                    })
+                    .addOnFailureListener(cb::onError);
+        };
+
+        if (currentUid() == null) {
+            auth.signInAnonymously()
+                    .addOnSuccessListener(authResult -> proceedWithClaim.run())
+                    .addOnFailureListener(cb::onError);
+        } else {
+            proceedWithClaim.run();
+        }
+    }
+
+    public void getStudentForParent(String studentId, OnResult<Student> cb) {
+        if (studentId == null) {
+            cb.onError(new IllegalArgumentException("Student ID cannot be null"));
+            return;
+        }
+        db.collection(COL_STUDENTS).document(studentId).get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && snap.exists()) {
+                        cb.onSuccess(snap.toObject(Student.class));
+                    } else {
+                        cb.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getMarksForParent(String studentId, String classId, OnResult<List<MarksRecord>> cb) {
+        if (studentId == null || classId == null) {
+            cb.onError(new IllegalArgumentException("Arguments cannot be null"));
+            return;
+        }
+        db.collection(COL_MARKS)
+                .whereEqualTo("studentId", studentId)
+                .whereEqualTo("classId", classId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<MarksRecord> marksList = new ArrayList<>();
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            MarksRecord m = doc.toObject(MarksRecord.class);
+                            if (m != null) {
+                                m.id = doc.getId();
+                                marksList.add(m);
+                            }
+                        }
+                    }
+                    cb.onSuccess(marksList);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getSchoolForParent(String schoolId, OnResult<School> cb) {
+        if (schoolId == null) {
+            cb.onError(new IllegalArgumentException("School ID cannot be null"));
+            return;
+        }
+        db.collection(COL_SCHOOLS).document(schoolId).get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && snap.exists()) {
+                        cb.onSuccess(snap.toObject(School.class));
+                    } else {
+                        cb.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void getClassForParent(String classId, OnResult<ClassModel> cb) {
+        if (classId == null) {
+            cb.onError(new IllegalArgumentException("Class ID cannot be null"));
+            return;
+        }
+        db.collection(COL_CLASSES).document(classId).get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && snap.exists()) {
+                        cb.onSuccess(snap.toObject(ClassModel.class));
+                    } else {
+                        cb.onSuccess(null);
+                    }
                 })
                 .addOnFailureListener(cb::onError);
     }

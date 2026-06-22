@@ -70,6 +70,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation("com.google.firebase:firebase-appcheck-debug")
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
@@ -111,6 +113,7 @@ dependencies {
 
     // Google Play Billing
     implementation("com.android.billingclient:billing:7.1.1")
+    implementation("com.google.android.play:review:2.0.2")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

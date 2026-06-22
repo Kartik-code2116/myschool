@@ -49,7 +49,7 @@ exports.verifyPurchase = functions.firestore
     }
 
     const purchaseToken = data.purchaseToken;
-    const productId = data.productId || "premium_monthly";
+    const productId = data.productId || "yearly_pro_access";
     const packageName = functions.config().googleplay.package;
 
     try {

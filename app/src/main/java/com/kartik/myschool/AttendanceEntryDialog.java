@@ -160,6 +160,8 @@ public class AttendanceEntryDialog extends DialogFragment {
                 showLoading(false);
                 if (getContext() != null)
                     Toast.makeText(getContext(), student.name + " ची उपस्थिती जतन झाली!", Toast.LENGTH_SHORT).show();
+                com.kartik.myschool.utils.AnalyticsHelper.logAttendanceMarked(student.classId, 
+                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(new java.util.Date()));
                 if (saveListener != null) saveListener.onAttendanceSaved(student, record);
                 dismiss();
             }

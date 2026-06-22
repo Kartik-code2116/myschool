@@ -61,6 +61,10 @@ public class StudentProfileActivity extends AppCompatActivity {
             UiAnimations.pulse(b.btnSpecialCard);
             openSpecialCard();
         });
+        b.btnParentCode.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnParentCode);
+            showParentCodeDialog();
+        });
 
         // Set quick scroll section navigation click listeners with scale pulse feedback
         b.btnNavBasic.setOnClickListener(v -> {
@@ -475,6 +479,8 @@ public class StudentProfileActivity extends AppCompatActivity {
                                     runOnUiThread(() -> {
                                         Toast.makeText(StudentProfileActivity.this, R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
                                         openPdfFile(pdfFile);
+                                        com.kartik.myschool.utils.AnalyticsHelper.logPdfGenerated("gunapattrak");
+                                        com.kartik.myschool.utils.ReviewHelper.incrementPdfCountAndCheck(StudentProfileActivity.this);
                                     });
                                 }
                                 @Override
@@ -521,6 +527,8 @@ public class StudentProfileActivity extends AppCompatActivity {
                                     runOnUiThread(() -> {
                                         Toast.makeText(StudentProfileActivity.this, R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
                                         openPdfFile(pdfFile);
+                                        com.kartik.myschool.utils.AnalyticsHelper.logPdfGenerated("special_card");
+                                        com.kartik.myschool.utils.ReviewHelper.incrementPdfCountAndCheck(StudentProfileActivity.this);
                                     });
                                 }
                                 @Override
@@ -839,6 +847,87 @@ public class StudentProfileActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void showParentCodeDialog() {
+        com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "कोड मिळवत आहे / Fetching code...");
+        loading.show();
+
+        FirebaseRepository.get().getParentLinkForStudent(student.id, new FirebaseRepository.OnResult<com.kartik.myschool.model.ParentLink>() {
+            @Override
+            public void onSuccess(com.kartik.myschool.model.ParentLink link) {
+                loading.dismiss();
+                if (link != null && link.code != null) {
+                    displayParentLinkCode(link);
+                } else {
+                    generateAndSaveParentLinkCode(loading);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                loading.dismiss();
+                Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void generateAndSaveParentLinkCode(com.kartik.myschool.utils.LoadingDialog loading) {
+        if (loading != null) {
+            loading.setMessage("नवीन कोड तयार करत आहे / Generating new code...");
+            if (!loading.isShowing()) loading.show();
+        }
+
+        String schName = SessionContext.selectedSchool != null ? SessionContext.selectedSchool.name : "MySchool";
+        String clsName = AppCache.selectedClass != null ? AppCache.selectedClass.className : (student.className != null ? student.className : "");
+        String tId = FirebaseRepository.get().currentUid();
+
+        FirebaseRepository.get().createParentLink(student.id, student.name, clsName, schName, tId, new FirebaseRepository.OnResult<com.kartik.myschool.model.ParentLink>() {
+            @Override
+            public void onSuccess(com.kartik.myschool.model.ParentLink link) {
+                if (loading != null) loading.dismiss();
+                displayParentLinkCode(link);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (loading != null) loading.dismiss();
+                Toast.makeText(StudentProfileActivity.this, "कोड तयार करण्यात अपयश: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void displayParentLinkCode(com.kartik.myschool.model.ParentLink link) {
+        String msg = "पालक प्रगतीपुस्तक पाहण्यासाठी हा ६ अंकी कोड वापरू शकतात:\n\n" +
+                     "★ कोड: " + link.code + " ★\n\n" +
+                     "(हा कोड 'MySchool Parent' ॲपमध्ये प्रविष्ट करा)";
+
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("पालक जोडणी कोड / Parent Code")
+                .setMessage(msg)
+                .setPositiveButton("WhatsApp वर पाठवा / Share", (dialog, which) -> {
+                    String shareText = "नमस्कार, आपल्या पाल्याचे प्रगतीपुस्तक आणि उपस्थिती पाहण्यासाठी 'MySchool Parent' ॲप डाउनलोड करा आणि खालील कोड प्रविष्ट करा:\n\n" +
+                                       "विद्यार्थी: " + student.name + "\n" +
+                                       "जोडणी कोड: " + link.code + "\n\n" +
+                                       "धन्यवाद!";
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+                    startActivity(Intent.createChooser(shareIntent, "Share via"));
+                })
+                .setNeutralButton("नवीन कोड तयार करा / Reset", (dialog, which) -> {
+                    new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("पुष्टीकरण / Reset Code")
+                            .setMessage("नवीन कोड तयार करायचा आहे का? जुना कोड काम करणार नाही.")
+                            .setPositiveButton("होय / Yes", (d, w) -> {
+                                com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "नवीन कोड तयार करत आहे...");
+                                generateAndSaveParentLinkCode(loading);
+                            })
+                            .setNegativeButton("नाही / No", null)
+                            .show();
+                })
+                .setNegativeButton("बंद करा / Close", null);
+        builder.show();
     }
 
     @Override

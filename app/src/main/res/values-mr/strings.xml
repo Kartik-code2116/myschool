@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">वार्षिक मूल्यमापन</string>
+    <string name="app_name_parent">पालक प्रगतीपुस्तक</string>
     <string name="app_tagline">स्मार्ट परिणाम व्यवस्थापन</string>
     
     <string name="nav_home">घर</string>
@@ -789,4 +790,5 @@
     <string name="menu_import_students">📥 विद्यार्थी आयात करा (Excel / CSV)</string>
     <string name="menu_switch_class">🏫 वर्ग / तुकडी बदला</string>
     <string name="menu_app_wide_main">🌐 ॲप मुख्य मेनू</string>
+    <string name="offline_banner_text">ऑफलाइन — जोडणी झाल्यावर बदल सिंक होतील</string>
 </resources>

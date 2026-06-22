@@ -593,6 +593,22 @@
                     app:backgroundTint="?attr/colorPrimary"
                     android:elevation="2dp"
                     android:minHeight="56dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnParentCode"
+                    style="@style/Widget.EduReport.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="पालक जोडणी कोड / Parent Code"
+                    android:textColor="?attr/colorSurface"
+                    android:fontFamily="sans-serif-bold"
+                    app:icon="@drawable/ic_person"
+                    app:iconGravity="textStart"
+                    app:iconTint="?attr/colorSurface"
+                    app:backgroundTint="#FFA000"
+                    android:elevation="2dp"
+                    android:minHeight="56dp"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

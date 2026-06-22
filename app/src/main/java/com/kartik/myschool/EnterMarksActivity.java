@@ -40,6 +40,8 @@ public class EnterMarksActivity extends AppCompatActivity {
     private Student student;
     private ClassModel classModel;
     private MarksRecord existingMarks;
+    private android.net.ConnectivityManager connectivityManager;
+    private android.net.ConnectivityManager.NetworkCallback networkCallback;
 
     // ── Per-subject max-mark breakdowns (computed once in addMarksRow) ─────────
     // Each array: [akarikMax, sanklitMax, nirikhshan, tondiKam, pratyakshik,
@@ -249,6 +251,74 @@ public class EnterMarksActivity extends AppCompatActivity {
 
         b.btnScanMarksheet.setOnClickListener(v -> showScanOptions());
         b.btnSaveMarks.setOnClickListener(v -> saveMarks());
+
+        connectivityManager = (android.net.ConnectivityManager) getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+        setupSyncStatusCallback();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (connectivityManager != null && networkCallback != null) {
+            try {
+                connectivityManager.registerDefaultNetworkCallback(networkCallback);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (connectivityManager != null && networkCallback != null) {
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setupSyncStatusCallback() {
+        if (connectivityManager == null) return;
+
+        boolean isConnected = false;
+        android.net.Network activeNet = connectivityManager.getActiveNetwork();
+        if (activeNet != null) {
+            android.net.NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNet);
+            if (caps != null) {
+                isConnected = caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            }
+        }
+        updateSyncStatus(isConnected);
+
+        networkCallback = new android.net.ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@androidx.annotation.NonNull android.net.Network network) {
+                updateSyncStatus(true);
+            }
+
+            @Override
+            public void onLost(@androidx.annotation.NonNull android.net.Network network) {
+                updateSyncStatus(false);
+            }
+        };
+    }
+
+    private void updateSyncStatus(boolean isOnline) {
+        runOnUiThread(() -> {
+            b.tvSyncStatus.setVisibility(View.VISIBLE);
+            if (isOnline) {
+                b.tvSyncStatus.setText("✓ Saved");
+                b.tvSyncStatus.setTextColor(getResources().getColor(R.color.success, null));
+                b.tvSyncStatus.setBackgroundResource(R.drawable.bg_sync_status_online);
+            } else {
+                b.tvSyncStatus.setText("Saved offline — will sync");
+                b.tvSyncStatus.setTextColor(getResources().getColor(R.color.warning, null));
+                b.tvSyncStatus.setBackgroundResource(R.drawable.bg_sync_status_offline);
+            }
+        });
     }
 
     @Override

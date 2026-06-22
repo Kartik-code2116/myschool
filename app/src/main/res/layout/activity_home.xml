@@ -157,6 +157,18 @@
                         android:contentDescription="@string/cd_more_options"/>
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
+
+            <TextView
+                android:id="@+id/offlineBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/offline_banner_text"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textSize="12sp"
+                android:background="#FFF9C4"
+                android:textColor="#F57F17"
+                android:visibility="gone"/>
         </com.google.android.material.appbar.AppBarLayout>
 
         <!-- Fragment container -->

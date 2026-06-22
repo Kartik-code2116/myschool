@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="default_web_client_id" translatable="false">323006914636-t0v6uav8qrhjvf5du7re90gpae1j8qe5.apps.googleusercontent.com</string>
     <string name="app_name">वार्षिक मूल्यमापन</string>
+    <string name="app_name_parent">पालक प्रगतीपुस्तक</string>
     <string name="app_tagline">स्मार्ट परिणाम व्यवस्थापन</string>
     
     <string name="nav_home">घर</string>
@@ -797,4 +798,5 @@
     <string name="cd_calculate">Calculate totals</string>
     <string name="cd_notifications">Notifications</string>
     <string name="cd_more_options">More options</string>
+    <string name="offline_banner_text">ऑफलाइन — जोडणी झाल्यावर बदल सिंक होतील</string>
 </resources>

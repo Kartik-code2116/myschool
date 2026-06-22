@@ -27,7 +27,7 @@ import java.util.Map;
 public class BillingHelper {
     private static final String TAG = "BillingHelper";
     // Default product ID. You MUST create this exactly in the Google Play Console!
-    public static final String SUBSCRIPTION_PRODUCT_ID = "premium_monthly";
+    public static final String SUBSCRIPTION_PRODUCT_ID = "yearly_pro_access";
 
     private BillingClient billingClient;
     private Context context;
@@ -130,11 +130,20 @@ public class BillingHelper {
             return;
         }
 
-        // Use the first available offer token
+        // Use the offer token for the specified base plan ID if available, otherwise fall back to first available
         String offerToken = null;
         if (subscriptionProductDetails.getSubscriptionOfferDetails() != null &&
                 !subscriptionProductDetails.getSubscriptionOfferDetails().isEmpty()) {
-            offerToken = subscriptionProductDetails.getSubscriptionOfferDetails().get(0).getOfferToken();
+            for (ProductDetails.SubscriptionOfferDetails offer : subscriptionProductDetails.getSubscriptionOfferDetails()) {
+                if ("yearly-plan-100".equals(offer.getBasePlanId())) {
+                    offerToken = offer.getOfferToken();
+                    break;
+                }
+            }
+            if (offerToken == null) {
+                // Fallback to first available offer/base plan
+                offerToken = subscriptionProductDetails.getSubscriptionOfferDetails().get(0).getOfferToken();
+            }
         }
 
         if (offerToken == null) {

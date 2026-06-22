@@ -29,6 +29,8 @@ public class HomeActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfig;
     private boolean isSchoolLevelExpanded = false;
+    private android.net.ConnectivityManager connectivityManager;
+    private android.net.ConnectivityManager.NetworkCallback networkCallback;
 
     public androidx.recyclerview.widget.RecyclerView.RecycledViewPool sharedPool = new androidx.recyclerview.widget.RecyclerView.RecycledViewPool();
 
@@ -277,12 +279,86 @@ public class HomeActivity extends AppCompatActivity {
         vm.loadTeacher();
         SessionContext.syncFromAppCache();
         handleNavigationIntent(getIntent());
+
+        connectivityManager = (android.net.ConnectivityManager) getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
+        setupOfflineBanner();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (connectivityManager != null && networkCallback != null) {
+            try {
+                connectivityManager.registerDefaultNetworkCallback(networkCallback);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setupDrawerHeader();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (connectivityManager != null && networkCallback != null) {
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setupOfflineBanner() {
+        if (connectivityManager == null) return;
+
+        boolean isConnected = false;
+        android.net.Network activeNet = connectivityManager.getActiveNetwork();
+        if (activeNet != null) {
+            android.net.NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNet);
+            if (caps != null) {
+                isConnected = caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            }
+        }
+
+        if (isConnected) {
+            b.offlineBanner.setVisibility(View.GONE);
+        } else {
+            b.offlineBanner.setVisibility(View.VISIBLE);
+            b.offlineBanner.setAlpha(1f);
+        }
+
+        networkCallback = new android.net.ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@androidx.annotation.NonNull android.net.Network network) {
+                runOnUiThread(() -> {
+                    if (b.offlineBanner.getVisibility() != View.GONE) {
+                        b.offlineBanner.animate()
+                                .alpha(0f)
+                                .setDuration(300)
+                                .withEndAction(() -> b.offlineBanner.setVisibility(View.GONE))
+                                .start();
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@androidx.annotation.NonNull android.net.Network network) {
+                runOnUiThread(() -> {
+                    b.offlineBanner.setVisibility(View.VISIBLE);
+                    b.offlineBanner.setAlpha(0f);
+                    b.offlineBanner.animate()
+                            .alpha(1f)
+                            .setDuration(300)
+                            .start();
+                });
+            }
+        };
     }
 
     @Override

@@ -246,8 +246,9 @@ public class PdfGenerator {
                 else
                     rName = "Personality";
                 File out = new File(outDir(ctx), "Bulk_" + rName + "_" + ts() + ".pdf");
+                File tempFile = File.createTempFile("pdf_tmp_", ".pdf", outDir(ctx));
                 Document doc = new Document(PageSize.A4);
-                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(tempFile));
                 __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
@@ -277,7 +278,11 @@ public class PdfGenerator {
                 doc.close();
                 pdfTrace.stop();
                 triggerVibration(ctx);
-                cb.onSuccess(out);
+                if (tempFile.renameTo(out)) {
+                    cb.onSuccess(out);
+                } else {
+                    cb.onError(new java.io.IOException("Failed to rename temp PDF to destination"));
+                }
             } catch (Exception e) {
                 pdfTrace.stop();
                 cb.onError(e);
@@ -303,8 +308,9 @@ public class PdfGenerator {
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "GradeChart_" + ts() + ".pdf");
+                File tempFile = File.createTempFile("pdf_tmp_", ".pdf", outDir(ctx));
                 Document doc = new Document(PageSize.A4);
-                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(tempFile));
                 __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
@@ -435,7 +441,11 @@ public class PdfGenerator {
                 doc.close();
                 pdfTrace.stop();
                 triggerVibration(ctx);
-                cb.onSuccess(out);
+                if (tempFile.renameTo(out)) {
+                    cb.onSuccess(out);
+                } else {
+                    cb.onError(new java.io.IOException("Failed to rename temp PDF to destination"));
+                }
             } catch (Exception e) {
                 pdfTrace.stop();
                 cb.onError(e);
@@ -461,8 +471,9 @@ public class PdfGenerator {
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Pragati_" + ts() + ".pdf");
+                File tempFile = File.createTempFile("pdf_tmp_", ".pdf", outDir(ctx));
                 Document doc = new Document(PageSize.A4.rotate());
-                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(tempFile));
                 __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
@@ -501,7 +512,11 @@ public class PdfGenerator {
                 doc.close();
                 pdfTrace.stop();
                 triggerVibration(ctx);
-                cb.onSuccess(out);
+                if (tempFile.renameTo(out)) {
+                    cb.onSuccess(out);
+                } else {
+                    cb.onError(new java.io.IOException("Failed to rename temp PDF to destination"));
+                }
             } catch (Exception e) {
                 pdfTrace.stop();
                 cb.onError(e);
@@ -903,8 +918,9 @@ public class PdfGenerator {
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "Personality_" + safeRoll(student) + "_" + ts() + ".pdf");
+                File tempFile = File.createTempFile("pdf_tmp_", ".pdf", outDir(ctx));
                 Document doc = new Document(PageSize.A4);
-                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(tempFile));
                 __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
@@ -912,7 +928,11 @@ public class PdfGenerator {
                 addPersonalityContent(doc, ctx, school, cls, student, sem1, sem2);
                 doc.close();
                 triggerVibration(ctx);
-                cb.onSuccess(out);
+                if (tempFile.renameTo(out)) {
+                    cb.onSuccess(out);
+                } else {
+                    cb.onError(new java.io.IOException("Failed to rename temp PDF to destination"));
+                }
             } catch (Exception e) {
                 cb.onError(e);
             }
@@ -929,8 +949,9 @@ public class PdfGenerator {
             try {
                 ensureFonts(ctx);
                 File out = new File(outDir(ctx), "CombinedReport_" + safeRoll(student) + "_" + ts() + ".pdf");
+                File tempFile = File.createTempFile("pdf_tmp_", ".pdf", outDir(ctx));
                 Document doc = new Document(PageSize.A4);
-                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                PdfWriter __writer = PdfWriter.getInstance(doc, new FileOutputStream(tempFile));
                 __writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
@@ -955,7 +976,11 @@ public class PdfGenerator {
 
                 doc.close();
                 triggerVibration(ctx);
-                cb.onSuccess(out);
+                if (tempFile.renameTo(out)) {
+                    cb.onSuccess(out);
+                } else {
+                    cb.onError(new java.io.IOException("Failed to rename temp PDF to destination"));
+                }
             } catch (Exception e) {
                 cb.onError(e);
             }

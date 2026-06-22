@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Edu Report</string>
+    <string name="app_name_parent">MySchool Parent</string>
     <string name="app_tagline">Smart Result Management</string>
     <!-- Nav -->
     <string name="nav_home">Home</string>
@@ -784,4 +785,5 @@
     <string name="msg_enter_year_label">Enter the label for the new Academic Year:</string>
     <string name="msg_year_empty">Label cannot be empty.</string>
     <string name="msg_year_sem_created">Academic Year and Semesters created.</string>
+    <string name="offline_banner_text">Offline — changes will sync when connected</string>
 </resources>

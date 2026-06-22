@@ -721,6 +721,10 @@ public class ReportPrintingFragment extends Fragment {
 
     private void openPdfFile(File file) {
         showInAppPdfViewer(file);
+        if (getActivity() != null) {
+            com.kartik.myschool.utils.AnalyticsHelper.logPdfGenerated("report_printing");
+            com.kartik.myschool.utils.ReviewHelper.incrementPdfCountAndCheck(getActivity());
+        }
     }
 
     private void showInAppPdfViewer(File pdfFile) {

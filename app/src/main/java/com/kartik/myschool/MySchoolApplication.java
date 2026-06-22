@@ -21,6 +21,27 @@ public class MySchoolApplication extends Application {
         // Initialize Global Zoom Helper
         ZoomHelper.initialize(this);
 
+        // Initialize Analytics Helper
+        com.kartik.myschool.utils.AnalyticsHelper.init(this);
+
+        // Initialize Firebase App Check
+        try {
+            com.google.firebase.appcheck.FirebaseAppCheck appCheck = com.google.firebase.appcheck.FirebaseAppCheck.getInstance();
+            if (BuildConfig.DEBUG) {
+                appCheck.installAppCheckProviderFactory(
+                        com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory.getInstance()
+                );
+                Log.d("APP_INIT", "App Check: Installed DebugAppCheckProviderFactory");
+            } else {
+                appCheck.installAppCheckProviderFactory(
+                        com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory.getInstance()
+                );
+                Log.d("APP_INIT", "App Check: Installed PlayIntegrityAppCheckProviderFactory");
+            }
+        } catch (Exception e) {
+            Log.e("APP_INIT", "Failed to initialize Firebase App Check: " + e.getMessage());
+        }
+
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(
             !BuildConfig.DEBUG
         );
