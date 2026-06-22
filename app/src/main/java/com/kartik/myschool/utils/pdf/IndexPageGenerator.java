@@ -97,9 +97,20 @@ public class IndexPageGenerator {
             PdfLocalizer.get(ctx, "पान क्र.", "Page No.")
         };
         for (String h : headers) {
-            PdfPCell c = rawCell(h, fBold, headerBg, C_DARK, Element.ALIGN_CENTER);
+            PdfPCell c = new PdfPCell();
+            c.setBackgroundColor(headerBg);
+            c.setBorderColor(C_DARK);
+            c.setBorderWidth(0.5f);
+            c.setHorizontalAlignment(Element.ALIGN_CENTER);
             c.setVerticalAlignment(Element.ALIGN_MIDDLE);
             c.setPadding(8);
+            try {
+                com.itextpdf.text.Image img = MarathiText.renderLine(h, 10f, true, android.graphics.Color.BLACK);
+                img.setAlignment(com.itextpdf.text.Image.MIDDLE);
+                c.addElement(img);
+            } catch (Exception e) {
+                c.setPhrase(PdfGenerator.createMixedPhrase(h, fBold));
+            }
             tbl.addCell(c);
         }
 
@@ -114,7 +125,16 @@ public class IndexPageGenerator {
                 
                 PdfPCell[] row = new PdfPCell[5];
                 row[0] = new PdfPCell(PdfGenerator.createMixedPhrase(String.valueOf(i + 1), fNormal));
-                row[1] = new PdfPCell(PdfGenerator.createMixedPhrase(nvl(s.name), fNormal));
+                
+                row[1] = new PdfPCell();
+                try {
+                    com.itextpdf.text.Image img = MarathiText.renderLine(nvl(s.name), 10f, false, android.graphics.Color.BLACK);
+                    img.setAlignment(com.itextpdf.text.Image.LEFT);
+                    row[1].addElement(img);
+                } catch (Exception e) {
+                    row[1].setPhrase(PdfGenerator.createMixedPhrase(nvl(s.name), fNormal));
+                }
+                
                 row[2] = new PdfPCell(PdfGenerator.createMixedPhrase(nvl(s.rollNo), fNormal)); // Using rollNo here
                 row[3] = new PdfPCell(PdfGenerator.createMixedPhrase(nvl(s.dob), fNormal));    // Using dob instead of birthDate property? The previous code used s.dob. Oh wait, it was s.registrationNo and s.dob in original.
                 row[4] = new PdfPCell(PdfGenerator.createMixedPhrase(String.valueOf(pageNo++), fNormal));

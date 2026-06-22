@@ -189,6 +189,17 @@
                     app:tint="@color/on_surface_variant"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Clear Search"/>
+                
+                <ImageView
+                    android:id="@+id/btnSortFilter"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_filter_list"
+                    android:padding="6dp"
+                    android:layout_marginStart="4dp"
+                    app:tint="@color/on_surface_variant"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Sort and Filter"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

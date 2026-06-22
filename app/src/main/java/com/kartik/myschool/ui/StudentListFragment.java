@@ -50,6 +50,13 @@ public class StudentListFragment extends Fragment {
     private ClassModel selectedClass = null;
     private String lastLoadedClassId = null; // Fix 2: Cache class ID to prevent redundant fetches
 
+    // Sort options and state
+    private static final int SORT_BY_ROLL_ASC = 0;
+    private static final int SORT_BY_ROLL_DESC = 1;
+    private static final int SORT_BY_NAME_ASC = 2;
+    private static final int SORT_BY_NAME_DESC = 3;
+    private int currentSortType = SORT_BY_ROLL_ASC;
+
     private final androidx.activity.result.ActivityResultLauncher<String> csvPickerLauncher = registerForActivityResult(
             new androidx.activity.result.contract.ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -73,6 +80,7 @@ public class StudentListFragment extends Fragment {
         setupSearch();
         setupFab();
         setupCustomToolbar();
+        setupSortFilterButton();
         UiAnimations.staggerFadeIn(b.etSearch, b.rvStudents, b.fabAddStudent);
 
         applySessionFilterIfAny();
@@ -181,16 +189,13 @@ public class StudentListFragment extends Fragment {
                             
                             allStudents.clear();
                             allStudents.addAll(list);
-                            filteredStudents.clear();
-                            filteredStudents.addAll(list);
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
                                     if (b == null) return;
                                     b.shimmerViewContainer.stopShimmer();
                                     b.shimmerViewContainer.setVisibility(View.GONE);
                                     b.rvStudents.setVisibility(View.VISIBLE);
-                                    studentAdapter.setData(filteredStudents);
-                                    b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                                    filterStudents(b.etSearch.getText().toString());
                                 });
                             }
                         }
@@ -389,16 +394,13 @@ public class StudentListFragment extends Fragment {
                 
                 allStudents.clear();
                 allStudents.addAll(list);
-                filteredStudents.clear();
-                filteredStudents.addAll(list);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         if (b == null) return;
                         b.shimmerViewContainer.stopShimmer();
                         b.shimmerViewContainer.setVisibility(View.GONE);
                         b.rvStudents.setVisibility(View.VISIBLE);
-                        studentAdapter.setData(filteredStudents);
-                        b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                        filterStudents(b.etSearch.getText().toString());
                     });
                 }
             }
@@ -433,8 +435,74 @@ public class StudentListFragment extends Fragment {
                 }
             }
         }
+        sortStudents(filteredStudents);
         studentAdapter.setData(filteredStudents);
         b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private void setupSortFilterButton() {
+        if (b.btnSortFilter != null) {
+            b.btnSortFilter.setOnClickListener(v -> {
+                android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
+                popup.getMenu().add(0, SORT_BY_ROLL_ASC, 0, "Roll Number (Ascending)")
+                        .setCheckable(true)
+                        .setChecked(currentSortType == SORT_BY_ROLL_ASC);
+                popup.getMenu().add(0, SORT_BY_ROLL_DESC, 1, "Roll Number (Descending)")
+                        .setCheckable(true)
+                        .setChecked(currentSortType == SORT_BY_ROLL_DESC);
+                popup.getMenu().add(0, SORT_BY_NAME_ASC, 2, "Name (Ascending)")
+                        .setCheckable(true)
+                        .setChecked(currentSortType == SORT_BY_NAME_ASC);
+                popup.getMenu().add(0, SORT_BY_NAME_DESC, 3, "Name (Descending)")
+                        .setCheckable(true)
+                        .setChecked(currentSortType == SORT_BY_NAME_DESC);
+                
+                popup.setOnMenuItemClickListener(item -> {
+                    currentSortType = item.getItemId();
+                    filterStudents(b.etSearch.getText().toString());
+                    return true;
+                });
+                popup.show();
+            });
+        }
+    }
+
+    private void sortStudents(List<Student> list) {
+        java.util.Collections.sort(list, (s1, s2) -> {
+            if (currentSortType == SORT_BY_ROLL_ASC) {
+                return compareRollNumbers(s1.rollNo, s2.rollNo);
+            } else if (currentSortType == SORT_BY_ROLL_DESC) {
+                return compareRollNumbers(s2.rollNo, s1.rollNo);
+            } else if (currentSortType == SORT_BY_NAME_ASC) {
+                String n1 = s1.name != null ? s1.name : "";
+                String n2 = s2.name != null ? s2.name : "";
+                return n1.compareToIgnoreCase(n2);
+            } else if (currentSortType == SORT_BY_NAME_DESC) {
+                String n1 = s1.name != null ? s1.name : "";
+                String n2 = s2.name != null ? s2.name : "";
+                return n2.compareToIgnoreCase(n1);
+            }
+            return 0;
+        });
+    }
+
+    private int compareRollNumbers(String r1, String r2) {
+        if (r1 == null) r1 = "";
+        if (r2 == null) r2 = "";
+        r1 = r1.trim();
+        r2 = r2.trim();
+        if (r1.isEmpty() && r2.isEmpty()) return 0;
+        if (r1.isEmpty()) return 1;
+        if (r2.isEmpty()) return -1;
+        
+        boolean isNum1 = r1.matches("\\d+");
+        boolean isNum2 = r2.matches("\\d+");
+        if (isNum1 && isNum2) {
+            try {
+                return Integer.compare(Integer.parseInt(r1), Integer.parseInt(r2));
+            } catch (NumberFormatException ignored) {}
+        }
+        return r1.compareToIgnoreCase(r2);
     }
 
     // Bug #7 fix: always clear AppCache.selectedClass before searching to prevent
