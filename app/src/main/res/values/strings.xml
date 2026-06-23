@@ -146,6 +146,7 @@
     <string name="section_class_level">वर्गस्तर माहिती</string>
     <string name="section_school_level">शाळास्तर माहिती</string>
     <string name="txt_school_level_info">शाळास्तर माहिती</string>
+    <string name="label_result_date_default">निकाल दिनांक (डीफॉल्ट)</string>
     <string name="menu_info_print">माहिती आणि मुद्रण सेटिंग</string>
     <string name="menu_formative_summative">आकारिक/संकलित नोंदी</string>
     <string name="menu_descriptive_entries">वर्णनात्मक नोंदी</string>
@@ -750,6 +751,8 @@
     <string name="report_desc_17">सत्र, वर्गवार, जातवार मुले-मुली श्रेणी तक्ता.</string>
     <string name="report_title_18">18. प्रगतीपत्रक मुखपृष्ठ</string>
     <string name="report_desc_18">A4 प्रथम सत्र प्रगतीपत्रक</string>
+    <string name="report_title_19">19. Holistic Progress Card (HPC)</string>
+    <string name="report_desc_19">NEP 2020 360-degree assessment report</string>
 
     <!-- Promote Students Screen -->
     <string name="title_promote_students">विद्यार्थी वर्गोन्नती आणि बदली</string>

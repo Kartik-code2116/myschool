@@ -216,14 +216,18 @@ public class ProgressBookCombinedGenerator {
             }
             allSubs.add(sub);
         }
+        boolean showAttendance = DynamicMarginHelper.showAttendance(ctx);
+
         int subCols = allSubs.size() * 2;
-        int totalCols = 4 + subCols + 3;
+        int totalCols = (showAttendance ? 4 : 3) + subCols + 3;
 
         float[] widths = new float[totalCols];
         int c = 0;
         widths[c++] = 0.5f; // अ.नं
-        widths[c++] = 2.4f; // विद्यार्थ्याचे नाव
-        widths[c++] = 0.45f; // उपस्थिती (vertical)
+        widths[c++] = 3.2f; // विद्यार्थ्याचे नाव
+        if (showAttendance) {
+            widths[c++] = 0.45f; // उपस्थिती (vertical)
+        }
         widths[c++] = 0.35f; // सत्र (vertical)
 
         for (Subject sub : allSubs) {
@@ -244,8 +248,10 @@ public class ProgressBookCombinedGenerator {
                 Element.ALIGN_CENTER);
         MarathiText.cell(tbl, PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"), 9, true, C_HEADER_BG, C_DARK,
                 1, 2, Element.ALIGN_CENTER);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"), fSmallBold,
-                C_HEADER_BG, C_DARK, 1, 2);
+        if (showAttendance) {
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "उपस्थिती", "Attendance"), fSmallBold,
+                    C_HEADER_BG, C_DARK, 1, 2);
+        }
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "सत्र", "Term"), fSmallBold, C_HEADER_BG,
                 C_DARK, 1, 2);
 
@@ -308,21 +314,26 @@ public class ProgressBookCombinedGenerator {
 
                 int rowspan = (selectedSemNum == 0) ? 2 : 1;
 
+                float totalUnits = 0.5f + 3.2f + (showAttendance ? 0.45f : 0f) + 0.35f + (allSubs.size() * 1.0f) + 0.5f + 0.7f + 0.45f;
+                float actualNameColWidth = (782f / totalUnits) * 3.2f - 6f; // A4 Landscape (842) - 60 margins = 782, minus padding
+
                 // ROW 1: Sem 1 (only if selectedSemNum is 0/both or 1)
                 if (selectedSemNum == 0 || selectedSemNum == 1) {
                     PdfPCell cSr = noPadCell(String.valueOf(sr++), bg);
                     cSr.setRowspan(rowspan);
                     tbl.addCell(cSr);
 
-                    PdfPCell cName = noPadCellMultiLine(nvl(student.name), bg, 90f);
+                    PdfPCell cName = noPadCellMultiLine(nvl(student.name), bg, actualNameColWidth);
                     cName.setHorizontalAlignment(Element.ALIGN_CENTER);
                     cName.setPaddingLeft(0);
                     cName.setRowspan(rowspan);
                     tbl.addCell(cName);
 
-                    PdfPCell cAtt = noPadCell(attStr, bg);
-                    cAtt.setRowspan(rowspan);
-                    tbl.addCell(cAtt);
+                    if (showAttendance) {
+                        PdfPCell cAtt = noPadCell(attStr, bg);
+                        cAtt.setRowspan(rowspan);
+                        tbl.addCell(cAtt);
+                    }
 
                     tbl.addCell(noPadCell("I", bg));
 
@@ -352,15 +363,17 @@ public class ProgressBookCombinedGenerator {
                         cSr.setRowspan(rowspan);
                         tbl.addCell(cSr);
 
-                        PdfPCell cName = noPadCellMultiLine(nvl(student.name), bg, 90f);
+                        PdfPCell cName = noPadCellMultiLine(nvl(student.name), bg, actualNameColWidth);
                         cName.setHorizontalAlignment(Element.ALIGN_CENTER);
                         cName.setPaddingLeft(0);
                         cName.setRowspan(rowspan);
                         tbl.addCell(cName);
 
-                        PdfPCell cAtt = noPadCell(attStr, bg);
-                        cAtt.setRowspan(rowspan);
-                        tbl.addCell(cAtt);
+                        if (showAttendance) {
+                            PdfPCell cAtt = noPadCell(attStr, bg);
+                            cAtt.setRowspan(rowspan);
+                            tbl.addCell(cAtt);
+                        }
                     }
 
                     tbl.addCell(noPadCell("II", bg));
@@ -456,21 +469,15 @@ public class ProgressBookCombinedGenerator {
         c.setBorderWidth(0.5f);
         c.setHorizontalAlignment(Element.ALIGN_CENTER);
         c.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        c.setPaddingTop(2f);
-        c.setPaddingBottom(4f);
-        c.setPaddingLeft(2f);
-        c.setPaddingRight(2f);
-
-        if (text != null && text.matches("^[A-Za-z0-9\\s\\-\\.,/\\:\\+\\(\\)]*$")) {
-            c.setPhrase(new Phrase(text, new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, BaseColor.BLACK)));
-        } else {
-            try {
-                com.itextpdf.text.Image img = MarathiText.renderMultiLine(text, 9, false, android.graphics.Color.BLACK, widthPt);
-                img.setAlignment(Element.ALIGN_CENTER);
-                c.addElement(img);
-            } catch (Exception e) {
-                c.setPhrase(new Phrase(text, fSmall));
-            }
+        c.setPadding(1);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setHorizontalAlignment(Element.ALIGN_LEFT);
+        if (text == null) text = "";
+        try {
+            com.itextpdf.text.Image img = MarathiText.renderMultiLine(text, 9, false, android.graphics.Color.BLACK, widthPt);
+            c.addElement(img);
+        } catch (Exception e) {
+            c.setPhrase(new Phrase(text, fSmall));
         }
         return c;
     }

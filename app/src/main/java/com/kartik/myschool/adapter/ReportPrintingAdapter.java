@@ -65,6 +65,8 @@ public class ReportPrintingAdapter extends RecyclerView.Adapter<ReportPrintingAd
         items.add(new ReportTemplate(R.string.report_cat_result_alt, R.string.report_title_17, R.string.report_desc_17));
         
         items.add(new ReportTemplate(R.string.report_cat_progress_card, R.string.report_title_18, R.string.report_desc_18));
+        
+        items.add(new ReportTemplate(R.string.report_cat_progress_card, R.string.report_title_19, R.string.report_desc_19));
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

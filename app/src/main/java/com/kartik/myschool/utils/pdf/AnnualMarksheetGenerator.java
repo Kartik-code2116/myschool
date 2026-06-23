@@ -42,11 +42,17 @@ public class AnnualMarksheetGenerator {
         @Override
         public void onEndPage(PdfWriter writer, Document document) {
             PdfContentByte canvas = writer.getDirectContent();
-            Rectangle rect = document.getPageSize();
             canvas.setColorStroke(BaseColor.BLACK);
             canvas.setLineWidth(2f);
-            // x, y, width, height, radius
-            canvas.roundRectangle(20, 20, rect.getWidth() - 40, rect.getHeight() - 40, 15);
+            
+            // Draw the box dynamically based on the current document margins!
+            // We draw it 10 points outside the content area.
+            float left = document.left() - 10f;
+            float bottom = document.bottom() - 10f;
+            float width = document.right() - document.left() + 20f;
+            float height = document.top() - document.bottom() + 20f;
+            
+            canvas.roundRectangle(left, bottom, width, height, 15f);
             canvas.stroke();
         }
     }
@@ -63,13 +69,12 @@ public class AnnualMarksheetGenerator {
                 File out = new File(PdfGenerator.outDir(ctx),
                         "AnnualMarksheet_" + PdfGenerator.ts() + ".pdf");
 
-                Document doc = new Document(PageSize.A4);
+                Document doc = new Document(PageSize.A4, 40, 40, 50, 50);
                 PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
                 writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 writer.setPageEvent(new RoundedBorderEvent());
                 doc.open();
-                doc.setMargins(40, 40, 50, 50);
 
                 boolean isFirst = true;
                 if (students != null) {
@@ -194,15 +199,20 @@ public class AnnualMarksheetGenerator {
             addTd(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),                 Element.ALIGN_CENTER);
             addTdBold(tbl, grade,                Element.ALIGN_CENTER);
 
-            // For the first non-academic subject, add the merged cell for cols 5 and 6
-            if (i == 0) {
-                PdfPCell mergedCell = new PdfPCell(new Phrase(" ", fSmall));
-                mergedCell.setColspan(2);
-                mergedCell.setRowspan(nonAcSubs.size());
-                mergedCell.setBorder(Rectangle.BOX);
-                mergedCell.setBorderColor(C_DARK);
-                tbl.addCell(mergedCell);
+            // Instead of rowspan which breaks pagination and overflows the box, merge cols 5 and 6 for this row
+            PdfPCell empty = new PdfPCell(new Phrase(" ", fSmall));
+            empty.setColspan(2);
+            empty.setBorderColor(C_DARK);
+            if (nonAcSubs.size() == 1) {
+                empty.setBorder(Rectangle.BOX);
+            } else if (i == 0) {
+                empty.setBorder(Rectangle.LEFT | Rectangle.RIGHT | Rectangle.TOP);
+            } else if (i == nonAcSubs.size() - 1) {
+                empty.setBorder(Rectangle.LEFT | Rectangle.RIGHT | Rectangle.BOTTOM);
+            } else {
+                empty.setBorder(Rectangle.LEFT | Rectangle.RIGHT);
             }
+            tbl.addCell(empty);
         }
 
         tbl.setSpacingAfter(15);
@@ -218,8 +228,26 @@ public class AnnualMarksheetGenerator {
         addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "एकूण गुण : ", "Total Marks: ") + totalObtained, fBold, Element.ALIGN_LEFT);
         addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "शेकडा गुण : ", "Percentage: ") + percStr, fBold, Element.ALIGN_RIGHT);
         
-        // Date formatting: today's date or static if preferred
-        String dateStr = new java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(new java.util.Date());
+        // Date formatting: default 1 May of the next year, or from school settings
+        String academicYear = cls != null && cls.academicYearLabel != null ? cls.academicYearLabel : "2025-26";
+        String nextYear = "";
+        if (academicYear.contains("-")) {
+            String[] parts = academicYear.split("-");
+            if (parts.length > 1) {
+                String y2 = parts[1].trim();
+                if (y2.length() == 2) {
+                    nextYear = "20" + y2;
+                } else {
+                    nextYear = y2;
+                }
+            }
+        }
+        if (nextYear.isEmpty()) {
+            nextYear = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
+        }
+        String defaultDate = "01-05-" + nextYear;
+        String dateStr = (school != null && school.resultDate != null && !school.resultDate.isEmpty()) ? school.resultDate : defaultDate;
+        
         addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "निकाल दिनांक : ", "Result Date: ") + dateStr, fNormal, Element.ALIGN_LEFT);
         addNoBorderCell(sumTbl, PdfLocalizer.get(ctx, "शेरा : ", "Remark: ") + passResult, fBold, Element.ALIGN_RIGHT);
 

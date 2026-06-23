@@ -10,6 +10,7 @@ public class School {
     public String teacherId;
     public String logoUrl;
     public int studentCount;
+    public String resultDate;
 
     public School() {}
 }

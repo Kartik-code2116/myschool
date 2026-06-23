@@ -161,7 +161,7 @@ public class MarksGradeLedgerGenerator {
         int topCols = 4 + numSubs * 2;
         float[] topWidths = new float[topCols];
         topWidths[0] = 0.3f; // अ.नं
-        topWidths[1] = 1.4f; // नाव
+        topWidths[1] = 2.5f; // नाव
         topWidths[2] = 0.3f; // लिंग
         topWidths[3] = 0.35f; // हजर दिवस
         for (int i = 4; i < topCols; i++)
@@ -264,7 +264,7 @@ public class MarksGradeLedgerGenerator {
                 }
             }
         }
-        topTbl.setKeepTogether(true);
+        topTbl.setHeaderRows(2);
         doc.add(topTbl);
 
         // ── 4. BOTTOM TABLE: grade distribution per subject ───────────────────

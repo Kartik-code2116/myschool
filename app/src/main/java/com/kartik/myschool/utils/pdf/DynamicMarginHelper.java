@@ -46,6 +46,30 @@ public class DynamicMarginHelper extends PdfPageEventHelper {
         }
     }
 
+    public static boolean getBooleanPref(Context ctx, String key, boolean defValue) {
+        SharedPreferences prefs = ctx.getSharedPreferences("report_margins", Context.MODE_PRIVATE);
+        String prefix = currentReportIndex == -1 ? "global_" : "report_" + currentReportIndex + "_";
+        
+        if (prefs.contains(prefix + key)) {
+            return prefs.getBoolean(prefix + key, defValue);
+        } else if (currentReportIndex != -1 && prefs.contains("global_" + key)) {
+            return prefs.getBoolean("global_" + key, defValue);
+        }
+        return defValue;
+    }
+
+    public static boolean showAttendance(Context ctx) {
+        return getBooleanPref(ctx, "show_attendance", true);
+    }
+
+    public static boolean showReligion(Context ctx) {
+        return getBooleanPref(ctx, "show_religion", true);
+    }
+
+    public static boolean showFormative(Context ctx) {
+        return getBooleanPref(ctx, "show_formative", true);
+    }
+
     @Override
     public void onOpenDocument(PdfWriter writer, Document document) {
         // Apply for page 1

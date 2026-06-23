@@ -290,6 +290,9 @@ public class ReportPrintingFragment extends Fragment {
             case 13: // 14. प्रगतीपत्रक मुखपृष्ठ (duplicate)
                 com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
                 break;
+            case 18: // HPC
+                com.kartik.myschool.utils.pdf.HPCGenerator.generateHPC(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                break;
             default: // Fallback to personality record for any other individual report
                 PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
                 break;
@@ -1241,6 +1244,10 @@ public class ReportPrintingFragment extends Fragment {
         com.google.android.material.textfield.TextInputEditText etBottomMargin = sheet.findViewById(R.id.etBottomMargin);
         com.google.android.material.textfield.TextInputEditText etLeftMargin = sheet.findViewById(R.id.etLeftMargin);
         com.google.android.material.textfield.TextInputEditText etRightMargin = sheet.findViewById(R.id.etRightMargin);
+        
+        com.google.android.material.materialswitch.MaterialSwitch switchShowAttendance = sheet.findViewById(R.id.switchShowAttendance);
+        com.google.android.material.materialswitch.MaterialSwitch switchShowReligion = sheet.findViewById(R.id.switchShowReligion);
+        com.google.android.material.materialswitch.MaterialSwitch switchShowFormative = sheet.findViewById(R.id.switchShowFormative);
 
         Runnable loadValuesForPage = () -> {
             String pageStr = etPageNumber.getText().toString().trim();
@@ -1257,6 +1264,11 @@ public class ReportPrintingFragment extends Fragment {
             etLeftMargin.setText(String.valueOf(loadInt.apply(pPrefix + "left") != -1 ? loadInt.apply(pPrefix + "left") : defaultLeft));
             etRightMargin.setText(String.valueOf(loadInt.apply(pPrefix + "right") != -1 ? loadInt.apply(pPrefix + "right") : defaultRight));
             etBottomMargin.setText(String.valueOf(loadInt.apply(pPrefix + "bottom") != -1 ? loadInt.apply(pPrefix + "bottom") : defaultBottom));
+            
+            // Load toggles (global per report type, not per-page)
+            switchShowAttendance.setChecked(prefs.getBoolean(prefix + "show_attendance", true));
+            switchShowReligion.setChecked(prefs.getBoolean(prefix + "show_religion", true));
+            switchShowFormative.setChecked(prefs.getBoolean(prefix + "show_formative", true));
         };
 
         // Initial load for Page 1
@@ -1284,6 +1296,10 @@ public class ReportPrintingFragment extends Fragment {
             etLeftMargin.setText(String.valueOf(defaultLeft));
             etRightMargin.setText(String.valueOf(defaultRight));
             etBottomMargin.setText(String.valueOf(defaultBottom));
+            
+            switchShowAttendance.setChecked(true);
+            switchShowReligion.setChecked(true);
+            switchShowFormative.setChecked(true);
         });
 
         // Save action
@@ -1302,8 +1318,12 @@ public class ReportPrintingFragment extends Fragment {
                 editor.putInt(prefix + pPrefix + "right", Integer.parseInt(etRightMargin.getText().toString()));
                 editor.putInt(prefix + pPrefix + "bottom", Integer.parseInt(etBottomMargin.getText().toString()));
                 
+                editor.putBoolean(prefix + "show_attendance", switchShowAttendance.isChecked());
+                editor.putBoolean(prefix + "show_religion", switchShowReligion.isChecked());
+                editor.putBoolean(prefix + "show_formative", switchShowFormative.isChecked());
+                
                 editor.apply();
-                Toast.makeText(getContext(), "Page " + pageStr + " margins saved!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Settings for Report saved!", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Please enter valid numbers", Toast.LENGTH_SHORT).show();
             }

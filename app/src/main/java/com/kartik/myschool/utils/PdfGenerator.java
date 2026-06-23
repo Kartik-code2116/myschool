@@ -270,6 +270,9 @@ public class PdfGenerator {
                     } else if (reportPosition == 0) {
                         com.kartik.myschool.utils.pdf.CoverPageGenerator.addCoverPageContent(doc, ctx, school, cls,
                                 student);
+                    } else if (reportPosition == 18) {
+                        com.kartik.myschool.utils.pdf.HPCGenerator.addHPCContent(doc, ctx, school, cls,
+                                student, s1, s2);
                     } else {
                         addPersonalityContent(doc, ctx, school, cls, student, s1, s2);
                     }
@@ -687,7 +690,7 @@ public class PdfGenerator {
 
         float[] widths = new float[numCols];
         widths[0] = 0.3f; // Sr.
-        widths[1] = 1.0f; // Name of Student
+        widths[1] = 2.0f; // Name of Student
         int idx = 2;
         for (Subject sub : subjects) {
             int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
@@ -821,6 +824,7 @@ public class PdfGenerator {
                 }
             }
         }
+        tbl.setHeaderRows(3);
         doc.add(tbl);
 
         // 4. Summary Table and Signatures (Side-by-side using a parent 2-column table)

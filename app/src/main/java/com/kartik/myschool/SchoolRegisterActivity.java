@@ -53,6 +53,7 @@ public class SchoolRegisterActivity extends AppCompatActivity {
             b.actvBoard.setText(s.board, false);
             b.etAddress.setText(s.address);
             b.etPrincipal.setText(s.principalName);
+            if (s.resultDate != null) b.etResultDate.setText(s.resultDate);
         }
     }
 
@@ -62,6 +63,7 @@ public class SchoolRegisterActivity extends AppCompatActivity {
         String board     = b.actvBoard.getText().toString().trim();
         String address   = str(b.etAddress);
         String principal = str(b.etPrincipal);
+        String resultDate = str(b.etResultDate);
 
         boolean valid = true;
         if (TextUtils.isEmpty(name))  { b.tilSchoolName.setError("Required"); valid = false; }
@@ -86,6 +88,7 @@ public class SchoolRegisterActivity extends AppCompatActivity {
         s.board         = board;
         s.address       = address;
         s.principalName = principal;
+        s.resultDate    = resultDate;
 
         showLoading(true);
         FirebaseRepository.get().saveSchool(s, new FirebaseRepository.OnResult<String>() {

@@ -87,7 +87,18 @@
                     <com.google.android.material.textfield.TextInputEditText
         android:maxLength="128" android:id="@+id/etPrincipal"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:inputType="textCapWords" android:imeOptions="actionDone" android:singleLine="true"/>
+                        android:inputType="textCapWords" android:imeOptions="actionNext" android:singleLine="true"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilResultDate"
+                    style="@style/Widget.EduReport.TextInputLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp" android:hint="@string/label_result_date_default"
+                    app:startIconDrawable="@drawable/ic_reports" app:startIconTint="@color/primary">
+                    <com.google.android.material.textfield.TextInputEditText
+        android:maxLength="20" android:id="@+id/etResultDate"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="text" android:imeOptions="actionDone" android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveSchool"

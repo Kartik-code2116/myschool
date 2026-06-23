@@ -44,7 +44,7 @@ public class MarksRegisterGenerator {
     // 19 data columns (matches Gunapattrak column layout)
     private static final float[] COL_WIDTHS = {
             0.45f, // अ.नं
-            1.6f,  // विद्यार्थ्याचे नाव (name)
+            2.8f,  // विद्यार्थ्याचे नाव (name)
             // Formative (9):
             0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.6f,
             // Summative (4):
@@ -108,6 +108,36 @@ public class MarksRegisterGenerator {
                                         List<Student> students, Map<String, MarksRecord> marksMap,
                                         Subject sub, boolean isSem2) throws Exception {
 
+        boolean showFormative = com.kartik.myschool.utils.pdf.DynamicMarginHelper.showFormative(ctx);
+
+        // 19 data columns normally. If not showing formative/summative details, we only show:
+        // SrNo, Name, Formative Total, Summative Total, A+B, Total, Grade. (Total 7 columns)
+        float[] colWidths;
+        if (showFormative) {
+            colWidths = new float[]{
+                0.45f, // अ.नं
+                2.8f,  // विद्यार्थ्याचे नाव (name)
+                // Formative (9):
+                0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.55f, 0.6f,
+                // Summative (4):
+                0.55f, 0.55f, 0.55f, 0.6f,
+                // Final 3:
+                0.6f,  // अ+ब
+                0.6f,  // श्रे.गुण
+                0.6f   // श्रेणी
+            };
+        } else {
+            colWidths = new float[]{
+                0.5f,  // अ.नं
+                4.0f,  // विद्यार्थ्याचे नाव (name)
+                1.0f,  // आकारिक (अ) एकूण
+                1.0f,  // संकलित (ब) एकूण
+                1.0f,  // अ+ब
+                1.0f,  // श्रे.गुण
+                1.0f   // श्रेणी
+            };
+        }
+
         // ── 1. Title ─────────────────────────────────────────────────────────
         PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
                 14, true, C_DARK, 0, 6);
@@ -138,66 +168,77 @@ public class MarksRegisterGenerator {
         doc.add(hdr2);
 
         // ── 3. Main table ─────────────────────────────────────────────────────
-        PdfPTable tbl = new PdfPTable(COL_WIDTHS);
+        PdfPTable tbl = new PdfPTable(colWidths);
         tbl.setWidthPercentage(100);
         tbl.setSpacingBefore(3);
+        tbl.setHeaderRows(3);
 
         // ── Header row 1: group spans ─────────────────────────────────────────
-        // अ.नं (rowspan 3), विद्यार्थ्याचे नाव (rowspan 3),
-        // आकारिक (अ) colspan 9, संकलित (ब) colspan 4,
-        // अ+ब (rowspan 3), श्रे.गुण (rowspan 3), श्रेणी (rowspan 3)
         com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "अ. नं", "Sr.No."),   9, true, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
         com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"),   9, true, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"),  9, true, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
-        com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"),  9, true, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+        
+        if (showFormative) {
+            com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"),  9, true, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
+            com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"),  9, true, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+        } else {
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"),  fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"),  fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+        }
+
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ+ब", "A+B"),     fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रे.गुण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
         GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),   fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
 
-        // ── Header row 2: sub-column names ────────────────────────────────────
-        String[] formNames = {
-            PdfLocalizer.get(ctx, "निरीक्षण", "Observation"),
-            PdfLocalizer.get(ctx, "तोंडीकाम", "Oral Work"),
-            PdfLocalizer.get(ctx, "प्रात्यक्षिक", "Practical"),
-            PdfLocalizer.get(ctx, "उपक्रम", "Activity"),
-            PdfLocalizer.get(ctx, "प्रकल्प", "Project"),
-            PdfLocalizer.get(ctx, "चाचणी", "Test"),
-            PdfLocalizer.get(ctx, "स्वाध्याय", "Assignment"),
-            PdfLocalizer.get(ctx, "इतर", "Other"),
-            PdfLocalizer.get(ctx, "एकूण", "Total")
-        };
-        for (String f : formNames) GunapattrakGenerator.cellVerticalSpan(tbl, ctx, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        
-        String[] summNames = {
-            PdfLocalizer.get(ctx, "तोंडी", "Oral"),
-            PdfLocalizer.get(ctx, "प्रात्य.", "Pract."),
-            PdfLocalizer.get(ctx, "लेखी", "Written"),
-            PdfLocalizer.get(ctx, "एकूण", "Total")
-        };
-        for (String s : summNames) GunapattrakGenerator.cellVerticalSpan(tbl, ctx, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        // ── Header row 2 & 3 ──────────────────────────────────────────────────
+        if (showFormative) {
+            // Row 2: sub-column names
+            String[] formNames = {
+                PdfLocalizer.get(ctx, "निरीक्षण", "Observation"),
+                PdfLocalizer.get(ctx, "तोंडीकाम", "Oral Work"),
+                PdfLocalizer.get(ctx, "प्रात्यक्षिक", "Practical"),
+                PdfLocalizer.get(ctx, "उपक्रम", "Activity"),
+                PdfLocalizer.get(ctx, "प्रकल्प", "Project"),
+                PdfLocalizer.get(ctx, "चाचणी", "Test"),
+                PdfLocalizer.get(ctx, "स्वाध्याय", "Assignment"),
+                PdfLocalizer.get(ctx, "इतर", "Other"),
+                PdfLocalizer.get(ctx, "एकूण", "Total")
+            };
+            for (String f : formNames) GunapattrakGenerator.cellVerticalSpan(tbl, ctx, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+            
+            String[] summNames = {
+                PdfLocalizer.get(ctx, "तोंडी", "Oral"),
+                PdfLocalizer.get(ctx, "प्रात्य.", "Pract."),
+                PdfLocalizer.get(ctx, "लेखी", "Written"),
+                PdfLocalizer.get(ctx, "एकूण", "Total")
+            };
+            for (String s : summNames) GunapattrakGenerator.cellVerticalSpan(tbl, ctx, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
 
-        // ── Header row 3: Max marks row ───────────────────────────────────────
-        int formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik
-                + sub.maxUpkram + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
-        if (formativeMax == 0 && sub.maxMarks > 0) formativeMax = sub.maxMarks / 2;
-        int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
-        if (summativeMax == 0 && sub.maxMarks > 0) summativeMax = sub.maxMarks / 2;
+            // Row 3: Max marks
+            int formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik
+                    + sub.maxUpkram + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
+            if (formativeMax == 0 && sub.maxMarks > 0) formativeMax = sub.maxMarks / 2;
+            int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+            if (summativeMax == 0 && sub.maxMarks > 0) summativeMax = sub.maxMarks / 2;
 
-        // Formative max cells
-        cellSpan(tbl, strBlank(sub.maxNirikhshan),  fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxTondiKam),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxPratyakshik), fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxUpkram),      fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxPrakalp),     fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxChachani),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxSwadhyay),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxItar),        fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, str(formativeMax),           fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        // Summative max cells
-        cellSpan(tbl, strBlank(sub.maxTondi),       fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxPratyakshikB),fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, strBlank(sub.maxLekhi),       fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-        cellSpan(tbl, str(summativeMax),           fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxNirikhshan),  fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxTondiKam),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxPratyakshik), fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxUpkram),      fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxPrakalp),     fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxChachani),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxSwadhyay),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxItar),        fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, str(formativeMax),           fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            
+            cellSpan(tbl, strBlank(sub.maxTondi),       fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxPratyakshikB),fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, strBlank(sub.maxLekhi),       fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, str(summativeMax),           fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+        } else {
+            // No row 2 & 3 required because everything spans 3 rows. But iText needs empty cells if headerRows=3.
+            // Wait, if headerRows=3, and row 1 has rowspan=3 for all columns, iText handles it automatically,
+            // we don't need to add empty cells for row 2 and 3.
+        }
 
         // ── Student data rows ─────────────────────────────────────────────────
         boolean alt = false;
@@ -213,28 +254,34 @@ public class MarksRegisterGenerator {
                 cellSpan(tbl, nvl(st.name),          fSmall,     bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
 
                 if (d != null) {
-                    // Formative
-                    cellSpan(tbl, strBlank(d.nirikhshan),  fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.tondiKam),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.pratyakshik), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.upkram),      fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.prakalp),     fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.chachani),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.swadhyay),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.itar),        fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, str(d.akarikTotal),     fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    // Summative
-                    cellSpan(tbl, strBlank(d.tondi),       fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.pratyakshikB),fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, strBlank(d.lekhi),       fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, str(d.sanklit),         fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    if (showFormative) {
+                        // Formative
+                        cellSpan(tbl, strBlank(d.nirikhshan),  fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.tondiKam),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.pratyakshik), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.upkram),      fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.prakalp),     fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.chachani),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.swadhyay),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.itar),        fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.akarikTotal),     fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        // Summative
+                        cellSpan(tbl, strBlank(d.tondi),       fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.pratyakshikB),fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.lekhi),       fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.sanklit),         fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    } else {
+                        cellSpan(tbl, str(d.akarikTotal),     fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.sanklit),         fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    }
+                    
                     // Final
                     cellSpan(tbl, str(d.grandTotal),      fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     cellSpan(tbl, str(d.grandTotal),      fSmall,     bg, C_DARK, 1, 1, Element.ALIGN_CENTER); // श्रे.गुण = grandTotal
                     cellSpan(tbl, nvl(normalizeGrade(d.grade != null ? d.grade : "")), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                 } else {
-                    // 16 empty columns
-                    for (int k = 0; k < 16; k++)
+                    int emptyCols = showFormative ? 16 : 5;
+                    for (int k = 0; k < emptyCols; k++)
                         cellSpan(tbl, "-", fSmall, bg, C_GREY, 1, 1, Element.ALIGN_CENTER);
                 }
             }

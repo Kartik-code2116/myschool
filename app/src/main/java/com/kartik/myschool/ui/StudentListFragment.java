@@ -651,11 +651,15 @@ public class StudentListFragment extends Fragment {
     private void showExcelOptionsPopupMenu(View v) {
         android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
         popup.getMenu().add(0, 1, 0, R.string.action_export_students);
-        popup.getMenu().add(0, 2, 1, R.string.action_import_students);
+        popup.getMenu().add(0, 3, 1, "Export UDISE+ / APAAR format");
+        popup.getMenu().add(0, 2, 2, R.string.action_import_students);
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == 1) {
                 exportStudentsToExcel();
+                return true;
+            } else if (itemId == 3) {
+                com.kartik.myschool.utils.ExportUtils.exportUdiseToExcel(requireContext(), filteredStudents, SessionContext.selectedClass);
                 return true;
             } else if (itemId == 2) {
                 importStudentsFromExcel();
