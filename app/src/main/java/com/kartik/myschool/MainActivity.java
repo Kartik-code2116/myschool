@@ -70,7 +70,7 @@ import com.kartik.myschool.data.OcrDatabase;
 import com.kartik.myschool.data.OcrRecordEntity;
 import com.kartik.myschool.ui.HistoryAdapter;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
     private ImageCapture imageCapture;

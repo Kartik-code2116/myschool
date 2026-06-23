@@ -79,6 +79,40 @@ public class MySchoolApplication extends Application {
         if (currentLocales.isEmpty() || !currentLocales.toLanguageTags().equals(lang)) {
             AppCompatDelegate.setApplicationLocales(androidx.core.os.LocaleListCompat.forLanguageTags(lang));
         }
+
+        // FCM token registration logic linked to Auth State
+        try {
+            com.google.firebase.auth.FirebaseAuth.getInstance().addAuthStateListener(auth -> {
+                com.google.firebase.auth.FirebaseUser user = auth.getCurrentUser();
+                if (user != null) {
+                    com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+                        .addOnCompleteListener(task -> {
+                            if (!task.isSuccessful() || task.getResult() == null) {
+                                Log.w("FCM_INIT", "Fetching FCM registration token failed", task.getException());
+                                return;
+                            }
+                            String token = task.getResult();
+                            Log.d("FCM_INIT", "FCM token retrieved: " + token);
+                            saveTokenToFirestore(user.getUid(), token);
+                        });
+                }
+            });
+        } catch (Exception e) {
+            Log.e("FCM_INIT", "Failed to initialize FCM token registration auth state listener: " + e.getMessage());
+        }
+    }
+
+    private void saveTokenToFirestore(String uid, String token) {
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("fcmToken", token);
+        updates.put("fcmTokenUpdatedAt", System.currentTimeMillis());
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("teachers")
+                .document(uid)
+                .set(updates, com.google.firebase.firestore.SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("FCM_INIT", "FCM token successfully saved to Firestore for uid=" + uid))
+                .addOnFailureListener(e -> Log.e("FCM_INIT", "Failed to save FCM token to Firestore", e));
     }
 
     public static void applyTheme(int themeMode) {

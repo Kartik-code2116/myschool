@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class StudentRegisterActivity extends AppCompatActivity {
+public class StudentRegisterActivity extends BaseActivity {
 
     private ActivityStudentRegisterBinding b;
     private final List<School> schools   = new ArrayList<>();

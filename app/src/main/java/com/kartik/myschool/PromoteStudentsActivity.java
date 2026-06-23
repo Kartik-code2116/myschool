@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PromoteStudentsActivity extends AppCompatActivity {
+public class PromoteStudentsActivity extends BaseActivity {
 
     private ActivityPromoteStudentsBinding b;
     private StudentPromoteAdapter adapter;

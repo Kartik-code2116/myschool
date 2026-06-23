@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ParentPortalActivity extends AppCompatActivity {
+public class ParentPortalActivity extends BaseActivity {
 
     private static final String PREFS_NAME = "parent_portal_prefs";
     private static final String KEY_STUDENT_ID = "linked_student_id";

@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
  * Now navigates immediately after auth check (≤150ms render delay).
  * This saves ~1.65 seconds on every cold start.
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

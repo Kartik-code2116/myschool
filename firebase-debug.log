@@ -1,0 +1,24 @@
+[debug] [2026-06-23T14:16:31.097Z] ----------------------------------------------------------------------
+[debug] [2026-06-23T14:16:31.100Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\KARTIK DILIP THORAT\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js functions:delete verifyPurchase --region asia-south1 --force
+[debug] [2026-06-23T14:16:31.101Z] CLI Version:   15.19.0
+[debug] [2026-06-23T14:16:31.101Z] Platform:      win32
+[debug] [2026-06-23T14:16:31.101Z] Node Version:  v22.16.0
+[debug] [2026-06-23T14:16:31.101Z] Time:          Tue Jun 23 2026 19:46:31 GMT+0530 (India Standard Time)
+[debug] [2026-06-23T14:16:31.101Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-23T14:16:31.598Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-23T14:16:31.599Z] > authorizing via signed-in user (kartikthorat2116@gmail.com)
+[debug] [2026-06-23T14:16:31.600Z] [iam] checking project kartik-28deb for permissions ["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]
+[debug] [2026-06-23T14:16:31.603Z] Checked if tokens are valid: true, expires at: 1782226982406
+[debug] [2026-06-23T14:16:31.603Z] Checked if tokens are valid: true, expires at: 1782226982406
+[debug] [2026-06-23T14:16:31.604Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/kartik-28deb:testIamPermissions [none]
+[debug] [2026-06-23T14:16:31.604Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/kartik-28deb:testIamPermissions  x-goog-user-project=kartik-28deb
+[debug] [2026-06-23T14:16:31.604Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/kartik-28deb:testIamPermissions {"permissions":["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]}
+[debug] [2026-06-23T14:16:33.529Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/kartik-28deb:testIamPermissions 200
+[debug] [2026-06-23T14:16:33.531Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/kartik-28deb:testIamPermissions {"permissions":["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]}
+[debug] [2026-06-23T14:16:33.536Z] Checked if tokens are valid: true, expires at: 1782226982406
+[debug] [2026-06-23T14:16:33.537Z] Checked if tokens are valid: true, expires at: 1782226982406
+[debug] [2026-06-23T14:16:33.540Z] Checked if tokens are valid: true, expires at: 1782226982406
+[debug] [2026-06-23T14:16:33.540Z] Checked if tokens are valid: true, expires at: 1782226982406
+[debug] [2026-06-23T14:16:33.541Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/kartik-28deb/adminSdkConfig [none]
+[debug] [2026-06-23T14:16:33.546Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/kartik-28deb/locations/-/functions [none]

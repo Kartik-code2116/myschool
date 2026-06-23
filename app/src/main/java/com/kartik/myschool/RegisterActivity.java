@@ -19,7 +19,7 @@ import com.kartik.myschool.utils.UiAnimations;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
     private ActivityRegisterBinding b;
     private FirebaseAuth auth;

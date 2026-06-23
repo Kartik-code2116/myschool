@@ -19,7 +19,7 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 
-public class SubscriptionHistoryActivity extends AppCompatActivity {
+public class SubscriptionHistoryActivity extends com.kartik.myschool.BaseActivity {
 
     private RecyclerView rvHistory;
     private ProgressBar progressBar;

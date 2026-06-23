@@ -25,7 +25,7 @@ import com.kartik.myschool.utils.PdfGenerator;
 import java.io.File;
 import java.util.List;
 
-public class MarksheetActivity extends AppCompatActivity {
+public class MarksheetActivity extends BaseActivity {
 
     private ActivityMarksheetBinding b;
     private Student student;

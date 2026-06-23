@@ -23,7 +23,7 @@ import com.kartik.myschool.utils.UiAnimations;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     private ActivityHomeBinding b;
     private NavController navController;
@@ -728,10 +728,14 @@ public class HomeActivity extends AppCompatActivity {
                             .show();
                     return true;
                 } else if (id == 902) {
-                    Toast.makeText(this, R.string.msg_thank_you_for_rating_us_5_star, Toast.LENGTH_SHORT).show();
+                    com.kartik.myschool.utils.ReviewHelper.triggerReview(this);
                     return true;
                 } else if (id == 903) {
-                    Toast.makeText(this, R.string.msg_opening_more_apps_on_play_stor, Toast.LENGTH_SHORT).show();
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://developer?id=Sanjay+Gore")));
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/developer?id=Sanjay+Gore")));
+                    }
                     return true;
                 } else if (id == 904) {
                     showAboutDeveloperDialog();

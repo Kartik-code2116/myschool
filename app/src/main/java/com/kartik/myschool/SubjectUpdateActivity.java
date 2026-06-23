@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.kartik.myschool.databinding.ActivitySubjectUpdateBinding;
 
-public class SubjectUpdateActivity extends AppCompatActivity {
+public class SubjectUpdateActivity extends BaseActivity {
 
     private ActivitySubjectUpdateBinding b;
 

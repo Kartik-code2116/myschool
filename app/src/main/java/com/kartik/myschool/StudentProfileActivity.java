@@ -22,7 +22,7 @@ import com.google.android.material.chip.Chip;
 import java.io.File;
 import java.util.List;
 
-public class StudentProfileActivity extends AppCompatActivity {
+public class StudentProfileActivity extends BaseActivity {
 
     private ActivityStudentProfileBinding b;
     private Student student;

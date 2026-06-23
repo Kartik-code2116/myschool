@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EnterDescriptiveActivity extends AppCompatActivity {
+public class EnterDescriptiveActivity extends BaseActivity {
 
     private ActivityEnterDescriptiveBinding b;
     private final List<ItemSubjectRemarkRowBinding> remarkRows = new ArrayList<>();

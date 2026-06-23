@@ -13,7 +13,7 @@ import com.kartik.myschool.databinding.ActivitySchoolRegisterBinding;
 import com.kartik.myschool.model.School;
 import com.kartik.myschool.repository.FirebaseRepository;
 
-public class SchoolRegisterActivity extends AppCompatActivity {
+public class SchoolRegisterActivity extends BaseActivity {
 
     private ActivitySchoolRegisterBinding b;
     private School editSchool; // non-null when editing existing school

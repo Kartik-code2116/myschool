@@ -19,7 +19,7 @@ import com.kartik.myschool.repository.FirebaseRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassSetupActivity extends AppCompatActivity {
+public class ClassSetupActivity extends BaseActivity {
 
     private ActivityClassSetupBinding b;
     private boolean shouldNavigateToSubjects = false;

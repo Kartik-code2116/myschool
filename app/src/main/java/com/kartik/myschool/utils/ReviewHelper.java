@@ -31,6 +31,11 @@ public final class ReviewHelper {
         }
     }
 
+    public static void triggerReview(Activity activity) {
+        if (activity == null) return;
+        requestInAppReview(activity);
+    }
+
     private static void requestInAppReview(Activity activity) {
         ReviewManager manager = ReviewManagerFactory.create(activity);
         Task<ReviewInfo> request = manager.requestReviewFlow();

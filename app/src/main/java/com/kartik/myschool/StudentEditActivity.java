@@ -17,7 +17,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 
-public class StudentEditActivity extends AppCompatActivity {
+public class StudentEditActivity extends BaseActivity {
 
     private ActivityStudentEditBinding b;
     private Student student;

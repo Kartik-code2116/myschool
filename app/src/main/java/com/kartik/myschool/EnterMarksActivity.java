@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnterMarksActivity extends AppCompatActivity {
+public class EnterMarksActivity extends BaseActivity {
 
     private ActivityEnterMarksBinding b;
     private final List<ItemSubjectMarksRowBinding> marksRows = new ArrayList<>();
