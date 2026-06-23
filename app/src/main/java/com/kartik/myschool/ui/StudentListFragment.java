@@ -75,6 +75,7 @@ public class StudentListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         setupRecycler();
         setupSearch();
@@ -567,6 +568,7 @@ public class StudentListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         SessionContext.syncFromAppCache();
 
         // Hide parent top app bar & fix CoordinatorLayout scrolling behavior offset

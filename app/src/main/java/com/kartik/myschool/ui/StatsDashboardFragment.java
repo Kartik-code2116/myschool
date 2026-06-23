@@ -110,6 +110,7 @@ public class StatsDashboardFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         
         activeClass = SessionContext.selectedClass;
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {

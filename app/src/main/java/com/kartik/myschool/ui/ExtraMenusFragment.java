@@ -49,6 +49,7 @@ public class ExtraMenusFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         if (getArguments() != null) {
             menuType = getArguments().getString("menu_type", "school_info");
@@ -62,6 +63,7 @@ public class ExtraMenusFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         if ("school_info".equals(menuType)) {
             // Reload school details in case they were updated
             School school = SessionContext.selectedSchool;

@@ -175,7 +175,19 @@ public class Subject {
             || sc.contains("इतिहास व नागरिकशास्त्र") || sc.contains("भूगोल व सामाजिक शास्त्र");
     }
 
+    private static final java.util.concurrent.ConcurrentHashMap<String, Boolean> sameSubjectCache = new java.util.concurrent.ConcurrentHashMap<>();
+
     public static boolean isSameSubject(String s1, String s2) {
+        if (s1 == null || s2 == null) return false;
+        String cacheKey = s1 + "|||" + s2;
+        Boolean cached = sameSubjectCache.get(cacheKey);
+        if (cached != null) return cached;
+        boolean result = isSameSubjectInternal(s1, s2);
+        sameSubjectCache.put(cacheKey, result);
+        return result;
+    }
+
+    private static boolean isSameSubjectInternal(String s1, String s2) {
         if (s1 == null || s2 == null) return false;
         if (s1.equalsIgnoreCase(s2)) return true;
 

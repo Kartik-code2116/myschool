@@ -757,9 +757,9 @@ public class StudentProfileActivity extends BaseActivity {
                     }
                 });
             } else {
-                android.graphics.Bitmap scaled = android.graphics.Bitmap.createScaledBitmap(currentPhotoBitmap, 300, 300, true);
+                android.graphics.Bitmap scaled = android.graphics.Bitmap.createScaledBitmap(currentPhotoBitmap, 800, 800, true);
                 java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, baos);
+                scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 75, baos);
                 byte[] bytes = baos.toByteArray();
 
                 Toast.makeText(this, "फोटो अपलोड होत आहे...", Toast.LENGTH_SHORT).show();

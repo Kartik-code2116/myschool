@@ -41,6 +41,7 @@ public class SubjectsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         setupRecyclerView();
         displayHeaderInfo();
@@ -375,6 +376,7 @@ public class SubjectsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         loadSubjects();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();

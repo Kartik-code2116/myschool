@@ -31,6 +31,18 @@ public class FirebaseRepository {
     private static final java.util.Map<String, List<Student>> cachedStudentsForClassMap = new java.util.HashMap<>();
     private static final java.util.Map<String, java.util.Map<String, MarksRecord>> cachedClassSemesterMarksMap = new java.util.HashMap<>();
 
+    private static final java.util.Map<String, Long> cacheTimestamps = new java.util.HashMap<>();
+
+    private static boolean isCacheValid(String key) {
+        Long timestamp = cacheTimestamps.get(key);
+        if (timestamp == null) return false;
+        return (System.currentTimeMillis() - timestamp) < 300000; // 5 minutes TTL
+    }
+
+    private static void markCacheFresh(String key) {
+        cacheTimestamps.put(key, System.currentTimeMillis());
+    }
+
     public static void clearCache() {
         synchronized (FirebaseRepository.class) {
             cachedTeacher = null;
@@ -41,10 +53,11 @@ public class FirebaseRepository {
             cachedStudentsForTeacher = null;
             cachedStudentsForClassMap.clear();
             cachedClassSemesterMarksMap.clear();
+            cacheTimestamps.clear();
         }
     }
-
-    /** Clears only the marks cache, leaving student/class/year caches intact. */
+ 
+    /** Clears only the marks cache, leaving student/class/year cachesintact. */
     public void clearMarksCache() {
         synchronized (FirebaseRepository.class) {
             cachedClassSemesterMarksMap.clear();
@@ -95,7 +108,11 @@ public class FirebaseRepository {
                         .setPersistenceEnabled(true)
                         .setCacheSizeBytes(com.google.firebase.firestore.FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
                         .build();
-        db.setFirestoreSettings(settings);
+        try {
+            db.setFirestoreSettings(settings);
+        } catch (IllegalStateException e) {
+            // Ignore if already set
+        }
 
         // Diagnostic: confirm which Firebase project this instance is connected to
         try {
@@ -141,6 +158,7 @@ public class FirebaseRepository {
                 .addOnSuccessListener(v -> {
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE", "saveTeacher: SUCCESS for uid=" + uid); }
                     cachedTeacher = t;
+                    markCacheFresh("teacher");
                     cb.onSuccess(null);
                 })
                 .addOnFailureListener(e -> {
@@ -150,7 +168,7 @@ public class FirebaseRepository {
     }
 
     public void getTeacher(OnResult<Teacher> cb) {
-        if (cachedTeacher != null) {
+        if (cachedTeacher != null && isCacheValid("teacher")) {
             cb.onSuccess(cachedTeacher);
             return;
         }
@@ -163,6 +181,7 @@ public class FirebaseRepository {
                 .addOnSuccessListener(snap -> {
                     Teacher t = snap != null ? snap.toObject(Teacher.class) : null;
                     cachedTeacher = t;
+                    markCacheFresh("teacher");
                     cb.onSuccess(t);
                 })
                 .addOnFailureListener(cb::onError);
@@ -291,13 +310,14 @@ public class FirebaseRepository {
         ref.set(y)
                 .addOnSuccessListener(v -> {
                     cachedYears = null; // Invalidate
+                    cacheTimestamps.remove("years");
                     cb.onSuccess(y.id);
                 })
                 .addOnFailureListener(cb::onError);
     }
 
     public void getAcademicYears(OnResult<List<AcademicYear>> cb) {
-        if (cachedYears != null) {
+        if (cachedYears != null && isCacheValid("years")) {
             cb.onSuccess(new ArrayList<>(cachedYears));
             return;
         }
@@ -347,6 +367,7 @@ public class FirebaseRepository {
 
                     Collections.sort(unique, (a, b) -> Integer.compare(b.startYear, a.startYear));
                     cachedYears = unique;
+                    markCacheFresh("years");
                     cb.onSuccess(new ArrayList<>(unique));
                 })
                 .addOnFailureListener(cb::onError);
@@ -367,6 +388,10 @@ public class FirebaseRepository {
         ref.set(s)
                 .addOnSuccessListener(v -> {
                     cachedSemestersMap.clear(); // Invalidate
+                    java.util.Iterator<String> it = cacheTimestamps.keySet().iterator();
+                    while (it.hasNext()) {
+                        if (it.next().startsWith("semesters_")) it.remove();
+                    }
                     cb.onSuccess(s.id);
                 })
                 .addOnFailureListener(cb::onError);
@@ -377,7 +402,8 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("Year ID cannot be null"));
             return;
         }
-        if (cachedSemestersMap.containsKey(yearId)) {
+        String key = "semesters_" + yearId;
+        if (cachedSemestersMap.containsKey(yearId) && isCacheValid(key)) {
             cb.onSuccess(new ArrayList<>(cachedSemestersMap.get(yearId)));
             return;
         }
@@ -400,6 +426,7 @@ public class FirebaseRepository {
                     }
                     Collections.sort(list, (a, b) -> Integer.compare(a.number, b.number));
                     cachedSemestersMap.put(yearId, list);
+                    markCacheFresh(key);
                     cb.onSuccess(new ArrayList<>(list));
                 })
                 .addOnFailureListener(cb::onError);
@@ -482,7 +509,8 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("Year ID cannot be null"));
             return;
         }
-        if (cachedClassesForYearMap.containsKey(yearId)) {
+        String key = "classes_year_" + yearId;
+        if (cachedClassesForYearMap.containsKey(yearId) && isCacheValid(key)) {
             cb.onSuccess(new ArrayList<>(cachedClassesForYearMap.get(yearId)));
             return;
         }
@@ -504,6 +532,7 @@ public class FirebaseRepository {
                         }
                     });
                     cachedClassesForYearMap.put(yearId, classes);
+                    markCacheFresh(key);
                     cb.onSuccess(new ArrayList<>(classes));
                 })
                 .addOnFailureListener(cb::onError);
@@ -575,6 +604,11 @@ public class FirebaseRepository {
                     cachedClassesForYearMap.clear(); // Invalidate
                     cachedClassesForSchoolMap.clear(); // Invalidate
                     com.kartik.myschool.AppCache.cachedClasses = null; // Clear static AppCache
+                    java.util.Iterator<String> it = cacheTimestamps.keySet().iterator();
+                    while (it.hasNext()) {
+                        String k = it.next();
+                        if (k.startsWith("classes_year_") || k.startsWith("classes_school_")) it.remove();
+                    }
                     cb.onSuccess(c.id);
                 })
                 .addOnFailureListener(cb::onError);
@@ -590,6 +624,11 @@ public class FirebaseRepository {
                     cachedClassesForYearMap.clear(); // Invalidate
                     cachedClassesForSchoolMap.clear(); // Invalidate
                     com.kartik.myschool.AppCache.cachedClasses = null; // Clear static AppCache
+                    java.util.Iterator<String> it = cacheTimestamps.keySet().iterator();
+                    while (it.hasNext()) {
+                        String k = it.next();
+                        if (k.startsWith("classes_year_") || k.startsWith("classes_school_")) it.remove();
+                    }
                     cb.onSuccess(null);
                 })
                 .addOnFailureListener(cb::onError);
@@ -600,7 +639,8 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("School ID cannot be null"));
             return;
         }
-        if (cachedClassesForSchoolMap.containsKey(schoolId)) {
+        String key = "classes_school_" + schoolId;
+        if (cachedClassesForSchoolMap.containsKey(schoolId) && isCacheValid(key)) {
             cb.onSuccess(new ArrayList<>(cachedClassesForSchoolMap.get(schoolId)));
             return;
         }
@@ -616,6 +656,7 @@ public class FirebaseRepository {
                         return nameA.compareTo(nameB);
                     });
                     cachedClassesForSchoolMap.put(schoolId, classes);
+                    markCacheFresh(key);
                     cb.onSuccess(new ArrayList<>(classes));
                 })
                 .addOnFailureListener(cb::onError);
@@ -650,8 +691,10 @@ public class FirebaseRepository {
         ref.set(s)
                 .addOnSuccessListener(v -> {
                     cachedStudentsForTeacher = null; // Invalidate
+                    cacheTimestamps.remove("students_teacher");
                     if (s.classId != null) {
                         cachedStudentsForClassMap.remove(s.classId); // Invalidate
+                        cacheTimestamps.remove("students_class_" + s.classId);
                     }
                     cb.onSuccess(s.id);
                 })
@@ -666,7 +709,12 @@ public class FirebaseRepository {
         db.collection(COL_STUDENTS).document(studentId).delete()
                 .addOnSuccessListener(v -> {
                     cachedStudentsForTeacher = null; // Invalidate
+                    cacheTimestamps.remove("students_teacher");
                     cachedStudentsForClassMap.clear(); // Invalidate
+                    java.util.Iterator<String> it = cacheTimestamps.keySet().iterator();
+                    while (it.hasNext()) {
+                        if (it.next().startsWith("students_class_")) it.remove();
+                    }
                     cb.onSuccess(null);
                 })
                 .addOnFailureListener(cb::onError);
@@ -680,7 +728,8 @@ public class FirebaseRepository {
             cb.onError(new IllegalArgumentException("Class ID cannot be null"));
             return;
         }
-        if (cachedStudentsForClassMap.containsKey(classId)) {
+        String key = "students_class_" + classId;
+        if (cachedStudentsForClassMap.containsKey(classId) && isCacheValid(key)) {
             cb.onSuccess(new ArrayList<>(cachedStudentsForClassMap.get(classId)));
             return;
         }
@@ -703,6 +752,7 @@ public class FirebaseRepository {
                         }
                     });
                     cachedStudentsForClassMap.put(classId, students);
+                    markCacheFresh(key);
                     cb.onSuccess(new ArrayList<>(students));
                 })
                 .addOnFailureListener(cb::onError);
@@ -723,7 +773,7 @@ public class FirebaseRepository {
     }
 
     public void getAllStudentsForTeacher(OnResult<List<Student>> cb) {
-        if (cachedStudentsForTeacher != null) {
+        if (cachedStudentsForTeacher != null && isCacheValid("students_teacher")) {
             cb.onSuccess(new ArrayList<>(cachedStudentsForTeacher));
             return;
         }
@@ -739,6 +789,7 @@ public class FirebaseRepository {
                 .addOnSuccessListener(snap -> {
                     List<Student> students = snap != null ? snap.toObjects(Student.class) : new ArrayList<>();
                     cachedStudentsForTeacher = students;
+                    markCacheFresh("students_teacher");
                     
                     cachedStudentsForClassMap.clear();
                     for (Student s : students) {
@@ -748,6 +799,9 @@ public class FirebaseRepository {
                             }
                             cachedStudentsForClassMap.get(s.classId).add(s);
                         }
+                    }
+                    for (String cid : cachedStudentsForClassMap.keySet()) {
+                        markCacheFresh("students_class_" + cid);
                     }
                     
                     cb.onSuccess(new ArrayList<>(students));
@@ -782,6 +836,10 @@ public class FirebaseRepository {
                 .addOnSuccessListener(v -> {
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "SUCCESS: doc written at " + ref.getPath()); }
                     cachedClassSemesterMarksMap.clear();
+                    java.util.Iterator<String> it = cacheTimestamps.keySet().iterator();
+                    while (it.hasNext()) {
+                        if (it.next().startsWith("marks_")) it.remove();
+                    }
                     com.kartik.myschool.utils.AnalyticsHelper.logMarksEntered(m.classId, m.studentId);
                     cb.onSuccess(m.id);
                 })
@@ -968,7 +1026,8 @@ public class FirebaseRepository {
             return;
         }
         String cacheKey = classId + "_" + semesterId;
-        if (cachedClassSemesterMarksMap.containsKey(cacheKey)) {
+        String key = "marks_" + cacheKey;
+        if (cachedClassSemesterMarksMap.containsKey(cacheKey) && isCacheValid(key)) {
             if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: cache hit key=" + cacheKey
                     + " size=" + cachedClassSemesterMarksMap.get(cacheKey).size()); }
             cb.onSuccess(new java.util.HashMap<>(cachedClassSemesterMarksMap.get(cacheKey)));
@@ -1105,6 +1164,7 @@ public class FirebaseRepository {
                     }
                     if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("FIRESTORE_MARKS", "getMarksForClassAndSemester: returning " + marksMap.size() + " marks records"); }
                     cachedClassSemesterMarksMap.put(cacheKey, marksMap);
+                    markCacheFresh(key);
                     cb.onSuccess(new java.util.HashMap<>(marksMap));
                 })
                 .addOnFailureListener(e -> {
@@ -1161,7 +1221,7 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
-    private void mergeRecords(MarksRecord target, MarksRecord source) {
+    static void mergeRecords(MarksRecord target, MarksRecord source) {
         if (target == null || source == null) return;
         
         // Target is the NEWER document, Source is the OLDER document.

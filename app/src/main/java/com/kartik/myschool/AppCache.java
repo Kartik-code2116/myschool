@@ -62,4 +62,31 @@ public class AppCache {
 
     // In-memory remark bank cache: subjectName -> list of remark options
     public static java.util.Map<String, java.util.List<String>> cachedRemarkBank = new java.util.HashMap<>();
+
+    // ── TTL Cache Expiration (5 minutes) ───────────────────────────────────────
+    private static final long CACHE_TTL_MS = 5 * 60 * 1000;
+    private static final java.util.Map<String, Long> cacheTimestamps = new java.util.HashMap<>();
+
+    /**
+     * Checks if a cache entry is valid and hasn't expired.
+     */
+    public static boolean isCacheValid(String key) {
+        Long timestamp = cacheTimestamps.get(key);
+        if (timestamp == null) return false;
+        return (System.currentTimeMillis() - timestamp) < CACHE_TTL_MS;
+    }
+
+    /**
+     * Marks a cache entry as fresh with the current timestamp.
+     */
+    public static void markCacheFresh(String key) {
+        cacheTimestamps.put(key, System.currentTimeMillis());
+    }
+
+    /**
+     * Invalidates a specific cache entry.
+     */
+    public static void invalidateCache(String key) {
+        cacheTimestamps.remove(key);
+    }
 }

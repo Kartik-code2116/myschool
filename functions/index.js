@@ -9,17 +9,19 @@ const androidpublisher = google.androidpublisher("v3");
 exports.verifyPurchase = onDocumentCreated(
   {
     document: "subscriptions/{uid}",
-    region: "asia-south1",
+    region: "us-central1"
   },
   async (event) => {
     const uid = event.params.uid;
-    const data = event.data ? event.data.data() : null;
+    const snapshot = event.data;
 
     // Only process if data exists
-    if (!data) {
+    if (!snapshot) {
       console.log(`No data for uid=${uid}`);
       return null;
     }
+
+    const data = snapshot.data();
 
     const purchaseToken = data.purchaseToken;
     const productId = data.productId || "yearly_pro_access";
@@ -45,7 +47,7 @@ exports.verifyPurchase = onDocumentCreated(
       });
 
       const subscription = response.data;
-      
+
       // paymentState: 0 (Payment pending), 1 (Payment received), 2 (Free trial), 3 (Pending deferred)
       const isValid =
         subscription.paymentState === 1 || // Payment received

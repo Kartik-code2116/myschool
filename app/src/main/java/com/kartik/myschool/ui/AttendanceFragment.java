@@ -45,11 +45,18 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         setupRecyclerView();
         displayHeaderInfo();
         setupActionIcons();
         loadData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
     }
 
     private void setupActionIcons() {

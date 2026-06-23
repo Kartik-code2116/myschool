@@ -90,6 +90,7 @@ public class InfoPrintSettingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).updateToolbar(
@@ -1282,6 +1283,7 @@ public class InfoPrintSettingFragment extends Fragment {
 
     @Override public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         if (isViewActive()) {
             if (isFirstLoad) {
                 isFirstLoad = false;

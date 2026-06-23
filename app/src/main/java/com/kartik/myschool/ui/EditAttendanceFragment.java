@@ -36,6 +36,7 @@ public class EditAttendanceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         student = SessionContext.currentStudentForAttendance;
         record = SessionContext.currentRecordForAttendance;
@@ -197,5 +198,11 @@ public class EditAttendanceFragment extends Fragment {
         b.progress.setVisibility(show ? View.VISIBLE : View.GONE);
         b.btnSave.setEnabled(!show);
         b.btnCancel.setEnabled(!show);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
     }
 }

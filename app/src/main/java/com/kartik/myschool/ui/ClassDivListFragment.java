@@ -45,6 +45,7 @@ public class ClassDivListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).updateToolbar(
                     getString(R.string.title_class_div),
@@ -187,6 +188,7 @@ public class ClassDivListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         if (b == null) return;
         b.tvClassDivYear.setText(getString(R.string.year_label, SessionContext.getYearLabel()));
         loadClasses();

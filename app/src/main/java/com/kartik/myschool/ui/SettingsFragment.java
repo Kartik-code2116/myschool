@@ -63,6 +63,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         settingsPrefs = requireContext().getSharedPreferences("myschool_settings_prefs", android.content.Context.MODE_PRIVATE);
 
@@ -194,5 +195,11 @@ public class SettingsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         b = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
     }
 }

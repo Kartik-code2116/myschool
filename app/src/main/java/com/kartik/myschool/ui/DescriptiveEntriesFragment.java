@@ -61,6 +61,7 @@ public class DescriptiveEntriesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         activeClass = SessionContext.selectedClass;
         if (SessionContext.selectedSemester != null && SessionContext.selectedSemester.id != null) {
@@ -330,6 +331,7 @@ public class DescriptiveEntriesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         if (SessionContext.selectedClass != null) {
             activeClass = SessionContext.selectedClass;
@@ -511,12 +513,17 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             private final ItemDescriptiveStudentBlockBinding binding;
+            private final SubjectInnerAdapter innerAdapter;
 
             public ViewHolder(ItemDescriptiveStudentBlockBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
                 binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
                 binding.rvSubjectsHorizontal.setNestedScrollingEnabled(false);
+                binding.rvSubjectsHorizontal.setHasFixedSize(true);
+
+                innerAdapter = new SubjectInnerAdapter(null, new ArrayList<>(), null, isGridViewMode, this);
+                binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
             }
 
             public void bind(Student s, int index) {
@@ -547,13 +554,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                     }
                 }
 
-                SubjectInnerAdapter innerAdapter = (SubjectInnerAdapter) binding.rvSubjectsHorizontal.getAdapter();
-                if (innerAdapter == null || innerAdapter.isGridViewMode() != isGridViewMode) {
-                    innerAdapter = new SubjectInnerAdapter(s, allDescriptiveSubjects, marks, isGridViewMode, this);
-                    binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
-                } else {
-                    innerAdapter.updateData(s, allDescriptiveSubjects, marks);
-                }
+                innerAdapter.updateData(s, allDescriptiveSubjects, marks, isGridViewMode);
             }
 
 
@@ -751,7 +752,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         private Student student;
         private List<Subject> subjects;
         private MarksRecord marks;
-        private final boolean isGridViewMode;
+        private boolean isGridViewMode;
         private final DescriptiveAdapter.ViewHolder parentHolder;
 
         public SubjectInnerAdapter(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridViewMode, DescriptiveAdapter.ViewHolder parentHolder) {
@@ -764,11 +765,20 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         public boolean isGridViewMode() { return isGridViewMode; }
 
-        public void updateData(Student student, List<Subject> subjects, MarksRecord marks) {
+        public void updateData(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridViewMode) {
+            boolean subjectsChanged = this.subjects == null || subjects == null || !this.subjects.equals(subjects);
+            boolean studentChanged = this.student == null || student == null || !this.student.id.equals(student.id);
+            boolean marksChanged = this.marks != marks && (this.marks == null || marks == null || this.marks.updatedAt != marks.updatedAt);
+            boolean gridChanged = this.isGridViewMode != isGridViewMode;
+
             this.student = student;
             this.subjects = subjects;
             this.marks = marks;
-            notifyDataSetChanged();
+            this.isGridViewMode = isGridViewMode;
+
+            if (subjectsChanged || studentChanged || marksChanged || gridChanged) {
+                notifyDataSetChanged();
+            }
         }
 
         @NonNull

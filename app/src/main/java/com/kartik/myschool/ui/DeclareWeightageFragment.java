@@ -38,7 +38,7 @@ public class DeclareWeightageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         activeClass = SessionContext.selectedClass;
 
         setupRecyclerView();

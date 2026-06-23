@@ -50,12 +50,14 @@ public class ReportPrintingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         setupRecyclerView();
         displayHeaderInfo();
         loadClassStudents();
         validateAndLoadSemesters();
     }
+
 
     private void setupRecyclerView() {
         b.rvReportCards.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
@@ -1336,6 +1338,7 @@ public class ReportPrintingFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             activity.showCustomToolbarActions(

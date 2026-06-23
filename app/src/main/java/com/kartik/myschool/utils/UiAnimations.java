@@ -148,24 +148,21 @@ public final class UiAnimations {
      */
     public static void animateScrollReveal(View view, int position, int[] lastPosition) {
         if (view == null) return;
+        view.animate().cancel();
+        
         if (position > lastPosition[0]) {
             lastPosition[0] = position;
 
-            // Cap animation on scroll to prevent main-thread layout lag for long lists
-            if (position >= 10) {
-                return;
-            }
-
             float density = view.getResources().getDisplayMetrics().density;
-            float translateY = 48 * density;
+            float translateY = 32 * density;
 
             view.setAlpha(0f);
             view.setTranslationY(translateY);
-            view.setScaleX(0.97f);
-            view.setScaleY(0.97f);
+            view.setScaleX(0.98f);
+            view.setScaleY(0.98f);
 
-            // Stagger each item slightly so they cascade in as you scroll
-            long delay = Math.min(position * 40L, 200L); // cap stagger at 200ms
+            // Stagger only the initial load, immediate pop for scrolled items
+            long delay = position < 10 ? Math.min(position * 40L, 200L) : 0L;
 
             view.animate()
                     .alpha(1f)
@@ -173,15 +170,15 @@ public final class UiAnimations {
                     .scaleX(1f)
                     .scaleY(1f)
                     .setStartDelay(delay)
-                    .setDuration(320)
-                    .setInterpolator(new android.view.animation.DecelerateInterpolator(1.4f))
-                    .withEndAction(() -> {
-                        view.setAlpha(1f);
-                        view.setTranslationY(0f);
-                        view.setScaleX(1f);
-                        view.setScaleY(1f);
-                    })
+                    .setDuration(300)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator(1.2f))
                     .start();
+        } else {
+            // Fix hallucination: Reset view state for recycled views when scrolling up
+            view.setAlpha(1f);
+            view.setTranslationY(0f);
+            view.setScaleX(1f);
+            view.setScaleY(1f);
         }
     }
 
@@ -195,6 +192,8 @@ public final class UiAnimations {
      */
     public static void animateCardPop(View view, int position, int[] lastPosition) {
         if (view == null) return;
+        view.animate().cancel();
+        
         if (position > lastPosition[0]) {
             lastPosition[0] = position;
 
@@ -205,7 +204,7 @@ public final class UiAnimations {
             view.setScaleX(0.92f);
             view.setScaleY(0.92f);
 
-            long delay = Math.min(position * 50L, 250L);
+            long delay = position < 10 ? Math.min(position * 50L, 250L) : 0L;
 
             view.animate()
                     .alpha(1f)
@@ -222,6 +221,11 @@ public final class UiAnimations {
                             .setInterpolator(new android.view.animation.OvershootInterpolator(1.5f))
                             .start())
                     .start();
+        } else {
+            view.setAlpha(1f);
+            view.setTranslationY(0f);
+            view.setScaleX(1f);
+            view.setScaleY(1f);
         }
     }
 }

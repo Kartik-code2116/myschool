@@ -66,6 +66,7 @@ public class FormativeSummativeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         activeClass = SessionContext.selectedClass;
         if (SessionContext.selectedSemester != null) {
@@ -330,6 +331,7 @@ public class FormativeSummativeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         if (SessionContext.selectedClass != null) {
             activeClass = SessionContext.selectedClass;
@@ -520,6 +522,7 @@ public class FormativeSummativeFragment extends Fragment {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             private final ItemEvaluationStudentBlockBinding binding;
+            private final SubjectInnerAdapter innerAdapter;
 
             public ViewHolder(ItemEvaluationStudentBlockBinding binding) {
                 super(binding.getRoot());
@@ -528,6 +531,9 @@ public class FormativeSummativeFragment extends Fragment {
                 binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
                 binding.rvSubjectsHorizontal.setHasFixedSize(true);
                 binding.rvSubjectsHorizontal.setNestedScrollingEnabled(false);
+
+                innerAdapter = new SubjectInnerAdapter(null, new ArrayList<>(), null, isGridView, this);
+                binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
             }
 
             public void bind(Student s, int index) {
@@ -606,16 +612,10 @@ public class FormativeSummativeFragment extends Fragment {
                 binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);
                 binding.layoutSummaryGrid.setVisibility(View.GONE);
 
-                if (activeClass.subjects != null) {
-                    SubjectInnerAdapter innerAdapter = (SubjectInnerAdapter) binding.rvSubjectsHorizontal.getAdapter();
-                    if (innerAdapter == null || innerAdapter.isGridView() != isGridView) {
-                        innerAdapter = new SubjectInnerAdapter(s, activeClass.subjects, marks, isGridView, this);
-                        binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
-                    } else {
-                        innerAdapter.updateData(s, activeClass.subjects, marks);
-                    }
+                if (activeClass != null && activeClass.subjects != null) {
+                    innerAdapter.updateData(s, activeClass.subjects, marks, isGridView);
                 } else {
-                    binding.rvSubjectsHorizontal.setAdapter(null);
+                    innerAdapter.updateData(s, new ArrayList<>(), null, isGridView);
                 }
             }
 
@@ -708,7 +708,7 @@ public class FormativeSummativeFragment extends Fragment {
         private Student student;
         private List<Subject> subjects;
         private MarksRecord marks;
-        private final boolean isGridView;
+        private boolean isGridView;
         private final EvaluationAdapter.ViewHolder parentHolder;
 
         public SubjectInnerAdapter(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridView, EvaluationAdapter.ViewHolder parentHolder) {
@@ -721,11 +721,20 @@ public class FormativeSummativeFragment extends Fragment {
 
         public boolean isGridView() { return isGridView; }
 
-        public void updateData(Student student, List<Subject> subjects, MarksRecord marks) {
+        public void updateData(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridView) {
+            boolean subjectsChanged = this.subjects == null || subjects == null || !this.subjects.equals(subjects);
+            boolean studentChanged = this.student == null || student == null || !this.student.id.equals(student.id);
+            boolean marksChanged = this.marks != marks && (this.marks == null || marks == null || this.marks.updatedAt != marks.updatedAt);
+            boolean gridChanged = this.isGridView != isGridView;
+
             this.student = student;
             this.subjects = subjects;
             this.marks = marks;
-            notifyDataSetChanged();
+            this.isGridView = isGridView;
+
+            if (subjectsChanged || studentChanged || marksChanged || gridChanged) {
+                notifyDataSetChanged();
+            }
         }
 
         @Override

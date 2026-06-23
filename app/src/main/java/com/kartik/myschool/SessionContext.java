@@ -209,6 +209,13 @@ public final class SessionContext {
         syncToAppCache();
     }
 
+    public static synchronized void ensureCacheLoaded(android.content.Context context) {
+        if (context == null) return;
+        if (selectedSchool == null || selectedClass == null || com.kartik.myschool.AppCache.cachedTeacherName == null) {
+            load(context);
+        }
+    }
+
     public static synchronized void load(android.content.Context ctx) {
         if (ctx == null) return;
         android.content.SharedPreferences prefs = ctx.getSharedPreferences("myschool_session_prefs", android.content.Context.MODE_PRIVATE);
