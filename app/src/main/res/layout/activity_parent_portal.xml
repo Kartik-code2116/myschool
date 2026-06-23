@@ -87,6 +87,7 @@
             android:fontFamily="sans-serif-bold"
             app:backgroundTint="#8BC34A"
             android:elevation="2dp"
+            android:visibility="gone"
             android:minHeight="56dp"/>
     </LinearLayout>
 

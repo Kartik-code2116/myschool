@@ -608,6 +608,7 @@
                     app:iconTint="?attr/colorSurface"
                     app:backgroundTint="#FFA000"
                     android:elevation="2dp"
+                    android:visibility="gone"
                     android:minHeight="56dp"/>
             </LinearLayout>
         </LinearLayout>
