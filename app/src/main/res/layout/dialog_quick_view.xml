@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:padding="24dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvQuickViewAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle"
+            android:backgroundTint="#F3EEFF"
+            android:textColor="#6C4CCF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="1"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/tvQuickViewAvatar"
+            android:layout_marginStart="16dp"
+            android:layout_centerVertical="true">
+            
+            <TextView
+                android:id="@+id/tvQuickViewName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Student Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+                
+            <TextView
+                android:id="@+id/tvQuickViewRegNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registration No: N/A"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorOutlineVariant"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Details Grid -->
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:useDefaultMargins="true">
+
+        <TextView android:text="DOB:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:id="@+id/tvQuickViewDob" android:text="-" android:textColor="?attr/colorOnSurface" />
+
+        <TextView android:text="Gender:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:id="@+id/tvQuickViewGender" android:text="-" android:textColor="?attr/colorOnSurface" />
+
+        <TextView android:text="Religion/Caste:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:id="@+id/tvQuickViewCaste" android:text="-" android:textColor="?attr/colorOnSurface" />
+
+        <TextView android:text="Mother's Name:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:id="@+id/tvQuickViewMother" android:text="-" android:textColor="?attr/colorOnSurface" />
+
+        <TextView android:text="Father's Name:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:id="@+id/tvQuickViewFather" android:text="-" android:textColor="?attr/colorOnSurface" />
+
+        <TextView android:text="Phone:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:id="@+id/tvQuickViewPhone" android:text="-" android:textColor="?attr/colorOnSurface" />
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/btnQuickViewClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Close"
+        style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+</LinearLayout>

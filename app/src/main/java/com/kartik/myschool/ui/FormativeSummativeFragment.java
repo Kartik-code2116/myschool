@@ -601,7 +601,7 @@ public class FormativeSummativeFragment extends Fragment {
                             Toast.makeText(itemView.getContext(), "Please select a specific subject's menu to edit its box", Toast.LENGTH_SHORT).show();
                             return true;
                         }
-                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        showQuickViewDialog(s);
                         return true;
                     });
                     popup.show();
@@ -728,6 +728,15 @@ public class FormativeSummativeFragment extends Fragment {
                     patchStudentMarks(studentId, newRecord);
                 });
                 dialog.show(FormativeSummativeFragment.this.getChildFragmentManager(), "SingleSubjectMarksDialog");
+            }
+
+            public void triggerQuickView(Student student) {
+                showQuickViewDialog(student);
+            }
+
+            public void triggerSubjectQuickView(Student student, Subject subject) {
+                MarksRecord record = marksMap.get(student.id);
+                showSubjectQuickViewDialog(student, subject, record);
             }
 
             private void openMarksEntry(Student student) {
@@ -922,7 +931,7 @@ public class FormativeSummativeFragment extends Fragment {
                             parentHolder.openSingleSubjectMarks(student, sub);
                             return true;
                         }
-                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        parentHolder.triggerSubjectQuickView(student, sub);
                         return true;
                     });
                     popup.show();
@@ -1016,7 +1025,7 @@ public class FormativeSummativeFragment extends Fragment {
                             parentHolder.openSingleSubjectMarks(student, sub);
                             return true;
                         }
-                        Toast.makeText(itemView.getContext(), R.string.msg_info_opened, Toast.LENGTH_SHORT).show();
+                        parentHolder.triggerSubjectQuickView(student, sub);
                         return true;
                     });
                     popup.show();
@@ -1025,5 +1034,131 @@ public class FormativeSummativeFragment extends Fragment {
                 cardB.getRoot().setOnClickListener(v -> parentHolder.openSingleSubjectMarks(student, sub));
             }
         }
+    }
+
+    private void showQuickViewDialog(Student s) {
+        if (getContext() == null || s == null) return;
+        
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
+        View sheet = LayoutInflater.from(getContext()).inflate(R.layout.dialog_quick_view, null);
+        dialog.setContentView(sheet);
+
+        TextView tvAvatar = sheet.findViewById(R.id.tvQuickViewAvatar);
+        TextView tvName = sheet.findViewById(R.id.tvQuickViewName);
+        TextView tvRegNo = sheet.findViewById(R.id.tvQuickViewRegNo);
+        TextView tvDob = sheet.findViewById(R.id.tvQuickViewDob);
+        TextView tvGender = sheet.findViewById(R.id.tvQuickViewGender);
+        TextView tvCaste = sheet.findViewById(R.id.tvQuickViewCaste);
+        TextView tvMother = sheet.findViewById(R.id.tvQuickViewMother);
+        TextView tvFather = sheet.findViewById(R.id.tvQuickViewFather);
+        TextView tvPhone = sheet.findViewById(R.id.tvQuickViewPhone);
+        android.widget.Button btnClose = sheet.findViewById(R.id.btnQuickViewClose);
+
+        tvAvatar.setText(s.rollNo != null && !s.rollNo.isEmpty() ? s.rollNo : "1");
+        tvName.setText(s.name != null ? s.name : "N/A");
+        tvRegNo.setText("Registration No: " + (s.registrationNo != null && !s.registrationNo.isEmpty() ? s.registrationNo : "N/A"));
+        
+        tvDob.setText(s.dob != null && !s.dob.isEmpty() ? s.dob : "-");
+        tvGender.setText(s.gender != null && !s.gender.isEmpty() ? s.gender : "-");
+        
+        String religionCaste = "";
+        if (s.religion != null && !s.religion.isEmpty()) religionCaste += s.religion;
+        if (s.cast != null && !s.cast.isEmpty()) {
+            if (!religionCaste.isEmpty()) religionCaste += " / ";
+            religionCaste += s.cast;
+        }
+        tvCaste.setText(!religionCaste.isEmpty() ? religionCaste : "-");
+
+        tvMother.setText(s.motherName != null && !s.motherName.isEmpty() ? s.motherName : "-");
+        tvFather.setText(s.fatherName != null && !s.fatherName.isEmpty() ? s.fatherName : "-");
+        
+        String phone = "";
+        if (s.motherPhone != null && !s.motherPhone.isEmpty()) phone += s.motherPhone;
+        else if (s.fatherPhone != null && !s.fatherPhone.isEmpty()) phone += s.fatherPhone;
+        tvPhone.setText(!phone.isEmpty() ? phone : "-");
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void showSubjectQuickViewDialog(Student s, Subject sub, MarksRecord record) {
+        if (getContext() == null || s == null || sub == null) return;
+        
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
+        View sheet = LayoutInflater.from(getContext()).inflate(R.layout.dialog_subject_quick_view, null);
+        dialog.setContentView(sheet);
+
+        TextView tvTitle = sheet.findViewById(R.id.tvSubjectTitle);
+        tvTitle.setText(sub.name + " (" + s.name + ")");
+
+        TextView tvA1 = sheet.findViewById(R.id.tvA1);
+        TextView tvA2 = sheet.findViewById(R.id.tvA2);
+        TextView tvA3 = sheet.findViewById(R.id.tvA3);
+        TextView tvA4 = sheet.findViewById(R.id.tvA4);
+        TextView tvA5 = sheet.findViewById(R.id.tvA5);
+        TextView tvA6 = sheet.findViewById(R.id.tvA6);
+        TextView tvA7 = sheet.findViewById(R.id.tvA7);
+        TextView tvA8 = sheet.findViewById(R.id.tvA8);
+        TextView tvATotal = sheet.findViewById(R.id.tvATotal);
+
+        TextView tvS1 = sheet.findViewById(R.id.tvS1);
+        TextView tvS2 = sheet.findViewById(R.id.tvS2);
+        TextView tvS3 = sheet.findViewById(R.id.tvS3);
+        TextView tvSTotal = sheet.findViewById(R.id.tvSTotal);
+
+        TextView tvGrandTotal = sheet.findViewById(R.id.tvGrandTotal);
+        TextView tvGrade = sheet.findViewById(R.id.tvGrade);
+        TextView tvRemark = sheet.findViewById(R.id.tvRemark);
+        android.widget.Button btnClose = sheet.findViewById(R.id.btnSubQuickViewClose);
+
+        MarksRecord.SubjectMarksDetail details = record != null && record.detailedMarks != null ? record.detailedMarks.get(sub.name) : null;
+
+        int aMax = sub.maxMarks / 2;
+        if (Subject.isNonAcademic(sub.name)) aMax = sub.maxMarks;
+
+        if (details != null) {
+            tvA1.setText(details.nirikhshan + "/" + sub.maxNirikhshan);
+            tvA2.setText(details.tondiKam + "/" + sub.maxTondiKam);
+            tvA3.setText(details.pratyakshik + "/" + sub.maxPratyakshik);
+            tvA4.setText(details.upkram + "/" + sub.maxUpkram);
+            tvA5.setText(details.prakalp + "/" + sub.maxPrakalp);
+            tvA6.setText(details.chachani + "/" + sub.maxChachani);
+            tvA7.setText(details.swadhyay + "/" + sub.maxSwadhyay);
+            tvA8.setText(details.itar + "/" + sub.maxItar);
+            tvATotal.setText(details.akarikTotal + "/" + aMax);
+
+            int sMax = sub.maxMarks - aMax;
+            tvS1.setText(details.tondi + "/" + sub.maxTondi);
+            tvS2.setText(details.pratyakshikB + "/" + sub.maxPratyakshikB);
+            tvS3.setText(details.lekhi + "/" + sub.maxLekhi);
+            tvSTotal.setText(details.sanklit + "/" + sMax);
+
+            tvGrandTotal.setText(details.grandTotal + "/" + sub.maxMarks);
+            tvGrade.setText(details.grade != null && !details.grade.isEmpty() ? details.grade : "-");
+            tvRemark.setText("Remark: " + (details.remark != null && !details.remark.isEmpty() ? details.remark : "-"));
+        } else {
+            tvA1.setText("0/" + sub.maxNirikhshan);
+            tvA2.setText("0/" + sub.maxTondiKam);
+            tvA3.setText("0/" + sub.maxPratyakshik);
+            tvA4.setText("0/" + sub.maxUpkram);
+            tvA5.setText("0/" + sub.maxPrakalp);
+            tvA6.setText("0/" + sub.maxChachani);
+            tvA7.setText("0/" + sub.maxSwadhyay);
+            tvA8.setText("0/" + sub.maxItar);
+            tvATotal.setText("0/" + aMax);
+
+            int sMax = sub.maxMarks - aMax;
+            tvS1.setText("0/" + sub.maxTondi);
+            tvS2.setText("0/" + sub.maxPratyakshikB);
+            tvS3.setText("0/" + sub.maxLekhi);
+            tvSTotal.setText("0/" + sMax);
+
+            tvGrandTotal.setText("0/" + sub.maxMarks);
+            tvGrade.setText("-");
+            tvRemark.setText("Remark: -");
+        }
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 }

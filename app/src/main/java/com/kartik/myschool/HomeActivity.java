@@ -542,7 +542,7 @@ public class HomeActivity extends BaseActivity {
         android.view.MenuItem itemSchoolLevelDropdown = menu.findItem(R.id.nav_school_level_dropdown);
         if (itemSchoolLevelDropdown != null) {
             itemSchoolLevelDropdown
-                    .setTitle(getString(R.string.txt_school_level_info) + (isSchoolLevelExpanded ? " ▴" : " ▾"));
+                    .setTitle(getString(R.string.txt_school_level_info) + (isSchoolLevelExpanded ? " \u25B2" : " \u25BC"));
         }
         android.view.MenuItem itemGender = menu.findItem(R.id.nav_gender);
         if (itemGender != null) {
@@ -604,21 +604,7 @@ public class HomeActivity extends BaseActivity {
 
     private void toggleSchoolLevelDropdown() {
         isSchoolLevelExpanded = !isSchoolLevelExpanded;
-
-        android.transition.TransitionManager.beginDelayedTransition(b.navigationView);
-
-        android.view.Menu menu = b.navigationView.getMenu();
-        if (menu != null) {
-            if (menu.findItem(R.id.nav_gender) != null) menu.findItem(R.id.nav_gender).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_school_info) != null) menu.findItem(R.id.nav_school_info).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_cast_category) != null) menu.findItem(R.id.nav_cast_category).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_class_teacher) != null) menu.findItem(R.id.nav_class_teacher).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_classes) != null) menu.findItem(R.id.nav_classes).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_subject) != null) menu.findItem(R.id.nav_subject).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_default_values) != null) menu.findItem(R.id.nav_default_values).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_working_days) != null) menu.findItem(R.id.nav_working_days).setVisible(isSchoolLevelExpanded);
-            if (menu.findItem(R.id.nav_he_she_items) != null) menu.findItem(R.id.nav_he_she_items).setVisible(isSchoolLevelExpanded);
-        }
+        localizeSidebar();
     }
 
 

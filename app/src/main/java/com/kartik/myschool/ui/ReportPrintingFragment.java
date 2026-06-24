@@ -1346,17 +1346,13 @@ public class ReportPrintingFragment extends Fragment {
                     v -> generateAndShowCollectivePdf(),
                     v -> {
                         PopupMenu popup = new PopupMenu(v.getContext(), v);
-                        popup.getMenu().add("Page Setup");
                         popup.getMenu().add("Select Margins");
-                        popup.getMenu().add("Unicode Settings");
                         popup.getMenu().add("Check Remaining Info");
                         popup.setOnMenuItemClickListener(menuItem -> {
                             if (menuItem.getTitle().equals("Select Margins")) {
                                 showReportSettingsDialog(true, -1, "All Reports (Global)");
                             } else if (menuItem.getTitle().equals("Check Remaining Info")) {
                                 showMissingInfoDialog();
-                            } else {
-                                Toast.makeText(getContext(), menuItem.getTitle() + " clicked", Toast.LENGTH_SHORT).show();
                             }
                             return true;
                         });

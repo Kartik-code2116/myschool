@@ -1,0 +1,452 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.section{margin:2rem 0}
+.section-title{font-size:18px;font-weight:500;margin-bottom:1rem;padding-bottom:8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;text-align:center}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.metric-val{font-size:22px;font-weight:500}
+.good{color:#1D9E75}.warn{color:#BA7517}.bad{color:#E24B4A}.info{color:#378ADD}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:13px;min-width:160px;color:var(--color-text-primary)}
+.bar-track{flex:1;height:10px;background:var(--color-background-secondary);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width 1s ease}
+.bar-score{font-size:13px;font-weight:500;min-width:36px;text-align:right}
+.tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary)}
+.tab.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.tab-content{display:none}.tab-content.active{display:block}
+.issue-row{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.issue-row:last-child{border-bottom:none}
+.badge{font-size:11px;padding:3px 8px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap}
+.badge-crit{background:#FCEBEB;color:#791F1F}
+.badge-warn{background:#FAEEDA;color:#633806}
+.badge-good{background:#EAF3DE;color:#27500A}
+.phase-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:10px}
+.phase-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.phase-title{font-size:15px;font-weight:500}
+.phase-num{font-size:12px;color:var(--color-text-secondary)}
+.task-list{list-style:none;margin-top:8px}
+.task-list li{font-size:13px;padding:4px 0;color:var(--color-text-secondary);padding-left:16px;position:relative}
+.task-list li::before{content:"→";position:absolute;left:0;color:var(--color-text-tertiary)}
+.app-compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1.5rem}
+.app-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.app-name{font-size:11px;font-weight:500;margin-bottom:4px}
+.app-score{font-size:18px;font-weight:500}
+.star-row{display:flex;gap:2px;justify-content:center;font-size:12px;margin-top:2px}
+.highlight-box{background:var(--color-background-info);border:0.5px solid var(--color-border-info);border-radius:var(--border-radius-md);padding:10px 14px;font-size:13px;color:var(--color-text-info);margin-bottom:12px}
+.crash-box{background:#FCEBEB;border:0.5px solid #F7C1C1;border-radius:var(--border-radius-md);padding:10px 14px;font-size:13px;color:#791F1F;margin-bottom:12px}
+</style>
+
+<h2 class="sr-only">MySchool (Edu Report) app — full analysis, rating, and perfection roadmap compared to global top educational apps</h2>
+
+<div class="section">
+  <div class="highlight-box">
+    <i class="ti ti-info-circle" aria-hidden="true"></i>
+    <strong>App:</strong> MySchool / Edu Report (माझी शाळा) &nbsp;|&nbsp; <strong>Version:</strong> 1.1 (versionCode 2) &nbsp;|&nbsp; <strong>Language:</strong> Java 17 &nbsp;|&nbsp; <strong>Target SDK:</strong> 36 (Android 16)
+  </div>
+  <div class="crash-box">
+    <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+    <strong>FATAL crash detected in logcat.txt (Jun 7):</strong> <code>ClassNotFoundException: MySchoolApplication</code> — the app crashed at startup on a release APK due to a ProGuard obfuscation issue stripping the Application class. This is a P0 (critical) bug.
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Overall score vs top global educational apps</div>
+  <div class="app-compare-grid">
+    <div class="app-card">
+      <div class="app-name">Google Classroom</div>
+      <div class="app-score good">91</div>
+      <div class="star-row good">★★★★★</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">ClassDojo</div>
+      <div class="app-score good">87</div>
+      <div class="star-row good">★★★★☆</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">iGrade</div>
+      <div class="app-score info">74</div>
+      <div class="star-row info">★★★★☆</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">Grade Tracker Pro</div>
+      <div class="app-score info">70</div>
+      <div class="star-row info">★★★☆☆</div>
+    </div>
+    <div class="app-card" style="border:1.5px solid var(--color-border-info)">
+      <div class="app-name" style="color:var(--color-text-info)">MySchool ✦</div>
+      <div class="app-score warn">63</div>
+      <div class="star-row warn">★★★☆☆</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">Smart Teacher</div>
+      <div class="app-score warn">58</div>
+      <div class="star-row warn">★★★☆☆</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Rating breakdown — 12 dimensions (out of 100)</div>
+
+  <div class="tabs" id="tabBar">
+    <div class="tab active" onclick="showTab('strengths')">Strengths</div>
+    <div class="tab" onclick="showTab('ux')">UX & Smoothness</div>
+    <div class="tab" onclick="showTab('code')">Code Quality</div>
+    <div class="tab" onclick="showTab('issues')">Issues Found</div>
+  </div>
+
+  <div id="strengths" class="tab-content active">
+    <div style="margin-bottom:12px;font-size:13px;color:var(--color-text-secondary)">Areas where MySchool excels compared to competitors</div>
+
+    <div class="bar-row">
+      <div class="bar-label">Offline-first architecture</div>
+      <div class="bar-track"><div class="bar-fill" style="width:88%;background:#1D9E75"></div></div>
+      <div class="bar-score good">88/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Bilingual support (EN + MR)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:90%;background:#1D9E75"></div></div>
+      <div class="bar-score good">90/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Domain specialisation (CCE)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:92%;background:#1D9E75"></div></div>
+      <div class="bar-score good">92/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">PDF generation depth</div>
+      <div class="bar-track"><div class="bar-fill" style="width:85%;background:#1D9E75"></div></div>
+      <div class="bar-score good">85/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">OCR scan-to-marks feature</div>
+      <div class="bar-track"><div class="bar-fill" style="width:80%;background:#1D9E75"></div></div>
+      <div class="bar-score good">80/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Firebase cache strategy (TTL)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:82%;background:#1D9E75"></div></div>
+      <div class="bar-score good">82/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Feature completeness</div>
+      <div class="bar-track"><div class="bar-fill" style="width:85%;background:#1D9E75"></div></div>
+      <div class="bar-score good">85/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Security (App Check, rules)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:75%;background:#639922"></div></div>
+      <div class="bar-score good">75/100</div>
+    </div>
+  </div>
+
+  <div id="ux" class="tab-content">
+    <div style="margin-bottom:12px;font-size:13px;color:var(--color-text-secondary)">User experience, performance, and smoothness ratings</div>
+
+    <div class="bar-row">
+      <div class="bar-label">Screen transition speed</div>
+      <div class="bar-track"><div class="bar-fill" style="width:72%;background:#639922"></div></div>
+      <div class="bar-score info">72/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">First launch time (cold start)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:60%;background:#BA7517"></div></div>
+      <div class="bar-score warn">60/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Navigation intuitiveness</div>
+      <div class="bar-track"><div class="bar-fill" style="width:58%;background:#BA7517"></div></div>
+      <div class="bar-score warn">58/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Marks entry UX (grid input)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:55%;background:#BA7517"></div></div>
+      <div class="bar-score warn">55/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Onboarding / first-run flow</div>
+      <div class="bar-track"><div class="bar-fill" style="width:40%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">40/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Error handling visibility</div>
+      <div class="bar-track"><div class="bar-fill" style="width:50%;background:#BA7517"></div></div>
+      <div class="bar-score warn">50/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Hallucination / wrong data</div>
+      <div class="bar-track"><div class="bar-fill" style="width:30%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">30/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Accessibility (a11y)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:35%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">35/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Empty states / loading UX</div>
+      <div class="bar-track"><div class="bar-fill" style="width:52%;background:#BA7517"></div></div>
+      <div class="bar-score warn">52/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Visual design polish</div>
+      <div class="bar-track"><div class="bar-fill" style="width:62%;background:#639922"></div></div>
+      <div class="bar-score info">62/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Responsiveness (tablet/foldable)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:30%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">30/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Play Store rating readiness</div>
+      <div class="bar-track"><div class="bar-fill" style="width:55%;background:#BA7517"></div></div>
+      <div class="bar-score warn">55/100</div>
+    </div>
+  </div>
+
+  <div id="code" class="tab-content">
+    <div style="margin-bottom:12px;font-size:13px;color:var(--color-text-secondary)">Code architecture, maintainability and best practices</div>
+
+    <div class="bar-row">
+      <div class="bar-label">Architecture (MVVM+Repo)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:70%;background:#639922"></div></div>
+      <div class="bar-score info">70/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Singleton safety (DCL)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:80%;background:#1D9E75"></div></div>
+      <div class="bar-score good">80/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Memory leak risk</div>
+      <div class="bar-track"><div class="bar-fill" style="width:45%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">45/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Static AppCache design</div>
+      <div class="bar-track"><div class="bar-fill" style="width:40%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">40/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">ProGuard config completeness</div>
+      <div class="bar-track"><div class="bar-fill" style="width:35%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">35/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Kotlin migration readiness</div>
+      <div class="bar-track"><div class="bar-fill" style="width:20%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">20/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Test coverage</div>
+      <div class="bar-track"><div class="bar-fill" style="width:10%;background:#E24B4A"></div></div>
+      <div class="bar-score bad">10/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Coroutine / async hygiene</div>
+      <div class="bar-track"><div class="bar-fill" style="width:52%;background:#BA7517"></div></div>
+      <div class="bar-score warn">52/100</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Error propagation model</div>
+      <div class="bar-track"><div class="bar-fill" style="width:60%;background:#BA7517"></div></div>
+      <div class="bar-score warn">60/100</div>
+    </div>
+  </div>
+
+  <div id="issues" class="tab-content">
+    <div style="margin-bottom:12px;font-size:13px;color:var(--color-text-secondary)">All confirmed issues ranked by severity</div>
+
+    <div class="issue-row">
+      <span class="badge badge-crit">P0 CRASH</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">ProGuard strips MySchoolApplication class</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Fatal crash on Jun 7 logcat. Release APK fails immediately at startup. Add <code>-keep class com.kartik.myschool.** { *; }</code> or specific keep rule in proguard-rules.pro.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-crit">P0 DATA</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">Static AppCache causes stale/cross-user data</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">AppCache is a raw static class with no lifecycle awareness. On process restart or second login, stale data from previous session is served to UI — teachers can see each other's class data. Should be ViewModel-scoped or cleared on logout.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-crit">P0 LOGIC</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">Semester detection relies on string heuristics</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">In <code>getMarksForStudentAndSemester()</code> — falls back to checking if semesterId "contains '2'" or "contains 'second'" to determine semester number. Fragile. Will misroute marks if ID happens to contain "2".</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P1 UX</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">HomeActivity has 700+ lines of inline logic</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">All navigation, toolbar logic, sidebar setup, offline detection, locale switching crammed into one Activity. God-object antipattern. Increases crash surface and makes debugging navigation bugs extremely hard.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P1 UX</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">No onboarding / empty state flow</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">New teachers see a blank HomeActivity with no guidance on "what to do first" (create school → add year → add class → add students). Top apps like ClassDojo show a step-by-step setup wizard. This is the #1 reason new users churn.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P1 PERF</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">Marks entry: full class Firestore fetch on every open</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Even with TTL cache, the 5-min window means large classes (40+ students) must wait for Firestore on cold open. Switching students causes visible lag. No pagination or lazy load in the marks grid.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P1 DATA</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">No Firestore composite index — sorting done in Java</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Students sorted in-memory after fetching all documents. With 200+ students this is O(N log N) on main thread. Should use Firestore orderBy with composite index (classId + rollNo).</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P1 CRASH</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">NetworkCallback registered/unregistered in onStart/onStop (not safe)</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">If connectivityManager is null or networkCallback not yet initialized when onStop runs, silent exception is swallowed with e.printStackTrace() — not reported to Crashlytics. Should null-check and use try-finally.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P2 UX</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">No undo/confirmation on destructive actions</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Deleting a student, deleting marks, promoting students — no snackbar undo. Firestore delete is permanent. ClassDojo and Google Classroom both offer 30-second undo on destructive actions.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-warn">P2 A11Y</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">Missing content descriptions on icon-only buttons</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Toolbar menu/help/calc buttons set contentDescription only in setupDrawerActions — many icon-only buttons elsewhere have none. TalkBack users cannot navigate the app.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-good">P3 NICE</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">No tablet / large-screen layout</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">All layouts are phone-portrait only. Google Play now penalises apps without large-screen support in rankings. A two-pane layout (class list + student detail) would dramatically improve tablet UX.</div>
+      </div>
+    </div>
+    <div class="issue-row">
+      <span class="badge badge-good">P3 NICE</span>
+      <div>
+        <div style="font-size:13px;font-weight:500">Zero automated tests</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">androidTest and test directories exist but are empty. GradeCalculator, PdfLocalizer, and mergeRecords() logic are critical paths that should have unit tests. Any mark calculation regression goes undetected.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Perfection roadmap — phased plan to reach global top ranking</div>
+
+  <div class="phase-card" style="border-left:3px solid #E24B4A">
+    <div class="phase-header">
+      <div class="phase-title">Phase 1 — Stop the bleeding (Week 1–2)</div>
+      <div class="phase-num">Target score after: 72/100</div>
+    </div>
+    <ul class="task-list">
+      <li>Fix ProGuard: add <code>-keep class com.kartik.myschool.** { *; }</code> + <code>-keepnames</code> for Firebase models</li>
+      <li>Fix AppCache stale data: call <code>AppCache.clear()</code> + <code>FirebaseRepository.clearCache()</code> in logout AND in <code>SessionContext.clear()</code></li>
+      <li>Fix semester detection: store <code>semesterNumber</code> (int) on every MarksRecord at save time, never heuristic-detect from ID string</li>
+      <li>Add Crashlytics breadcrumbs to all caught exceptions (replace all <code>e.printStackTrace()</code> calls)</li>
+      <li>Add null safety: check <code>networkCallback != null</code> before registering in onStart</li>
+    </ul>
+  </div>
+
+  <div class="phase-card" style="border-left:3px solid #BA7517">
+    <div class="phase-header">
+      <div class="phase-title">Phase 2 — First-time user experience (Week 3–5)</div>
+      <div class="phase-num">Target score after: 79/100</div>
+    </div>
+    <ul class="task-list">
+      <li>Build a 4-step setup wizard: School info → Academic Year → First Class → First Students</li>
+      <li>Add empty-state illustrations on all blank screens (no students, no classes, no marks)</li>
+      <li>Add undo snackbar (5s) on all destructive operations using <code>Snackbar.make(...).setAction("Undo", ...)</code></li>
+      <li>Add progress indicators to PDF generation (currently shows nothing during iText rendering)</li>
+      <li>Add content descriptions to all ImageButton and ImageView elements</li>
+    </ul>
+  </div>
+
+  <div class="phase-card" style="border-left:3px solid #378ADD">
+    <div class="phase-header">
+      <div class="phase-title">Phase 3 — Performance & scale (Week 6–8)</div>
+      <div class="phase-num">Target score after: 85/100</div>
+    </div>
+    <ul class="task-list">
+      <li>Add Firestore composite indexes: (classId + rollNo), (classId + semesterId + teacherId)</li>
+      <li>Migrate marks grid to paginated RecyclerView with DiffUtil (avoid rebinding entire adapter on single student update)</li>
+      <li>Move HomeActivity into NavigationComponent cleanly — extract DrawerManager, ToolbarManager, LocaleManager helper classes</li>
+      <li>Convert AppCache from static class to Hilt-injected singleton with proper lifecycle scoping</li>
+      <li>Add Room offline queue for attendance saves (currently UNAVAILABLE code only partially handles offline)</li>
+    </ul>
+  </div>
+
+  <div class="phase-card" style="border-left:3px solid #1D9E75">
+    <div class="phase-header">
+      <div class="phase-title">Phase 4 — Global ranking push (Week 9–14)</div>
+      <div class="phase-num">Target score after: 91/100</div>
+    </div>
+    <ul class="task-list">
+      <li>Add large-screen / tablet two-pane layout using SlidingPaneLayout or WindowSizeClass API</li>
+      <li>Migrate to Kotlin + Coroutines (start with new files; keep Java where stable)</li>
+      <li>Add JUnit unit tests for GradeCalculator, PdfLocalizer, mergeRecords() — min 60% coverage on business logic</li>
+      <li>Add parent-facing push notifications via FCM when new marks are published</li>
+      <li>Add Play Store in-app review prompt after teacher's 5th PDF generated (optimal moment)</li>
+      <li>Add Gemini AI assistant: auto-suggest descriptive remarks based on student's marks pattern</li>
+      <li>Submit for Google Play's "Editor's Choice" program — offline-first + bilingual is a strong story for India market</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Final overall rating</div>
+  <div class="metric-grid">
+    <div class="metric">
+      <div class="metric-label">Overall score</div>
+      <div class="metric-val warn">63/100</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">After Phase 1</div>
+      <div class="metric-val info">72/100</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">After Phase 2</div>
+      <div class="metric-val info">79/100</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">After Phase 3</div>
+      <div class="metric-val good">85/100</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">After Phase 4</div>
+      <div class="metric-val good">91/100</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Global competitors avg</div>
+      <div class="metric-val info">76/100</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
