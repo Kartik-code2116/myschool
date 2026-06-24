@@ -48,6 +48,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
     private final List<SubjectItem> items = new ArrayList<>();
     private final List<String> activeSubjectNames = new ArrayList<>();
     private OnToggleListener toggleListener;
+    private final int[] lastAnimatedPos = {-1};
 
     public void setOnToggleListener(OnToggleListener listener) {
         this.toggleListener = listener;
@@ -173,6 +174,8 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
             });
             popup.show();
         });
+        
+        com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);
     }
 
     @Override

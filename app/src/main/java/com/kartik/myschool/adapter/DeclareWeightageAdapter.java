@@ -16,6 +16,7 @@ import java.util.List;
 public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeightageAdapter.VH> {
 
     private final List<Subject> subjects = new ArrayList<>();
+    private final int[] lastAnimatedPos = {-1};
 
     public void setData(List<Subject> list) {
         subjects.clear();
@@ -223,6 +224,8 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
         b.etTondiMax.addTextChangedListener(holder.subWatcher);
         b.etPratyakshikBMax.addTextChangedListener(holder.subWatcher);
         b.etLekhiMax.addTextChangedListener(holder.subWatcher);
+        
+        com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);
     }
 
     private void setVal(EditText et, int val) {

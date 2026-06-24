@@ -716,6 +716,7 @@ public class ExtraMenusFragment extends Fragment {
     private class SchoolSubjectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private static final int TYPE_HEADER = 0;
         private static final int TYPE_SUBJECT = 1;
+        private final int[] lastAnimatedPos = {-1};
 
         private final List<SchoolSubjectItem> items = new ArrayList<>();
 
@@ -830,6 +831,7 @@ public class ExtraMenusFragment extends Fragment {
                     });
                     popup.show();
                 });
+                com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);
             }
         }
 
@@ -860,6 +862,7 @@ public class ExtraMenusFragment extends Fragment {
     private class RemarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private static final int TYPE_HEADER = 0;
         private static final int TYPE_SUBJECT = 1;
+        private final int[] lastAnimatedPos = {-1};
 
         private final List<SchoolSubjectItem> items = new ArrayList<>();
 
@@ -932,6 +935,7 @@ public class ExtraMenusFragment extends Fragment {
                         loadAndRenderRemarks(h, item.name);
                     }
                 });
+                com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);
             }
         }
 
@@ -1874,3 +1878,4 @@ public class ExtraMenusFragment extends Fragment {
         }
     }
 }
+

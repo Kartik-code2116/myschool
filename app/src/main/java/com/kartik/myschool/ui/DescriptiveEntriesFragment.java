@@ -551,7 +551,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Student st = students.get(position);
             holder.bind(st, position + 1);
-            com.kartik.myschool.utils.UiAnimations.animateScrollReveal(holder.itemView, position, lastPosition);
+            com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastPosition);
         }
 
         @Override

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardBackgroundColor="?attr/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Avatar / Roll Number -->
+            <TextView
+                android:id="@+id/tvMissingInfoRoll"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_circle"
+                android:backgroundTint="#F3EEFF"
+                android:textColor="#6C4CCF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:text="1"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/tvMissingInfoName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/tvMissingInfoRoll"
+                android:layout_toStartOf="@id/ivMissingInfoStatus"
+                android:layout_marginStart="12dp"
+                android:layout_centerVertical="true"
+                android:text="Student Name"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <!-- Status Icon (Green Tick or Red Warning) -->
+            <ImageView
+                android:id="@+id/ivMissingInfoStatus"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_check_circle"
+                app:tint="#4CAF50" />
+        </RelativeLayout>
+
+        <!-- Missing Information Text -->
+        <TextView
+            android:id="@+id/tvMissingInfoDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="44dp"
+            android:text="Missing: Father Name, Maths Marks"
+            android:textColor="#D32F2F"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1349,9 +1349,12 @@ public class ReportPrintingFragment extends Fragment {
                         popup.getMenu().add("Page Setup");
                         popup.getMenu().add("Select Margins");
                         popup.getMenu().add("Unicode Settings");
+                        popup.getMenu().add("Check Remaining Info");
                         popup.setOnMenuItemClickListener(menuItem -> {
                             if (menuItem.getTitle().equals("Select Margins")) {
                                 showReportSettingsDialog(true, -1, "All Reports (Global)");
+                            } else if (menuItem.getTitle().equals("Check Remaining Info")) {
+                                showMissingInfoDialog();
                             } else {
                                 Toast.makeText(getContext(), menuItem.getTitle() + " clicked", Toast.LENGTH_SHORT).show();
                             }
@@ -1439,4 +1442,117 @@ public class ReportPrintingFragment extends Fragment {
             }
         }
     }
+
+    private void showMissingInfoDialog() {
+        if (getContext() == null || com.kartik.myschool.SessionContext.selectedClass == null) return;
+
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(getContext());
+        android.view.View sheet = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_missing_info, null);
+        dialog.setContentView(sheet);
+
+        androidx.recyclerview.widget.RecyclerView rv = sheet.findViewById(R.id.rvMissingInfo);
+        android.widget.ProgressBar progress = sheet.findViewById(R.id.progressMissingInfo);
+        android.widget.ImageButton btnClose = sheet.findViewById(R.id.btnCloseMissingInfo);
+
+        rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        com.kartik.myschool.adapter.MissingInfoAdapter adapter = new com.kartik.myschool.adapter.MissingInfoAdapter();
+        rv.setAdapter(adapter);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+
+        String classId = com.kartik.myschool.SessionContext.selectedClass.id;
+        String[] sids = getSemesterIds();
+        String semesterId = sids[0]; // Currently just using sem 1 for missing checks, can be expanded
+        
+        com.kartik.myschool.repository.FirebaseRepository.get().getStudentsForClass(classId, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.List<com.kartik.myschool.model.Student>>() {
+            @Override
+            public void onSuccess(java.util.List<com.kartik.myschool.model.Student> students) {
+                if (!isAdded()) return;
+
+                com.kartik.myschool.repository.FirebaseRepository.get().getMarksForClassAndSemester(classId, semesterId, new com.kartik.myschool.repository.FirebaseRepository.OnResult<java.util.Map<String, com.kartik.myschool.model.MarksRecord>>() {
+                    @Override
+                    public void onSuccess(java.util.Map<String, com.kartik.myschool.model.MarksRecord> marksMap) {
+                        if (!isAdded()) return;
+
+                        java.util.List<com.kartik.myschool.adapter.MissingInfoAdapter.MissingInfoItem> items = new java.util.ArrayList<>();
+                        java.util.List<com.kartik.myschool.model.Subject> classSubjects = com.kartik.myschool.SessionContext.selectedClass.subjects;
+
+                        for (com.kartik.myschool.model.Student s : students) {
+                            java.util.List<String> missing = new java.util.ArrayList<>();
+                            
+                            // Check profile
+                            if (s.dob == null || s.dob.trim().isEmpty()) missing.add("DOB");
+                            if (s.motherName == null || s.motherName.trim().isEmpty()) missing.add("Mother Name");
+                            if (s.gender == null || s.gender.trim().isEmpty()) missing.add("Gender");
+                            if (s.cast == null || s.cast.trim().isEmpty()) missing.add("Caste");
+                            if (s.religion == null || s.religion.trim().isEmpty()) missing.add("Religion");
+
+                            // Check marks & remarks
+                            com.kartik.myschool.model.MarksRecord record = marksMap.get(s.id);
+                            
+                            if (classSubjects != null) {
+                                // 1. Check Marks for all academic subjects
+                                for (com.kartik.myschool.model.Subject sub : classSubjects) {
+                                    boolean hasDetails = record != null && record.detailedMarks != null && record.detailedMarks.containsKey(sub.name);
+                                    if (!hasDetails || (record.detailedMarks.get(sub.name).grandTotal == 0 && (record.detailedMarks.get(sub.name).grade == null || record.detailedMarks.get(sub.name).grade.trim().isEmpty()))) {
+                                        missing.add(sub.name + " (Marks)");
+                                    }
+                                }
+
+                                // 2. Check Descriptive Remarks for all academic subjects + 4 special ones
+                                java.util.List<String> descSubjects = new java.util.ArrayList<>();
+                                for (com.kartik.myschool.model.Subject sub : classSubjects) descSubjects.add(sub.name);
+                                descSubjects.add("Vishesh pragati");
+                                descSubjects.add("Aavad, chanda, etc");
+                                descSubjects.add("Sudharna Aavashyaka");
+                                descSubjects.add("Vyaktimatva gun vishgesh");
+
+                                for (String subName : descSubjects) {
+                                    boolean hasDetails = record != null && record.detailedMarks != null && record.detailedMarks.containsKey(subName);
+                                    if (!hasDetails || record.detailedMarks.get(subName).remark == null || record.detailedMarks.get(subName).remark.trim().isEmpty()) {
+                                        missing.add(subName + " (Remarks)");
+                                    }
+                                }
+                            }
+
+                            items.add(new com.kartik.myschool.adapter.MissingInfoAdapter.MissingInfoItem(s, missing));
+                        }
+
+                        // Sort: Students with missing info first, then by roll number
+                        items.sort((a, b) -> {
+                            boolean aEmpty = a.missingDetails.isEmpty();
+                            boolean bEmpty = b.missingDetails.isEmpty();
+                            if (aEmpty != bEmpty) return aEmpty ? 1 : -1;
+                            
+                            try {
+                                int r1 = Integer.parseInt(a.student.rollNo);
+                                int r2 = Integer.parseInt(b.student.rollNo);
+                                return Integer.compare(r1, r2);
+                            } catch (Exception e) {
+                                return 0;
+                            }
+                        });
+
+                        progress.setVisibility(android.view.View.GONE);
+                        rv.setVisibility(android.view.View.VISIBLE);
+                        adapter.setData(items);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        progress.setVisibility(android.view.View.GONE);
+                        android.widget.Toast.makeText(getContext(), "Failed to load marks", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                progress.setVisibility(android.view.View.GONE);
+                android.widget.Toast.makeText(getContext(), "Failed to load students", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
+
