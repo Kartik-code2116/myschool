@@ -73,12 +73,14 @@ public class HelpDialogHelper {
                         + "📌 नवीन विद्यार्थी जोडण्यासाठी खालील '+' बटणावर क्लिक करा.\n\n"
                         + "📌 शोध घेण्यासाठी वर असलेल्या सर्च बारचा वापर करा.\n\n"
                         + "📌 विद्यार्थ्याचे गुण किंवा हजेरी भरण्यासाठी उजव्या बाजूच्या ३-बिंदू मेनूवर क्लिक करा.\n\n"
-                        + "📌 एक्सेल (Excel) चिन्हावर क्लिक करून विद्यार्थ्यांचा डेटा आयात (Import) किंवा निर्यात (Export) करा."
+                        + "📌 एक्सेल (Excel) चिन्हावर क्लिक करून विद्यार्थ्यांचा डेटा आयात (Import) किंवा निर्यात (Export) करा.\n\n"
+                        + "📌 वर्गाचे आलेख आणि सांख्यिकी पाहण्यासाठी टूलबारमधील चार्ट (📊) चिन्हावर टॅप करा."
                         : "❤️ View and manage all students enrolled in the active class.\n\n"
                         + "📌 Click the '+' button in the bottom right corner to add a new student.\n\n"
                         + "📌 Use the top search bar to find students by name or roll number.\n\n"
                         + "📌 Tap the 3-dots menu on a student card to enter marks, attendance, or edit info.\n\n"
-                        + "📌 Tap the Excel icon in the toolbar to import or export student profiles.";
+                        + "📌 Tap the Excel icon in the toolbar to import or export student profiles.\n\n"
+                        + "📌 Tap the Chart (📊) icon in the toolbar to view class statistics and charts.";
                 break;
 
             case "formative_summative":
@@ -115,18 +117,18 @@ public class HelpDialogHelper {
                 title = isMarathi ? "मासिक उपस्थिती :" : "Monthly Attendance :";
                 message = isMarathi
                         ? "❤️ विद्यार्थ्यांची प्रत्येक महिन्याची हजेरी नोंदवा.\n\n"
-                        + "📌 'हजेरी जोडा' (+) चिन्हावर क्लिक करून महिना निवडा व हजेरी भरा.\n\n"
+                        + "📌 विद्यार्थी जोडण्यासाठी किंवा यादी पाहण्यासाठी '+' चिन्हावर क्लिक करा.\n\n"
                         + "📌 शोध (🔍) चिन्हाचा वापर करून विशिष्ट विद्यार्थी त्वरित शोधा.\n\n"
                         + "📌 प्रत्येक विद्यार्थ्याच्या बॉक्समध्ये डावीकडे एकूण 'हजर दिवस' (हिरवा आकडा) दिसतो.\n\n"
                         + "📌 बॉक्समधील तक्त्यात प्रत्येक महिन्याचे 'हजर/एकूण' (उदा. 24/26) दिवस दिसतात.\n\n"
-                        + "📌 ३-बिंदू (⋮) वर क्लिक करून डुप्लिकेट किंवा डिलीट पर्याय निवडू शकता.\n\n"
+                        + "📌 प्रत्येक विद्यार्थ्याच्या बॉक्समधील ३-बिंदू (⋮) वर क्लिक करून डुप्लिकेट किंवा डिलीट पर्याय निवडू शकता.\n\n"
                         + "📌 वर्गाचा एकूण हजेरी अहवाल पाहण्यासाठी 'कॅल्क्युलेटर' (🧮) दाबा."
                         : "❤️ Record student attendance for each month of the academic year.\n\n"
-                        + "📌 Tap 'Add' (+) to select a month and enter attendance for everyone.\n\n"
+                        + "📌 Tap the '+' icon to go to the Student List page to add or manage student details.\n\n"
                         + "📌 Use the Search (🔍) icon to filter for a specific student.\n\n"
                         + "📌 Each student box displays the total 'Present Days' on the left.\n\n"
                         + "📌 The grid inside the box shows 'Present/Total' days (e.g., 24/26) for each month.\n\n"
-                        + "📌 Click the 3-dots (⋮) option to duplicate or delete attendance records.\n\n"
+                        + "📌 Click the 3-dots (⋮) option on a student card to duplicate or delete attendance records.\n\n"
                         + "📌 Tap the Calculator (🧮) icon to view the class attendance report.";
                 break;
 

@@ -219,10 +219,10 @@ public class ProductTourHelper {
                         m ? "३. एक्सेल 📊" : "3. Excel 📊",
                         m ? "या चिन्हावर टॅप केल्यास CSV आयात किंवा CSV निर्यात पर्याय दिसेल."
                           : "Tap to choose between importing students from CSV or exporting to CSV."));
-                s.add(new TourStep(R.id.btnSave,
-                        m ? "४. डेटा जतन 💾" : "4. Save Data 💾",
-                        m ? "वर्गातील सर्व विद्यार्थ्यांची माहिती बॅकअप म्हणून जतन करा."
-                          : "Save a backup of all student information in the class."));
+                s.add(new TourStep(R.id.btnDashboard,
+                        m ? "४. सांख्यिकी डॅशबोर्ड 📊" : "4. Stats Dashboard 📊",
+                        m ? "तुमच्या वर्गाची मुले-मुलींचे प्रमाण, जात प्रवर्ग आणि इतर सांख्यिकी आलेख स्वरूपात पाहण्यासाठी येथे टॅप करा."
+                          : "Tap here to view the graphical statistics and caste/gender ratio charts for your class."));
                 s.add(new TourStep(R.id.btnMoreOptions,
                         m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: सर्व गुण रीसेट, क्रम बदलणे इत्यादी पर्याय आहेत."
@@ -258,39 +258,35 @@ public class ProductTourHelper {
                         m ? "हजेरी पानाची संपूर्ण मार्गदर्शिका पाहण्यासाठी येथे टॅप करा."
                           : "Tap to open the complete guide for the Attendance page."));
                 s.add(new TourStep(R.id.btnToolbarAdd,
-                        m ? "३. हजेरी जोडा +" : "3. Add Attendance +",
-                        m ? "'जोडा' दाबल्यावर महिना निवडा, एकूण दिवस व हजर दिवस प्रविष्ट करा."
-                          : "Tap Add to select a month and enter working days + present days."));
+                        m ? "३. विद्यार्थी व्यवस्थापन ➕" : "3. Manage Students ➕",
+                        m ? "वर्गामध्ये नवीन विद्यार्थी जोडण्यासाठी किंवा विद्यार्थ्यांची यादी पाहण्यासाठी येथे टॅप करा."
+                          : "Tap this button to go to the Student List page to add or manage student details."));
                 s.add(new TourStep(R.id.btnToolbarCalc,
-                        m ? "४. कॅल्क्युलेटर (हजेरी अहवाल) 🧮" : "4. Calculator (Attendance Report) 🧮",
-                        m ? "वर्गाचा हजेरी अहवाल पाहण्यासाठी या कॅल्क्युलेटर चिन्हावर दाबा."
+                        m ? "४. हजेरी अहवाल 🧮" : "4. Attendance Report 🧮",
+                        m ? "वर्गाचा एकूण हजेरी अहवाल पाहण्यासाठी या कॅल्क्युलेटर चिन्हावर दाबा."
                           : "Tap this calculator icon to view the class attendance report."));
-                s.add(new TourStep(R.id.btnToolbarMore,
-                        m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
-                        m ? "⋮ मेनूमध्ये: हजेरी कॉपी करणे, डिलीट करणे इत्यादी पर्याय आहेत."
-                          : "⋮ menu has options to copy attendance to another month or delete."));
                 s.add(new TourStep(R.id.btnSearchStudents,
-                        m ? "६. विद्यार्थी शोधा 🔍" : "6. Search Student 🔍",
+                        m ? "५. विद्यार्थी शोधा 🔍" : "5. Search Student 🔍",
                         m ? "विशिष्ट विद्यार्थ्याची हजेरी तपासण्यासाठी त्याचे नाव किंवा रोल नंबर शोधा."
                           : "Type a name or roll number to search and filter for a specific student."));
                 s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "७. विद्यार्थी हजेरी यादी" : "7. Student Attendance List",
+                        m ? "६. विद्यार्थी हजेरी यादी" : "6. Student Attendance List",
                         m ? "येथे प्रत्येक विद्यार्थ्याचा हजेरी बॉक्स दिसतो. प्रत्येक बॉक्समध्ये विद्यार्थ्याच्या वार्षिक हजेरीचा संपूर्ण तपशील असतो. खालील स्टेप्समध्ये प्रत्येक भाग समजून घ्या."
                           : "Each student has their own attendance box here. It shows the full yearly attendance summary. The next steps will explain each part of the box."));
                 s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.tvAttendanceTotal,
-                        m ? "८. एकूण हजर दिवस 🟢" : "8. Total Present Days 🟢",
+                        m ? "७. एकूण हजर दिवस 🟢" : "7. Total Present Days 🟢",
                         m ? "बॉक्सच्या डाव्या बाजूला मोठा हिरवा आकडा दिसतो.\n\nहा आकडा म्हणजे त्या विद्यार्थ्याचे वर्षभरातील एकूण 'हजर दिवस' (Total Present Days) होय.\n\nजास्त आकडा = जास्त उपस्थिती. 🎉"
                           : "The large green number on the left side of the box shows the student's Total Present Days for the entire year.\n\nHigher number = Better attendance! 🎉"));
                 s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.tvJun,
-                        m ? "९. १२ महिन्यांचा तक्ता 📊" : "9. 12 Months Grid 📊",
+                        m ? "८. १२ महिन्यांचा तक्ता 📊" : "8. 12 Months Grid 📊",
                         m ? "प्रत्येक बॉक्समध्ये जून ते मे पर्यंत १२ महिन्यांचा तक्ता असतो.\n\nप्रत्येक महिन्यात 'हजर / एकूण' (उदा. 24/26) असे लिहिलेले दिसते.\n• पहिला आकडा = त्या महिन्यात हजर दिवस\n• दुसरा आकडा = एकूण कामकाजाचे दिवस\n\nतक्त्यावर स्क्रोल करून सर्व महिने पाहता येतात."
                           : "Each box contains a 12-month grid from June to May.\n\nEach cell shows 'Present / Total' (e.g. 24/26):\n• First number = Days present that month\n• Second number = Total working days that month\n\nScroll the grid to see all months."));
                 s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.cardStudentAttendance,
-                        m ? "१०. हजेरी बदलण्यासाठी बॉक्सवर क्लिक करा ✏️" : "10. Tap Box to Edit Attendance ✏️",
+                        m ? "९. हजेरी बदलण्यासाठी बॉक्सवर क्लिक करा ✏️" : "9. Tap Box to Edit Attendance ✏️",
                         m ? "कोणत्याही विद्यार्थ्याच्या हजेरी बॉक्सवर क्लिक करा.\n\nएक 'हजेरी भरा' पॉप-अप उघडेल. त्यात:\n• प्रत्येक महिन्यासाठी हजर दिवस व एकूण कामकाज दिवस टाका.\n• 'जतन करा' दाबून हजेरी सेव्ह करा.\n\nहे अगदी तशाच पद्धतीने काम करते जसे आकारिक-संकलित गुण भरताना करतात."
                           : "Tap anywhere on any student's attendance box to open the Edit Attendance popup.\n\nIn the popup:\n• Enter Present Days and Working Days for each month.\n• Tap 'Save' to save the attendance.\n\nThis works exactly like the marks entry popup on the Formative/Summative page."));
                 s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.ivOptions,
-                        m ? "११. ⋮ मेन्यू: Duplicate व Delete" : "11. ⋮ Menu: Duplicate & Delete",
+                        m ? "१०. ⋮ मेन्यू: Duplicate व Delete" : "10. ⋮ Menu: Duplicate & Delete",
                         m ? "प्रत्येक हजेरी बॉक्सच्या उजव्या कोपऱ्यात (⋮) मेन्यू असतो.\n\n• 'Duplicate' → एका विद्यार्थ्याची हजेरी दुसऱ्या विद्यार्थ्यावर कॉपी करा (उदा. वर्गाची समान हजेरी सर्वांसाठी लावायची असल्यास).\n• 'Delete' → त्या विद्यार्थ्याची सर्व हजेरी नष्ट करा.\n\n⚠️ Delete केल्यावर हजेरी परत येत नाही, काळजी घ्या!"
                           : "Each attendance box has a ⋮ (3-dots) menu in the top-right corner.\n\n• 'Duplicate' → Copy this student's attendance to another student (useful when multiple students have the same attendance).\n• 'Delete' → Permanently remove all attendance data for this student.\n\n⚠️ Deleted attendance cannot be recovered!"));
                 break;
@@ -515,11 +511,11 @@ public class ProductTourHelper {
                         m ? "या पेजविषयी सर्व माहिती मिळवण्यासाठी '?' वर क्लिक करा."
                           : "Tap '?' to get all information about this report printing page."));
                 s.add(new TourStep(R.id.rvReportCards, 0, R.id.btnReportSettings,
-                        m ? "⚙️ सेटिंग चिन्ह" : "⚙️ Settings Icon",
+                        m ? "४. ⚙️ सेटिंग चिन्ह" : "4. ⚙️ Settings Icon",
                         m ? "काही अहवालांसाठी येथे टॅप करून अतिरिक्त माहिती भरता येते (उदा. शेरे, तारखा)." 
                           : "Tap here for reports that require additional settings or custom text."));
                 s.add(new TourStep(R.id.rvReportCards, 0, R.id.btnReportAction,
-                        m ? "🖨️ प्रिंट चिन्ह" : "🖨️ Print Icon",
+                        m ? "५. 🖨️ प्रिंट चिन्ह" : "5. 🖨️ Print Icon",
                         m ? "हा अहवाल त्वरित PDF स्वरूपात तयार करण्यासाठी येथे टॅप करा." 
                           : "Tap this print icon to instantly generate the PDF for this report."));
                 s.add(new TourStep(R.id.rvReportCards, 0,
@@ -616,7 +612,7 @@ public class ProductTourHelper {
                           : "All classes in the school are listed here. Tap a class to make it active."));
 
                 s.add(new TourStep(R.id.fabAddClass,
-                        m ? "८. नवीन वर्ग जोडा +" : "8. Add New Class +",
+                        m ? "७. नवीन वर्ग जोडा +" : "7. Add New Class +",
                         m ? "'+' FAB दाबून नवीन वर्ग व तुकडी (उदा. ५-A) तयार करा. लगेच यादीत दिसेल."
                           : "Tap '+' to create a new class and division (e.g. Class 5-A). It appears instantly."));
                 break;
@@ -689,11 +685,11 @@ public class ProductTourHelper {
                         m ? "बँक खाते, शाखा, IFSC व UID पाहण्यासाठी 'बँक' टॅप करा."
                           : "Tap Bank to see account number, branch, IFSC code and UID."));
                 s.add(new TourStep(R.id.btnEditStudent,
-                        m ? "८. माहिती संपादित करा ✏️" : "8. Edit Student ✏️",
+                        m ? "७. माहिती संपादित करा ✏️" : "7. Edit Student ✏️",
                         m ? "'संपादित करा' दाबून विद्यार्थ्याची कोणतीही माहिती बदला."
                           : "Press Edit to update any field of this student's profile."));
                 s.add(new TourStep(R.id.btnSpecialCard,
-                        m ? "९. विशेष प्रगती पत्रक 📄" : "9. Special Progress Card 📄",
+                        m ? "८. विशेष प्रगती पत्रक 📄" : "8. Special Progress Card 📄",
                         m ? "विशेष आणि अत्यंत आकर्षक डिझाईन असलेले प्रगती पत्रक PDF स्वरूपात तयार व डाऊनलोड करण्यासाठी येथे टॅप करा."
                           : "Tap to generate and view a beautifully styled personalized special progress card PDF."));
                 break;
