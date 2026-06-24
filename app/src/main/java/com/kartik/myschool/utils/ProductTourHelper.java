@@ -262,31 +262,35 @@ public class ProductTourHelper {
                         m ? "'जोडा' दाबल्यावर महिना निवडा, एकूण दिवस व हजर दिवस प्रविष्ट करा."
                           : "Tap Add to select a month and enter working days + present days."));
                 s.add(new TourStep(R.id.btnToolbarCalc,
-                        m ? "४. हजेरी अहवाल 📋" : "4. Attendance Report 📋",
-                        m ? "वर्गाची सरासरी हजेरी टक्केवारी व सर्वोत्तम विद्यार्थी येथे पाहा."
-                          : "View class average attendance percentage and top attending students."));
+                        m ? "४. कॅल्क्युलेटर (हजेरी अहवाल) 🧮" : "4. Calculator (Attendance Report) 🧮",
+                        m ? "वर्गाचा हजेरी अहवाल पाहण्यासाठी या कॅल्क्युलेटर चिन्हावर दाबा."
+                          : "Tap this calculator icon to view the class attendance report."));
                 s.add(new TourStep(R.id.btnToolbarMore,
                         m ? "५. अधिक पर्याय ⋮" : "5. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: हजेरी कॉपी करणे, डिलीट करणे इत्यादी पर्याय आहेत."
                           : "⋮ menu has options to copy attendance to another month or delete."));
+                s.add(new TourStep(R.id.btnSearchStudents,
+                        m ? "६. विद्यार्थी शोधा 🔍" : "6. Search Student 🔍",
+                        m ? "विशिष्ट विद्यार्थ्याची हजेरी तपासण्यासाठी त्याचे नाव किंवा रोल नंबर शोधा."
+                          : "Type a name or roll number to search and filter for a specific student."));
                 s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "६. विद्यार्थी हजेरी यादी" : "6. Student Attendance List",
+                        m ? "७. विद्यार्थी हजेरी यादी" : "7. Student Attendance List",
                         m ? "येथे प्रत्येक विद्यार्थ्याचा हजेरी बॉक्स दिसतो. प्रत्येक बॉक्समध्ये विद्यार्थ्याच्या वार्षिक हजेरीचा संपूर्ण तपशील असतो. खालील स्टेप्समध्ये प्रत्येक भाग समजून घ्या."
                           : "Each student has their own attendance box here. It shows the full yearly attendance summary. The next steps will explain each part of the box."));
-                s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "७. एकूण हजर दिवस 🟢" : "7. Total Present Days 🟢",
+                s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.tvAttendanceTotal,
+                        m ? "८. एकूण हजर दिवस 🟢" : "8. Total Present Days 🟢",
                         m ? "बॉक्सच्या डाव्या बाजूला मोठा हिरवा आकडा दिसतो.\n\nहा आकडा म्हणजे त्या विद्यार्थ्याचे वर्षभरातील एकूण 'हजर दिवस' (Total Present Days) होय.\n\nजास्त आकडा = जास्त उपस्थिती. 🎉"
                           : "The large green number on the left side of the box shows the student's Total Present Days for the entire year.\n\nHigher number = Better attendance! 🎉"));
-                s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "८. १२ महिन्यांचा तक्ता 📊" : "8. 12 Months Grid 📊",
+                s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.tvJun,
+                        m ? "९. १२ महिन्यांचा तक्ता 📊" : "9. 12 Months Grid 📊",
                         m ? "प्रत्येक बॉक्समध्ये जून ते मे पर्यंत १२ महिन्यांचा तक्ता असतो.\n\nप्रत्येक महिन्यात 'हजर / एकूण' (उदा. 24/26) असे लिहिलेले दिसते.\n• पहिला आकडा = त्या महिन्यात हजर दिवस\n• दुसरा आकडा = एकूण कामकाजाचे दिवस\n\nतक्त्यावर स्क्रोल करून सर्व महिने पाहता येतात."
                           : "Each box contains a 12-month grid from June to May.\n\nEach cell shows 'Present / Total' (e.g. 24/26):\n• First number = Days present that month\n• Second number = Total working days that month\n\nScroll the grid to see all months."));
-                s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "९. हजेरी बदलण्यासाठी बॉक्सवर क्लिक करा ✏️" : "9. Tap Box to Edit Attendance ✏️",
+                s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.cardStudentAttendance,
+                        m ? "१०. हजेरी बदलण्यासाठी बॉक्सवर क्लिक करा ✏️" : "10. Tap Box to Edit Attendance ✏️",
                         m ? "कोणत्याही विद्यार्थ्याच्या हजेरी बॉक्सवर क्लिक करा.\n\nएक 'हजेरी भरा' पॉप-अप उघडेल. त्यात:\n• प्रत्येक महिन्यासाठी हजर दिवस व एकूण कामकाज दिवस टाका.\n• 'जतन करा' दाबून हजेरी सेव्ह करा.\n\nहे अगदी तशाच पद्धतीने काम करते जसे आकारिक-संकलित गुण भरताना करतात."
                           : "Tap anywhere on any student's attendance box to open the Edit Attendance popup.\n\nIn the popup:\n• Enter Present Days and Working Days for each month.\n• Tap 'Save' to save the attendance.\n\nThis works exactly like the marks entry popup on the Formative/Summative page."));
-                s.add(new TourStep(R.id.rvAttendanceStudents,
-                        m ? "१०. ⋮ मेन्यू: Duplicate व Delete" : "10. ⋮ Menu: Duplicate & Delete",
+                s.add(new TourStep(R.id.rvAttendanceStudents, 0, R.id.ivOptions,
+                        m ? "११. ⋮ मेन्यू: Duplicate व Delete" : "11. ⋮ Menu: Duplicate & Delete",
                         m ? "प्रत्येक हजेरी बॉक्सच्या उजव्या कोपऱ्यात (⋮) मेन्यू असतो.\n\n• 'Duplicate' → एका विद्यार्थ्याची हजेरी दुसऱ्या विद्यार्थ्यावर कॉपी करा (उदा. वर्गाची समान हजेरी सर्वांसाठी लावायची असल्यास).\n• 'Delete' → त्या विद्यार्थ्याची सर्व हजेरी नष्ट करा.\n\n⚠️ Delete केल्यावर हजेरी परत येत नाही, काळजी घ्या!"
                           : "Each attendance box has a ⋮ (3-dots) menu in the top-right corner.\n\n• 'Duplicate' → Copy this student's attendance to another student (useful when multiple students have the same attendance).\n• 'Delete' → Permanently remove all attendance data for this student.\n\n⚠️ Deleted attendance cannot be recovered!"));
                 break;
@@ -313,23 +317,27 @@ public class ProductTourHelper {
                         m ? "नवीन FA किंवा SA मूल्यमापन तयार करण्यासाठी '+' दाबा."
                           : "Tap '+' to create a new Formative or Summative evaluation entry."));
                 s.add(new TourStep(R.id.btnCalcSquare,
-                        m ? "४. कॅल्क्युलेटर 🧮" : "4. Calculator 🧮",
-                        m ? "गुणांची गणना तपासण्यासाठी बिल्ट-इन कॅल्क्युलेटर वापरा."
-                          : "Use the built-in calculator to cross-check and verify marks."));
+                        m ? "४. एकत्रित गुण अहवाल 📊" : "4. Full Marks Report 📊",
+                        m ? "वर्गाचा एकूण सरासरी निकाल, उत्तीर्ण-अनुत्तीर्ण प्रमाण आणि सर्वाधिक गुण मिळवणारे विद्यार्थी यांचा एकत्रित अहवाल पाहण्यासाठी येथे टॅप करा."
+                          : "Tap this icon to view the full class marks report, class average, pass/fail status, and top scorers."));
+                s.add(new TourStep(R.id.btnSearchStudents,
+                        m ? "५. विद्यार्थी शोधा 🔍" : "5. Search Students 🔍",
+                        m ? "नाव किंवा रोल नंबर टाकून त्वरित विशिष्ट विद्यार्थी शोधा."
+                          : "Type a name or roll number to quickly find a specific student."));
                 s.add(new TourStep(R.id.btnGridListToggle,
-                        m ? "५. दृश्य बदला 🔄" : "5. Toggle View 🔄",
+                        m ? "६. दृश्य बदला 🔄" : "6. Toggle View 🔄",
                         m ? "ग्रीड दृश्य (अनेक विद्यार्थी एकत्र) किंवा लिस्ट दृश्य निवडा."
                           : "Switch between Grid view (compact) and List view (detailed)."));
                 s.add(new TourStep(R.id.btnThreeDotMenu,
-                        m ? "६. अधिक पर्याय ⋮" : "6. More Options ⋮",
+                        m ? "७. अधिक पर्याय ⋮" : "7. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: गुण सेव्ह, रीसेट, विद्यार्थी क्रम बदलणे इत्यादी पर्याय आहेत."
                           : "⋮ menu has save, reset marks and reorder student options."));
                 s.add(new TourStep(R.id.rvEvaluationStudents,
-                        m ? "७. विद्यार्थी मूल्यमापन यादी" : "7. Student Evaluation List",
+                        m ? "८. विद्यार्थी मूल्यमापन यादी" : "8. Student Evaluation List",
                         m ? "प्रत्येक विद्यार्थ्याच्या रांगेत गुण भरा. रंगीत गुण = सेव्ह झाले."
                           : "Enter marks in each student row. Coloured marks are already saved."));
                 s.add(new TourStep(R.id.swipeRefreshLayout,
-                        m ? "८. खाली ओढून रिफ्रेश करा" : "8. Pull to Refresh",
+                        m ? "९. खाली ओढून रिफ्रेश करा" : "9. Pull to Refresh",
                         m ? "यादी खाली ओढल्यास ताज्या डेटाने रिफ्रेश होते."
                           : "Pull the list down to refresh and reload the latest student data."));
                 break;
@@ -354,14 +362,30 @@ public class ProductTourHelper {
                         m ? "३. शेरे जोडा +" : "3. Add Remarks +",
                         m ? "नवीन शेऱ्याची नोंद करण्यासाठी '+' बटण दाबा."
                           : "Tap '+' to begin adding a new descriptive remark entry."));
+                s.add(new TourStep(R.id.btnCalcSquare,
+                        m ? "४. वर्णनात्मक नोंदी अहवाल 📊" : "4. Remarks Report 📊",
+                        m ? "वर्गातील विद्यार्थ्यांचे एकूण शेरे आणि कोणत्या विद्यार्थ्यांचे शेरे अपूर्ण आहेत, याचा एकत्रित अहवाल पाहण्यासाठी येथे टॅप करा."
+                          : "Tap this icon to view the full descriptive remarks report, total remarks entered, and student progress status."));
+                s.add(new TourStep(R.id.btnSearchStudents,
+                        m ? "५. विद्यार्थी शोधा 🔍" : "5. Search Students 🔍",
+                        m ? "नाव किंवा रोल नंबर टाकून त्वरित विशिष्ट विद्यार्थी शोधा."
+                          : "Type a name or roll number to quickly find a specific student."));
+                s.add(new TourStep(R.id.btnGridListToggle,
+                        m ? "६. दृश्य बदला 🔄" : "6. Toggle View 🔄",
+                        m ? "ग्रीड दृश्य (अनेक विद्यार्थी एकत्र) किंवा लिस्ट दृश्य निवडा."
+                          : "Switch between Grid view (compact) and List view (detailed)."));
                 s.add(new TourStep(R.id.btnThreeDotMenu,
-                        m ? "४. अधिक पर्याय ⋮" : "4. More Options ⋮",
+                        m ? "७. अधिक पर्याय ⋮" : "7. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: शेरे डिलीट, 'तो'→'ती' (लिंग बदल), रीसेट पर्याय आहेत."
                           : "⋮ has delete entries, swap gender (he→she) and reset options."));
                 s.add(new TourStep(R.id.rvDescriptiveStudents,
-                        m ? "५. विद्यार्थी यादी" : "5. Student List",
+                        m ? "८. विद्यार्थी यादी" : "8. Student List",
                         m ? "प्रत्येक विद्यार्थ्याच्या कार्डावर टॅप केल्यास त्याचे शेरे संपादित होतात."
                           : "Tap a student card to open and edit their descriptive remarks."));
+                s.add(new TourStep(R.id.swipeRefreshLayout,
+                        m ? "९. खाली ओढून रिफ्रेश करा" : "9. Pull to Refresh",
+                        m ? "यादी खाली ओढल्यास ताज्या डेटाने रिफ्रेश होते."
+                          : "Pull the list down to refresh and reload the latest student data."));
                 break;
 
             // ════════════════════════════════════════════════════════════
@@ -482,6 +506,14 @@ public class ProductTourHelper {
                         m ? "१. वर्ष व सत्र" : "1. Year & Semester",
                         m ? "कोणत्या वर्ष व सत्रासाठी गुणपत्रक तयार होत आहे ते येथे दिसते."
                           : "Confirms which academic year and semester marksheets are for."));
+                s.add(new TourStep(R.id.btnWatchSquare,
+                        m ? "२. व्हिडिओ 🎥" : "2. Watch Video 🎥",
+                        m ? "ॲनिमेटेड व्हिडिओ पाहण्यासाठी या चिन्हावर क्लिक करा."
+                          : "Tap this icon to watch the animated guide video for this page."));
+                s.add(new TourStep(R.id.btnHelpSquare,
+                        m ? "३. मदत ?" : "3. Help ?",
+                        m ? "या पेजविषयी सर्व माहिती मिळवण्यासाठी '?' वर क्लिक करा."
+                          : "Tap '?' to get all information about this report printing page."));
                 s.add(new TourStep(R.id.rvReportCards, 0, R.id.btnReportSettings,
                         m ? "⚙️ सेटिंग चिन्ह" : "⚙️ Settings Icon",
                         m ? "काही अहवालांसाठी येथे टॅप करून अतिरिक्त माहिती भरता येते (उदा. शेरे, तारखा)." 
@@ -544,6 +576,9 @@ public class ProductTourHelper {
                 s.add(new TourStep(R.id.rvReportCards, 17,
                         m ? "अहवाल १८: १८. प्रगतीपत्रक मुखपृष्ठ" : "Report 18: 18. Progress Card Cover",
                         m ? "A4 प्रथम सत्र प्रगतीपत्रक" : "A4 First Semester Progress Card"));
+                s.add(new TourStep(R.id.rvReportCards, 18,
+                        m ? "अहवाल १९: १९. होलिस्टिक प्रोग्रेस कार्ड (HPC)" : "Report 19: 19. Holistic Progress Card (HPC)",
+                        m ? "NEP 2020 360-डिग्री मूल्यमापन अहवाल" : "NEP 2020 360-degree assessment report"));
                 break;
 
             // ════════════════════════════════════════════════════════════
@@ -793,6 +828,120 @@ public class ProductTourHelper {
                         m ? "७. प्रक्रिया पूर्ण करा" : "7. Execute Adjustment",
                         m ? "निवडलेले विद्यार्थी नवीन वर्गात पाठवण्यासाठी हे बटण दाबा."
                           : "Press this button to commit the promotion or transfer process."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 18. Attendance Report (8 steps)
+            // ════════════════════════════════════════════════════════════
+            case "attendance_report":
+                s.add(new TourStep(0,
+                        m ? "📊 हजेरी अहवाल" : "📊 Attendance Report",
+                        m ? "वर्गातील विद्यार्थ्यांच्या मासिक आणि वार्षिक उपस्थितीचे विश्लेषण येथे पहा."
+                          : "View detailed monthly and yearly class attendance statistics."));
+                s.add(new TourStep(R.id.tvReportContext,
+                        m ? "१. सत्र व वर्ग माहिती" : "1. Active Session",
+                        m ? "हा अहवाल कोणत्या शैक्षणिक वर्ष आणि इयत्तेसाठी आहे ते येथे दिसते."
+                          : "Confirms the year, standard and division of the report data."));
+                s.add(new TourStep(R.id.tvTotalStudents,
+                        m ? "२. एकूण विद्यार्थी" : "2. Total Students",
+                        m ? "वर्गात एकूण किती विद्यार्थी आहेत ते येथे दिसते."
+                          : "Displays total number of students enrolled in the class."));
+                s.add(new TourStep(R.id.tvAvgAttendance,
+                        m ? "३. सरासरी उपस्थिती" : "3. Avg Attendance",
+                        m ? "वर्गातील सर्व विद्यार्थ्यांची एकूण सरासरी उपस्थिती टक्केवारी येथे दिसते."
+                          : "Shows the overall average attendance percentage of the entire class."));
+                s.add(new TourStep(R.id.tvTotalPresent,
+                        m ? "४. एकूण हजेरी दिवस" : "4. Total Present Days",
+                        m ? "वर्गातील सर्व विद्यार्थ्यांच्या एकूण हजर दिवसांची बेरीज येथे दिसते."
+                          : "Sum of all present days of all students combined."));
+                s.add(new TourStep(R.id.tvTotalWorking,
+                        m ? "५. एकूण कामकाजाचे दिवस" : "5. Total Working Days",
+                        m ? "सध्याच्या सत्रातील एकूण कामकाजाच्या दिवसांची संख्या येथे दिसते."
+                          : "Sum of all working/school days in the selected period."));
+                s.add(new TourStep(R.id.tvBestAttender,
+                        m ? "६. सर्वाधिक उपस्थिती असलेला विद्यार्थी" : "6. Best Attending Student",
+                        m ? "वर्गातील ज्या विद्यार्थ्याची उपस्थिती टक्केवारी सर्वाधिक आहे त्याचे नाव येथे दिसते."
+                          : "Highlights the student with the highest attendance percentage."));
+                s.add(new TourStep(R.id.rvReportStudents,
+                        m ? "७. विद्यार्थी यादी अहवाल" : "7. Student Roster",
+                        m ? "प्रत्येक विद्यार्थ्याचा रोल नंबर, नाव, एकूण हजर/कामकाजाचे दिवस आणि उपस्थिती टक्केवारी उतरत्या क्रमाने येथे दिसते."
+                          : "Displays each student's name, roll number, present days, working days, and attendance percentage. Sorted from highest to lowest."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 19. Evaluation Report / Marks Report (8 steps)
+            // ════════════════════════════════════════════════════════════
+            case "evaluation_report":
+                s.add(new TourStep(0,
+                        m ? "📊 मूल्यमापन अहवाल" : "📊 Evaluation Report",
+                        m ? "विद्यार्थ्यांचे विषयनिहाय एकूण गुण, सरासरी श्रेणी आणि निकाल सद्यस्थिती येथे पहा."
+                          : "View subject-wise overall marks, average grade, pass/fail status, and top scorers."));
+                s.add(new TourStep(R.id.tvReportContext,
+                        m ? "१. सत्र व वर्ग माहिती" : "1. Active Session",
+                        m ? "हा अहवाल कोणत्या शैक्षणिक वर्ष आणि इयत्तेसाठी आहे ते येथे दिसते."
+                          : "Confirms the academic year, standard and division."));
+                s.add(new TourStep(R.id.tvTotalStudents,
+                        m ? "२. एकूण विद्यार्थी" : "2. Total Students",
+                        m ? "परीक्षेला बसलेल्या एकूण विद्यार्थ्यांची संख्या येथे दिसते."
+                          : "Displays total number of students who appeared for exams."));
+                s.add(new TourStep(R.id.tvAvgGrade,
+                        m ? "३. सरासरी श्रेणी (Grade)" : "3. Class Average Grade",
+                        m ? "संपूर्ण वर्गाची सरासरी टक्केवारी आणि त्यानुसार मिळणारी सरासरी श्रेणी येथे दिसते."
+                          : "Shows the overall average grade and percentage of the entire class."));
+                s.add(new TourStep(R.id.tvTotalPass,
+                        m ? "४. उत्तीर्ण विद्यार्थी संख्या" : "4. Passed Students",
+                        m ? "सर्व परीक्षांमध्ये उत्तीर्ण झालेल्या विद्यार्थ्यांची एकूण संख्या येथे दिसते."
+                          : "Shows the count of students who cleared all evaluations."));
+                s.add(new TourStep(R.id.tvTotalFail,
+                        m ? "५. सुधारणा आवश्यक विद्यार्थी" : "5. Needs Improvement",
+                        m ? "ज्या विद्यार्थ्यांची प्रगती असमाधानकारक आहे त्यांची संख्या येथे दिसते."
+                          : "Shows the count of students who need additional improvement."));
+                s.add(new TourStep(R.id.tvTopScorer,
+                        m ? "६. प्रथम क्रमांकाचा विद्यार्थी" : "6. Top Scorer",
+                        m ? "वर्गामध्ये एकूण गुणांमध्ये सर्वाधिक टक्केवारी मिळविलेला विद्यार्थी येथे दिसतो."
+                          : "Highlights the student with the highest overall percentage."));
+                s.add(new TourStep(R.id.rvReportStudents,
+                        m ? "७. विद्यार्थी अहवाल यादी" : "7. Student Marks Roster",
+                        m ? "प्रत्येक विद्यार्थ्याचे एकूण मिळालेले गुण, एकूण कमाल गुण, टक्केवारी व श्रेणी उतरत्या क्रमाने येथे दिसते."
+                          : "Lists students with their individual total marks, out-of marks, grade, and percentage. Sorted from highest to lowest."));
+                break;
+
+            // ════════════════════════════════════════════════════════════
+            // 20. Descriptive Remarks Report (8 steps)
+            // ════════════════════════════════════════════════════════════
+            case "descriptive_report":
+                s.add(new TourStep(0,
+                        m ? "📊 वर्णनात्मक नोंदी अहवाल" : "📊 Descriptive Remarks Report",
+                        m ? "विविध विषयांमधील विद्यार्थ्यांच्या वर्णनात्मक नोंदी पूर्ण झाल्याची सद्यस्थिती येथे तपासा."
+                          : "Track completion progress of qualitative remarks and descriptors across subjects."));
+                s.add(new TourStep(R.id.tvReportContext,
+                        m ? "१. सत्र व वर्ग माहिती" : "1. Active Session",
+                        m ? "हा अहवाल कोणत्या शैक्षणिक वर्ष आणि इयत्तेसाठी आहे ते येथे दिसते."
+                          : "Confirms academic year, standard and division."));
+                s.add(new TourStep(R.id.tvTotalStudents,
+                        m ? "२. एकूण विद्यार्थी" : "2. Total Students",
+                        m ? "वर्गातील एकूण विद्यार्थ्यांची संख्या येथे दिसते."
+                          : "Displays total number of students in the class."));
+                s.add(new TourStep(R.id.tvTotalSubjects,
+                        m ? "३. एकूण मूल्यमापन घटक" : "3. Tracked Attributes",
+                        m ? "वर्गासाठी वर्णनात्मक नोंदी भरायचे एकूण विषय आणि इतर गुणवैशिष्ट्ये येथे दिसतात."
+                          : "Shows the total number of subjects and attributes tracked for remarks."));
+                s.add(new TourStep(R.id.tvRemarksFilled,
+                        m ? "४. एकूण भरलेले शेरे" : "4. Remarks Filled",
+                        m ? "वर्गातील सर्व विद्यार्थ्यांसाठी अबतपर्यंत भरलेल्या एकूण शेऱ्यांची बेरीज येथे दिसते."
+                          : "Shows the total count of remarks successfully entered across the class."));
+                s.add(new TourStep(R.id.tvCompletion,
+                        m ? "५. पूर्णत्व टक्केवारी" : "5. Completion Percentage",
+                        m ? "संपूर्ण वर्गाचे वर्णनात्मक शेरे भरणे किती टक्के पूर्ण झाले आहे ते येथे दिसते."
+                          : "Shows the completion progress of remarks for the entire class."));
+                s.add(new TourStep(R.id.tvTopStudent,
+                        m ? "६. सर्वाधिक नोंदी असलेला विद्यार्थी" : "6. Most Complete Profile",
+                        m ? "वर्गातील ज्या विद्यार्थ्याचे सर्वाधिक विषयांचे शेरे भरून पूर्ण झाले आहेत, त्याचे नाव येथे दिसते."
+                          : "Highlights the student with the most complete descriptive remarks profile."));
+                s.add(new TourStep(R.id.rvReportStudents,
+                        m ? "७. विद्यार्थी शेरा सद्यस्थिती" : "7. Completion Roster",
+                        m ? "प्रत्येक विद्यार्थ्याचे एकूण घटकांपैकी किती विषयांचे शेरे भरले आहेत (उदा. ७/१४) ते टक्केवारीसह उतरत्या क्रमाने येथे दिसते."
+                          : "Lists each student showing how many remarks are completed out of total attributes. Sorted by completion percentage."));
                 break;
 
             default:

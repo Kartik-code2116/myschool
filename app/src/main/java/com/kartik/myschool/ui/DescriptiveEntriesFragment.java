@@ -128,6 +128,13 @@ public class DescriptiveEntriesFragment extends Fragment {
                 ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
             }
         });
+        if (b.btnCalcSquare != null) {
+            b.btnCalcSquare.setOnClickListener(v -> {
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) getActivity()).navigateTo(R.id.nav_descriptive_report);
+                }
+            });
+        }
     }
 
     private void setupHeaderStrip() {

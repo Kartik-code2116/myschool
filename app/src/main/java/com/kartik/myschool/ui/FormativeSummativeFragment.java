@@ -141,7 +141,7 @@ public class FormativeSummativeFragment extends Fragment {
         });
         b.btnCalcSquare.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_print_report);
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_evaluation_report);
             }
         });
     }

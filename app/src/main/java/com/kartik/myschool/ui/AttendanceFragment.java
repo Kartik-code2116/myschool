@@ -68,7 +68,7 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
             }
             View btnCalc = ha.findViewById(R.id.btnToolbarCalc);
             if (btnCalc != null) {
-                btnCalc.setOnClickListener(v -> showClassReportDialog());
+                btnCalc.setOnClickListener(v -> ha.navigateTo(R.id.nav_attendance_report));
             }
         }
     }

@@ -161,4 +161,19 @@
         android:name="com.kartik.myschool.ui.SettingsFragment"
         android:label="Settings"/>
 
+    <fragment
+        android:id="@+id/nav_attendance_report"
+        android:name="com.kartik.myschool.ui.AttendanceReportFragment"
+        android:label="Attendance Report"/>
+
+    <fragment
+        android:id="@+id/nav_evaluation_report"
+        android:name="com.kartik.myschool.ui.EvaluationReportFragment"
+        android:label="Evaluation Report"/>
+
+    <fragment
+        android:id="@+id/nav_descriptive_report"
+        android:name="com.kartik.myschool.ui.DescriptiveReportFragment"
+        android:label="Descriptive Remarks Report"/>
+
 </navigation>

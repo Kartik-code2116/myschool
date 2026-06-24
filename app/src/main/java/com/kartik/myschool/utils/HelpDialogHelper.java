@@ -84,26 +84,30 @@ public class HelpDialogHelper {
             case "formative_summative":
                 title = isMarathi ? "मूल्यमापन नोंदणी :" : "Evaluation Entry :";
                 message = isMarathi
-                        ? "❤️ विद्यार्थ्यांचे विषयनिहाय घटक आणि गुण प्रविष्ट करा.\n\n"
+                        ? "❤️ विद्यार्थ्यांचे विषयनिहाय आकारिक आणि संकलित गुण प्रविष्ट करा.\n\n"
+                        + "📌 शोध (🔍) चिन्हाचा वापर करून विशिष्ट विद्यार्थी त्वरित शोधा.\n\n"
+                        + "📌 गुणांची बेरीज तपासण्यासाठी कॅल्क्युलेटर (🧮) वापरा.\n\n"
                         + "📌 गुणांची नोंद करण्यासाठी विद्यार्थ्याच्या कार्डावर किंवा ३-बिंदू मेनूवर क्लिक करा.\n\n"
-                        + "📌 आकारिक आणि संकलित मूल्यमापनाचे गुण वेगळे भरता येतात.\n\n"
-                        + "📌 वरील ग्रीड/लिस्ट बटणाद्वारे मांडणी बदलू शकता."
+                        + "📌 वरील 'ग्रीड/लिस्ट' (🔄) बटणाद्वारे मांडणी बदलू शकता."
                         : "❤️ Enter and review subject-wise formative and summative marks.\n\n"
+                        + "📌 Use the Search (🔍) icon to quickly find a specific student.\n\n"
+                        + "📌 Use the Calculator (🧮) to verify marks addition.\n\n"
                         + "📌 Click on a student's card or use the 3-dots menu to edit subject marks.\n\n"
-                        + "📌 Record scores for formative components and written summative tests.\n\n"
-                        + "📌 Use the toggle button at the top to switch between list and grid layouts.";
+                        + "📌 Use the toggle button (🔄) at the top to switch between list and grid layouts.";
                 break;
 
             case "descriptive":
                 title = isMarathi ? "वर्णनात्मक नोंदी शेरे :" : "Descriptive Remarks :";
                 message = isMarathi
                         ? "❤️ विद्यार्थ्यांच्या विषयानुरूप प्रगती आणि वर्णनात्मक नोंदी निवडा.\n\n"
+                        + "📌 शोध (🔍) चिन्हाचा वापर करून विशिष्ट विद्यार्थी त्वरित शोधा.\n\n"
                         + "📌 पूर्वनिर्धारित यादीमधून योग्य शेरे निवडा किंवा स्वतःच्या आवडीनुसार बदल करा.\n\n"
-                        + "📌 विद्यार्थ्याच्या विशेष आवडी आणि छंद देखील येथे जतन करा.\n\n"
-                        + "📌 ३-बिंदू मेनू वापरून जतन केलेले शेरे एकाच वेळी डिलीट किंवा बदलू शकता."
+                        + "📌 वरील 'ग्रीड/लिस्ट' (🔄) बटणाद्वारे मांडणी बदलू शकता.\n\n"
+                        + "📌 ३-बिंदू मेनू वापरून जतन केलेले शेरे एकाच वेळी डिलीट किंवा तो/ती (लिंग) बदलू शकता."
                         : "❤️ Record student progress and qualitative descriptive remarks.\n\n"
+                        + "📌 Use the Search (🔍) icon to quickly find a specific student.\n\n"
                         + "📌 Choose remarks from predefined templates or type customized entries.\n\n"
-                        + "📌 Manage special interests, hobby descriptions, and progress comments.\n\n"
+                        + "📌 Use the toggle button (🔄) at the top to switch between list and grid layouts.\n\n"
                         + "📌 Use the 3-dots menu to bulk delete or adjust gender pronouns in sentences.";
                 break;
 
@@ -111,17 +115,19 @@ public class HelpDialogHelper {
                 title = isMarathi ? "मासिक उपस्थिती :" : "Monthly Attendance :";
                 message = isMarathi
                         ? "❤️ विद्यार्थ्यांची प्रत्येक महिन्याची हजेरी नोंदवा.\n\n"
-                        + "📌 प्रत्येक विद्यार्थ्याच्या बॉक्समध्ये डावीकडे एकूण 'हजर दिवस' (मोठा हिरवा आकडा) दिसतो.\n\n"
+                        + "📌 'हजेरी जोडा' (+) चिन्हावर क्लिक करून महिना निवडा व हजेरी भरा.\n\n"
+                        + "📌 शोध (🔍) चिन्हाचा वापर करून विशिष्ट विद्यार्थी त्वरित शोधा.\n\n"
+                        + "📌 प्रत्येक विद्यार्थ्याच्या बॉक्समध्ये डावीकडे एकूण 'हजर दिवस' (हिरवा आकडा) दिसतो.\n\n"
                         + "📌 बॉक्समधील तक्त्यात प्रत्येक महिन्याचे 'हजर/एकूण' (उदा. 24/26) दिवस दिसतात.\n\n"
-                        + "📌 महिना निवडून हजेरी भरण्यासाठी विद्यार्थ्याच्या बॉक्सवर किंवा '+' चिन्हावर क्लिक करा.\n\n"
                         + "📌 ३-बिंदू (⋮) वर क्लिक करून डुप्लिकेट किंवा डिलीट पर्याय निवडू शकता.\n\n"
-                        + "📌 वर्गाचा एकूण हजेरी अहवाल आणि सर्वाधिक उपस्थिती असलेला विद्यार्थी पाहण्यासाठी रिपोर्ट आयकॉन दाबा."
+                        + "📌 वर्गाचा एकूण हजेरी अहवाल पाहण्यासाठी 'कॅल्क्युलेटर' (🧮) दाबा."
                         : "❤️ Record student attendance for each month of the academic year.\n\n"
-                        + "📌 Each student box displays the total 'Present Days' (Large Green Number) on the left.\n\n"
+                        + "📌 Tap 'Add' (+) to select a month and enter attendance for everyone.\n\n"
+                        + "📌 Use the Search (🔍) icon to filter for a specific student.\n\n"
+                        + "📌 Each student box displays the total 'Present Days' on the left.\n\n"
                         + "📌 The grid inside the box shows 'Present/Total' days (e.g., 24/26) for each month.\n\n"
-                        + "📌 Tap on a student's box or the '+' icon to enter attendance for a month.\n\n"
                         + "📌 Click the 3-dots (⋮) option to duplicate or delete attendance records.\n\n"
-                        + "📌 Tap the Report icon to view average class attendance and find best attender.";
+                        + "📌 Tap the Calculator (🧮) icon to view the class attendance report.";
                 break;
 
             case "subjects":
@@ -163,6 +169,8 @@ public class HelpDialogHelper {
                 title = isMarathi ? "गुणपत्रक प्रिंट अहवाल :" : "Print Report / Marksheet :";
                 message = isMarathi
                         ? "❤️ विद्यार्थ्यांचे अधिकृत प्रगतीपत्रक (गुणपत्रक) व इतर अहवाल पीडीएफ स्वरूपात तयार करा.\n\n"
+                        + "📌 विशिष्ट अहवालाची PDF काढण्यासाठी 'प्रिंट' (🖨️) चिन्हावर टॅप करा.\n\n"
+                        + "📌 अतिरिक्त माहिती भरण्यासाठी 'सेटिंग्ज' (⚙️) चिन्हावर टॅप करा.\n\n"
                         + "१. मुखपृष्ठ : प्रगतीपुस्तकाचे मुख्य कव्हर पेज.\n"
                         + "२. अनुक्रमणिका : वर्गातील विद्यार्थ्यांची यादी व इंडेक्स.\n"
                         + "३. गुणनोंदी : विषयनिहाय विद्यार्थ्यांचे गुण.\n"
@@ -182,6 +190,8 @@ public class HelpDialogHelper {
                         + "१७. जात श्रेणी तक्ता : जातनिहाय विद्यार्थी श्रेणी तक्ता.\n"
                         + "१८. प्रगतीपत्रक मुखपृष्ठ : प्रगतीपत्रक (इतर फॉरमॅट)."
                         : "❤️ Generate official report cards and PDFs.\n\n"
+                        + "📌 Tap the 'Print' (🖨️) icon next to any report to instantly generate the PDF.\n\n"
+                        + "📌 Tap the 'Settings' (⚙️) icon to configure custom text for that report.\n\n"
                         + "1. Cover Page : Progress book cover.\n"
                         + "2. Index : Student roster index.\n"
                         + "3. Marks Register : Subject-wise marks.\n"
@@ -285,6 +295,51 @@ public class HelpDialogHelper {
                         + "📌 Tap the '+' icon to easily create/register a new academic year on the fly.\n\n"
                         + "📌 Choose an Adjustment Mode: 'Promote (Copy)' to copy profiles to the new year, or 'Transfer (Move)' to update class pointers for division transfers.\n\n"
                         + "📌 Check/select the students in the roster checklist, and tap 'Execute Adjustment'.";
+                break;
+
+            case "attendance_report":
+                title = isMarathi ? "हजेरी अहवाल :" : "Attendance Report :";
+                message = isMarathi
+                        ? "❤️ संपूर्ण वर्गाचा मासिक व वार्षिक हजेरी अहवाल एकाच ठिकाणी पहा.\n\n"
+                        + "📌 एकूण विद्यार्थी संख्या आणि वर्गाची सरासरी उपस्थिती टक्केवारी येथे दिसते.\n\n"
+                        + "📌 वर्षभरातील एकूण हजर दिवस आणि एकूण कामकाजाचे दिवस यांचे प्रमाण तपासा.\n\n"
+                        + "📌 सर्वाधिक उपस्थिती असणारा विद्यार्थी ठळकपणे दिसतो.\n\n"
+                        + "📌 सर्व विद्यार्थ्यांची यादी त्यांच्या उपस्थितीच्या उतरत्या क्रमाने दिसते."
+                        : "❤️ View class-wide attendance summary, totals, and percentages.\n\n"
+                        + "📌 Displays total student count and overall class attendance percentage.\n\n"
+                        + "📌 Compare total present days against total working days.\n\n"
+                        + "📌 See the student with the best attendance record.\n\n"
+                        + "📌 List of all students sorted by their attendance percentage.";
+                break;
+
+            case "evaluation_report":
+                title = isMarathi ? "गुण अहवाल :" : "Marks Report :";
+                message = isMarathi
+                        ? "❤️ आकारिक आणि संकलित मूल्यमापनाचे विषयनिहाय एकूण गुण आणि टक्केवारी अहवाल पहा.\n\n"
+                        + "📌 वर्गाची सरासरी श्रेणी (Grade) आणि एकूण सरासरी टक्केवारी येथे दिसते.\n\n"
+                        + "📌 उत्तीर्ण आणि सुधारणा आवश्यक (Needs Improvement) विद्यार्थ्यांचे प्रमाण तपासा.\n\n"
+                        + "📌 वर्गातील प्रथम क्रमांकाचा (Top Scorer) विद्यार्थी पहा.\n\n"
+                        + "📌 सर्व विद्यार्थ्यांची यादी त्यांच्या एकूण गुणांच्या टक्केवारीच्या उतरत्या क्रमाने पहा."
+                        : "❤️ View subject-wise overall formative and summative marks report.\n\n"
+                        + "📌 Displays class average grade and class overall passing percentage.\n\n"
+                        + "📌 View pass and fail (needs improvement) student counts.\n\n"
+                        + "📌 Find the top-scoring student in the class.\n\n"
+                        + "📌 List of all students sorted by their final total percentage.";
+                break;
+
+            case "descriptive_report":
+                title = isMarathi ? "वर्णनात्मक नोंदी अहवाल :" : "Descriptive Remarks Report :";
+                message = isMarathi
+                        ? "❤️ वर्गातील विद्यार्थ्यांच्या वर्णनात्मक नोंदी पूर्ण झाल्याची सद्यस्थिती पहा.\n\n"
+                        + "📌 एकूण विद्यार्थी आणि वर्गातील एकूण विषय संख्या एका दृष्टीक्षेपात तपासा.\n\n"
+                        + "📌 आतापर्यंत भरलेल्या एकूण नोंदींचे प्रमाण आणि टक्केवारी पहा.\n\n"
+                        + "📌 सर्वाधिक नोंदी पूर्ण झालेला विद्यार्थी पहा.\n\n"
+                        + "📌 प्रत्येक विद्यार्थ्याच्या किती नोंदी पूर्ण झाल्या आहेत याची यादी पहा (उदा. 7/10 विषय पूर्ण)."
+                        : "❤️ Check completion status of qualitative remarks and descriptors.\n\n"
+                        + "📌 View the total number of students and total subjects in the class.\n\n"
+                        + "📌 Track the total descriptive remarks entered vs. total capacity.\n\n"
+                        + "📌 Find students with the most complete profiles.\n\n"
+                        + "📌 Roster showing exactly how many remarks are completed for each student (e.g., 7 / 10 subjects completed).";
                 break;
 
             default:
