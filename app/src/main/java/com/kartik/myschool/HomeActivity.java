@@ -31,6 +31,7 @@ public class HomeActivity extends BaseActivity {
     private boolean isSchoolLevelExpanded = false;
     private android.net.ConnectivityManager connectivityManager;
     private android.net.ConnectivityManager.NetworkCallback networkCallback;
+    private int pendingDestination = -1;
 
     public androidx.recyclerview.widget.RecyclerView.RecycledViewPool sharedPool = new androidx.recyclerview.widget.RecyclerView.RecycledViewPool();
 
@@ -390,16 +391,11 @@ public class HomeActivity extends BaseActivity {
         return true;
     }
 
-    /** Helper to allow the drawer to slide away smoothly BEFORE the main thread locks up for navigation. */
     private void closeDrawerAndNavigate(int destId) {
         if (b != null && b.drawerLayout != null) {
             b.drawerLayout.closeDrawer(GravityCompat.START);
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                navigateToAnimated(destId);
-            }, 250);
-        } else {
-            navigateToAnimated(destId);
         }
+        navigateToAnimated(destId);
     }
 
     private boolean navigateBottomItem(android.view.MenuItem item) {
@@ -611,16 +607,17 @@ public class HomeActivity extends BaseActivity {
 
         android.transition.TransitionManager.beginDelayedTransition(b.navigationView);
 
-        // Clear and re-inflate menu to force NavigationView to rebuild the adapter and
-        // reflect visibility changes instantly
-        b.navigationView.getMenu().clear();
-        b.navigationView.inflateMenu(R.menu.drawer_menu);
-        localizeSidebar();
-
-        // Restore active item selection highlight
-        if (navController != null && navController.getCurrentDestination() != null) {
-            int currentId = navController.getCurrentDestination().getId();
-            b.navigationView.setCheckedItem(currentId);
+        android.view.Menu menu = b.navigationView.getMenu();
+        if (menu != null) {
+            if (menu.findItem(R.id.nav_gender) != null) menu.findItem(R.id.nav_gender).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_school_info) != null) menu.findItem(R.id.nav_school_info).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_cast_category) != null) menu.findItem(R.id.nav_cast_category).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_class_teacher) != null) menu.findItem(R.id.nav_class_teacher).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_classes) != null) menu.findItem(R.id.nav_classes).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_subject) != null) menu.findItem(R.id.nav_subject).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_default_values) != null) menu.findItem(R.id.nav_default_values).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_working_days) != null) menu.findItem(R.id.nav_working_days).setVisible(isSchoolLevelExpanded);
+            if (menu.findItem(R.id.nav_he_she_items) != null) menu.findItem(R.id.nav_he_she_items).setVisible(isSchoolLevelExpanded);
         }
     }
 

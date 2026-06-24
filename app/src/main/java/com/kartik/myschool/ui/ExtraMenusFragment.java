@@ -1031,7 +1031,7 @@ public class ExtraMenusFragment extends Fragment {
             android.widget.TextView tv = new android.widget.TextView(context);
             tv.setText(title);
             tv.setTextSize(13);
-            tv.setTextColor(0xFF000000); // Black for headers
+            tv.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.on_surface));
             tv.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD));
             tv.setPadding(0, 12, 0, 4);
             container.addView(tv);
@@ -1042,7 +1042,7 @@ public class ExtraMenusFragment extends Fragment {
             android.widget.TextView tv = new android.widget.TextView(context);
             tv.setText("• " + text);
             tv.setTextSize(13);
-            tv.setTextColor(0xFF333333);
+            tv.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.on_surface_variant));
             tv.setPadding(8, 4, 0, 4);
             container.addView(tv);
         }

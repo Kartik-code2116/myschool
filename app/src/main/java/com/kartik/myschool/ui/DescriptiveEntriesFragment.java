@@ -575,7 +575,8 @@ public class DescriptiveEntriesFragment extends Fragment {
             }
 
             public void bind(Student s, int index) {
-                binding.tvStudentName.setText(index + ". " + s.name);
+                String roll = (s.rollNo != null && !s.rollNo.isEmpty()) ? s.rollNo : String.valueOf(index);
+                binding.tvStudentName.setText(roll + ". " + s.name);
                 binding.btnStudentMore.setOnClickListener(v -> showStudentRemarkMenu(v, s));
 
                 MarksRecord marks = getDisplayMarksForStudent(s);

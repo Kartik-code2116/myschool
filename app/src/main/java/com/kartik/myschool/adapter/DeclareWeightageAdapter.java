@@ -58,6 +58,24 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
             b.ivExpandArrow.setRotation(visible ? 0f : 180f);
         });
 
+        // Remove old watchers BEFORE setting text to prevent cascade of callbacks and massive lag
+        if (holder.mainWatcher != null) {
+            b.etMaxMarks.removeTextChangedListener(holder.mainWatcher);
+        }
+        if (holder.subWatcher != null) {
+            b.etNirikhshanMax.removeTextChangedListener(holder.subWatcher);
+            b.etTondiKamMax.removeTextChangedListener(holder.subWatcher);
+            b.etPratyakshikMax.removeTextChangedListener(holder.subWatcher);
+            b.etUpkramMax.removeTextChangedListener(holder.subWatcher);
+            b.etPrakalpMax.removeTextChangedListener(holder.subWatcher);
+            b.etChachaniMax.removeTextChangedListener(holder.subWatcher);
+            b.etSwadhyayMax.removeTextChangedListener(holder.subWatcher);
+            b.etItarMax.removeTextChangedListener(holder.subWatcher);
+            b.etTondiMax.removeTextChangedListener(holder.subWatcher);
+            b.etPratyakshikBMax.removeTextChangedListener(holder.subWatcher);
+            b.etLekhiMax.removeTextChangedListener(holder.subWatcher);
+        }
+
         // Initialize values into inputs
         b.etMaxMarks.setText(String.valueOf(subject.maxMarks));
         b.etNirikhshanMax.setText(String.valueOf(subject.maxNirikhshan));
@@ -95,22 +113,6 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
             b.layoutSummative.setVisibility(View.VISIBLE);
         }
 
-        if (holder.mainWatcher != null) {
-            b.etMaxMarks.removeTextChangedListener(holder.mainWatcher);
-        }
-        if (holder.subWatcher != null) {
-            b.etNirikhshanMax.removeTextChangedListener(holder.subWatcher);
-            b.etTondiKamMax.removeTextChangedListener(holder.subWatcher);
-            b.etPratyakshikMax.removeTextChangedListener(holder.subWatcher);
-            b.etUpkramMax.removeTextChangedListener(holder.subWatcher);
-            b.etPrakalpMax.removeTextChangedListener(holder.subWatcher);
-            b.etChachaniMax.removeTextChangedListener(holder.subWatcher);
-            b.etSwadhyayMax.removeTextChangedListener(holder.subWatcher);
-            b.etItarMax.removeTextChangedListener(holder.subWatcher);
-            b.etTondiMax.removeTextChangedListener(holder.subWatcher);
-            b.etPratyakshikBMax.removeTextChangedListener(holder.subWatcher);
-            b.etLekhiMax.removeTextChangedListener(holder.subWatcher);
-        }
 
         // ── Main total watch ──────────────────────────────────────────────────
         holder.mainWatcher = new TextWatcher() {

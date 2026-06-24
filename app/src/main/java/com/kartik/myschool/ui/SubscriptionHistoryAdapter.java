@@ -68,8 +68,40 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
             bg.setColor(Color.parseColor("#FEF3C7")); // Light Orange
         }
 
-        // Screenshot
-        if (request.screenshotUrl != null && !request.screenshotUrl.isEmpty()) {
+        // Plan Details
+        if (request.planName != null || request.amount != null) {
+            holder.tvPlanDetails.setVisibility(View.VISIBLE);
+            String planStr = request.planName != null ? "Plan: " + request.planName : "Plan: Unknown";
+            String amtStr = request.amount != null ? "\nAmount: ₹" + request.amount : "";
+            holder.tvPlanDetails.setText(planStr + amtStr);
+        } else {
+            holder.tvPlanDetails.setVisibility(View.GONE);
+        }
+
+        // Transaction ID
+        if (request.purchaseToken != null && !request.purchaseToken.isEmpty()) {
+            holder.tvTransactionId.setVisibility(View.VISIBLE);
+            // Show first few characters of the token as Txn ID or the actual ID if mapped differently
+            String prefix = request.purchaseToken.length() > 15 ? request.purchaseToken.substring(0, 15) + "..." : request.purchaseToken;
+            holder.tvTransactionId.setText("Txn ID: " + prefix);
+        } else {
+            holder.tvTransactionId.setVisibility(View.GONE);
+        }
+
+        // Rejection Reason
+        if ("rejected".equals(status) && request.rejectionReason != null && !request.rejectionReason.isEmpty()) {
+            holder.tvRejectionReason.setVisibility(View.VISIBLE);
+            holder.tvRejectionReason.setText("Reason: " + request.rejectionReason);
+        } else {
+            holder.tvRejectionReason.setVisibility(View.GONE);
+        }
+
+        // Screenshot (Hide if Google Play billing was used)
+        if (request.purchaseToken != null && !request.purchaseToken.isEmpty() && (request.screenshotUrl == null || request.screenshotUrl.isEmpty())) {
+            holder.imgScreenshot.setImageDrawable(null);
+            holder.imgScreenshot.setBackgroundResource(R.drawable.ic_check_circle); // Using check circle to show successful digital purchase
+            holder.imgScreenshot.setOnClickListener(null);
+        } else if (request.screenshotUrl != null && !request.screenshotUrl.isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(request.screenshotUrl)
                     .centerCrop()
@@ -122,12 +154,18 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
         ImageView imgScreenshot;
         TextView tvDate;
         TextView tvStatus;
+        TextView tvPlanDetails;
+        TextView tvTransactionId;
+        TextView tvRejectionReason;
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
             imgScreenshot = itemView.findViewById(R.id.imgScreenshot);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvPlanDetails = itemView.findViewById(R.id.tvPlanDetails);
+            tvTransactionId = itemView.findViewById(R.id.tvTransactionId);
+            tvRejectionReason = itemView.findViewById(R.id.tvRejectionReason);
         }
     }
 }

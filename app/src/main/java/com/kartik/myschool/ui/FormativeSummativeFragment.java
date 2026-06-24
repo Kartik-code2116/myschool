@@ -585,7 +585,8 @@ public class FormativeSummativeFragment extends Fragment {
             }
 
             public void bind(Student s, int index) {
-                binding.tvStudentName.setText(index + ". " + s.name);
+                String roll = (s.rollNo != null && !s.rollNo.isEmpty()) ? s.rollNo : String.valueOf(index);
+                binding.tvStudentName.setText(roll + ". " + s.name);
                 binding.btnStudentMore.setOnClickListener(v -> {
                     androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
                             itemView.getContext(), v);

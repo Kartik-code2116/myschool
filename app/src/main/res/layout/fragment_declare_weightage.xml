@@ -32,98 +32,93 @@
                 android:fontFamily="sans-serif-medium"/>
         </LinearLayout>
 
-        <!-- Main Scrollable Container -->
-        <androidx.core.widget.NestedScrollView
+        <!-- Main Content Area -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:fillViewport="true">
+            android:orientation="vertical">
+
+            <!-- Empty State: Displayed when no subjects are active -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_book"
+                    app:tint="#B39DDB" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/str_empty_9"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/str_empty_10"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGotoSubjects"
+                    style="@style/Widget.EduReport.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/str_empty_11"
+                    app:icon="@drawable/ic_add_circle" />
+            </LinearLayout>
+
+            <!-- Subjects List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvWeightageSubjects"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:padding="8dp" />
+
+        </LinearLayout>
+
+        <!-- Bottom Action Bar (End of Page) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSaveWeightage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:background="?attr/colorSurface"
+                android:padding="16dp">
 
-                <!-- Empty State: Displayed when no subjects are active -->
-                <LinearLayout
-                    android:id="@+id/layoutEmptyState"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSaveWeightage"
+                    style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:src="@drawable/ic_book"
-                        app:tint="#B39DDB" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/str_empty_9"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center"
-                        android:text="@string/str_empty_10"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="13sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnGotoSubjects"
-                        style="@style/Widget.EduReport.Button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:text="@string/str_empty_11"
-                        app:icon="@drawable/ic_add_circle" />
-                </LinearLayout>
-
-                <!-- Subjects List -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvWeightageSubjects"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:clipToPadding="false"
-                    android:padding="8dp" />
-
-                <!-- Bottom Action Bar (End of Page) -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="12dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/colorSurface"
-                        android:padding="16dp">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSaveWeightage"
-                            style="@style/Widget.EduReport.Button"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/str_empty_12"
-                            app:icon="@drawable/ic_check_circle" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
+                    android:text="@string/str_empty_12"
+                    app:icon="@drawable/ic_check_circle" />
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

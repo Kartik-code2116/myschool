@@ -29,7 +29,9 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.VH
     }
 
     private final List<Student> students = new ArrayList<>();
+    private final Map<String, AttendanceRecord> records = new HashMap<>();
     private final OnOptionClickListener listener;
+    private final int[] lastAnimatedPos = {-1};
 
     public AttendanceAdapter(OnOptionClickListener listener) {
         this.listener = listener;
@@ -55,7 +57,8 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.VH
         ItemStudentAttendanceBinding b = holder.b;
 
         // Set serial number and name in purple
-        b.tvStudentName.setText((position + 1) + ". " + s.name);
+        String roll = (s.rollNo != null && !s.rollNo.isEmpty()) ? s.rollNo : String.valueOf(position + 1);
+        b.tvStudentName.setText(roll + ". " + s.name);
 
         // Retrieve attendance from Student object
         AttendanceRecord r = new AttendanceRecord();
@@ -116,6 +119,8 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.VH
                 listener.onEdit(s, finalRecord);
             }
         });
+        
+        com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastAnimatedPos);
     }
 
     private void bindMonthCell(TextView tv, String val) {

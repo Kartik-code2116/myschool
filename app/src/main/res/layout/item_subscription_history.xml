@@ -78,6 +78,36 @@
                 android:textColor="@color/warning"
                 tools:text="PENDING"/>
                 
+            <TextView
+                android:id="@+id/tvPlanDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="13sp"
+                android:textColor="?attr/colorOnSurface"
+                android:visibility="gone"
+                tools:text="Plan: Yearly Pro Access\nAmount: ₹100"/>
+
+            <TextView
+                android:id="@+id/tvTransactionId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone"
+                tools:text="Txn ID: GPA.3300-1111-2222-3333"/>
+                
+            <TextView
+                android:id="@+id/tvRejectionReason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textSize="12sp"
+                android:textColor="?attr/colorError"
+                android:visibility="gone"
+                tools:text="Reason: Screenshot not clear"/>
+
         </LinearLayout>
         
     </androidx.constraintlayout.widget.ConstraintLayout>
