@@ -95,6 +95,53 @@ public class AttendanceFragment extends Fragment implements AttendanceAdapter.On
                     ? SessionContext.selectedClass.division : "-";
         }
         b.tvAttendanceContext.setText("सन : " + yearLabel + "  इयत्ता: " + classVal + ", तुकडी: " + divVal);
+
+        if (b.btnSearchStudents != null && b.etSearchStudents != null) {
+            b.btnSearchStudents.setOnClickListener(v -> {
+                boolean isSearching = b.etSearchStudents.getVisibility() == View.VISIBLE;
+                if (isSearching) {
+                    b.etSearchStudents.setText("");
+                    b.etSearchStudents.setVisibility(View.GONE);
+                    b.tvAttendanceContext.setVisibility(View.VISIBLE);
+                    b.btnSearchStudents.setImageResource(R.drawable.ic_search);
+                    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(b.etSearchStudents.getWindowToken(), 0);
+                } else {
+                    b.tvAttendanceContext.setVisibility(View.GONE);
+                    b.etSearchStudents.setVisibility(View.VISIBLE);
+                    b.etSearchStudents.requestFocus();
+                    b.btnSearchStudents.setImageResource(R.drawable.ic_close);
+                    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(b.etSearchStudents, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+                }
+            });
+
+            b.etSearchStudents.addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterStudents(s.toString());
+                }
+                @Override public void afterTextChanged(android.text.Editable s) {}
+            });
+        }
+    }
+
+    private void filterStudents(String query) {
+        if (studentsList == null || adapter == null) return;
+        if (query == null || query.trim().isEmpty()) {
+            adapter.updateData(studentsList);
+            return;
+        }
+        String q = query.toLowerCase().trim();
+        List<Student> filtered = new ArrayList<>();
+        for (Student s : studentsList) {
+            boolean matchName = s.name != null && s.name.toLowerCase().contains(q);
+            boolean matchRoll = s.rollNo != null && s.rollNo.toLowerCase().contains(q);
+            if (matchName || matchRoll) {
+                filtered.add(s);
+            }
+        }
+        adapter.updateData(filtered);
     }
 
 

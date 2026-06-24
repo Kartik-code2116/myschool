@@ -148,6 +148,54 @@ public class DescriptiveEntriesFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
             adapter.notifyDataSetChanged();
         });
+
+        if (b.btnSearchStudents != null && b.etSearchStudents != null) {
+            b.btnSearchStudents.setOnClickListener(v -> {
+                boolean isSearching = b.etSearchStudents.getVisibility() == View.VISIBLE;
+                if (isSearching) {
+                    b.etSearchStudents.setText("");
+                    b.etSearchStudents.setVisibility(View.GONE);
+                    b.tvHeaderStripInfo.setVisibility(View.VISIBLE);
+                    b.btnSearchStudents.setImageResource(R.drawable.ic_search);
+                    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(b.etSearchStudents.getWindowToken(), 0);
+                } else {
+                    b.tvHeaderStripInfo.setVisibility(View.GONE);
+                    b.etSearchStudents.setVisibility(View.VISIBLE);
+                    b.etSearchStudents.requestFocus();
+                    b.btnSearchStudents.setImageResource(R.drawable.ic_close);
+                    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(b.etSearchStudents, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+                }
+            });
+
+            b.etSearchStudents.addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterStudents(s.toString());
+                }
+                @Override public void afterTextChanged(android.text.Editable s) {}
+            });
+        }
+    }
+
+    private void filterStudents(String query) {
+        if (AppCache.cachedDescriptiveStudents == null || adapter == null) return;
+        Map<String, MarksRecord> marks = AppCache.cachedDescriptiveMarksMap != null ? AppCache.cachedDescriptiveMarksMap : new HashMap<>();
+        if (query == null || query.trim().isEmpty()) {
+            adapter.setData(AppCache.cachedDescriptiveStudents, marks, false);
+            return;
+        }
+        String q = query.toLowerCase().trim();
+        List<Student> filtered = new ArrayList<>();
+        for (Student s : AppCache.cachedDescriptiveStudents) {
+            boolean matchName = s.name != null && s.name.toLowerCase().contains(q);
+            boolean matchRoll = s.rollNo != null && s.rollNo.toLowerCase().contains(q);
+            if (matchName || matchRoll) {
+                filtered.add(s);
+            }
+        }
+        adapter.setData(filtered, marks, false);
     }
 
     private void loadDescriptiveData() {
