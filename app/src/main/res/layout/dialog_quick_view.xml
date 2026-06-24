@@ -66,22 +66,22 @@
         android:columnCount="2"
         android:useDefaultMargins="true">
 
-        <TextView android:text="DOB:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:text="@string/qv_dob" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView android:id="@+id/tvQuickViewDob" android:text="-" android:textColor="?attr/colorOnSurface" />
 
-        <TextView android:text="Gender:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:text="@string/qv_gender" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView android:id="@+id/tvQuickViewGender" android:text="-" android:textColor="?attr/colorOnSurface" />
 
-        <TextView android:text="Religion/Caste:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:text="@string/qv_religion_caste" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView android:id="@+id/tvQuickViewCaste" android:text="-" android:textColor="?attr/colorOnSurface" />
 
-        <TextView android:text="Mother's Name:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:text="@string/qv_mother_name" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView android:id="@+id/tvQuickViewMother" android:text="-" android:textColor="?attr/colorOnSurface" />
 
-        <TextView android:text="Father's Name:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:text="@string/qv_father_name" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView android:id="@+id/tvQuickViewFather" android:text="-" android:textColor="?attr/colorOnSurface" />
 
-        <TextView android:text="Phone:" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
+        <TextView android:text="@string/qv_phone" android:textStyle="bold" android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView android:id="@+id/tvQuickViewPhone" android:text="-" android:textColor="?attr/colorOnSurface" />
 
     </GridLayout>
@@ -91,7 +91,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Close"
+        android:text="@string/qv_close"
         style="@style/Widget.MaterialComponents.Button.TextButton" />
 
 </LinearLayout>

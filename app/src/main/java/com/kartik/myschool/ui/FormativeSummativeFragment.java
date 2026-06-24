@@ -1062,7 +1062,7 @@ public class FormativeSummativeFragment extends Fragment {
 
         tvAvatar.setText(s.rollNo != null && !s.rollNo.isEmpty() ? s.rollNo : "1");
         tvName.setText(s.name != null ? s.name : "N/A");
-        tvRegNo.setText("Registration No: " + (s.registrationNo != null && !s.registrationNo.isEmpty() ? s.registrationNo : "N/A"));
+        tvRegNo.setText(getString(R.string.qv_registration_no, (s.registrationNo != null && !s.registrationNo.isEmpty() ? s.registrationNo : "N/A")));
         
         tvDob.setText(s.dob != null && !s.dob.isEmpty() ? s.dob : "-");
         tvGender.setText(s.gender != null && !s.gender.isEmpty() ? s.gender : "-");
@@ -1141,7 +1141,7 @@ public class FormativeSummativeFragment extends Fragment {
 
             tvGrandTotal.setText(details.grandTotal + "/" + sub.maxMarks);
             tvGrade.setText(details.grade != null && !details.grade.isEmpty() ? details.grade : "-");
-            tvRemark.setText("Remark: " + (details.remark != null && !details.remark.isEmpty() ? details.remark : "-"));
+            tvRemark.setText(getString(R.string.qv_remark, (details.remark != null && !details.remark.isEmpty() ? details.remark : "-")));
         } else {
             tvA1.setText("0/" + sub.maxNirikhshan);
             tvA2.setText("0/" + sub.maxTondiKam);
@@ -1161,7 +1161,7 @@ public class FormativeSummativeFragment extends Fragment {
 
             tvGrandTotal.setText("0/" + sub.maxMarks);
             tvGrade.setText("-");
-            tvRemark.setText("Remark: -");
+            tvRemark.setText(getString(R.string.qv_remark, "-"));
         }
 
         btnClose.setOnClickListener(v -> dialog.dismiss());

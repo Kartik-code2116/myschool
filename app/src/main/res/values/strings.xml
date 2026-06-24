@@ -801,5 +801,35 @@
     <string name="cd_calculate">Calculate totals</string>
     <string name="cd_notifications">Notifications</string>
     <string name="cd_more_options">More options</string>
-    <string name="offline_banner_text">ऑफलाइन — जोडणी झाल्यावर बदल सिंक होतील</string>
+    <string name="offline_banner_text">ऑफलाइन — डेटा स्थानिक कॅशमधून दाखवत आहोत</string>
+
+    <!-- Quick View Dialog Labels -->
+    <string name="qv_registration_no">Registration No: %1$s</string>
+    <string name="qv_dob">DOB:</string>
+    <string name="qv_gender">Gender:</string>
+    <string name="qv_religion_caste">Religion/Caste:</string>
+    <string name="qv_mother_name">Mother\'s Name:</string>
+    <string name="qv_father_name">Father\'s Name:</string>
+    <string name="qv_phone">Phone:</string>
+    <string name="qv_close">Close</string>
+    <string name="qv_remark">Remark: %1$s</string>
+
+    <!-- Subject Quick View Dialog Labels -->
+    <string name="sqv_formative">Formative (Akarik)</string>
+    <string name="sqv_summative">Summative (Sanklit)</string>
+    <string name="sqv_nirikhshan">Nirikhshan:</string>
+    <string name="sqv_tondi_kam">Tondi Kam:</string>
+    <string name="sqv_pratyakshik">Pratyakshik:</string>
+    <string name="sqv_upkram">Upkram:</string>
+    <string name="sqv_prakalp">Prakalp:</string>
+    <string name="sqv_chachani">Chachani:</string>
+    <string name="sqv_swadhyay">Swadhyay:</string>
+    <string name="sqv_itar">Itar:</string>
+    <string name="sqv_total_f">TOTAL F:</string>
+    <string name="sqv_tondi">Tondi:</string>
+    <string name="sqv_pratyakshik_b">Pratyakshik:</string>
+    <string name="sqv_lekhi">Lekhi:</string>
+    <string name="sqv_total_s">TOTAL S:</string>
+    <string name="sqv_grand">GRAND:</string>
+    <string name="sqv_grade">GRADE:</string>
 </resources>

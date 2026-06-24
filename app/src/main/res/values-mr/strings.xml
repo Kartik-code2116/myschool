@@ -790,5 +790,35 @@
     <string name="menu_import_students">📥 विद्यार्थी आयात करा (Excel / CSV)</string>
     <string name="menu_switch_class">🏫 वर्ग / तुकडी बदला</string>
     <string name="menu_app_wide_main">🌐 ॲप मुख्य मेनू</string>
-    <string name="offline_banner_text">ऑफलाइन — जोडणी झाल्यावर बदल सिंक होतील</string>
+    <string name="offline_banner_text">ऑफलाइन — डेटा स्थानिक कॅशमधून दाखवत आहोत</string>
+
+    <!-- Quick View Dialog Labels -->
+    <string name="qv_registration_no">नोंदणी क्र.: %1$s</string>
+    <string name="qv_dob">जन्मतारीख:</string>
+    <string name="qv_gender">लिंग:</string>
+    <string name="qv_religion_caste">धर्म/जात:</string>
+    <string name="qv_mother_name">आईचे नाव:</string>
+    <string name="qv_father_name">वडिलांचे नाव:</string>
+    <string name="qv_phone">फोन नंबर:</string>
+    <string name="qv_close">बंद करा</string>
+    <string name="qv_remark">शेरा: %1$s</string>
+
+    <!-- Subject Quick View Dialog Labels -->
+    <string name="sqv_formative">आकारिक मूल्यमापन</string>
+    <string name="sqv_summative">संकलित मूल्यमापन</string>
+    <string name="sqv_nirikhshan">निरीक्षण:</string>
+    <string name="sqv_tondi_kam">तोंडी काम:</string>
+    <string name="sqv_pratyakshik">प्रात्यक्षिक:</string>
+    <string name="sqv_upkram">उपक्रम:</string>
+    <string name="sqv_prakalp">प्रकल्प:</string>
+    <string name="sqv_chachani">चाचणी:</string>
+    <string name="sqv_swadhyay">स्वाध्याय:</string>
+    <string name="sqv_itar">इतर:</string>
+    <string name="sqv_total_f">आकारिक एकूण:</string>
+    <string name="sqv_tondi">तोंडी:</string>
+    <string name="sqv_pratyakshik_b">प्रात्यक्षिक:</string>
+    <string name="sqv_lekhi">लेखी:</string>
+    <string name="sqv_total_s">संकलित एकूण:</string>
+    <string name="sqv_grand">एकूण:</string>
+    <string name="sqv_grade">श्रेणी:</string>
 </resources>
