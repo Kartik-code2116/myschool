@@ -133,8 +133,10 @@ public class ClassDivListFragment extends Fragment {
         if (b == null || adapter == null) return;
         if (list == null || list.isEmpty()) {
             adapter.setData(list, 0);
+            b.emptyState.setVisibility(View.VISIBLE);
             return;
         }
+        b.emptyState.setVisibility(View.GONE);
         if (SessionContext.selectedClass != null) {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).id != null && list.get(i).id.equals(SessionContext.selectedClass.id)) {

@@ -211,23 +211,34 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:padding="24dp">
             
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/ic_students"
-                android:alpha="0.3"
-                app:tint="@color/on_surface_variant"
+                app:tint="?attr/colorOutlineVariant"
+                android:layout_marginBottom="16dp"
                 android:contentDescription="Empty State Icon"/>
             
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/empty_no_students"
-                android:textSize="15sp"
-                android:textColor="@color/on_surface_variant"/>
+                android:text="No students found"
+                android:textSize="18sp"
+                android:textColor="?attr/colorOnSurface"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="8dp"/>
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tap the + button below to add your first student to this class."
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textAlignment="center"
+                android:lineSpacingExtra="4dp"/>
         </LinearLayout>
 
         <!-- Shimmer Placeholder for Loading State -->
@@ -263,6 +274,8 @@
             android:paddingEnd="4dp"
             android:paddingTop="8dp"
             android:paddingBottom="96dp"/>
+
+
     </LinearLayout>
 
     <!-- FAB: Add Student with aligned styling -->

@@ -516,6 +516,28 @@ public class FormativeSummativeFragment extends Fragment {
             final Map<String, MarksRecord> newMarks = new HashMap<>(map);
 
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                androidx.recyclerview.widget.DiffUtil.DiffResult diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
+                    @Override
+                    public int getOldListSize() { return students.size(); }
+                    @Override
+                    public int getNewListSize() { return newStudents.size(); }
+                    @Override
+                    public boolean areItemsTheSame(int oldPos, int newPos) {
+                        return java.util.Objects.equals(students.get(oldPos).id, newStudents.get(newPos).id);
+                    }
+                    @Override
+                    public boolean areContentsTheSame(int oldPos, int newPos) {
+                        Student oldS = students.get(oldPos);
+                        Student newS = newStudents.get(newPos);
+                        MarksRecord oldM = marksMap.get(oldS.id);
+                        MarksRecord newM = newMarks.get(newS.id);
+                        
+                        boolean studentSame = java.util.Objects.equals(oldS.name, newS.name) && java.util.Objects.equals(oldS.rollNo, newS.rollNo);
+                        boolean marksSame = (oldM == null && newM == null) || (oldM != null && newM != null && oldM.updatedAt == newM.updatedAt);
+                        return studentSame && marksSame;
+                    }
+                });
+
                 this.students.clear();
                 this.students.addAll(newStudents);
                 this.marksMap.clear();
@@ -523,7 +545,7 @@ public class FormativeSummativeFragment extends Fragment {
                 if (resetAnimation) {
                     lastPosition[0] = -1;
                 }
-                notifyDataSetChanged();
+                diffResult.dispatchUpdatesTo(this);
             });
         }
 

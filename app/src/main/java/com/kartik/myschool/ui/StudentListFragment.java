@@ -276,9 +276,28 @@ public class StudentListFragment extends Fragment {
                                             studentAdapter.setData(filteredStudents);
                                             b.emptyState.setVisibility(
                                                     filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
-                                            android.widget.Toast.makeText(requireContext(),
-                                                    R.string.msg_student_deleted_successfully,
-                                                    android.widget.Toast.LENGTH_SHORT).show();
+                                            com.google.android.material.snackbar.Snackbar.make(
+                                                    b.getRoot(),
+                                                    student.name + " deleted",
+                                                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                                                    .setAction("UNDO", view -> {
+                                                        FirebaseRepository.get().saveStudent(student, new FirebaseRepository.OnResult<String>() {
+                                                            @Override
+                                                            public void onSuccess(String newId) {
+                                                                if (getActivity() != null) {
+                                                                    getActivity().runOnUiThread(() -> {
+                                                                        if (b == null) return;
+                                                                        allStudents.add(student);
+                                                                        filteredStudents.add(student);
+                                                                        studentAdapter.setData(filteredStudents);
+                                                                        b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                                                                    });
+                                                                }
+                                                            }
+                                                            @Override
+                                                            public void onError(Exception ex) { }
+                                                        });
+                                                    }).show();
                                         });
                                     }
                                 }
