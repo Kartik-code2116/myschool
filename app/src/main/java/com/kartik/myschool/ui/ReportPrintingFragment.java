@@ -65,7 +65,7 @@ public class ReportPrintingFragment extends Fragment {
         adapter.setOnItemClickListener(new ReportPrintingAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ReportPrintingAdapter.ReportTemplate template, int position) {
-                handleReportSelection(position);
+                handleReportSelection(position, getString(template.titleResId));
             }
 
             @Override
@@ -151,7 +151,7 @@ public class ReportPrintingFragment extends Fragment {
                name.equals("५") || name.equals("८");
     }
 
-    private void handleReportSelection(int position) {
+    private void handleReportSelection(int position, String reportName) {
         if (SessionContext.selectedClass == null) {
             Toast.makeText(getContext(), R.string.msg_empty_10, Toast.LENGTH_LONG).show();
             return;
@@ -170,15 +170,15 @@ public class ReportPrintingFragment extends Fragment {
             boolean isClassReport = (position == 0 || position == 1 || position == 3 || position == 4 || position == 5 || position == 6 || position == 7 || position == 8 || position == 9 || position == 10 || position == 11 || position == 12 || position == 13 || position == 14 || position == 15 || position == 16 || position == 17);
 
             if (isClassReport) {
-                generateClassRosterReport(position);
+                generateClassRosterReport(position, reportName);
             } else {
                 // Default to generating for all students directly
-                triggerBulkReportGeneration(position);
+                triggerBulkReportGeneration(position, reportName);
             }
         });
     }
 
-    private void showStudentSelectionDialog(int reportPosition) {
+    private void showStudentSelectionDialog(int reportPosition, String reportName) {
         if (studentsList == null || studentsList.isEmpty()) {
             Toast.makeText(getContext(), R.string.msg_empty_11, Toast.LENGTH_SHORT).show();
             return;
@@ -193,7 +193,7 @@ public class ReportPrintingFragment extends Fragment {
                 .setTitle(R.string.msg_select_student)
                 .setItems(studentNames, (dialog, which) -> {
                     Student selectedStudent = studentsList.get(which);
-                    generateIndividualReport(selectedStudent, reportPosition);
+                    generateIndividualReport(selectedStudent, reportPosition, reportName);
                 })
                 .show();
     }
@@ -227,8 +227,9 @@ public class ReportPrintingFragment extends Fragment {
         return isSelectedSemesterTwo() ? sem2Map : sem1Map;
     }
 
-    private void generateIndividualReport(Student student, int reportPosition) {
-        Toast.makeText(getContext(), student.name + " चा रिपोर्ट तयार होत आहे...", Toast.LENGTH_SHORT).show();
+    private void generateIndividualReport(Student student, int reportPosition, String reportName) {
+        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(requireContext(), null, student.name + " चा " + reportName + " तयार होत आहे. कृपया प्रतीक्षा करा...");
+        pd.show();
         
         String classId = SessionContext.selectedClass.id;
         String[] sids = getSemesterIds();
@@ -238,29 +239,39 @@ public class ReportPrintingFragment extends Fragment {
                 FirebaseRepository.get().getMarksForStudentAndSemester(student.id, classId, sids[1], new FirebaseRepository.OnResult<MarksRecord>() {
                     @Override
                     public void onSuccess(MarksRecord s2) {
-                        triggerIndividualGenerator(student, s1, s2, reportPosition);
+                        triggerIndividualGenerator(student, s1, s2, reportPosition, reportName, pd);
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), R.string.msg_empty_12, Toast.LENGTH_SHORT).show();
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                            pd.dismiss();
+                            Toast.makeText(getContext(), R.string.msg_empty_12, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), R.string.msg_empty_13, Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                    pd.dismiss();
+                    Toast.makeText(getContext(), R.string.msg_empty_13, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
 
-    private void triggerIndividualGenerator(Student student, MarksRecord s1, MarksRecord s2, int reportPosition) {
+    private void triggerIndividualGenerator(Student student, MarksRecord s1, MarksRecord s2, int reportPosition, String reportName, com.kartik.myschool.utils.LoadingDialog pd) {
+        long startTime = System.currentTimeMillis();
         com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = reportPosition;
         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
             @Override
             public void onSuccess(File pdfFile) {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
+                        if (pd != null) pd.dismiss();
+                        long duration = System.currentTimeMillis() - startTime;
+                        float sec = duration / 1000f;
+                        Toast.makeText(getContext(), getString(R.string.msg_empty_3) + " (" + sec + "s)", Toast.LENGTH_SHORT).show();
                         openPdfFile(pdfFile);
                     });
                 }
@@ -268,8 +279,10 @@ public class ReportPrintingFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(), "त्रुटी आढळली: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    getActivity().runOnUiThread(() -> {
+                        if (pd != null) pd.dismiss();
+                        Toast.makeText(getContext(), "त्रुटी आढळली: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
                 }
             }
         };
@@ -301,14 +314,15 @@ public class ReportPrintingFragment extends Fragment {
         }
     }
 
-    private void triggerBulkReportGeneration(int reportPosition) {
+    private void triggerBulkReportGeneration(int reportPosition, String reportName) {
         if (studentsList == null || studentsList.isEmpty()) {
             Toast.makeText(getContext(), R.string.msg_empty_14, Toast.LENGTH_SHORT).show();
             return;
         }
         
         com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = reportPosition;
-        Toast.makeText(getContext(), R.string.msg_empty_15, Toast.LENGTH_LONG).show();
+        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(requireContext(), null, reportName + " तयार होत आहे. कृपया प्रतीक्षा करा...");
+        pd.show();
         
         String classId = SessionContext.selectedClass.id;
         String[] sids = getSemesterIds();
@@ -318,32 +332,44 @@ public class ReportPrintingFragment extends Fragment {
                 FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[1], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
                     @Override
                     public void onSuccess(Map<String, MarksRecord> sem2Map) {
-                        generateBulkPdfs(sem1Map, sem2Map, reportPosition);
+                        generateBulkPdfs(sem1Map, sem2Map, reportPosition, pd);
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), R.string.msg_empty_16, Toast.LENGTH_SHORT).show();
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                            pd.dismiss();
+                            Toast.makeText(getContext(), R.string.msg_empty_16, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), R.string.msg_empty_17, Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                    pd.dismiss();
+                    Toast.makeText(getContext(), R.string.msg_empty_17, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
 
-    private void generateBulkPdfs(Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map, int reportPosition) {
+    private void generateBulkPdfs(Map<String, MarksRecord> sem1Map, Map<String, MarksRecord> sem2Map, int reportPosition, com.kartik.myschool.utils.LoadingDialog pd) {
+        long startTime = System.currentTimeMillis();
         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
             @Override public void onSuccess(File pdfFile) {
                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), R.string.msg_empty_18, Toast.LENGTH_LONG).show();
+                    if (pd != null) pd.dismiss();
+                    long duration = System.currentTimeMillis() - startTime;
+                    float sec = duration / 1000f;
+                    Toast.makeText(getContext(), getString(R.string.msg_empty_18) + " (" + sec + "s)", Toast.LENGTH_LONG).show();
                     openPdfFile(pdfFile);
                 });
             }
             @Override public void onError(Exception e) {
-                if (getActivity() != null) getActivity().runOnUiThread(() ->
-                    Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                    if (pd != null) pd.dismiss();
+                    Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
             }
         };
         PdfGenerator.generateBulkCombinedPdf(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, sem1Map, sem2Map, reportPosition, cb);
@@ -375,26 +401,33 @@ public class ReportPrintingFragment extends Fragment {
         return result[0];
     }
 
-    private void generateClassRosterReport(int reportPosition) {
+    private void generateClassRosterReport(int reportPosition, String reportName) {
         if (studentsList == null || studentsList.isEmpty()) {
             Toast.makeText(getContext(), R.string.msg_empty_11, Toast.LENGTH_SHORT).show();
             return;
         }
         
         com.kartik.myschool.utils.pdf.DynamicMarginHelper.currentReportIndex = reportPosition;
+        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(requireContext(), null, reportName + " तयार होत आहे. कृपया प्रतीक्षा करा...");
+        pd.show();
         
         if (reportPosition == 0) {
-            Toast.makeText(getContext(), R.string.msg_empty_19, Toast.LENGTH_SHORT).show();
+            long startTime = System.currentTimeMillis();
             PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                 @Override public void onSuccess(File pdfFile) {
                     if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), R.string.msg_empty_20, Toast.LENGTH_SHORT).show();
+                        pd.dismiss();
+                        long duration = System.currentTimeMillis() - startTime;
+                        float sec = duration / 1000f;
+                        Toast.makeText(getContext(), getString(R.string.msg_empty_20) + " (" + sec + "s)", Toast.LENGTH_SHORT).show();
                         openPdfFile(pdfFile);
                     });
                 }
                 @Override public void onError(Exception e) {
-                    if (getActivity() != null) getActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                        pd.dismiss();
+                        Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
                 }
             };
             com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, null, null, null, cb);
@@ -402,25 +435,28 @@ public class ReportPrintingFragment extends Fragment {
         }
 
         if (reportPosition == 1) {
-            Toast.makeText(getContext(), R.string.msg_empty_21, Toast.LENGTH_SHORT).show();
+            long startTime = System.currentTimeMillis();
             PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                 @Override public void onSuccess(File pdfFile) {
                     if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), R.string.msg_empty_22, Toast.LENGTH_SHORT).show();
+                        pd.dismiss();
+                        long duration = System.currentTimeMillis() - startTime;
+                        float sec = duration / 1000f;
+                        Toast.makeText(getContext(), getString(R.string.msg_empty_22) + " (" + sec + "s)", Toast.LENGTH_SHORT).show();
                         openPdfFile(pdfFile);
                     });
                 }
                 @Override public void onError(Exception e) {
-                    if (getActivity() != null) getActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                        pd.dismiss();
+                        Toast.makeText(getContext(), "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
                 }
             };
             com.kartik.myschool.utils.pdf.IndexPageGenerator.generateIndexPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, studentsList, cb);
             return;
         }
 
-        Toast.makeText(getContext(), R.string.msg_empty_23, Toast.LENGTH_SHORT).show();
-        
         // For descriptive remarks (position 3/7), clear internal marks cache
         // to force a fresh Firestore fetch so the PDF has the latest remarks
         if (reportPosition == 3 || reportPosition == 7) {
@@ -429,6 +465,7 @@ public class ReportPrintingFragment extends Fragment {
 
         String classId = SessionContext.selectedClass.id;
         String[] sids = getSemesterIds();
+        long startTime = System.currentTimeMillis();
         FirebaseRepository.get().getMarksForClassAndSemester(classId, sids[0], new FirebaseRepository.OnResult<Map<String, MarksRecord>>() {
             @Override
             public void onSuccess(Map<String, MarksRecord> sem1Map) {
@@ -438,13 +475,18 @@ public class ReportPrintingFragment extends Fragment {
                         PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                             @Override public void onSuccess(File pdfFile) {
                                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
-                                    Toast.makeText(getContext(), R.string.msg_empty_24, Toast.LENGTH_SHORT).show();
+                                    pd.dismiss();
+                                    long duration = System.currentTimeMillis() - startTime;
+                                    float sec = duration / 1000f;
+                                    Toast.makeText(getContext(), getString(R.string.msg_empty_24) + " (" + sec + "s)", Toast.LENGTH_SHORT).show();
                                     openPdfFile(pdfFile);
                                 });
                             }
                             @Override public void onError(Exception e) {
-                                if (getActivity() != null) getActivity().runOnUiThread(() ->
-                                    Toast.makeText(getContext(), "तक्ता बनवण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                                    pd.dismiss();
+                                    Toast.makeText(getContext(), "तक्ता बनवण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                });
                             }
                         };
                         switch (reportPosition) {
@@ -544,13 +586,19 @@ public class ReportPrintingFragment extends Fragment {
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(getContext(), R.string.msg_empty_16, Toast.LENGTH_SHORT).show();
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                            pd.dismiss();
+                            Toast.makeText(getContext(), R.string.msg_empty_16, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             }
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getContext(), R.string.msg_empty_17, Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) getActivity().runOnUiThread(() -> {
+                    pd.dismiss();
+                    Toast.makeText(getContext(), R.string.msg_empty_17, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
@@ -608,6 +656,7 @@ public class ReportPrintingFragment extends Fragment {
                     public void onSuccess(Map<String, MarksRecord> sem2Map) {
                         new Thread(() -> {
                             try {
+                                long startTime = System.currentTimeMillis();
                                 List<File> allFiles = new ArrayList<>();
                                 // Generate all 18 reports
                                 for (int i = 0; i <= 17; i++) {
@@ -620,7 +669,9 @@ public class ReportPrintingFragment extends Fragment {
                                 
                                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
                                     pd.dismiss();
-                                    Toast.makeText(getContext(), R.string.msg_empty_25, Toast.LENGTH_LONG).show();
+                                    long duration = System.currentTimeMillis() - startTime;
+                                    float sec = duration / 1000f;
+                                    Toast.makeText(getContext(), getString(R.string.msg_empty_25) + " (" + sec + "s)", Toast.LENGTH_LONG).show();
                                     openPdfFile(masterOut);
                                 });
                             } catch (Exception e) {

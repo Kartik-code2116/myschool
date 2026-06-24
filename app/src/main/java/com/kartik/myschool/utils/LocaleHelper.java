@@ -21,7 +21,16 @@ public class LocaleHelper {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             config.setLocale(locale);
-            return context.createConfigurationContext(config);
+            Context newContext = context.createConfigurationContext(config);
+            return new android.content.ContextWrapper(newContext) {
+                @Override
+                public Object getSystemService(String name) {
+                    if (Context.PRINT_SERVICE.equals(name)) {
+                        return context.getSystemService(name);
+                    }
+                    return super.getSystemService(name);
+                }
+            };
         } else {
             config.locale = locale;
             res.updateConfiguration(config, res.getDisplayMetrics());
