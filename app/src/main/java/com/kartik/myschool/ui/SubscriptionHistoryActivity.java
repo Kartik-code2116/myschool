@@ -29,7 +29,7 @@ public class SubscriptionHistoryActivity extends com.kartik.myschool.BaseActivit
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         setContentView(R.layout.activity_subscription_history);
 
         Toolbar toolbar = findViewById(R.id.toolbar);

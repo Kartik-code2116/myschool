@@ -25,7 +25,7 @@ public class StudentEditActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivityStudentEditBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 

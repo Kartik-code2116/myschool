@@ -85,6 +85,7 @@ public class MySchoolApplication extends Application {
             com.google.firebase.auth.FirebaseAuth.getInstance().addAuthStateListener(auth -> {
                 com.google.firebase.auth.FirebaseUser user = auth.getCurrentUser();
                 if (user != null) {
+                    FirebaseCrashlytics.getInstance().setUserId(user.getUid());
                     com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
                         .addOnCompleteListener(task -> {
                             if (!task.isSuccessful() || task.getResult() == null) {
@@ -95,6 +96,8 @@ public class MySchoolApplication extends Application {
                             Log.d("FCM_INIT", "FCM token retrieved: " + token);
                             saveTokenToFirestore(user.getUid(), token);
                         });
+                } else {
+                    FirebaseCrashlytics.getInstance().setUserId("");
                 }
             });
         } catch (Exception e) {

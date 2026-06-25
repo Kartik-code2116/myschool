@@ -48,6 +48,14 @@ public final class SessionContext {
         AppCache.selectedSchool = selectedSchool;
         AppCache.selectedClass = selectedClass;
         AppCache.cachedRemarkBank.clear();
+        
+        try {
+            com.google.firebase.crashlytics.FirebaseCrashlytics crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance();
+            crashlytics.setCustomKey("active_school_id", selectedSchool != null ? selectedSchool.id : "");
+            crashlytics.setCustomKey("active_class_id", selectedClass != null ? selectedClass.id : "");
+            crashlytics.setCustomKey("active_semester_id", selectedSemester != null ? selectedSemester.id : "");
+            crashlytics.setCustomKey("active_year_id", selectedYear != null ? selectedYear.id : "");
+        } catch (Exception ignored) {}
     }
 
     /**
@@ -378,6 +386,14 @@ public final class SessionContext {
         AppCache.cachedClasses = null;
         AppCache.cachedTeacherName = null;
         AppCache.cachedStudentCountByClassId = null;
+
+        try {
+            com.google.firebase.crashlytics.FirebaseCrashlytics crashlytics = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance();
+            crashlytics.setCustomKey("active_school_id", "");
+            crashlytics.setCustomKey("active_class_id", "");
+            crashlytics.setCustomKey("active_semester_id", "");
+            crashlytics.setCustomKey("active_year_id", "");
+        } catch (Exception ignored) {}
 
         com.kartik.myschool.repository.FirebaseRepository.clearCache();
     }

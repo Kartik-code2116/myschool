@@ -22,7 +22,7 @@ public class SchoolRegisterActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivitySchoolRegisterBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         setSupportActionBar(b.toolbar);

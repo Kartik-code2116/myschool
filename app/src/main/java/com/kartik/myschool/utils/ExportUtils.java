@@ -69,7 +69,7 @@ public class ExportUtils {
             context.startActivity(Intent.createChooser(intent, "Export UDISE+ / APAAR Format"));
         } catch (Exception e) {
             Toast.makeText(context, "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 

@@ -854,7 +854,7 @@ public class FirebaseRepository {
                             return;
                         }
                     }
-                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "FAILURE writing marks: " + e.getMessage(), e); }
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "FAILURE writing marks: " + e.getMessage(), e); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("FAILURE writing marks: " + e.getMessage()); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e); }
                     cb.onError(e);
                 });
     }
@@ -943,14 +943,10 @@ public class FirebaseRepository {
                                 }
                             }
                             if (!foundRecordSem) {
-                                if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
-                                    try {
-                                        recordSemNum = Integer.parseInt(m.semesterNumber);
-                                    } catch (NumberFormatException ignored) {}
-                                } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
-                                    if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
-                                        recordSemNum = 2;
-                                    }
+                                try {
+                                    recordSemNum = m.semesterNumber != null && !m.semesterNumber.isEmpty() ? Integer.parseInt(m.semesterNumber) : 1;
+                                } catch (NumberFormatException ignored) {
+                                    recordSemNum = 1;
                                 }
                             }
                             
@@ -988,7 +984,7 @@ public class FirebaseRepository {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "getMarksForStudentAndSemester FAILED: " + e.getMessage(), e); }
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "getMarksForStudentAndSemester FAILED: " + e.getMessage(), e); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("getMarksForStudentAndSemester FAILED: " + e.getMessage()); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e); }
                     cb.onError(e);
                 });
     }
@@ -1100,14 +1096,10 @@ public class FirebaseRepository {
                                     }
                                 }
                                 if (!foundRecordSem) {
-                                    if (m.semesterNumber != null && !m.semesterNumber.isEmpty()) {
-                                        try {
-                                            recordSemNum = Integer.parseInt(m.semesterNumber);
-                                        } catch (NumberFormatException ignored) {}
-                                    } else if (m.semesterId != null && !m.semesterId.isEmpty() && m.semesterId.length() < 10) {
-                                        if (m.semesterId.contains("2") || m.semesterId.toLowerCase().contains("second")) {
-                                            recordSemNum = 2;
-                                        }
+                                    try {
+                                        recordSemNum = m.semesterNumber != null && !m.semesterNumber.isEmpty() ? Integer.parseInt(m.semesterNumber) : 1;
+                                    } catch (NumberFormatException ignored) {
+                                        recordSemNum = 1;
                                     }
                                 }
                                 
@@ -1168,7 +1160,7 @@ public class FirebaseRepository {
                     cb.onSuccess(new java.util.HashMap<>(marksMap));
                 })
                 .addOnFailureListener(e -> {
-                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "getMarksForClassAndSemester FAILED: " + e.getMessage(), e); }
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e("FIRESTORE_MARKS", "getMarksForClassAndSemester FAILED: " + e.getMessage(), e); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("getMarksForClassAndSemester FAILED: " + e.getMessage()); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e); }
                     cb.onError(e);
                 });
     }
@@ -1856,7 +1848,7 @@ public class FirebaseRepository {
                                     list.add(new com.kartik.myschool.model.Subject(name.trim(), maxMarks));
                                 }
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
                             }
                         }
                     }

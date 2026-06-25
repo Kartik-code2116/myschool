@@ -20,7 +20,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         
         // Fix 1: No layout inflation, no handler delay. Navigate instantly.
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {

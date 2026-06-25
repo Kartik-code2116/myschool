@@ -45,7 +45,7 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
@@ -292,7 +292,7 @@ public class HomeActivity extends BaseActivity {
             try {
                 connectivityManager.registerDefaultNetworkCallback(networkCallback);
             } catch (Exception e) {
-                e.printStackTrace();
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
     }
@@ -310,7 +310,7 @@ public class HomeActivity extends BaseActivity {
             try {
                 connectivityManager.unregisterNetworkCallback(networkCallback);
             } catch (Exception e) {
-                e.printStackTrace();
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
     }

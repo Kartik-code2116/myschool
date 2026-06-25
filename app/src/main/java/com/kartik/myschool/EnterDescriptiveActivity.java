@@ -47,7 +47,7 @@ public class EnterDescriptiveActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ClassModel callerClass = AppCache.selectedClass;
         SessionContext.load(this);
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivityEnterDescriptiveBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 

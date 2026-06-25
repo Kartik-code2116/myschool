@@ -45,7 +45,7 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         auth = FirebaseAuth.getInstance();
@@ -181,6 +181,7 @@ public class LoginActivity extends BaseActivity {
                                 newTeacher.id = uid;
                                 newTeacher.email = auth.getCurrentUser() != null ? auth.getCurrentUser().getEmail() : email;
                                 newTeacher.name = "Teacher";
+                                SessionContext.clear(LoginActivity.this);
                                 repo.saveTeacher(newTeacher, new FirebaseRepository.OnResult<Void>() {
                                     @Override
                                     public void onSuccess(Void result) {
@@ -205,7 +206,7 @@ public class LoginActivity extends BaseActivity {
 
                         @Override
                         public void onError(Exception e) {
-                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Firestore getTeacher FAILED", e); }
+                            if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Firestore getTeacher FAILED", e); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Firestore getTeacher FAILED"); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e); }
                             auth.signOut();
                             showLoading(false);
                             showError("Login Failed",
@@ -214,7 +215,7 @@ public class LoginActivity extends BaseActivity {
                     });
                 })
                 .addOnFailureListener(e -> {
-                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Firebase Auth FAILED", e); }
+                    if (com.kartik.myschool.BuildConfig.DEBUG) { Log.e(TAG, "Firebase Auth FAILED", e); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Firebase Auth FAILED"); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e); }
                     showLoading(false);
                     showError("Login Failed", getFriendlyLoginError(e));
                 });
@@ -350,6 +351,7 @@ public class LoginActivity extends BaseActivity {
                     newTeacher.name = name != null ? name : "Teacher";
                     newTeacher.phone = ""; // Phone not provided by Google
                     
+                    SessionContext.clear(LoginActivity.this);
                     repo.saveTeacher(newTeacher, new FirebaseRepository.OnResult<Void>() {
                         @Override
                         public void onSuccess(Void v) {

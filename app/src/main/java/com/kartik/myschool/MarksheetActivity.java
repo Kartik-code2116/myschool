@@ -35,7 +35,7 @@ public class MarksheetActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivityMarksheetBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         b.toolbar.setNavigationOnClickListener(v -> finish());

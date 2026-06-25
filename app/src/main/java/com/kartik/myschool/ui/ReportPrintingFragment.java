@@ -675,7 +675,7 @@ public class ReportPrintingFragment extends Fragment {
                                     openPdfFile(masterOut);
                                 });
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
                                 if (getActivity() != null) getActivity().runOnUiThread(() -> {
                                     pd.dismiss();
                                     Toast.makeText(getContext(), "मास्टर रिपोर्ट तयार करण्यात त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -995,7 +995,7 @@ public class ReportPrintingFragment extends Fragment {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (Exception e) {
-            e.printStackTrace();
+            com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             sharePdfFile(file);
         }
     }
@@ -1076,7 +1076,7 @@ public class ReportPrintingFragment extends Fragment {
                 pageCount = renderer.getPageCount();
                 renderer.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             }
             final int finalPageCount = pageCount;
             String jobName = activity.getString(R.string.app_name) + " Document";
@@ -1459,7 +1459,7 @@ public class ReportPrintingFragment extends Fragment {
                     page.close();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
 

@@ -140,7 +140,7 @@ public class StudentSpecialCardGenerator {
                     imgCopy.setAbsolutePosition(position.getLeft() + dx, position.getBottom() + dy);
                     canvas.addImage(imgCopy);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
                 }
 
                 canvas.restoreState();
@@ -304,7 +304,7 @@ public class StudentSpecialCardGenerator {
                         byte[] decodedString = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
                         photoImg = com.itextpdf.text.Image.getInstance(decodedString);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
                     }
                 } else if (student.photoUrl.startsWith("http://") || student.photoUrl.startsWith("https://")) {
                     // Download from network URL (Firebase Storage / HTTPS)
@@ -334,7 +334,7 @@ public class StudentSpecialCardGenerator {
                         }
                         connection.disconnect();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
                     }
                 } else {
                     // Try as a local file path
@@ -344,7 +344,7 @@ public class StudentSpecialCardGenerator {
                             photoImg = com.itextpdf.text.Image.getInstance(student.photoUrl);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
                     }
                 }
             }
@@ -360,7 +360,7 @@ public class StudentSpecialCardGenerator {
                 photoImg = getItextImageFromDrawable(ctx, avatarRes);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
         }
 
         if (photoImg != null) {
@@ -677,7 +677,7 @@ public class StudentSpecialCardGenerator {
             byte[] byteArray = stream.toByteArray();
             return com.itextpdf.text.Image.getInstance(byteArray);
         } catch (Exception e) {
-            e.printStackTrace();
+            com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             return null;
         }
     }

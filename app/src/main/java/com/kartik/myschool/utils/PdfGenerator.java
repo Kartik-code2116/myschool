@@ -1103,7 +1103,7 @@ public class PdfGenerator {
                 c.addElement(img);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
         }
 
         Paragraph p = new Paragraph("Edu Report", colored(fTitle, C_DARK));

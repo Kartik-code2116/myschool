@@ -56,3 +56,9 @@
 # Gson serialization (used in SessionContext)
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
+
+# Keep App Core Classes
+-keep class com.kartik.myschool.MySchoolApplication { *; }
+-keep class com.kartik.myschool.BaseActivity { *; }
+-keep class com.kartik.myschool.SessionContext { *; }
+-keep class com.kartik.myschool.AppCache { *; }

@@ -106,7 +106,7 @@ public class EnterMarksActivity extends BaseActivity {
         ClassModel callerClass = AppCache.selectedClass;
 
         SessionContext.load(this);
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
         b = ActivityEnterMarksBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         setSupportActionBar(b.toolbar);
@@ -263,7 +263,7 @@ public class EnterMarksActivity extends BaseActivity {
             try {
                 connectivityManager.registerDefaultNetworkCallback(networkCallback);
             } catch (Exception e) {
-                e.printStackTrace();
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
     }
@@ -275,7 +275,7 @@ public class EnterMarksActivity extends BaseActivity {
             try {
                 connectivityManager.unregisterNetworkCallback(networkCallback);
             } catch (Exception e) {
-                e.printStackTrace();
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
     }
