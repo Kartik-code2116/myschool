@@ -302,4 +302,241 @@ public class MarksRegisterGenerator {
     private static String strBlank(int v) {
         return v > 0 ? String.valueOf(v) : "";
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Single-student marks register: ALL subjects on ONE page
+    // Layout: 2 rows per subject (ग्राप = obtained, पैकी = max marks)
+    // ─────────────────────────────────────────────────────────────────────────
+    public static void generateSingleStudentRegister(Context ctx,
+                                                      School school,
+                                                      ClassModel cls,
+                                                      Student student,
+                                                      MarksRecord sem1,
+                                                      MarksRecord sem2,
+                                                      PdfGenerator.PdfCallback cb) {
+        new Thread(() -> {
+            try {
+                PdfGenerator.ensureFonts(ctx);
+                File out = new File(PdfGenerator.outDir(ctx),
+                        "MarksRegister_" + PdfGenerator.safeRoll(student) + "_" + PdfGenerator.ts() + ".pdf");
+
+                Document doc = new Document(PageSize.A4);
+                PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(out));
+                writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
+                com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
+                doc.open();
+                doc.setMargins(18, 18, 22, 22);
+
+                List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new java.util.ArrayList<>();
+
+                // ── 1. Title ──────────────────────────────────────────
+                PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
+                        16, true, C_DARK, 0, 8);
+
+                // ── 2. Meta header ────────────────────────────────────
+                String yearLabel  = cls != null ? nvl(cls.academicYearLabel) : "";
+                String className  = cls != null ? nvl(cls.className)         : "";
+                String division   = cls != null ? nvl(cls.division)          : "";
+                String semLabel   = PdfLocalizer.get(ctx, "प्रथम सत्र", "First Semester");
+
+                // Row 1: name (left) | year (right)
+                PdfPTable hdr1 = new PdfPTable(new float[]{2f, 1.5f});
+                hdr1.setWidthPercentage(100);
+                addNoBorder(hdr1, PdfLocalizer.get(ctx, "नाव: ", "Name: ") + nvl(student.name), fSmallBold, Element.ALIGN_LEFT);
+                addNoBorder(hdr1, PdfLocalizer.get(ctx, "सन : ", "Year : ") + yearLabel, fSmallBold, Element.ALIGN_RIGHT);
+                hdr1.setSpacingAfter(2);
+                doc.add(hdr1);
+
+                // Row 2: class+div (left) | roll no (center) | semester (right)
+                PdfPTable hdr2 = new PdfPTable(new float[]{1.5f, 1f, 1f});
+                hdr2.setWidthPercentage(100);
+                addNoBorder(hdr2, PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Div: ") + division, fSmall, Element.ALIGN_LEFT);
+                addNoBorder(hdr2, PdfLocalizer.get(ctx, "रोल नं.: ", "Roll No.: ") + nvl(student.rollNo), fSmallBold, Element.ALIGN_CENTER);
+                addNoBorder(hdr2, semLabel, fSmallBold, Element.ALIGN_RIGHT);
+                hdr2.setSpacingAfter(5);
+                doc.add(hdr2);
+
+                // ── 3. Main Table ────────────────────────────────────
+                // Columns: अ.नं | विषय | तपशील | निरीक्षण..इतर(8) | एकूण | तोंडी,प्रात्य.,लेखी,एकूण(4) | अ+ब | श्रे.गुण | श्रेणी
+                // Total = 3 + 8 + 1 + 4 + 3 = 19 columns
+                float[] colWidths = {
+                    0.35f,  // अ.नं
+                    1.4f,   // विषय
+                    0.55f,  // तपशील
+                    // Formative 8 sub-cols:
+                    0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f,
+                    0.45f,  // एकूण (formative total)
+                    // Summative 4 sub-cols:
+                    0.4f, 0.4f, 0.4f, 0.45f,
+                    // Finals:
+                    0.45f,  // अ+ब
+                    0.4f,   // श्रे.गुण
+                    0.4f    // श्रेणी
+                };
+
+                PdfPTable tbl = new PdfPTable(colWidths);
+                tbl.setWidthPercentage(100);
+                tbl.setSpacingBefore(3);
+                tbl.setHeaderRows(3);
+
+                // ── Header Row 1 ─────────────────────
+                cellSpan(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr."), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "तपशील", "Detail"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                
+                cellSpan(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"), fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"), fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+                
+                cellSpan(tbl, PdfLocalizer.get(ctx, "अ+ब", "A+B"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "श्रे.गुण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+
+                // ── Header Row 2 ─────────────────
+                String[] formNames = {
+                    PdfLocalizer.get(ctx, "निरीक्षण", "Obs."),
+                    PdfLocalizer.get(ctx, "तोंडीकाम", "Oral"),
+                    PdfLocalizer.get(ctx, "प्रात्यक्षिक", "Pract."),
+                    PdfLocalizer.get(ctx, "उपक्रम", "Activity"),
+                    PdfLocalizer.get(ctx, "प्रकल्प", "Project"),
+                    PdfLocalizer.get(ctx, "चाचणी", "Test"),
+                    PdfLocalizer.get(ctx, "स्वाध्याय", "Assign."),
+                    PdfLocalizer.get(ctx, "इतर", "Other")
+                };
+                for (String f : formNames)
+                    cellSpan(tbl, f, fMicro, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+
+                cellSpan(tbl, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+
+                String[] summNames = {
+                    PdfLocalizer.get(ctx, "तोंडी", "Oral"),
+                    PdfLocalizer.get(ctx, "प्रात्य.", "Pract."),
+                    PdfLocalizer.get(ctx, "लेखी", "Written"),
+                    PdfLocalizer.get(ctx, "एकूण", "Total")
+                };
+                for (String s : summNames)
+                    cellSpan(tbl, s, fMicro, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+
+                // ── Header Row 3 ─────────────────
+                for (int i = 1; i <= 8; i++)
+                    cellSpan(tbl, String.valueOf(i), fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+
+                // ── Data rows: 2 rows per subject (ग्राप + पैकी) ────
+                int grandObtained = 0;
+                int grandMax = 0;
+
+                for (int i = 0; i < subjects.size(); i++) {
+                    Subject sub = subjects.get(i);
+                    MarksRecord.SubjectMarksDetail d = detail(sem1, sub.name);
+
+                    int formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik
+                            + sub.maxUpkram + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;
+                    int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
+                    int totalMax = formativeMax + summativeMax;
+                    if (totalMax == 0 && sub.maxMarks > 0) {
+                        formativeMax = sub.maxMarks / 2;
+                        summativeMax = sub.maxMarks - formativeMax;
+                        totalMax = sub.maxMarks;
+                    }
+
+                    int obtFormative = d != null ? d.akarikTotal : 0;
+                    int obtSummative = d != null ? d.sanklit : 0;
+                    int obtTotal = d != null ? d.grandTotal : 0;
+                    String grade = d != null && d.grade != null ? normalizeGrade(d.grade) : "—";
+
+                    // Count only academic subjects for grand total
+                    boolean isNonAcademic = (sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi == 0 && sub.maxMarks > 0);
+                    if (!isNonAcademic) {
+                        grandObtained += obtTotal;
+                        grandMax += totalMax;
+                    }
+
+                    // ── Row 1: प्राप्त (obtained marks) ──────────────
+                    // Sr.No spans 2 rows
+                    cellSpan(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    // Subject name spans 2 rows
+                    cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_LEFT);
+                    // तपशील: प्राप्त
+                    cellSpan(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+
+                    if (d != null) {
+                        // Formative individual obtained
+                        cellSpan(tbl, strBlank(d.nirikhshan),  fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.tondiKam),    fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.pratyakshik), fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.upkram),      fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.prakalp),     fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.chachani),    fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.swadhyay),    fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.itar),        fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        // Formative total
+                        cellSpan(tbl, str(d.akarikTotal), fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        // Summative obtained
+                        cellSpan(tbl, strBlank(d.tondi),       fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.pratyakshikB),fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, strBlank(d.lekhi),       fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, str(d.sanklit),         fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    } else {
+                        for (int k = 0; k < 13; k++)
+                            cellSpan(tbl, "-", fSmall, C_WHITE, C_GREY, 1, 1, Element.ALIGN_CENTER);
+                    }
+                    // A+B, श्रे.गुण, श्रेणी span 2 rows
+                    cellSpan(tbl, str(obtTotal), fSmallBold, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    cellSpan(tbl, str(obtTotal), fSmall,     C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    cellSpan(tbl, nvl(grade),    fSmallBold, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+
+                    // ── Row 2: पैकी (max marks) ──────────────────
+                    // Sr.No and Subject already have rowspan=2, skip them
+                    cellSpan(tbl, PdfLocalizer.get(ctx, "पैकी", "Max"), fMicro, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    // Formative max marks
+                    cellSpan(tbl, strBlank(sub.maxNirikhshan),  fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxTondiKam),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxPratyakshik), fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxUpkram),      fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxPrakalp),     fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxChachani),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxSwadhyay),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxItar),        fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, str(formativeMax),           fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    // Summative max marks
+                    cellSpan(tbl, strBlank(sub.maxTondi),       fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxPratyakshikB),fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, strBlank(sub.maxLekhi),       fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, str(summativeMax),           fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    // A+B, श्रे.गुण, श्रेणी already have rowspan=2, skip
+                }
+
+                doc.add(tbl);
+
+                // ── 4. Summary Stats ──────────────────────────────────
+                double percentage = grandMax > 0 ? (grandObtained * 100.0) / grandMax : 0.0;
+                String overallGrade = grandMax > 0 ? com.kartik.myschool.utils.GradeCalculator.getGrade(percentage) : "-";
+
+                PdfPTable sumTbl = new PdfPTable(new float[]{1f, 1f, 1f});
+                sumTbl.setWidthPercentage(100);
+                sumTbl.setSpacingBefore(6);
+                cellSpan(sumTbl, PdfLocalizer.get(ctx, "एकूण गुण : ", "Total Marks : ") + grandObtained + " / " + grandMax,
+                        fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(sumTbl, PdfLocalizer.get(ctx, "शे.गुण : ", "Percent : ") + String.format(java.util.Locale.US, "%.1f %%", percentage),
+                        fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(sumTbl, PdfLocalizer.get(ctx, "सर्वसाधारण श्रेणी : ", "Overall Grade : ") + overallGrade,
+                        fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                doc.add(sumTbl);
+
+                // ── 5. Signature Footer ───────────────────────────────
+                PdfPTable sigTbl = new PdfPTable(new float[]{1f, 1f});
+                sigTbl.setWidthPercentage(100);
+                sigTbl.setSpacingBefore(30);
+                String teacherName = cls != null ? nvl(cls.teacherName) : "";
+                String principalName = school != null ? nvl(school.principalName) : "";
+                addNoBorder(sigTbl, PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी : ", "Class Teacher : ") + teacherName, fSmallBold, Element.ALIGN_LEFT);
+                addNoBorder(sigTbl, PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी : ", "Principal : ") + principalName, fSmallBold, Element.ALIGN_RIGHT);
+                doc.add(sigTbl);
+
+                doc.close();
+                cb.onSuccess(out);
+            } catch (Exception e) {
+                cb.onError(e);
+            }
+        }).start();
+    }
 }

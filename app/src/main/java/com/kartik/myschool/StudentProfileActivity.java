@@ -593,7 +593,7 @@ public class StudentProfileActivity extends BaseActivity {
                                     com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, map2, cb);
                                     break;
                                 case 2: // Marks Register
-                                    com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateMarksRegister(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, false, cb);
+                                    com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateSingleStudentRegister(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
                                     break;
                                 case 8: // Progress Card Cover
                                     com.kartik.myschool.utils.pdf.ProgressCardCoverGenerator.generateProgressCardCover(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, map2, cb);
