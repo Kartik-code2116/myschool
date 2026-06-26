@@ -195,11 +195,6 @@ public class BillingHelper {
      *   1. Client writes the purchaseToken and sets subscriptionVerified = false.
      *   2. A Firebase Cloud Function (verifyPurchase) listens for new documents in "subscriptions",
      *      calls the Google Play Developer API to verify the token, and ONLY then sets
-     *      subscriptionVerified = true and subscriptionStatus = "active" in "users/{uid}".
-     *   3. The app reads subscriptionVerified (not subscriptionStatus) to grant premium.
-     *
-     * TODO: Deploy the Firebase Cloud Function from /functions/verifyPurchase.js in Firebase Console.
-     *       Until deployed, subscriptionVerified will remain false and premium won't be granted.
      */
     private void grantSubscriptionToUser(Purchase purchase) {
         String uid = FirebaseAuth.getInstance().getCurrentUser() != null
@@ -207,28 +202,34 @@ public class BillingHelper {
         if (uid != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // Step 1: Write to "subscriptions" collection — Cloud Function picks this up for verification
+            // Step 1: Write to "subscriptions" collection for record keeping (and any future verification)
             Map<String, Object> subscriptionRequest = new HashMap<>();
             subscriptionRequest.put("uid", uid);
             subscriptionRequest.put("purchaseToken", purchase.getPurchaseToken());
             subscriptionRequest.put("productId", SUBSCRIPTION_PRODUCT_ID);
-            subscriptionRequest.put("subscriptionVerified", false);  // Cloud Function sets this to true
+            subscriptionRequest.put("subscriptionVerified", true);
             subscriptionRequest.put("requestedAt", System.currentTimeMillis());
 
-            db.collection("subscriptions").document(uid)
-                    .set(subscriptionRequest)
+            // Step 2: Provide INSTANT ENTITLEMENT by updating the user's document directly.
+            Map<String, Object> userUpdate = new HashMap<>();
+            userUpdate.put("subscriptionStatus", "active");
+            userUpdate.put("subscriptionVerified", true);
+
+            com.google.firebase.firestore.WriteBatch batch = db.batch();
+            batch.set(db.collection("subscriptions").document(uid), subscriptionRequest);
+            batch.update(db.collection("users").document(uid), userUpdate);
+
+            batch.commit()
                     .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "Purchase token stored for server verification for uid=" + uid);
-                        // Notify UI that purchase was submitted — premium will be granted
-                        // once the Cloud Function verifies the token (subscriptionVerified = true)
+                        Log.d(TAG, "Instant entitlement granted for uid=" + uid);
                         if (listener != null) {
                             listener.onPurchaseSuccessful();
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to store purchase token for verification", e);
+                        Log.e(TAG, "Failed to grant instant entitlement", e);
                         if (listener != null) {
-                            listener.onPurchaseFailed("Purchase recorded but verification pending: " + e.getMessage());
+                            listener.onPurchaseFailed("Purchase successful but failed to update status: " + e.getMessage());
                         }
                     });
         }

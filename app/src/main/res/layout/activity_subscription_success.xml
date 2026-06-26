@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <ImageView
+        android:id="@+id/imgSuccess"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="64dp"
+        android:src="@drawable/ic_check_circle"
+        app:tint="#4CAF50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-black"
+        android:text="Subscription Active!"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgSuccess" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:text="Your account has been upgraded instantly. You now have access to all premium features."
+        android:textAlignment="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="48dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="16dp"
+            android:text="Unlimited Students"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_check_circle"
+            app:drawableTint="#4CAF50" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:drawablePadding="16dp"
+            android:text="Advanced Analytics"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_check_circle"
+            app:drawableTint="#4CAF50" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:drawablePadding="16dp"
+            android:text="Secure Cloud Backup"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_check_circle"
+            app:drawableTint="#4CAF50" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnStartManaging"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:text="Start Managing"
+        android:textSize="16sp"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

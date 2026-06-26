@@ -75,7 +75,8 @@ public class SubscriptionBottomSheet extends BottomSheetDialogFragment implement
     public void onPurchaseSuccessful() {
         if (isAdded()) {
             requireActivity().runOnUiThread(() -> {
-                Toast.makeText(requireContext(), "Subscription activated! You can now add unlimited students.", Toast.LENGTH_LONG).show();
+                android.content.Intent intent = new android.content.Intent(requireActivity(), SubscriptionSuccessActivity.class);
+                startActivity(intent);
                 dismiss();
             });
         }

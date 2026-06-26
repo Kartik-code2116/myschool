@@ -4,7 +4,6 @@ public class SubscriptionRequest {
     public String id;
     public String teacherId;
     public String status;
-    public String screenshotUrl;
     public long timestamp;
 
     public String purchaseToken;

@@ -95,23 +95,6 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
         } else {
             holder.tvRejectionReason.setVisibility(View.GONE);
         }
-
-        // Screenshot (Hide if Google Play billing was used)
-        if (request.purchaseToken != null && !request.purchaseToken.isEmpty() && (request.screenshotUrl == null || request.screenshotUrl.isEmpty())) {
-            holder.imgScreenshot.setImageDrawable(null);
-            holder.imgScreenshot.setBackgroundResource(R.drawable.ic_check_circle); // Using check circle to show successful digital purchase
-            holder.imgScreenshot.setOnClickListener(null);
-        } else if (request.screenshotUrl != null && !request.screenshotUrl.isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(request.screenshotUrl)
-                    .centerCrop()
-                    .into(holder.imgScreenshot);
-                    
-            holder.imgScreenshot.setOnClickListener(v -> showFullImage(v.getContext(), request.screenshotUrl));
-        } else {
-            holder.imgScreenshot.setImageDrawable(null);
-            holder.imgScreenshot.setBackgroundColor(Color.parseColor("#E2E8F0"));
-        }
     }
 
     @Override
@@ -119,39 +102,7 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
         return requests.size();
     }
 
-    private void showFullImage(android.content.Context context, String url) {
-        android.app.Dialog dialog = new android.app.Dialog(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        
-        android.widget.RelativeLayout layout = new android.widget.RelativeLayout(context);
-        layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        layout.setBackgroundColor(Color.BLACK);
-        
-        ImageView imgView = new ImageView(context);
-        imgView.setLayoutParams(new android.widget.RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        layout.addView(imgView);
-        
-        ImageView btnClose = new ImageView(context);
-        android.widget.RelativeLayout.LayoutParams params = new android.widget.RelativeLayout.LayoutParams(120, 120);
-        params.addRule(android.widget.RelativeLayout.ALIGN_PARENT_TOP);
-        params.addRule(android.widget.RelativeLayout.ALIGN_PARENT_END);
-        params.setMargins(0, 80, 40, 0);
-        btnClose.setLayoutParams(params);
-        btnClose.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-        btnClose.setColorFilter(Color.WHITE);
-        btnClose.setPadding(20, 20, 20, 20);
-        layout.addView(btnClose);
-        
-        dialog.setContentView(layout);
-        
-        Glide.with(context).load(url).into(imgView);
-        
-        btnClose.setOnClickListener(v -> dialog.dismiss());
-        imgView.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
-    }
-
     static class HistoryViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgScreenshot;
         TextView tvDate;
         TextView tvStatus;
         TextView tvPlanDetails;
@@ -160,7 +111,6 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgScreenshot = itemView.findViewById(R.id.imgScreenshot);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             tvPlanDetails = itemView.findViewById(R.id.tvPlanDetails);
