@@ -297,12 +297,21 @@ public class ReportPrintingFragment extends Fragment {
                 java.util.Map<String, com.kartik.myschool.model.MarksRecord> map2 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
                 com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), map1, map2, cb);
                 break;
-            case 1:  // 2. अनुक्रमणिका (Index)
-            case 2:  // 3. गुणनोंदी (Marks Register - now Individual)
-            case 8:  // 9. प्रगतीपत्रक मुखपृष्ठ (Progress Card Cover)
-            case 9:  // 10. प्रगतीपत्रक पृष्ठ (Progress Card Inner)
-            case 11: // 12. पाचवी आठवी गुणपत्रक
-            case 13: // 14. प्रगतीपत्रक मुखपृष्ठ (duplicate)
+            case 11: // 12. Annual Marksheet
+                java.util.Map<String, com.kartik.myschool.model.MarksRecord> map2For11 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
+                com.kartik.myschool.utils.pdf.AnnualMarksheetGenerator.generateAnnualMarksheet(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), map2For11, cb);
+                break;
+            case 12: // 13. Result Sheet
+                java.util.Map<String, com.kartik.myschool.model.MarksRecord> map2For12 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
+                com.kartik.myschool.utils.pdf.ResultSheetGenerator.generateResultSheet(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), map2For12, cb);
+                break;
+            case 13: // 14. Gunapattrak (Progress Card Inner)
+                com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), cb);
+                break;
+            case 1:  // 2. Index
+            case 2:  // 3. Marks Register
+            case 8:  // 9. Progress Card Cover
+            case 9:  // 10. Progress Card Inner
                 com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
                 break;
             case 18: // HPC
@@ -387,12 +396,22 @@ public class ReportPrintingFragment extends Fragment {
         
         switch (reportPosition) {
             case 0:  com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
+            case 11:
+                java.util.Map<String, com.kartik.myschool.model.MarksRecord> m2For11 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
+                com.kartik.myschool.utils.pdf.AnnualMarksheetGenerator.generateAnnualMarksheet(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), m2For11, callback); 
+                break;
+            case 12:
+                java.util.Map<String, com.kartik.myschool.model.MarksRecord> m2For12 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
+                com.kartik.myschool.utils.pdf.ResultSheetGenerator.generateResultSheet(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), m2For12, callback); 
+                break;
+            case 13:
+                com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), callback);
+                break;
             case 1:
             case 2:
             case 8:
             case 9:
-            case 11:
-            case 13: com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
+                com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
             default: PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
         }
         

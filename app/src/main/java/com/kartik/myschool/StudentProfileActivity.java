@@ -57,9 +57,9 @@ public class StudentProfileActivity extends BaseActivity {
             startActivity(new Intent(this, StudentEditActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
-        b.btnSpecialCard.setOnClickListener(v -> {
-            UiAnimations.pulse(b.btnSpecialCard);
-            openSpecialCard();
+        b.btnGenerateReport.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnGenerateReport);
+            showReportSelectionDialog();
         });
         b.btnParentCode.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnParentCode);
@@ -132,7 +132,7 @@ public class StudentProfileActivity extends BaseActivity {
         b.tvStudentName.setText(name);
 
         String std = val(s.standard);
-        if (("—".equals(std) || "-".equals(std)) && s.className != null) {
+        if (("â€”".equals(std) || "-".equals(std)) && s.className != null) {
             std = extractStandardFromClassName(s.className);
         }
         String div = val(s.division);
@@ -229,22 +229,22 @@ public class StudentProfileActivity extends BaseActivity {
     }
 
     private String getDisplayGender(String gender) {
-        if (gender == null || gender.isEmpty()) return "—";
+        if (gender == null || gender.isEmpty()) return "â€”";
         String g = gender.trim().toLowerCase();
-        if (g.equals("1") || g.equals("male") || g.equals("boy") || g.equals("पुरुष") || g.equals("मुलगा")) {
+        if (g.equals("1") || g.equals("male") || g.equals("boy") || g.equals("à¤ªà¥à¤°à¥à¤·") || g.equals("à¤®à¥à¤²à¤—à¤¾")) {
             return "M";
         }
-        if (g.equals("2") || g.equals("female") || g.equals("girl") || g.equals("स्त्री") || g.equals("मुलगी")) {
+        if (g.equals("2") || g.equals("female") || g.equals("girl") || g.equals("à¤¸à¥à¤¤à¥à¤°à¥€") || g.equals("à¤®à¥à¤²à¤—à¥€")) {
             return "F";
         }
         if (!gender.trim().isEmpty()) {
             return gender.trim().substring(0, Math.min(gender.trim().length(), 1)).toUpperCase();
         }
-        return "—";
+        return "â€”";
     }
 
     private String getDisplayCast(String cast) {
-        if (cast == null || cast.isEmpty()) return "—";
+        if (cast == null || cast.isEmpty()) return "â€”";
         String trim = cast.trim();
         if (trim.equals("0") || trim.equals("1") || trim.equalsIgnoreCase("SC")) {
             return "SC";
@@ -271,7 +271,7 @@ public class StudentProfileActivity extends BaseActivity {
     }
 
     private String getShortCast(String cast) {
-        if (cast == null || cast.isEmpty()) return "—";
+        if (cast == null || cast.isEmpty()) return "â€”";
         String trim = cast.trim();
         if (trim.equals("0") || trim.equals("1")) return "SC";
         if (trim.equals("2")) return "ST";
@@ -282,25 +282,25 @@ public class StudentProfileActivity extends BaseActivity {
         if (trim.equals("7")) return "Open";
 
         String upper = trim.toUpperCase();
-        if (upper.equals("SC") || upper.contains("SCHEDULED CASTES") || upper.contains("SCHEDULED CASTE") || upper.contains("अनुसूचित जाती") || upper.contains("अनु. जाती")) {
+        if (upper.equals("SC") || upper.contains("SCHEDULED CASTES") || upper.contains("SCHEDULED CASTE") || upper.contains("à¤…à¤¨à¥à¤¸à¥‚à¤šà¤¿à¤¤ à¤œà¤¾à¤¤à¥€") || upper.contains("à¤…à¤¨à¥. à¤œà¤¾à¤¤à¥€")) {
             return "SC";
         }
-        if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES") || upper.contains("SCHEDULED TRIBE") || upper.contains("अनुसूचित जमाती") || upper.contains("अनु. जमाती")) {
+        if (upper.equals("ST") || upper.contains("SCHEDULED TRIBES") || upper.contains("SCHEDULED TRIBE") || upper.contains("à¤…à¤¨à¥à¤¸à¥‚à¤šà¤¿à¤¤ à¤œà¤®à¤¾à¤¤à¥€") || upper.contains("à¤…à¤¨à¥. à¤œà¤®à¤¾à¤¤à¥€")) {
             return "ST";
         }
-        if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT") || upper.contains("विमुक्त")) {
+        if (upper.equals("VJ") || upper.contains("VIMUKT JATI") || upper.contains("VIMUKT") || upper.contains("à¤µà¤¿à¤®à¥à¤•à¥à¤¤")) {
             return "VJ";
         }
-        if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("NOMADIC TRIBE") || upper.contains("BHATKYA") || upper.contains("भटक्या") || upper.contains("भ.ज.")) {
+        if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("NOMADIC TRIBE") || upper.contains("BHATKYA") || upper.contains("à¤­à¤Ÿà¤•à¥à¤¯à¤¾") || upper.contains("à¤­.à¤œ.")) {
             return "NT";
         }
-        if (upper.equals("OBC") || upper.contains("OTHER BACKWARD") || upper.contains("इतर मागास") || upper.contains("इ.मा.व.")) {
+        if (upper.equals("OBC") || upper.contains("OTHER BACKWARD") || upper.contains("à¤‡à¤¤à¤° à¤®à¤¾à¤—à¤¾à¤¸") || upper.contains("à¤‡.à¤®à¤¾.à¤µ.")) {
             return "OBC";
         }
-        if (upper.equals("SBC") || upper.contains("SPECIAL BACKWARD") || upper.contains("विशेष मागास") || upper.contains("वि.मा.प्र.")) {
+        if (upper.equals("SBC") || upper.contains("SPECIAL BACKWARD") || upper.contains("à¤µà¤¿à¤¶à¥‡à¤· à¤®à¤¾à¤—à¤¾à¤¸") || upper.contains("à¤µà¤¿.à¤®à¤¾.à¤ªà¥à¤°.")) {
             return "SBC";
         }
-        if (upper.equals("OPEN") || upper.contains("GENERAL") || upper.contains("खुला")) {
+        if (upper.equals("OPEN") || upper.contains("GENERAL") || upper.contains("à¤–à¥à¤²à¤¾")) {
             return "Open";
         }
         if (cast.contains("(")) {
@@ -459,7 +459,7 @@ public class StudentProfileActivity extends BaseActivity {
 
     private void openReport() {
         loadPrerequisitesThen(() -> {
-            Toast.makeText(this, student.name + " चा रिपोर्ट तयार होत आहे...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, student.name + " à¤šà¤¾ à¤°à¤¿à¤ªà¥‹à¤°à¥à¤Ÿ à¤¤à¤¯à¤¾à¤° à¤¹à¥‹à¤¤ à¤†à¤¹à¥‡...", Toast.LENGTH_SHORT).show();
             String classId = (AppCache.selectedClass != null && AppCache.selectedClass.id != null) 
                              ? AppCache.selectedClass.id : student.classId;
             String[] sids = getSemesterIds();
@@ -486,28 +486,48 @@ public class StudentProfileActivity extends BaseActivity {
                                 @Override
                                 public void onError(Exception e) {
                                     runOnUiThread(() -> {
-                                        Toast.makeText(StudentProfileActivity.this, "त्रुटी आढळli: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€ à¤†à¤¢à¤³li: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                     });
                                 }
                             });
                         }
                         @Override
                         public void onError(Exception e) {
-                            runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "द्वितीया सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                            runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "à¤¦à¥à¤µà¤¿à¤¤à¥€à¤¯à¤¾ à¤¸à¤¤à¥à¤°à¤¾à¤šà¥‡ à¤—à¥à¤£ à¤®à¤¿à¤³à¤µà¤£à¥à¤¯à¤¾à¤¤ à¤…à¤ªà¤¯à¤¶ à¤†à¤²à¥‡: " + e.getMessage(), Toast.LENGTH_LONG).show());
                         }
                     });
                 }
                 @Override
                 public void onError(Exception e) {
-                    runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "प्रथम सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "à¤ªà¥à¤°à¤¥à¤® à¤¸à¤¤à¥à¤°à¤¾à¤šà¥‡ à¤—à¥à¤£ à¤®à¤¿à¤³à¤µà¤£à¥à¤¯à¤¾à¤¤ à¤…à¤ªà¤¯à¤¶ à¤†à¤²à¥‡: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 }
             });
         });
     }
 
-    private void openSpecialCard() {
+    private void showReportSelectionDialog() {
+        String[] reportNames = {
+            getString(R.string.report_title_12), // 12. Annual Marksheet
+            getString(R.string.report_title_13), // 13. Result Sheet
+            getString(R.string.report_title_14), // 14. Gunapattrak (Progress Card Inner)
+            getString(R.string.report_title_19), // Holistic Progress Card
+            getString(R.string.report_title_4)   // Descriptive Remarks
+        };
+        final int[] reportPositions = {11, 12, 13, 18, 3}; // Corresponding positions in ReportPrintingFragment
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("अहवाल निवडा")
+            .setItems(reportNames, (dialog, which) -> {
+                generateReportForStudent(reportPositions[which], reportNames[which]);
+            })
+            .show();
+    }
+
+    private void generateReportForStudent(int reportIndex, String reportName) {
         loadPrerequisitesThen(() -> {
-            Toast.makeText(this, student.name + " चे विशेष प्रगती पत्रक तयार होत आहे...", Toast.LENGTH_SHORT).show();
+            com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(this, null, "Generating " + reportName + "...");
+            pd.show();
+            
             String classId = (AppCache.selectedClass != null && AppCache.selectedClass.id != null) 
                              ? AppCache.selectedClass.id : student.classId;
             String[] sids = getSemesterIds();
@@ -518,36 +538,76 @@ public class StudentProfileActivity extends BaseActivity {
                         @Override
                         public void onSuccess(MarksRecord s2) {
                             if (s1 == null && s2 == null) {
-                                runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, R.string.no_marks_yet, Toast.LENGTH_SHORT).show());
+                                runOnUiThread(() -> {
+                                    pd.dismiss();
+                                    Toast.makeText(StudentProfileActivity.this, R.string.no_marks_yet, Toast.LENGTH_SHORT).show();
+                                });
                                 return;
                             }
-                            com.kartik.myschool.utils.pdf.StudentSpecialCardGenerator.generateSpecialCard(StudentProfileActivity.this, SessionContext.selectedSchool, AppCache.selectedClass, student, s1, s2, new PdfGenerator.PdfCallback() {
+                            
+                            PdfGenerator.PdfCallback cb = new PdfGenerator.PdfCallback() {
                                 @Override
                                 public void onSuccess(File pdfFile) {
                                     runOnUiThread(() -> {
+                                        pd.dismiss();
                                         Toast.makeText(StudentProfileActivity.this, R.string.msg_empty_3, Toast.LENGTH_SHORT).show();
                                         openPdfFile(pdfFile);
-                                        com.kartik.myschool.utils.AnalyticsHelper.logPdfGenerated("special_card");
+                                        com.kartik.myschool.utils.AnalyticsHelper.logPdfGenerated("single_report_" + reportIndex);
                                         com.kartik.myschool.utils.ReviewHelper.incrementPdfCountAndCheck(StudentProfileActivity.this);
                                     });
                                 }
                                 @Override
                                 public void onError(Exception e) {
                                     runOnUiThread(() -> {
-                                        Toast.makeText(StudentProfileActivity.this, "त्रुटी आढळली: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        pd.dismiss();
+                                        Toast.makeText(StudentProfileActivity.this, "Error generating report: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                     });
                                 }
-                            });
+                            };
+
+                            List<Student> list = java.util.Collections.singletonList(student);
+                            java.util.Map<String, MarksRecord> map1 = s1 != null ? java.util.Collections.singletonMap(student.id, s1) : new java.util.HashMap<>();
+                            java.util.Map<String, MarksRecord> map2 = s2 != null ? java.util.Collections.singletonMap(student.id, s2) : new java.util.HashMap<>();
+
+                            switch (reportIndex) {
+                                case 11: // Annual Marksheet
+                                    com.kartik.myschool.utils.pdf.AnnualMarksheetGenerator.generateAnnualMarksheet(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map2, cb);
+                                    break;
+                                case 12: // Result Sheet
+                                    com.kartik.myschool.utils.pdf.ResultSheetGenerator.generateResultSheet(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map2, cb);
+                                    break;
+                                case 13: // Gunapattrak (Progress Card Inner)
+                                    com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, cb);
+                                    break;
+                                case 0: // Cover Page
+                                    com.kartik.myschool.utils.pdf.CoverPageGenerator.generateCoverPage(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                                    break;
+                                case 18: // HPC
+                                    com.kartik.myschool.utils.pdf.HPCGenerator.generateHPC(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                                    break;
+                                case 3: // Descriptive Remarks
+                                    com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, map2, cb);
+                                    break;
+                                default:
+                                    com.kartik.myschool.utils.PdfGenerator.generatePersonalityRecord(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                                    break;
+                            }
                         }
                         @Override
                         public void onError(Exception e) {
-                            runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "द्वितीय सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                            runOnUiThread(() -> {
+                                pd.dismiss();
+                                Toast.makeText(StudentProfileActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            });
                         }
                     });
                 }
                 @Override
                 public void onError(Exception e) {
-                    runOnUiThread(() -> Toast.makeText(StudentProfileActivity.this, "प्रथम सत्राचे गुण मिळवण्यात अपयश आले: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    runOnUiThread(() -> {
+                        pd.dismiss();
+                        Toast.makeText(StudentProfileActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
                 }
             });
         });
@@ -641,7 +701,7 @@ public class StudentProfileActivity extends BaseActivity {
                         .into(b.ivHeaderBg);
             }
         } else {
-            // No photo selected — show plain color (FrameLayout background shows through)
+            // No photo selected â€” show plain color (FrameLayout background shows through)
             b.ivHeaderBg.setImageDrawable(null);
         }
     }
@@ -649,7 +709,7 @@ public class StudentProfileActivity extends BaseActivity {
     private int getPlaceholderRes(Student s) {
         if (s.gender != null) {
             String g = s.gender.toLowerCase().trim();
-            if (g.contains("female") || g.contains("स्त्री") || g.contains("मुलगी")
+            if (g.contains("female") || g.contains("à¤¸à¥à¤¤à¥à¤°à¥€") || g.contains("à¤®à¥à¤²à¤—à¥€")
                     || g.equals("2") || g.equals("f")) {
                 return R.drawable.ic_girl_avatar;
             }
@@ -695,9 +755,9 @@ public class StudentProfileActivity extends BaseActivity {
         }
 
         btnCamera.setOnClickListener(v -> {
-            String[] options = {"कॅमेरा (Camera)", "गॅलरी (Gallery)"};
+            String[] options = {"à¤•à¥…à¤®à¥‡à¤°à¤¾ (Camera)", "à¤—à¥…à¤²à¤°à¥€ (Gallery)"};
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                    .setTitle("फोटोचा स्त्रोत निवडा (Choose Photo Source)")
+                    .setTitle("à¤«à¥‹à¤Ÿà¥‹à¤šà¤¾ à¤¸à¥à¤¤à¥à¤°à¥‹à¤¤ à¤¨à¤¿à¤µà¤¡à¤¾ (Choose Photo Source)")
                     .setItems(options, (dialogInterface, which) -> {
                         if (which == 0) {
                             launchCamera();
@@ -717,16 +777,16 @@ public class StudentProfileActivity extends BaseActivity {
                 int cropH = (height - newWidth) / 2;
                 currentPhotoBitmap = android.graphics.Bitmap.createBitmap(currentPhotoBitmap, cropW, cropH, newWidth, newWidth);
                 dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
-                Toast.makeText(this, "फोटो क्रॉप केला", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤•à¥à¤°à¥‰à¤ª à¤•à¥‡à¤²à¤¾", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "क्रॉप करण्यासाठी आधी फोटो निवडा", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤•à¥à¤°à¥‰à¤ª à¤•à¤°à¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ à¤†à¤§à¥€ à¤«à¥‹à¤Ÿà¥‹ à¤¨à¤¿à¤µà¤¡à¤¾", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnDelete.setOnClickListener(v -> {
             currentPhotoBitmap = null;
             dialogPhotoPreview.setImageResource(getPlaceholderRes(student));
-            Toast.makeText(this, "फोटो काढला (डिफॉल्ट अवतार दर्शविला जाईल)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤•à¤¾à¤¢à¤²à¤¾ (à¤¡à¤¿à¤«à¥‰à¤²à¥à¤Ÿ à¤…à¤µà¤¤à¤¾à¤° à¤¦à¤°à¥à¤¶à¤µà¤¿à¤²à¤¾ à¤œà¤¾à¤ˆà¤²)", Toast.LENGTH_SHORT).show();
         });
 
         btnRotate.setOnClickListener(v -> {
@@ -736,24 +796,24 @@ public class StudentProfileActivity extends BaseActivity {
                 currentPhotoBitmap = android.graphics.Bitmap.createBitmap(currentPhotoBitmap, 0, 0, currentPhotoBitmap.getWidth(), currentPhotoBitmap.getHeight(), matrix, true);
                 dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
             } else {
-                Toast.makeText(this, "फिरवण्यासाठी आधी फोटो निवडा", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤«à¤¿à¤°à¤µà¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ à¤†à¤§à¥€ à¤«à¥‹à¤Ÿà¥‹ à¤¨à¤¿à¤µà¤¡à¤¾", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnSave.setOnClickListener(v -> {
             if (currentPhotoBitmap == null) {
-                Toast.makeText(this, "फोटो काढून टाकत आहे...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤•à¤¾à¤¢à¥‚à¤¨ à¤Ÿà¤¾à¤•à¤¤ à¤†à¤¹à¥‡...", Toast.LENGTH_SHORT).show();
                 FirebaseRepository.get().deleteStudentPhoto(student.id, new FirebaseRepository.OnResult<Void>() {
                     @Override
                     public void onSuccess(Void result) {
                         student.photoUrl = "";
                         loadStudentPhoto(student, b.ivStudentPhoto);
-                        Toast.makeText(StudentProfileActivity.this, "फोटो यशस्वीरीत्या काढला", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "à¤«à¥‹à¤Ÿà¥‹ à¤¯à¤¶à¤¸à¥à¤µà¥€à¤°à¥€à¤¤à¥à¤¯à¤¾ à¤•à¤¾à¤¢à¤²à¤¾", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             } else {
@@ -762,18 +822,18 @@ public class StudentProfileActivity extends BaseActivity {
                 scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 75, baos);
                 byte[] bytes = baos.toByteArray();
 
-                Toast.makeText(this, "फोटो अपलोड होत आहे...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤…à¤ªà¤²à¥‹à¤¡ à¤¹à¥‹à¤¤ à¤†à¤¹à¥‡...", Toast.LENGTH_SHORT).show();
                 FirebaseRepository.get().uploadStudentPhoto(student.id, bytes, new FirebaseRepository.OnResult<String>() {
                     @Override
                     public void onSuccess(String url) {
                         student.photoUrl = url;
                         loadStudentPhoto(student, b.ivStudentPhoto);
-                        Toast.makeText(StudentProfileActivity.this, "फोटो यशस्वीरीत्या जतन केला", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "à¤«à¥‹à¤Ÿà¥‹ à¤¯à¤¶à¤¸à¥à¤µà¥€à¤°à¥€à¤¤à¥à¤¯à¤¾ à¤œà¤¤à¤¨ à¤•à¥‡à¤²à¤¾", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -793,7 +853,7 @@ public class StudentProfileActivity extends BaseActivity {
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             // Verify that a camera app can handle the intent
             if (intent.resolveActivity(getPackageManager()) == null) {
-                Toast.makeText(this, "कॅमेरा ऍप आढळले नाही", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤•à¥…à¤®à¥‡à¤°à¤¾ à¤à¤ª à¤†à¤¢à¤³à¤²à¥‡ à¤¨à¤¾à¤¹à¥€", Toast.LENGTH_SHORT).show();
                 return;
             }
             java.io.File tempFile = new java.io.File(getExternalCacheDir(), "temp_profile.jpg");
@@ -804,7 +864,7 @@ public class StudentProfileActivity extends BaseActivity {
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivityForResult(intent, REQ_CODE_CAMERA);
         } catch (Exception e) {
-            Toast.makeText(this, "कॅमेरा सुरू करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "à¤•à¥…à¤®à¥‡à¤°à¤¾ à¤¸à¥à¤°à¥‚ à¤•à¤°à¤¤à¤¾ à¤†à¤²à¤¾ à¤¨à¤¾à¤¹à¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -828,7 +888,7 @@ public class StudentProfileActivity extends BaseActivity {
                         }
                     }
                 } catch (Exception e) {
-                    Toast.makeText(this, "फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤²à¥‹à¤¡ à¤•à¤°à¤¤à¤¾ à¤†à¤²à¤¾ à¤¨à¤¾à¤¹à¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == REQ_CODE_GALLERY) {
                 if (data != null && data.getData() != null) {
@@ -842,7 +902,7 @@ public class StudentProfileActivity extends BaseActivity {
                             }
                         }
                     } catch (Exception e) {
-                        Toast.makeText(this, "फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤²à¥‹à¤¡ à¤•à¤°à¤¤à¤¾ à¤†à¤²à¤¾ à¤¨à¤¾à¤¹à¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -850,7 +910,7 @@ public class StudentProfileActivity extends BaseActivity {
     }
 
     private void showParentCodeDialog() {
-        com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "कोड मिळवत आहे / Fetching code...");
+        com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "à¤•à¥‹à¤¡ à¤®à¤¿à¤³à¤µà¤¤ à¤†à¤¹à¥‡ / Fetching code...");
         loading.show();
 
         FirebaseRepository.get().getParentLinkForStudent(student.id, new FirebaseRepository.OnResult<com.kartik.myschool.model.ParentLink>() {
@@ -867,14 +927,14 @@ public class StudentProfileActivity extends BaseActivity {
             @Override
             public void onError(Exception e) {
                 loading.dismiss();
-                Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void generateAndSaveParentLinkCode(com.kartik.myschool.utils.LoadingDialog loading) {
         if (loading != null) {
-            loading.setMessage("नवीन कोड तयार करत आहे / Generating new code...");
+            loading.setMessage("à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¤ à¤†à¤¹à¥‡ / Generating new code...");
             if (!loading.isShowing()) loading.show();
         }
 
@@ -892,41 +952,41 @@ public class StudentProfileActivity extends BaseActivity {
             @Override
             public void onError(Exception e) {
                 if (loading != null) loading.dismiss();
-                Toast.makeText(StudentProfileActivity.this, "कोड तयार करण्यात अपयश: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentProfileActivity.this, "à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤£à¥à¤¯à¤¾à¤¤ à¤…à¤ªà¤¯à¤¶: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void displayParentLinkCode(com.kartik.myschool.model.ParentLink link) {
-        String msg = "पालक प्रगतीपुस्तक पाहण्यासाठी हा ६ अंकी कोड वापरू शकतात:\n\n" +
-                     "★ कोड: " + link.code + " ★\n\n" +
-                     "(हा कोड 'MySchool Parent' ॲपमध्ये प्रविष्ट करा)";
+        String msg = "à¤ªà¤¾à¤²à¤• à¤ªà¥à¤°à¤—à¤¤à¥€à¤ªà¥à¤¸à¥à¤¤à¤• à¤ªà¤¾à¤¹à¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ à¤¹à¤¾ à¥¬ à¤…à¤‚à¤•à¥€ à¤•à¥‹à¤¡ à¤µà¤¾à¤ªà¤°à¥‚ à¤¶à¤•à¤¤à¤¾à¤¤:\n\n" +
+                     "â˜… à¤•à¥‹à¤¡: " + link.code + " â˜…\n\n" +
+                     "(à¤¹à¤¾ à¤•à¥‹à¤¡ 'MySchool Parent' à¥²à¤ªà¤®à¤§à¥à¤¯à¥‡ à¤ªà¥à¤°à¤µà¤¿à¤·à¥à¤Ÿ à¤•à¤°à¤¾)";
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("पालक जोडणी कोड / Parent Code")
+                .setTitle("à¤ªà¤¾à¤²à¤• à¤œà¥‹à¤¡à¤£à¥€ à¤•à¥‹à¤¡ / Parent Code")
                 .setMessage(msg)
-                .setPositiveButton("WhatsApp वर पाठवा / Share", (dialog, which) -> {
-                    String shareText = "नमस्कार, आपल्या पाल्याचे प्रगतीपुस्तक आणि उपस्थिती पाहण्यासाठी 'MySchool Parent' ॲप डाउनलोड करा आणि खालील कोड प्रविष्ट करा:\n\n" +
-                                       "विद्यार्थी: " + student.name + "\n" +
-                                       "जोडणी कोड: " + link.code + "\n\n" +
-                                       "धन्यवाद!";
+                .setPositiveButton("WhatsApp à¤µà¤° à¤ªà¤¾à¤ à¤µà¤¾ / Share", (dialog, which) -> {
+                    String shareText = "à¤¨à¤®à¤¸à¥à¤•à¤¾à¤°, à¤†à¤ªà¤²à¥à¤¯à¤¾ à¤ªà¤¾à¤²à¥à¤¯à¤¾à¤šà¥‡ à¤ªà¥à¤°à¤—à¤¤à¥€à¤ªà¥à¤¸à¥à¤¤à¤• à¤†à¤£à¤¿ à¤‰à¤ªà¤¸à¥à¤¥à¤¿à¤¤à¥€ à¤ªà¤¾à¤¹à¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ 'MySchool Parent' à¥²à¤ª à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤°à¤¾ à¤†à¤£à¤¿ à¤–à¤¾à¤²à¥€à¤² à¤•à¥‹à¤¡ à¤ªà¥à¤°à¤µà¤¿à¤·à¥à¤Ÿ à¤•à¤°à¤¾:\n\n" +
+                                       "à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤°à¥à¤¥à¥€: " + student.name + "\n" +
+                                       "à¤œà¥‹à¤¡à¤£à¥€ à¤•à¥‹à¤¡: " + link.code + "\n\n" +
+                                       "à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦!";
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("text/plain");
                     shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
                     startActivity(Intent.createChooser(shareIntent, "Share via"));
                 })
-                .setNeutralButton("नवीन कोड तयार करा / Reset", (dialog, which) -> {
+                .setNeutralButton("à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¾ / Reset", (dialog, which) -> {
                     new androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("पुष्टीकरण / Reset Code")
-                            .setMessage("नवीन कोड तयार करायचा आहे का? जुना कोड काम करणार नाही.")
-                            .setPositiveButton("होय / Yes", (d, w) -> {
-                                com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "नवीन कोड तयार करत आहे...");
+                            .setTitle("à¤ªà¥à¤·à¥à¤Ÿà¥€à¤•à¤°à¤£ / Reset Code")
+                            .setMessage("à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¾à¤¯à¤šà¤¾ à¤†à¤¹à¥‡ à¤•à¤¾? à¤œà¥à¤¨à¤¾ à¤•à¥‹à¤¡ à¤•à¤¾à¤® à¤•à¤°à¤£à¤¾à¤° à¤¨à¤¾à¤¹à¥€.")
+                            .setPositiveButton("à¤¹à¥‹à¤¯ / Yes", (d, w) -> {
+                                com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¤ à¤†à¤¹à¥‡...");
                                 generateAndSaveParentLinkCode(loading);
                             })
-                            .setNegativeButton("नाही / No", null)
+                            .setNegativeButton("à¤¨à¤¾à¤¹à¥€ / No", null)
                             .show();
                 })
-                .setNegativeButton("बंद करा / Close", null);
+                .setNegativeButton("à¤¬à¤‚à¤¦ à¤•à¤°à¤¾ / Close", null);
         builder.show();
     }
 
@@ -935,10 +995,10 @@ public class StudentProfileActivity extends BaseActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                // Camera permission granted – re-launch camera
+                // Camera permission granted â€“ re-launch camera
                 launchCamera();
             } else {
-                Toast.makeText(this, "कॅमेरा वापरण्यासाठी परवानगी द्या", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "à¤•à¥…à¤®à¥‡à¤°à¤¾ à¤µà¤¾à¤ªà¤°à¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ à¤ªà¤°à¤µà¤¾à¤¨à¤—à¥€ à¤¦à¥à¤¯à¤¾", Toast.LENGTH_SHORT).show();
             }
         }
     }

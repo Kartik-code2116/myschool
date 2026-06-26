@@ -579,12 +579,12 @@
 
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSpecialCard"
+                    android:id="@+id/btnGenerateReport"
                     style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="@string/view_special_card"
+                    android:text="अहवाल तयार करा"
                     android:textColor="?attr/colorSurface"
                     android:fontFamily="sans-serif-bold"
                     app:icon="@drawable/ic_school"
