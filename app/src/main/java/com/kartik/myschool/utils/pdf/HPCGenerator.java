@@ -21,8 +21,9 @@ import com.kartik.myschool.utils.PdfGenerator;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
 import static com.kartik.myschool.utils.PdfGenerator.*;
+import com.kartik.myschool.utils.pdf.MarathiText;
+import com.kartik.myschool.utils.pdf.PdfLocalizer;
 
 public class HPCGenerator {
 
@@ -57,7 +58,8 @@ public class HPCGenerator {
             MarksRecord sem1, MarksRecord sem2) throws Exception {
 
         // --- TITLE ---
-        PdfGenerator.addMarathiParagraph(doc, "Holistic Progress Card (HPC) / सर्वांगीण प्रगतीपत्रक", 18, true, C_DARK, 0, 15);
+        String title = PdfLocalizer.get(ctx, "सर्वांगीण प्रगतीपत्रक (HPC)", "Holistic Progress Card (HPC)");
+        PdfGenerator.addMarathiParagraph(doc, title, 18, true, C_DARK, 0, 15);
 
         // --- HEADER ---
         PdfPTable headerTbl = new PdfPTable(2);
@@ -71,17 +73,29 @@ public class HPCGenerator {
         String schoolName = (school != null ? nvl(school.name) : "");
         String udise = (school != null ? nvl(school.udiseCode) : "");
 
-        PdfPCell c1 = rawCell("Student Name: " + sName + "\nRoll No: " + sRoll, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        String lblStudent = PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव: ", "Student Name: ");
+        String lblRoll = PdfLocalizer.get(ctx, "हजेरी क्र.: ", "Roll No: ");
+        String lblClass = PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ");
+        String lblYear = PdfLocalizer.get(ctx, "वर्ष: ", "Year: ");
+        String lblSchool = PdfLocalizer.get(ctx, "शाळेचे नाव: ", "School: ");
+        String lblUdise = PdfLocalizer.get(ctx, "युडायस: ", "UDISE: ");
+
+        String c1Text = lblStudent + sName + "\n" + lblRoll + sRoll;
+        String c2Text = lblClass + sClass + "\n" + lblYear + sYear;
+        String c3Text = lblSchool + schoolName;
+        String c4Text = lblUdise + udise;
+
+        PdfPCell c1 = marathiCell(ctx, c1Text, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
         c1.setBorder(Rectangle.NO_BORDER);
-        PdfPCell c2 = rawCell("Class: " + sClass + "\nYear: " + sYear, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
+        PdfPCell c2 = marathiCell(ctx, c2Text, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
         c2.setBorder(Rectangle.NO_BORDER);
 
         headerTbl.addCell(c1);
         headerTbl.addCell(c2);
         
-        PdfPCell c3 = rawCell("School: " + schoolName, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        PdfPCell c3 = marathiCell(ctx, c3Text, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_LEFT);
         c3.setBorder(Rectangle.NO_BORDER);
-        PdfPCell c4 = rawCell("UDISE: " + udise, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
+        PdfPCell c4 = marathiCell(ctx, c4Text, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_RIGHT);
         c4.setBorder(Rectangle.NO_BORDER);
         
         headerTbl.addCell(c3);
@@ -91,50 +105,52 @@ public class HPCGenerator {
         doc.add(headerTbl);
 
         // --- 360 DEGREE ASSESSMENT TABLE ---
-        PdfGenerator.addMarathiParagraph(doc, "NEP 2020: 360 Degree Multidimensional Assessment", 14, true, C_PRIMARY, 0, 10);
+        String lblNep = PdfLocalizer.get(ctx, "राष्ट्रीय शैक्षणिक धोरण २०२०: ३६० अंश बहुआयामी मूल्यमापन", "NEP 2020: 360 Degree Multidimensional Assessment");
+        PdfGenerator.addMarathiParagraph(doc, lblNep, 14, true, C_PRIMARY, 0, 10);
         
         PdfPTable tbl = new PdfPTable(new float[]{0.6f, 3f, 1f, 1f, 1f, 1f});
         tbl.setWidthPercentage(100);
         tbl.setSpacingAfter(20);
 
         // Header Row
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "Sr.", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "Dimensions of Development", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "Self\nAssessment", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "Peer\nAssessment", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "Teacher\nAssessment", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
-        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "Parent\nAssessment", fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ.क्र.", "Sr."), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "विकासाची क्षेत्रे", "Dimensions of Development"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "स्वयं\nमूल्यमापन", "Self\nAssessment"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "सहपाठी\nमूल्यमापन", "Peer\nAssessment"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "शिक्षक\nमूल्यमापन", "Teacher\nAssessment"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+        GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "पालक\nमूल्यमापन", "Parent\nAssessment"), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
 
         String[] dimensions = {
-            "Cognitive Development (Academic)",
-            "Socio-Emotional Development",
-            "Physical & Motor Development",
-            "Creative & Artistic Development",
-            "Communication & Language",
-            "Values & Disposition"
+            PdfLocalizer.get(ctx, "बौद्धिक विकास (शैक्षणिक)", "Cognitive Development (Academic)"),
+            PdfLocalizer.get(ctx, "सामाजिक-भावनिक विकास", "Socio-Emotional Development"),
+            PdfLocalizer.get(ctx, "शारीरिक आणि कारक विकास", "Physical & Motor Development"),
+            PdfLocalizer.get(ctx, "सर्जनशील व कलात्मक विकास", "Creative & Artistic Development"),
+            PdfLocalizer.get(ctx, "संभाषण आणि भाषा विकास", "Communication & Language"),
+            PdfLocalizer.get(ctx, "मूल्ये आणि वृत्ती", "Values & Disposition")
         };
 
         boolean alt = false;
         for (int i = 0; i < dimensions.length; i++) {
             BaseColor bg = alt ? C_ROW_ALT : C_WHITE; alt = !alt;
-            cellSpan(tbl, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, dimensions[i], fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, String.valueOf(i+1), fSmall, bg, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, dimensions[i], fSmall, bg, C_DARK, 1, 1);
             // Defaulting all to 3-point scale or smiling faces
-            cellSpan(tbl, "✓", fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, "✓", fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, "✓", fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, "✓", fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "✓", fSmallBold, bg, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "✓", fSmallBold, bg, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "✓", fSmallBold, bg, C_DARK, 1, 1);
+            GunapattrakGenerator.cellVerticalSpan(tbl, ctx, "✓", fSmallBold, bg, C_DARK, 1, 1);
         }
         doc.add(tbl);
 
         // --- TEACHER'S OBSERVATIONS ---
-        PdfGenerator.addMarathiParagraph(doc, "Teacher's Qualitative Remarks / शिक्षकांचा अभिप्राय", 14, true, C_PRIMARY, 0, 10);
+        String lblTeacherRemarks = PdfLocalizer.get(ctx, "शिक्षकांचा अभिप्राय", "Teacher's Qualitative Remarks");
+        PdfGenerator.addMarathiParagraph(doc, lblTeacherRemarks, 14, true, C_PRIMARY, 0, 10);
         PdfPTable rTbl = new PdfPTable(1);
         rTbl.setWidthPercentage(100);
         rTbl.setSpacingAfter(20);
         
-        String remarks = "Student is showing excellent progress in cognitive skills and works well with peers. Continues to display strong leadership qualities during group activities. Need to encourage more participation in physical activities.";
-        PdfPCell rCell = rawCell(remarks, fSmall, C_WHITE, C_DARK, Element.ALIGN_LEFT);
+        String remarks = PdfLocalizer.get(ctx, "विद्यार्थी बौद्धिक कौशल्यांमध्ये उत्तम प्रगती दर्शवत आहे आणि सहकाऱ्यांसोबत चांगले काम करतो. शारीरिक उपक्रमांमध्ये अधिक सहभाग घेण्यास प्रोत्साहित करणे आवश्यक आहे.", "Student is showing excellent progress in cognitive skills and works well with peers. Continues to display strong leadership qualities during group activities. Need to encourage more participation in physical activities.");
+        PdfPCell rCell = marathiCell(ctx, remarks, fSmall, C_WHITE, C_DARK, Element.ALIGN_LEFT);
         rCell.setPadding(10);
         rTbl.addCell(rCell);
         doc.add(rTbl);
@@ -144,18 +160,48 @@ public class HPCGenerator {
         sigTbl.setWidthPercentage(100);
         sigTbl.setSpacingBefore(40);
 
-        PdfPCell cSig1 = rawCell("Class Teacher\n" + (cls != null ? nvl(cls.teacherName) : ""), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        String lblClassTeacher = PdfLocalizer.get(ctx, "वर्गशिक्षक\n", "Class Teacher\n");
+        String lblParent = PdfLocalizer.get(ctx, "पालक", "Parent/Guardian");
+        String lblHeadmaster = PdfLocalizer.get(ctx, "मुख्याध्यापक\n", "Headmaster\n");
+
+        PdfPCell cSig1 = marathiCell(ctx, lblClassTeacher + (cls != null ? nvl(cls.teacherName) : ""), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         cSig1.setBorder(Rectangle.NO_BORDER);
 
-        PdfPCell cSig2 = rawCell("Parent/Guardian", fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell cSig2 = marathiCell(ctx, lblParent, fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         cSig2.setBorder(Rectangle.NO_BORDER);
 
-        PdfPCell cSig3 = rawCell("Headmaster\n" + (school != null ? nvl(school.principalName) : ""), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+        PdfPCell cSig3 = marathiCell(ctx, lblHeadmaster + (school != null ? nvl(school.principalName) : ""), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
         cSig3.setBorder(Rectangle.NO_BORDER);
 
         sigTbl.addCell(cSig1);
         sigTbl.addCell(cSig2);
         sigTbl.addCell(cSig3);
         doc.add(sigTbl);
+    }
+
+    private static PdfPCell marathiCell(Context ctx, String text, Font font, BaseColor bg, BaseColor fg, int align) {
+        PdfPCell c = new PdfPCell();
+        if (bg != null) c.setBackgroundColor(bg);
+        c.setHorizontalAlignment(align);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        c.setPadding(4);
+        try {
+            boolean bold = (font == fSmallBold || font == fTitle);
+            int size = 10;
+            if (font == fTitle) size = 18;
+            
+            int colorInt = android.graphics.Color.rgb(fg.getRed(), fg.getGreen(), fg.getBlue());
+            String[] lines = text.split("\n");
+            for (String line : lines) {
+                com.itextpdf.text.Image img = MarathiText.renderLine(line, size, bold, colorInt);
+                if (align == Element.ALIGN_CENTER) img.setAlignment(com.itextpdf.text.Image.MIDDLE);
+                else if (align == Element.ALIGN_RIGHT) img.setAlignment(com.itextpdf.text.Image.RIGHT);
+                else img.setAlignment(com.itextpdf.text.Image.LEFT);
+                c.addElement(img);
+            }
+        } catch (Exception e) {
+            c.setPhrase(new Phrase(text, font));
+        }
+        return c;
     }
 }

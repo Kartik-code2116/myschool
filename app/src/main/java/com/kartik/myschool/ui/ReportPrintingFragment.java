@@ -309,10 +309,19 @@ public class ReportPrintingFragment extends Fragment {
                 com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), cb);
                 break;
             case 1:  // 2. Index
+                PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                break;
             case 2:  // 3. Marks Register
+                com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateMarksRegister(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), false, cb);
+                break;
             case 8:  // 9. Progress Card Cover
+                com.kartik.myschool.utils.pdf.ProgressCardCoverGenerator.generateProgressCardCover(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), java.util.Collections.singletonMap(student.id, s2), cb);
+                break;
             case 9:  // 10. Progress Card Inner
-                com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
+                com.kartik.myschool.utils.pdf.BothSemDescriptiveGenerator.generateBothSemDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), java.util.Collections.singletonMap(student.id, s2), cb);
+                break;
+            case 17: // 18. Progress Card First Sem
+                com.kartik.myschool.utils.pdf.ProgressCardFirstSemGenerator.generateProgressCardFirstSem(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), cb);
                 break;
             case 18: // HPC
                 com.kartik.myschool.utils.pdf.HPCGenerator.generateHPC(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
@@ -408,10 +417,15 @@ public class ReportPrintingFragment extends Fragment {
                 com.kartik.myschool.utils.pdf.ProgressCardPortraitGenerator.generateProgressCardPortrait(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), callback);
                 break;
             case 1:
+                PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
             case 2:
+                com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateMarksRegister(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), false, callback); break;
             case 8:
+                com.kartik.myschool.utils.pdf.ProgressCardCoverGenerator.generateProgressCardCover(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), java.util.Collections.singletonMap(student.id, s2), callback); break;
             case 9:
-                com.kartik.myschool.utils.pdf.GunapattrakGenerator.generateGunapattrak(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
+                com.kartik.myschool.utils.pdf.BothSemDescriptiveGenerator.generateBothSemDescriptive(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), java.util.Collections.singletonMap(student.id, s2), callback); break;
+            case 17:
+                com.kartik.myschool.utils.pdf.ProgressCardFirstSemGenerator.generateProgressCardFirstSem(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, java.util.Collections.singletonList(student), java.util.Collections.singletonMap(student.id, s1), callback); break;
             default: PdfGenerator.generatePersonalityRecord(getContext(), SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, callback); break;
         }
         

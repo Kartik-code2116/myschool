@@ -507,13 +507,17 @@ public class StudentProfileActivity extends BaseActivity {
 
     private void showReportSelectionDialog() {
         String[] reportNames = {
-            getString(R.string.report_title_12), // 12. Annual Marksheet
-            getString(R.string.report_title_13), // 13. Result Sheet
-            getString(R.string.report_title_14), // 14. Gunapattrak (Progress Card Inner)
-            getString(R.string.report_title_19), // Holistic Progress Card
-            getString(R.string.report_title_4)   // Descriptive Remarks
+                getString(R.string.report_title_3),  // 3. Marks Register
+                getString(R.string.report_title_4),  // 4. Descriptive Remarks
+                getString(R.string.report_title_9),  // 9. Progress Card Cover
+                getString(R.string.report_title_10), // 10. Progress Card Inner
+                getString(R.string.report_title_12), // 12. Annual Marksheet
+                getString(R.string.report_title_13), // 13. Result Sheet
+                getString(R.string.report_title_14), // 14. Gunapattrak
+                getString(R.string.report_title_18), // 18. Progress Card First Sem
+                getString(R.string.report_title_19)  // 19. HPC
         };
-        final int[] reportPositions = {11, 12, 13, 18, 3}; // Corresponding positions in ReportPrintingFragment
+        final int[] reportPositions = {2, 3, 8, 9, 11, 12, 13, 17, 18}; // Corresponding positions in ReportPrintingFragment
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("अहवाल निवडा")
@@ -587,6 +591,18 @@ public class StudentProfileActivity extends BaseActivity {
                                     break;
                                 case 3: // Descriptive Remarks
                                     com.kartik.myschool.utils.pdf.DescriptiveRemarksGenerator.generateDescriptive(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, map2, cb);
+                                    break;
+                                case 2: // Marks Register
+                                    com.kartik.myschool.utils.pdf.MarksRegisterGenerator.generateMarksRegister(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, false, cb);
+                                    break;
+                                case 8: // Progress Card Cover
+                                    com.kartik.myschool.utils.pdf.ProgressCardCoverGenerator.generateProgressCardCover(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, map2, cb);
+                                    break;
+                                case 9: // Progress Card Inner
+                                    com.kartik.myschool.utils.pdf.BothSemDescriptiveGenerator.generateBothSemDescriptive(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, map2, cb);
+                                    break;
+                                case 17: // Progress Card First Sem
+                                    com.kartik.myschool.utils.pdf.ProgressCardFirstSemGenerator.generateProgressCardFirstSem(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, list, map1, cb);
                                     break;
                                 default:
                                     com.kartik.myschool.utils.PdfGenerator.generatePersonalityRecord(StudentProfileActivity.this, SessionContext.selectedSchool, SessionContext.selectedClass, student, s1, s2, cb);
