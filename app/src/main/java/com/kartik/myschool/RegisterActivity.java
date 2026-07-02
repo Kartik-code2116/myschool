@@ -267,7 +267,9 @@ public class RegisterActivity extends BaseActivity {
             @Override public void onSuccess(Void v) {
                 if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "saveTeacher: SUCCESS"); }
                 showLoading(false);
-                startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                Intent intent = new Intent(RegisterActivity.this, SchoolRegisterActivity.class);
+                intent.putExtra("is_onboarding", true);
+                startActivity(intent);
                 finishAffinity();
             }
             @Override public void onError(Exception e) {

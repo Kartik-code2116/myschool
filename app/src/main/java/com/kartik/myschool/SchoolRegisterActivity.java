@@ -17,6 +17,7 @@ public class SchoolRegisterActivity extends BaseActivity {
 
     private ActivitySchoolRegisterBinding b;
     private School editSchool; // non-null when editing existing school
+    private boolean isOnboarding = false;
 
     private static final String[] BOARDS = {"CBSE", "ICSE", "State Board", "IB", "IGCSE", "Other"};
 
@@ -37,6 +38,27 @@ public class SchoolRegisterActivity extends BaseActivity {
         if (getIntent().hasExtra("school_id")) {
             String sid = getIntent().getStringExtra("school_id");
             loadSchool(sid);
+        }
+
+        isOnboarding = getIntent().getBooleanExtra("is_onboarding", false);
+        if (isOnboarding) {
+            b.toolbar.setTitle("Setup Your School");
+            b.toolbar.setNavigationIcon(null); // Remove back button for onboarding
+            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+                @Override
+                public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
+                    if (teacher != null) {
+                        if (TextUtils.isEmpty(b.etSchoolName.getText())) {
+                            b.etSchoolName.setText(teacher.schoolName);
+                        }
+                        if (TextUtils.isEmpty(b.etUdise.getText())) {
+                            b.etUdise.setText(teacher.udiseCode);
+                        }
+                    }
+                }
+                @Override
+                public void onError(Exception e) {}
+            });
         }
 
         b.btnSaveSchool.setOnClickListener(v -> saveSchool());
@@ -100,6 +122,11 @@ public class SchoolRegisterActivity extends BaseActivity {
                 showLoading(false);
                 Toast.makeText(SchoolRegisterActivity.this, R.string.msg_school_saved, Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
+                if (isOnboarding) {
+                    Intent intent = new Intent(SchoolRegisterActivity.this, ClassSetupActivity.class);
+                    intent.putExtra("is_onboarding", true);
+                    startActivity(intent);
+                }
                 finish();
             }
             @Override public void onError(Exception e) {

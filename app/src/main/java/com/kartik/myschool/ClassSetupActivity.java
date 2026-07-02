@@ -23,6 +23,7 @@ public class ClassSetupActivity extends BaseActivity {
 
     private ActivityClassSetupBinding b;
     private boolean shouldNavigateToSubjects = false;
+    private boolean isOnboarding = false;
 
     private static final String[] CLASSES   = {"1","2","3","4","5","6","7","8","9","10","11","12"};
     private static final String[] DIVISIONS = {"No Division", "A", "B", "C", "D", "E"};
@@ -40,6 +41,12 @@ public class ClassSetupActivity extends BaseActivity {
                 android.R.layout.simple_dropdown_item_1line, CLASSES));
         b.actvDivision.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, DIVISIONS));
+
+        isOnboarding = getIntent().getBooleanExtra("is_onboarding", false);
+        if (isOnboarding) {
+            b.toolbar.setTitle("Add First Class");
+            b.toolbar.setNavigationIcon(null);
+        }
 
         b.btnAddSubject.setOnClickListener(v -> {
             shouldNavigateToSubjects = true;
@@ -161,6 +168,10 @@ public class ClassSetupActivity extends BaseActivity {
                     android.content.Intent intent = new android.content.Intent(ClassSetupActivity.this, HomeActivity.class);
                     intent.putExtra("navigate_to", R.id.nav_subjects);
                     intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                } else if (isOnboarding) {
+                    android.content.Intent intent = new android.content.Intent(ClassSetupActivity.this, HomeActivity.class);
+                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
                 finish();
