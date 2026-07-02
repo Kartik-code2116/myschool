@@ -128,6 +128,8 @@ public class StudentListFragment extends Fragment {
         popup.getMenu().add(0, 3, 2, getString(R.string.menu_import_students));
         popup.getMenu().add(0, 4, 3, getString(R.string.menu_switch_class));
         popup.getMenu().add(0, 5, 4, getString(R.string.menu_app_wide_main));
+        popup.getMenu().add(0, 6, 5, "Transfer Students");
+        popup.getMenu().add(0, 7, 6, "Import via Transfer Code");
         
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
@@ -154,10 +156,143 @@ public class StudentListFragment extends Fragment {
                     ((HomeActivity) getActivity()).showHomeMoreMenu(v);
                 }
                 return true;
+            } else if (itemId == 6) {
+                startTransferMode();
+                return true;
+            } else if (itemId == 7) {
+                showImportTransferCodeDialog();
+                return true;
             }
             return false;
         });
         popup.show();
+    }
+
+    private void startTransferMode() {
+        if (SessionContext.selectedClass == null) {
+            android.widget.Toast.makeText(requireContext(), "Please select a class first.", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (filteredStudents.isEmpty()) {
+            android.widget.Toast.makeText(requireContext(), "No students to transfer.", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        studentAdapter.setMultiSelectMode(true);
+        b.fabAddStudent.setVisibility(View.GONE);
+        b.fabConfirmTransfer.setVisibility(View.VISIBLE);
+        android.widget.Toast.makeText(requireContext(), "Select students to transfer", android.widget.Toast.LENGTH_LONG).show();
+    }
+
+    private void showImportTransferCodeDialog() {
+        if (SessionContext.selectedClass == null) {
+            android.widget.Toast.makeText(requireContext(), "Please select a class first to import students into.", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint("Enter 6-digit code");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        input.setMaxLines(1);
+        
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Import Students")
+            .setMessage("Enter the 6-digit transfer code provided by the other teacher.")
+            .setView(input)
+            .setPositiveButton("Import", (d, w) -> {
+                String code = input.getText().toString().trim();
+                if (code.length() != 6) {
+                    android.widget.Toast.makeText(requireContext(), "Invalid code format", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                processTransferCode(code);
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void processTransferCode(String code) {
+        b.shimmerViewContainer.setVisibility(View.VISIBLE);
+        b.shimmerViewContainer.startShimmer();
+        
+        // Find transfer request
+        com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("transfer_requests")
+            .whereEqualTo("transferCode", code)
+            .whereEqualTo("isClaimed", false)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    b.shimmerViewContainer.stopShimmer();
+                    b.shimmerViewContainer.setVisibility(View.GONE);
+                    android.widget.Toast.makeText(requireContext(), "Invalid or expired transfer code", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                com.google.firebase.firestore.DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
+                com.kartik.myschool.model.TransferRequest req = doc.toObject(com.kartik.myschool.model.TransferRequest.class);
+                if (req == null || req.studentIds == null || req.studentIds.isEmpty()) {
+                    b.shimmerViewContainer.stopShimmer();
+                    b.shimmerViewContainer.setVisibility(View.GONE);
+                    android.widget.Toast.makeText(requireContext(), "Transfer request is empty or corrupt", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                // Get current teacher
+                FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+                    @Override
+                    public void onSuccess(com.kartik.myschool.model.Teacher currentTeacher) {
+                        if (currentTeacher == null) {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            return;
+                        }
+                        
+                        // Perform batch update
+                        com.google.firebase.firestore.WriteBatch batch = com.google.firebase.firestore.FirebaseFirestore.getInstance().batch();
+                        
+                        for (String sId : req.studentIds) {
+                            com.google.firebase.firestore.DocumentReference studentRef = 
+                                com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("students").document(sId);
+                            batch.update(studentRef, "teacherId", currentTeacher.id);
+                            batch.update(studentRef, "classId", SessionContext.selectedClass.id);
+                            batch.update(studentRef, "className", SessionContext.selectedClass.className);
+                            batch.update(studentRef, "standard", SessionContext.selectedClass.className);
+                            batch.update(studentRef, "division", SessionContext.selectedClass.division);
+                            if (SessionContext.selectedSchool != null) {
+                                batch.update(studentRef, "schoolId", SessionContext.selectedSchool.id);
+                                batch.update(studentRef, "schoolName", SessionContext.selectedSchool.name);
+                            }
+                        }
+                        
+                        // Mark code as claimed
+                        batch.update(doc.getReference(), "isClaimed", true);
+                        
+                        batch.commit().addOnSuccessListener(aVoid -> {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            android.widget.Toast.makeText(requireContext(), req.studentIds.size() + " students successfully imported!", android.widget.Toast.LENGTH_LONG).show();
+                            
+                            // Refresh list
+                            AppCache.cachedClassIdForStudents = null; // force refresh
+                            applySessionFilterIfAny();
+                        }).addOnFailureListener(e -> {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            android.widget.Toast.makeText(requireContext(), "Failed to import students: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                        });
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        b.shimmerViewContainer.stopShimmer();
+                        b.shimmerViewContainer.setVisibility(View.GONE);
+                        android.widget.Toast.makeText(requireContext(), "Failed to get teacher profile", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                });
+            })
+            .addOnFailureListener(e -> {
+                b.shimmerViewContainer.stopShimmer();
+                b.shimmerViewContainer.setVisibility(View.GONE);
+                android.widget.Toast.makeText(requireContext(), "Error finding transfer code: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+            });
     }
 
     private void applySessionFilterIfAny() {
@@ -376,6 +511,66 @@ public class StudentListFragment extends Fragment {
                 @Override
                 public void onError(Exception e) {
                     openAddStudent();
+                }
+            });
+        });
+        
+        b.fabConfirmTransfer.setOnClickListener(v -> {
+            List<String> selected = studentAdapter.getSelectedStudentIds();
+            if (selected.isEmpty()) {
+                android.widget.Toast.makeText(requireContext(), "No students selected", android.widget.Toast.LENGTH_SHORT).show();
+                
+                // Cancel mode
+                studentAdapter.setMultiSelectMode(false);
+                b.fabConfirmTransfer.setVisibility(View.GONE);
+                b.fabAddStudent.setVisibility(View.VISIBLE);
+                return;
+            }
+            
+            b.fabConfirmTransfer.setEnabled(false);
+            
+            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+                @Override
+                public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
+                    if (teacher == null) return;
+                    
+                    String code = String.format(java.util.Locale.US, "%06d", new java.util.Random().nextInt(999999));
+                    
+                    com.kartik.myschool.model.TransferRequest req = new com.kartik.myschool.model.TransferRequest();
+                    req.id = java.util.UUID.randomUUID().toString();
+                    req.fromTeacherId = teacher.id;
+                    req.transferCode = code;
+                    req.studentIds = selected;
+                    req.createdAt = System.currentTimeMillis();
+                    req.isClaimed = false;
+                    
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                        .collection("transfer_requests")
+                        .document(req.id)
+                        .set(req)
+                        .addOnSuccessListener(aVoid -> {
+                            if (getActivity() == null) return;
+                            b.fabConfirmTransfer.setEnabled(true);
+                            studentAdapter.setMultiSelectMode(false);
+                            b.fabConfirmTransfer.setVisibility(View.GONE);
+                            b.fabAddStudent.setVisibility(View.VISIBLE);
+                            
+                            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                .setTitle("Transfer Code Generated!")
+                                .setMessage("Share this 6-digit code with the new teacher:\n\n" + code + "\n\nThey can use the 'Import via Transfer Code' option to claim these " + selected.size() + " students.")
+                                .setPositiveButton("OK", null)
+                                .setCancelable(false)
+                                .show();
+                        })
+                        .addOnFailureListener(e -> {
+                            if (getActivity() == null) return;
+                            b.fabConfirmTransfer.setEnabled(true);
+                            android.widget.Toast.makeText(requireContext(), "Failed to generate code", android.widget.Toast.LENGTH_SHORT).show();
+                        });
+                }
+                @Override
+                public void onError(Exception e) {
+                    b.fabConfirmTransfer.setEnabled(true);
                 }
             });
         });

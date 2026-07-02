@@ -33,6 +33,32 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
     // Tracks last animated position so each item animates only once per load
     private final int[] lastAnimatedPos = {-1};
 
+    private boolean isMultiSelectMode = false;
+    private final java.util.Set<String> selectedStudentIds = new java.util.HashSet<>();
+
+    public void setMultiSelectMode(boolean mode) {
+        this.isMultiSelectMode = mode;
+        if (!mode) selectedStudentIds.clear();
+        notifyDataSetChanged();
+    }
+
+    public boolean isMultiSelectMode() {
+        return isMultiSelectMode;
+    }
+
+    public void toggleSelection(String studentId) {
+        if (selectedStudentIds.contains(studentId)) {
+            selectedStudentIds.remove(studentId);
+        } else {
+            selectedStudentIds.add(studentId);
+        }
+        notifyDataSetChanged();
+    }
+
+    public List<String> getSelectedStudentIds() {
+        return new ArrayList<>(selectedStudentIds);
+    }
+
     public void setData(List<Student> data) {
         items.clear();
         if (data != null) items.addAll(data);
@@ -83,8 +109,29 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
         // Photo / Avatar binding
         bindPhoto(h, s);
 
+        // Multi-select visuals
+        com.google.android.material.card.MaterialCardView card = (com.google.android.material.card.MaterialCardView) h.itemView;
+        if (isMultiSelectMode) {
+            h.btnOptions.setVisibility(View.GONE);
+            if (selectedStudentIds.contains(s.id)) {
+                card.setStrokeWidth(6);
+                card.setStrokeColor(android.graphics.Color.parseColor("#4CAF50")); // Green highlight
+            } else {
+                card.setStrokeWidth(3);
+                card.setStrokeColor(card.getContext().getResources().getColor(R.color.outline_variant));
+            }
+        } else {
+            h.btnOptions.setVisibility(View.VISIBLE);
+            card.setStrokeWidth(3);
+            card.setStrokeColor(card.getContext().getResources().getColor(R.color.outline_variant));
+        }
+
         h.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onClick(s, pos);
+            if (isMultiSelectMode) {
+                toggleSelection(s.id);
+            } else {
+                if (listener != null) listener.onClick(s, pos);
+            }
         });
 
         h.btnOptions.setOnClickListener(v -> {
