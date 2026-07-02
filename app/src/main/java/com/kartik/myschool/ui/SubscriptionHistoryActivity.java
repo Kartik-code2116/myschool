@@ -68,24 +68,56 @@ public class SubscriptionHistoryActivity extends com.kartik.myschool.BaseActivit
             return;
         }
 
-        FirebaseRepository.get().getSubscriptionHistory(teacherId, new FirebaseRepository.OnResult<List<SubscriptionRequest>>() {
+        FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
             @Override
-            public void onSuccess(List<SubscriptionRequest> result) {
-                progressBar.setVisibility(View.GONE);
-                if (result == null || result.isEmpty()) {
-                    tvEmptyState.setVisibility(View.VISIBLE);
-                } else {
-                    adapter.setRequests(result);
-                    rvHistory.setVisibility(View.VISIBLE);
-                }
+            public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
+                FirebaseRepository.get().getSubscriptionHistory(teacherId, new FirebaseRepository.OnResult<List<SubscriptionRequest>>() {
+                    @Override
+                    public void onSuccess(List<SubscriptionRequest> result) {
+                        progressBar.setVisibility(View.GONE);
+                        
+                        List<SubscriptionRequest> finalList = new java.util.ArrayList<>();
+                        
+                        // Inject admin granted access if present
+                        if (teacher != null && "active".equalsIgnoreCase(teacher.subscriptionStatus) 
+                                && teacher.adminNote != null && !teacher.adminNote.trim().isEmpty()) {
+                            SubscriptionRequest adminGrant = new SubscriptionRequest();
+                            adminGrant.id = "admin_grant_" + System.currentTimeMillis();
+                            adminGrant.planName = "Admin Granted Access";
+                            adminGrant.status = "approved";
+                            adminGrant.timestamp = teacher.subscriptionExpiry > 0 ? teacher.subscriptionExpiry : System.currentTimeMillis();
+                            adminGrant.adminNote = teacher.adminNote;
+                            finalList.add(adminGrant);
+                        }
+                        
+                        if (result != null) {
+                            finalList.addAll(result);
+                        }
+
+                        if (finalList.isEmpty()) {
+                            tvEmptyState.setVisibility(View.VISIBLE);
+                        } else {
+                            adapter.setRequests(finalList);
+                            rvHistory.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(SubscriptionHistoryActivity.this, "Error loading history", Toast.LENGTH_SHORT).show();
+                        tvEmptyState.setVisibility(View.VISIBLE);
+                        tvEmptyState.setText("Error loading history: " + e.getMessage());
+                    }
+                });
             }
 
             @Override
             public void onError(Exception e) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(SubscriptionHistoryActivity.this, "Error loading history", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SubscriptionHistoryActivity.this, "Failed to load profile", Toast.LENGTH_SHORT).show();
                 tvEmptyState.setVisibility(View.VISIBLE);
-                tvEmptyState.setText("Error loading history: " + e.getMessage());
+                tvEmptyState.setText("Error: " + e.getMessage());
             }
         });
     }

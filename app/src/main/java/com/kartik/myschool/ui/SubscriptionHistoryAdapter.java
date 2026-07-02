@@ -107,6 +107,14 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
         } else {
             holder.tvRejectionReason.setVisibility(View.GONE);
         }
+
+        // Admin Note
+        if (request.adminNote != null && !request.adminNote.trim().isEmpty()) {
+            holder.tvAdminNote.setVisibility(View.VISIBLE);
+            holder.tvAdminNote.setText("Note: " + request.adminNote);
+        } else {
+            holder.tvAdminNote.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -121,6 +129,7 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
         TextView tvTransactionId;
         TextView tvPaymentMethod;
         TextView tvProductId;
+        TextView tvAdminNote;
         TextView tvRejectionReason;
 
         public HistoryViewHolder(@NonNull View itemView) {
@@ -131,6 +140,7 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
             tvTransactionId = itemView.findViewById(R.id.tvTransactionId);
             tvPaymentMethod = itemView.findViewById(R.id.tvPaymentMethod);
             tvProductId = itemView.findViewById(R.id.tvProductId);
+            tvAdminNote = itemView.findViewById(R.id.tvAdminNote);
             tvRejectionReason = itemView.findViewById(R.id.tvRejectionReason);
         }
     }

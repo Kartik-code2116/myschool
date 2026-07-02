@@ -188,6 +188,7 @@ export default function UserDetail() {
       accountStatus: 'active',
       subscriptionStatus: 'active',
       subscriptionExpiry: expiry.toISOString().slice(0, 10),
+      adminNote: "Admin Gift you this subscription",
     });
   };
 

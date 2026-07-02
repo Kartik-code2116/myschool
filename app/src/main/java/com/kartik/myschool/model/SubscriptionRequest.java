@@ -13,6 +13,7 @@ public class SubscriptionRequest {
     
     // Additional details for UI
     public String rejectionReason;
+    public String adminNote;
     public String planName;
     public Double amount;
 
