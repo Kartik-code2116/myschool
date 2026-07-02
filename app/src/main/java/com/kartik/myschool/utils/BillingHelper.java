@@ -204,11 +204,15 @@ public class BillingHelper {
 
             // Step 1: Write to "subscriptions" collection for record keeping (and any future verification)
             Map<String, Object> subscriptionRequest = new HashMap<>();
-            subscriptionRequest.put("uid", uid);
+            subscriptionRequest.put("teacherId", uid);
             subscriptionRequest.put("purchaseToken", purchase.getPurchaseToken());
             subscriptionRequest.put("productId", SUBSCRIPTION_PRODUCT_ID);
+            subscriptionRequest.put("planName", "Google Play - Yearly Pro");
+            subscriptionRequest.put("status", "approved");
             subscriptionRequest.put("subscriptionVerified", true);
-            subscriptionRequest.put("requestedAt", System.currentTimeMillis());
+            long now = System.currentTimeMillis();
+            subscriptionRequest.put("requestedAt", now);
+            subscriptionRequest.put("timestamp", now);
 
             // Step 2: Provide INSTANT ENTITLEMENT by updating the user's document directly.
             Map<String, Object> userUpdate = new HashMap<>();
@@ -216,7 +220,10 @@ public class BillingHelper {
             userUpdate.put("subscriptionVerified", true);
 
             com.google.firebase.firestore.WriteBatch batch = db.batch();
-            batch.set(db.collection("subscriptions").document(uid), subscriptionRequest);
+            
+            // Create a unique document ID so we keep a history of multiple purchases
+            String historyId = db.collection("subscriptions").document().getId();
+            batch.set(db.collection("subscriptions").document(historyId), subscriptionRequest);
             batch.update(db.collection("users").document(uid), userUpdate);
 
             batch.commit()

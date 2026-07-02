@@ -84,8 +84,20 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
             // Show first few characters of the token as Txn ID or the actual ID if mapped differently
             String prefix = request.purchaseToken.length() > 15 ? request.purchaseToken.substring(0, 15) + "..." : request.purchaseToken;
             holder.tvTransactionId.setText("Txn ID: " + prefix);
+            
+            holder.tvPaymentMethod.setVisibility(View.VISIBLE);
+            holder.tvPaymentMethod.setText("Payment Method: Google Play Billing");
         } else {
             holder.tvTransactionId.setVisibility(View.GONE);
+            holder.tvPaymentMethod.setVisibility(View.GONE);
+        }
+
+        // Product ID
+        if (request.productId != null && !request.productId.isEmpty()) {
+            holder.tvProductId.setVisibility(View.VISIBLE);
+            holder.tvProductId.setText("Product ID: " + request.productId);
+        } else {
+            holder.tvProductId.setVisibility(View.GONE);
         }
 
         // Rejection Reason
@@ -107,6 +119,8 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
         TextView tvStatus;
         TextView tvPlanDetails;
         TextView tvTransactionId;
+        TextView tvPaymentMethod;
+        TextView tvProductId;
         TextView tvRejectionReason;
 
         public HistoryViewHolder(@NonNull View itemView) {
@@ -115,6 +129,8 @@ public class SubscriptionHistoryAdapter extends RecyclerView.Adapter<Subscriptio
             tvStatus = itemView.findViewById(R.id.tvStatus);
             tvPlanDetails = itemView.findViewById(R.id.tvPlanDetails);
             tvTransactionId = itemView.findViewById(R.id.tvTransactionId);
+            tvPaymentMethod = itemView.findViewById(R.id.tvPaymentMethod);
+            tvProductId = itemView.findViewById(R.id.tvProductId);
             tvRejectionReason = itemView.findViewById(R.id.tvRejectionReason);
         }
     }
