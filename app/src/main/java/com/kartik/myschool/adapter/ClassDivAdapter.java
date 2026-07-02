@@ -59,19 +59,32 @@ public class ClassDivAdapter extends RecyclerView.Adapter<ClassDivAdapter.VH> {
         String div = c.division != null && !c.division.isEmpty() ? c.division : "-";
 
         b.tvClassBigNumber.setText(classNum);
-        b.tvClassSmallNumber.setText("1");
+        
+        // Add proper suffix (st, nd, rd, th) based on class number
+        String suffix = "th";
+        if (classNum.equals("1")) suffix = "st";
+        else if (classNum.equals("2")) suffix = "nd";
+        else if (classNum.equals("3")) suffix = "rd";
+        else if (classNum.equals("Jr. KG") || classNum.equals("Sr. KG")) suffix = "";
+        
+        b.tvClassSmallNumber.setText(suffix);
         b.tvClassDivTitle.setText(
                 holder.itemView.getContext().getString(R.string.class_div_format, classNum, div));
 
-        String t1 = c.teacherName != null ? c.teacherName : holder.itemView.getContext().getString(R.string.teacher_placeholder);
-        b.tvTeacher1.setText(t1);
-        b.tvTeacher2.setText(c.assistantTeacherName != null ? c.assistantTeacherName
-                : holder.itemView.getContext().getString(R.string.teacher_placeholder));
+        String t1 = c.teacherName != null && !c.teacherName.isEmpty() ? c.teacherName : holder.itemView.getContext().getString(R.string.teacher_placeholder);
+        b.tvTeacher1.setText("👨‍🏫 Teacher: " + t1);
+        
+        if (c.assistantTeacherName != null && !c.assistantTeacherName.isEmpty()) {
+            b.tvTeacher2.setVisibility(View.VISIBLE);
+            b.tvTeacher2.setText("👨‍🏫 Asst: " + c.assistantTeacherName);
+        } else {
+            b.tvTeacher2.setVisibility(View.GONE);
+        }
 
         int count = c.studentCount;
-        b.tvStatTop.setText(String.valueOf(count));
-        b.tvStatMid.setText("0");
-        b.tvStatBottom.setText("0");
+        b.tvStatTop.setText(count + " Students");
+        b.tvStatMid.setVisibility(View.GONE);
+        b.tvStatBottom.setVisibility(View.GONE);
 
         b.cardClassDiv.setCardBackgroundColor(
                 holder.itemView.getContext().getColor(

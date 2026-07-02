@@ -719,9 +719,9 @@ public class HomeActivity extends BaseActivity {
                     return true;
                 } else if (id == 903) {
                     try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://developer?id=Kartik+Thorat")));
+                        startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://search?q=pub:Kartik2116")));
                     } catch (android.content.ActivityNotFoundException anfe) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/developer?id=Kartik+Thorat")));
+                        startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/search?q=pub:Kartik2116")));
                     }
                     return true;
                 } else if (id == 904) {

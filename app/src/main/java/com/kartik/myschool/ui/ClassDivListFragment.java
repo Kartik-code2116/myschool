@@ -147,6 +147,27 @@ public class ClassDivListFragment extends Fragment {
         }
         adapter.setData(list, selectedIndex);
         UiAnimations.fadeIn(b.rvClassDiv);
+        
+        FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<com.kartik.myschool.model.Student>>() {
+            @Override
+            public void onSuccess(List<com.kartik.myschool.model.Student> students) {
+                if (students == null || adapter == null) return;
+                java.util.Map<String, Integer> counts = new java.util.HashMap<>();
+                for (com.kartik.myschool.model.Student s : students) {
+                    if (s.classId != null) {
+                        counts.put(s.classId, counts.getOrDefault(s.classId, 0) + 1);
+                    }
+                }
+                for (ClassModel c : list) {
+                    if (c.id != null) {
+                        c.studentCount = counts.getOrDefault(c.id, 0);
+                    }
+                }
+                if (b != null) adapter.setData(list, selectedIndex);
+            }
+            @Override
+            public void onError(Exception e) {}
+        });
     }
 
     private void openAddClass() {

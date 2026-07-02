@@ -17,59 +17,63 @@
         android:textColor="@color/on_surface"
         android:textSize="16sp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvClassDiv"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingHorizontal="12dp"
-        android:paddingBottom="80dp"/>
-
-    <!-- Empty State Layout -->
-    <LinearLayout
-        android:id="@+id/emptyState"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        android:padding="24dp">
+        android:layout_weight="1">
         
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_school"
-            app:tint="?attr/colorOutlineVariant"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="Empty Class Icon"/>
-            
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No classes created yet"
-            android:textSize="18sp"
-            android:textColor="?attr/colorOnSurface"
-            android:fontFamily="sans-serif-medium"
-            android:layout_marginBottom="8dp"/>
-            
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tap the + button to add your first class for this academic year."
-            android:textSize="14sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textAlignment="center"
-            android:lineSpacingExtra="4dp"/>
-    </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvClassDiv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="80dp"/>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabAddClass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="16dp"
-        android:text="@string/add_class"
-        app:icon="@drawable/ic_add_circle"/>
+        <!-- Empty State Layout -->
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="24dp">
+            
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_school"
+                app:tint="?attr/colorOutlineVariant"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="Empty Class Icon"/>
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No classes created yet"
+                android:textSize="18sp"
+                android:textColor="?attr/colorOnSurface"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="8dp"/>
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tap the + button to add your first class for this academic year."
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textAlignment="center"
+                android:lineSpacingExtra="4dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fabAddClass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:text="@string/add_class"
+            app:icon="@drawable/ic_add_circle"/>
+    </FrameLayout>
 </LinearLayout>
