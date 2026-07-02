@@ -100,6 +100,7 @@ public class RegisterActivity extends BaseActivity {
 
         b.tvLoginLink.setOnClickListener(v -> {
             UiAnimations.pulse(b.tvLoginLink);
+            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
             finish();
             overridePendingTransition(R.anim.fade_in, R.anim.slide_out_right);
         });
