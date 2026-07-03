@@ -32,37 +32,31 @@ public class AiAgentManager {
     private JsonArray history;
     private boolean contextInitialized = false;
 
-    // gemini-2.0-flash is fast, stable and has no thinking-token limits causing 503
-    private static final String API_KEY = BuildConfig.GEMINI_API_KEY;
     // gemini-2.0-flash-lite has a higher free-tier quota (30 RPM vs 15 RPM)
+    private static final String API_KEY = BuildConfig.GEMINI_API_KEY;
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=" + API_KEY;
-    private static final int MAX_RETRIES = 3;
+    private static final int MAX_RETRIES = 4;
+    // Keep only last 10 messages (5 pairs) to avoid sending too many tokens per request
+    private static final int MAX_HISTORY_MESSAGES = 10;
+    // Retry delays: 15s, 30s, 60s, 90s - Google rate limit window is 60 seconds
+    private static final long[] RETRY_DELAYS_MS = {15000, 30000, 60000, 90000};
 
-    // Detailed knowledge about the MySchool app
+    // App knowledge about MySchool (concise to save tokens)
     private static final String APP_KNOWLEDGE =
-        "Here is detailed knowledge about the MySchool app you are an agent for:\n\n" +
-        "## MySchool App Features\n" +
-        "**MySchool** is an Android app for Indian school teachers to manage their classwork digitally.\n\n" +
-        "### Core Features:\n" +
-        "1. **Student Management** - Add, edit, delete students with photos. Assign them to a class.\n" +
-        "2. **Attendance Tracking** - Mark daily attendance for each student. View attendance history per class.\n" +
-        "3. **Marks/Grades Entry** - Enter exam marks for students across subjects and semesters.\n" +
-        "4. **Report Generation** - Generate PDF progress reports for students to share with parents.\n" +
-        "5. **Class Management** - Create and manage multiple classes and academic years/semesters.\n" +
-        "6. **QR Code / Parent Linking** - Share a QR code link so parents can track their child's progress.\n" +
-        "7. **School Profile** - Set up the school name, UDISE code, and teacher profile.\n" +
-        "8. **Subscription** - The app has free and premium subscription plans for full access.\n" +
-        "9. **AI Assistant (You!)** - This AI chat assistant to help teachers with school-related queries.\n\n" +
-        "### Navigation:\n" +
-        "- The bottom navigation bar has: Home, Students, Attendance, Marks, and AI Assistant tabs.\n" +
-        "- The Home screen shows a dashboard with quick stats.\n\n" +
-        "### How to use key features:\n" +
-        "- **Add a student**: Go to Students tab → tap the + button → fill in name and details.\n" +
-        "- **Mark attendance**: Go to Attendance tab → select class and date → mark each student.\n" +
-        "- **Enter marks**: Go to Marks tab → select class and subject → enter marks for each student.\n" +
-        "- **Generate report**: Open a student profile → tap 'Generate Report' button.\n" +
-        "- **Link parent**: Open a student profile → tap 'Parent Link' → share the QR code with parent.\n\n" +
-        "Always answer questions about this app helpfully and accurately. If a teacher asks how to do something in the app, guide them step by step.";
+        "MySchool app features for Indian school teachers:\n" +
+        "1. Student Management - add/edit/delete students with photos\n" +
+        "2. Attendance - mark daily attendance per class\n" +
+        "3. Marks/Grades - enter exam marks per subject/semester\n" +
+        "4. PDF Reports - generate student progress reports\n" +
+        "5. Parent Linking - share QR code so parents track child progress\n" +
+        "6. Class Management - manage classes, academic years, semesters\n" +
+        "7. School Profile - set school name, UDISE code\n" +
+        "8. Subscription - free and premium plans\n" +
+        "Navigation: Home, Students, Attendance, Marks, AI Assistant (bottom bar).\n" +
+        "To add student: Students tab → + button. Attendance: Attendance tab → select class/date.\n" +
+        "Marks: Marks tab → select class/subject. Report: open student profile → Generate Report.\n" +
+        "Parent link: student profile → Parent Link → share QR.";
+
 
     private AiAgentManager() {
         client = new OkHttpClient.Builder()
@@ -82,6 +76,11 @@ public class AiAgentManager {
         return instance;
     }
 
+    /** Reset the singleton so a fresh Marathi context is loaded next time. */
+    public static synchronized void reset() {
+        instance = null;
+    }
+
     private void initContext() {
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
             @Override
@@ -91,26 +90,27 @@ public class AiAgentManager {
                     : "You are assisting a school teacher.";
 
                 String systemPrompt =
-                    "You are MySchool AI Agent, a smart and helpful assistant built into the MySchool Android app. " +
+                    "तुम्ही MySchool AI Agent आहात - MySchool Android app मध्ये बनवलेले एक स्मार्ट आणि उपयुक्त सहाय्यक. " +
                     teacherInfo + "\n\n" +
                     APP_KNOWLEDGE + "\n\n" +
-                    "Rules:\n" +
-                    "- Always be friendly, concise, and helpful.\n" +
-                    "- If asked about app features, answer accurately using the knowledge above.\n" +
-                    "- You can also help with general teaching and education questions.\n" +
-                    "- Format responses clearly using bullet points where needed.";
+                    "नियम:\n" +
+                    "- नेहमी मराठीत उत्तर द्या (Marathi language only).\n" +
+                    "- शिक्षकाशी मैत्रीपूर्ण, स्पष्ट आणि मदतगार रहा.\n" +
+                    "- App बद्दल प्रश्न असल्यास वरील माहिती वापरून अचूक उत्तर द्या.\n" +
+                    "- शिक्षण व शाळेशी संबंधित सर्व प्रश्नांना मदत करा.\n" +
+                    "- उत्तरे स्पष्ट व मुद्देसूद ठेवा.";
 
-                addMessageToHistory("user", systemPrompt + "\n\nUnderstood?");
-                addMessageToHistory("model", "Understood! I am the MySchool AI Agent, ready to help you manage your school and answer any questions about the app. How can I assist you today?");
+                addMessageToHistory("user", systemPrompt + "\n\nसमजले का?");
+                addMessageToHistory("model", "हो, समजले! मी MySchool AI Agent आहे. तुमच्या शाळेच्या कामात आणि या App बद्दल कोणत्याही प्रश्नासाठी मी मराठीत मदत करण्यास तयार आहे. आज मी तुम्हाला कशी मदत करू?");
                 contextInitialized = true;
             }
 
             @Override
             public void onError(Exception e) {
                 Log.e(TAG, "Failed to get teacher context", e);
-                // Still initialize with generic context
-                addMessageToHistory("user", "You are MySchool AI Agent, a helpful assistant for school teachers using the MySchool app.\n\n" + APP_KNOWLEDGE + "\n\nUnderstood?");
-                addMessageToHistory("model", "Understood! I am ready to help. How can I assist you today?");
+                // Still initialize with generic context in Marathi
+                addMessageToHistory("user", "तुम्ही MySchool AI Agent आहात - शाळेतील शिक्षकांसाठी मदतगार सहाय्यक. नेहमी मराठीत उत्तर द्या.\n\n" + APP_KNOWLEDGE + "\n\nसमजले का?");
+                addMessageToHistory("model", "हो, समजले! मी तुमच्या मदतीसाठी तयार आहे. आज मी तुम्हाला कशी मदत करू?");
                 contextInitialized = true;
             }
         });
@@ -135,11 +135,22 @@ public class AiAgentManager {
     }
 
     private void sendWithRetry(OnMessageCallback callback, int retryCount) {
+        // Build a trimmed view of history: keep first 2 messages (system context) + last N recent ones
+        JsonArray trimmedHistory = new JsonArray();
+        int systemMessages = Math.min(2, history.size()); // first 2 = system init pair
+        for (int i = 0; i < systemMessages; i++) {
+            trimmedHistory.add(history.get(i));
+        }
+        int recentStart = Math.max(systemMessages, history.size() - MAX_HISTORY_MESSAGES);
+        for (int i = recentStart; i < history.size(); i++) {
+            trimmedHistory.add(history.get(i));
+        }
+
         JsonObject payload = new JsonObject();
-        payload.add("contents", history);
+        payload.add("contents", trimmedHistory);
 
         JsonObject generationConfig = new JsonObject();
-        generationConfig.addProperty("maxOutputTokens", 1024);
+        generationConfig.addProperty("maxOutputTokens", 512);
         generationConfig.addProperty("temperature", 0.7);
         payload.add("generationConfig", generationConfig);
 
@@ -166,16 +177,32 @@ public class AiAgentManager {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                // Handle 429 Rate Limit: auto-retry with exponential backoff
+                // Handle 429 Rate Limit: auto-retry with longer backoff
                 if (response.code() == 429) {
+                    try {
+                        String errBody = response.body() != null ? response.body().string() : "";
+                        // Daily quota exhausted: limit=0 means no retrying will help
+                        boolean dailyExhausted = errBody.contains("limit: 0") || errBody.contains("PerDay");
+                        if (dailyExhausted) {
+                            if (history.size() > 0) history.remove(history.size() - 1);
+                            new Handler(Looper.getMainLooper()).post(() ->
+                                    callback.onError("Daily quota exhausted. Please try again tomorrow or use a different API key from Google AI Studio (ai.google.dev)."));
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+
                     if (retryCount < MAX_RETRIES) {
-                        long delayMs = (long) Math.pow(2, retryCount) * 2000; // 2s, 4s, 8s
-                        Log.w(TAG, "Rate limited (429). Retrying in " + delayMs + "ms (attempt " + (retryCount + 1) + ")");
+                        long delayMs = RETRY_DELAYS_MS[retryCount];
+                        int waitSecs = (int)(delayMs / 1000);
+                        Log.w(TAG, "Rate limited (429). Retrying in " + waitSecs + "s (attempt " + (retryCount + 1) + ")");
+                        // Notify UI to show countdown
+                        new Handler(Looper.getMainLooper()).post(() ->
+                                callback.onRetrying("Rate limited. Retrying in " + waitSecs + "s..."));
                         new Handler(Looper.getMainLooper()).postDelayed(() -> sendWithRetry(callback, retryCount + 1), delayMs);
                     } else {
                         if (history.size() > 0) history.remove(history.size() - 1);
                         new Handler(Looper.getMainLooper()).post(() ->
-                                callback.onError("Too many requests. Please wait a moment and try again."));
+                                callback.onError("Still rate limited. Please wait 1-2 minutes then try again."));
                     }
                     return;
                 }
@@ -230,5 +257,7 @@ public class AiAgentManager {
     public interface OnMessageCallback {
         void onSuccess(String response);
         void onError(String error);
+        /** Called when a 429 rate limit triggers a retry so the UI can show a countdown */
+        default void onRetrying(String message) { /* optional override */ }
     }
 }

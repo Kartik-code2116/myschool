@@ -100,6 +100,7 @@
             android:indeterminateTint="@color/primary" />
 
         <TextView
+            android:id="@+id/tv_typing_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -127,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_chat_input"
-            android:hint="Ask anything..."
+            android:hint="काहीही विचारा..."
             android:inputType="textMultiLine"
             android:maxLines="4"
             android:minHeight="48dp"

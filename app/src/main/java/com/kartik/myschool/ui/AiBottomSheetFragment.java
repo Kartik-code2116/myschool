@@ -36,6 +36,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
     private FrameLayout btnSend;
     private ImageView btnClose;
     private LinearLayout llTypingIndicator;
+    private TextView tvTypingText;
     
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessages;
@@ -59,6 +60,8 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Reset the agent so it starts with a fresh Marathi context each time the sheet is opened
+        AiAgentManager.reset();
         return inflater.inflate(R.layout.fragment_ai_bottom_sheet, container, false);
     }
 
@@ -71,6 +74,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
         btnSend = view.findViewById(R.id.btn_send);
         btnClose = view.findViewById(R.id.btn_close);
         llTypingIndicator = view.findViewById(R.id.ll_typing_indicator);
+        tvTypingText = view.findViewById(R.id.tv_typing_text);
 
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(chatMessages);
@@ -81,7 +85,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
         rvChat.setAdapter(chatAdapter);
 
         // Add intro message
-        chatMessages.add(new ChatMessage("Hello! I am your MySchool AI Assistant. How can I help you today?", true));
+        chatMessages.add(new ChatMessage("नमस्कार! मी तुमचा MySchool AI सहाय्यक आहे. तुम्हाला कशी मदत करू? 🙏", true));
         chatAdapter.notifyItemInserted(chatMessages.size() - 1);
 
         btnClose.setOnClickListener(v -> dismiss());
@@ -116,6 +120,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
             public void onSuccess(String response) {
                 if (getContext() == null) return;
                 llTypingIndicator.setVisibility(View.GONE);
+                if (tvTypingText != null) tvTypingText.setText("AI is typing...");
                 chatMessages.add(new ChatMessage(response, true));
                 chatAdapter.notifyItemInserted(chatMessages.size() - 1);
                 rvChat.scrollToPosition(chatMessages.size() - 1);
@@ -125,7 +130,19 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
             public void onError(String error) {
                 if (getContext() == null) return;
                 llTypingIndicator.setVisibility(View.GONE);
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+                if (tvTypingText != null) tvTypingText.setText("AI is typing...");
+                // Show error as a chat bubble instead of a Toast
+                chatMessages.add(new ChatMessage("⚠️ " + error, true));
+                chatAdapter.notifyItemInserted(chatMessages.size() - 1);
+                rvChat.scrollToPosition(chatMessages.size() - 1);
+            }
+
+            @Override
+            public void onRetrying(String message) {
+                if (getContext() == null) return;
+                // Keep typing indicator visible but update text with countdown
+                llTypingIndicator.setVisibility(View.VISIBLE);
+                if (tvTypingText != null) tvTypingText.setText(message);
             }
         });
     }
