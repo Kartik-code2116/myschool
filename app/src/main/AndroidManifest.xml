@@ -68,6 +68,7 @@
         <activity android:name=".EnterDescriptiveActivity"   android:exported="false"/>
         <activity android:name=".ui.SubscriptionHistoryActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
         <activity android:name=".ui.SubscriptionSuccessActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
+        <activity android:name=".ui.AiAssistantActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

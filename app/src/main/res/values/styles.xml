@@ -243,4 +243,10 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.60</item>
     </style>
+
+    <!-- FAB Circle Shape -->
+    <style name="ShapeAppearanceOverlay.App.FABCircle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

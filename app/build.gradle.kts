@@ -115,6 +115,10 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.guava)
 
+    // Firebase AI (Gemini)
+    implementation("com.google.firebase:firebase-ai:17.13.0")
+    implementation("org.reactivestreams:reactive-streams:1.0.4")
+
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
 

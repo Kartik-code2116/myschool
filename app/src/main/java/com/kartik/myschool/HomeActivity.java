@@ -131,6 +131,17 @@ public class HomeActivity extends BaseActivity {
             }
         });
 
+        // Bottom nav with AI Assistant intercept
+        b.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_ai_assistant) {
+                startActivity(new Intent(this, com.kartik.myschool.ui.AiAssistantActivity.class));
+                overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+                return false; // Don't select this tab
+            }
+            return navigateBottomItem(item);
+        });
+
         b.navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_school_level_dropdown) {
@@ -147,7 +158,7 @@ public class HomeActivity extends BaseActivity {
         setupDrawerActions();
         localizeSidebar();
 
-        b.bottomNav.setOnItemSelectedListener(this::navigateBottomItem);
+
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination == null)
