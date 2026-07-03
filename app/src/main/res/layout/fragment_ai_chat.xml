@@ -4,20 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_bottom_sheet_ai">
+    android:background="@color/background">
 
-    <!-- Drag Handle -->
-    <View
-        android:id="@+id/drag_handle"
-        android:layout_width="40dp"
-        android:layout_height="4dp"
-        android:layout_marginTop="12dp"
-        android:background="#D1D5DB"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Header -->
+    <!-- Header / Toolbar area -->
     <LinearLayout
         android:id="@+id/ll_header"
         android:layout_width="match_parent"
@@ -25,8 +14,10 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="24dp"
         android:paddingVertical="16dp"
+        android:background="@color/surface"
+        android:elevation="4dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/drag_handle">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:layout_width="32dp"
@@ -39,24 +30,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="sans-serif-medium"
-            android:text="MySchool AI Assistant"
-            android:textColor="@color/black"
+            android:text="MySchool AI Agent"
+            android:textColor="@color/on_surface"
             android:textSize="20sp" />
             
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
-            
-        <ImageView
-            android:id="@+id/btn_close"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="#6B7280"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true" />
     </LinearLayout>
 
     <View

@@ -130,6 +130,18 @@ public class AiAgentManager {
     }
 
     public void sendMessage(String userMessage, OnMessageCallback callback) {
+        String msgLower = userMessage.trim().toLowerCase();
+        // Match common greetings even with punctuation
+        if (msgLower.matches("^(hi|hello|hey|हाय|नमस्कार)[!?.]*$")) {
+            addMessageToHistory("user", userMessage);
+            String reply = "नमस्कार! मी MySchool AI Agent आहे. आज मी तुम्हाला कशी मदत करू? 🙏";
+            addMessageToHistory("model", reply);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (callback != null) callback.onSuccess(reply);
+            }, 500);
+            return;
+        }
+
         addMessageToHistory("user", userMessage);
         sendWithRetry(callback, 0);
     }
@@ -159,10 +171,14 @@ public class AiAgentManager {
                 MediaType.parse("application/json")
         );
 
+        // Remove key from URL if it's there
+        String baseUrl = API_URL.split("\\?")[0];
+
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(baseUrl)
                 .post(body)
                 .header("Content-Type", "application/json")
+                .header("x-goog-api-key", API_KEY)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -211,9 +227,17 @@ public class AiAgentManager {
                     String err = response.body() != null ? response.body().string() : "Unknown error";
                     Log.e(TAG, "API Error " + response.code() + ": " + err);
                     if (history.size() > 0) history.remove(history.size() - 1);
-                    String userMsg = response.code() == 503
-                        ? "Server is busy, please try again in a moment."
-                        : "Something went wrong. Please try again.";
+                    
+                    String userMsg;
+                    if (response.code() == 401) {
+                        userMsg = "Invalid API Key. Please check your Gemini API key.";
+                    } else if (response.code() == 400) {
+                        userMsg = "Bad Request. The API key might be malformed or invalid.";
+                    } else if (response.code() == 503) {
+                        userMsg = "Server is busy, please try again in a moment.";
+                    } else {
+                        userMsg = "Something went wrong. Please try again.";
+                    }
                     new Handler(Looper.getMainLooper()).post(() -> callback.onError(userMsg));
                     return;
                 }

@@ -20,49 +20,30 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.fragment.app.Fragment;
 import com.kartik.myschool.R;
 import com.kartik.myschool.ai.AiAgentManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AiBottomSheetFragment extends BottomSheetDialogFragment {
+public class AiChatFragment extends Fragment {
 
     private RecyclerView rvChat;
     private EditText etMessage;
     private FrameLayout btnSend;
-    private ImageView btnClose;
     private LinearLayout llTypingIndicator;
     private TextView tvTypingText;
     
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessages;
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-        dialog.setOnShowListener(dialogInterface -> {
-            BottomSheetDialog d = (BottomSheetDialog) dialogInterface;
-            FrameLayout bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottomSheet != null) {
-                BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
-                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                behavior.setSkipCollapsed(true);
-            }
-        });
-        return dialog;
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Reset the agent so it starts with a fresh Marathi context each time the sheet is opened
         AiAgentManager.reset();
-        return inflater.inflate(R.layout.fragment_ai_bottom_sheet, container, false);
+        return inflater.inflate(R.layout.fragment_ai_chat, container, false);
     }
 
     @Override
@@ -72,7 +53,6 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
         rvChat = view.findViewById(R.id.rv_chat);
         etMessage = view.findViewById(R.id.et_message);
         btnSend = view.findViewById(R.id.btn_send);
-        btnClose = view.findViewById(R.id.btn_close);
         llTypingIndicator = view.findViewById(R.id.ll_typing_indicator);
         tvTypingText = view.findViewById(R.id.tv_typing_text);
 
@@ -87,8 +67,6 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
         // Add intro message
         chatMessages.add(new ChatMessage("नमस्कार! मी तुमचा MySchool AI सहाय्यक आहे. तुम्हाला कशी मदत करू? 🙏", true));
         chatAdapter.notifyItemInserted(chatMessages.size() - 1);
-
-        btnClose.setOnClickListener(v -> dismiss());
 
         btnSend.setOnClickListener(v -> sendMessage());
 
@@ -118,7 +96,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
         AiAgentManager.getInstance().sendMessage(msg, new AiAgentManager.OnMessageCallback() {
             @Override
             public void onSuccess(String response) {
-                if (getContext() == null) return;
+                if (!isAdded()) return;
                 llTypingIndicator.setVisibility(View.GONE);
                 if (tvTypingText != null) tvTypingText.setText("AI is typing...");
                 chatMessages.add(new ChatMessage(response, true));
@@ -128,7 +106,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onError(String error) {
-                if (getContext() == null) return;
+                if (!isAdded()) return;
                 llTypingIndicator.setVisibility(View.GONE);
                 if (tvTypingText != null) tvTypingText.setText("AI is typing...");
                 // Show error as a chat bubble instead of a Toast
@@ -139,7 +117,7 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onRetrying(String message) {
-                if (getContext() == null) return;
+                if (!isAdded()) return;
                 // Keep typing indicator visible but update text with countdown
                 llTypingIndicator.setVisibility(View.VISIBLE);
                 if (tvTypingText != null) tvTypingText.setText(message);
