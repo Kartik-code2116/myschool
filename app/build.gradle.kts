@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
@@ -22,6 +24,13 @@ android {
         versionCode = 2
         versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY") ?: project.findProperty("GEMINI_API_KEY") as String? ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -118,6 +127,9 @@ dependencies {
     // Firebase AI (Gemini)
     implementation("com.google.firebase:firebase-ai:17.13.0")
     implementation("org.reactivestreams:reactive-streams:1.0.4")
+    
+    // AI SDK (Raw OkHttp for Gemini API)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")

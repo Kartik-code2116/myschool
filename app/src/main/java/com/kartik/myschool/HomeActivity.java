@@ -135,12 +135,18 @@ public class HomeActivity extends BaseActivity {
         b.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_ai_assistant) {
-                startActivity(new Intent(this, com.kartik.myschool.ui.AiAssistantActivity.class));
-                overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+                new com.kartik.myschool.ui.AiBottomSheetFragment().show(getSupportFragmentManager(), "AiBottomSheet");
                 return false; // Don't select this tab
             }
             return navigateBottomItem(item);
         });
+
+        // Apply AI Agent visibility based on saved preference
+        android.content.SharedPreferences settingsPrefs =
+            getSharedPreferences("myschool_settings_prefs", android.content.Context.MODE_PRIVATE);
+        boolean aiEnabled = settingsPrefs.getBoolean("ai_agent_enabled", true);
+        updateAiNavVisibility(aiEnabled);
+
 
         b.navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -295,6 +301,15 @@ public class HomeActivity extends BaseActivity {
         connectivityManager = (android.net.ConnectivityManager) getSystemService(android.content.Context.CONNECTIVITY_SERVICE);
         setupOfflineBanner();
     }
+
+    /** Show or hide the AI Assistant item in the bottom navigation bar. */
+    public void updateAiNavVisibility(boolean visible) {
+        android.view.MenuItem aiItem = b.bottomNav.getMenu().findItem(R.id.nav_ai_assistant);
+        if (aiItem != null) {
+            aiItem.setVisible(visible);
+        }
+    }
+
 
     @Override
     protected void onStart() {

@@ -114,7 +114,20 @@ public class SettingsFragment extends Fragment {
         b.btnResetSession.setOnClickListener(v -> { UiAnimations.pulse(b.btnResetSession); resetSession(); });
         b.btnClearCache.setOnClickListener(v -> { UiAnimations.pulse(b.btnClearCache); clearCache(); });
 
-        UiAnimations.staggerFadeIn(b.cardTheme, b.cardLanguage, b.cardBackup, b.cardCache);
+        UiAnimations.staggerFadeIn(b.cardTheme, b.cardLanguage, b.cardBackup, b.cardCache, b.cardAiAgent);
+
+        // AI Agent toggle
+        boolean aiEnabled = settingsPrefs.getBoolean("ai_agent_enabled", true);
+        b.switchAiAgent.setChecked(aiEnabled);
+        updateAiToggleUi(aiEnabled);
+        b.switchAiAgent.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            settingsPrefs.edit().putBoolean("ai_agent_enabled", isChecked).apply();
+            updateAiToggleUi(isChecked);
+            // Notify HomeActivity to show/hide the bottom nav AI item immediately
+            if (getActivity() instanceof HomeActivity) {
+                ((HomeActivity) getActivity()).updateAiNavVisibility(isChecked);
+            }
+        });
     }
 
     // ── Theme UI ─────────────────────────────────────────────────────────────
@@ -183,6 +196,13 @@ public class SettingsFragment extends Fragment {
     private void clearCache() {
         SessionContext.clear(requireContext());
         Toast.makeText(requireContext(), R.string.msg_cache_cleared_successfully, Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateAiToggleUi(boolean enabled) {
+        if (b == null) return;
+        b.tvAiAgentStatus.setText(enabled ? "AI Assistant: ON ✅" : "AI Assistant: OFF");
+        b.tvAiAgentStatus.setTextColor(getResources().getColor(
+            enabled ? R.color.primary : R.color.on_surface_variant, null));
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────
