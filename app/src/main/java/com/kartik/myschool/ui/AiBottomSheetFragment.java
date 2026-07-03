@@ -15,19 +15,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.widget.HorizontalScrollView;
+import android.view.WindowManager;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import androidx.fragment.app.Fragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.kartik.myschool.R;
 import com.kartik.myschool.ai.AiAgentManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AiChatFragment extends Fragment {
+public class AiBottomSheetFragment extends BottomSheetDialogFragment {
 
     private RecyclerView rvChat;
     private EditText etMessage;
@@ -37,13 +42,52 @@ public class AiChatFragment extends Fragment {
     
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessages;
+    private LinearLayout llHeader;
+    private View dragHandle;
+    private ImageView btnClose;
+    private BottomSheetBehavior<?> behavior;
+    
+    private HorizontalScrollView hsvSuggestions;
+    private TextView chipAddStudent, chipAttendance, chipReport, chipPrint;
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        // We will initialize behavior in onStart where the view is fully attached
+        return dialog;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog instanceof BottomSheetDialog) {
+            BottomSheetDialog d = (BottomSheetDialog) dialog;
+            FrameLayout bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                // Set initial height to 65% of screen height
+                int screenHeight = getResources().getDisplayMetrics().heightPixels;
+                ViewGroup.LayoutParams lp = bottomSheet.getLayoutParams();
+                lp.height = (int) (screenHeight * 0.65);
+                bottomSheet.setLayoutParams(lp);
+
+                behavior = BottomSheetBehavior.from(bottomSheet);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setSkipCollapsed(true);
+            }
+            if (d.getWindow() != null) {
+                d.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+            }
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Reset the agent so it starts with a fresh Marathi context each time the sheet is opened
         AiAgentManager.reset();
-        return inflater.inflate(R.layout.fragment_ai_chat, container, false);
+        return inflater.inflate(R.layout.fragment_ai_bottom_sheet, container, false);
     }
 
     @Override
@@ -55,6 +99,22 @@ public class AiChatFragment extends Fragment {
         btnSend = view.findViewById(R.id.btn_send);
         llTypingIndicator = view.findViewById(R.id.ll_typing_indicator);
         tvTypingText = view.findViewById(R.id.tv_typing_text);
+        llHeader = view.findViewById(R.id.ll_header);
+        dragHandle = view.findViewById(R.id.drag_handle);
+        btnClose = view.findViewById(R.id.btn_close);
+        
+        btnClose.setOnClickListener(v -> dismiss());
+
+        hsvSuggestions = view.findViewById(R.id.hsv_suggestions);
+        chipAddStudent = view.findViewById(R.id.chip_add_student);
+        chipAttendance = view.findViewById(R.id.chip_attendance);
+        chipReport = view.findViewById(R.id.chip_report);
+        chipPrint = view.findViewById(R.id.chip_print);
+
+        setupSuggestionClick(chipAddStudent, "विद्यार्थी कसा जोडावा? 👤");
+        setupSuggestionClick(chipAttendance, "हजेरी कशी भरावी? 📝");
+        setupSuggestionClick(chipReport, "गुणपत्रक रिपोर्ट कसा काढावा? 📊");
+        setupSuggestionClick(chipPrint, "माहिती प्रिंट कशी करावी? 🖨️");
 
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(chatMessages);
@@ -79,11 +139,42 @@ public class AiChatFragment extends Fragment {
         });
     }
 
+    private void setupSuggestionClick(TextView chip, String query) {
+        chip.setOnClickListener(v -> {
+            // Trim any emojis from search query before sending to AI to keep it clean, 
+            // but the UI text is fine. Actually, sending with emoji is also fine.
+            etMessage.setText(query);
+            sendMessage();
+        });
+    }
+
     private void sendMessage() {
         String msg = etMessage.getText().toString().trim();
         if (TextUtils.isEmpty(msg)) return;
 
         etMessage.setText("");
+        
+        // Expand to full screen when interacting
+        if (behavior != null) {
+            Dialog dialog = getDialog();
+            if (dialog instanceof BottomSheetDialog) {
+                BottomSheetDialog d = (BottomSheetDialog) dialog;
+                FrameLayout bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+                if (bottomSheet != null) {
+                    ViewGroup.LayoutParams lp = bottomSheet.getLayoutParams();
+                    lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                    bottomSheet.setLayoutParams(lp);
+                }
+            }
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            llHeader.setVisibility(View.VISIBLE);
+            dragHandle.setVisibility(View.GONE);
+            hsvSuggestions.setVisibility(View.GONE);
+            View root = getView();
+            if (root != null) {
+                root.setBackgroundResource(R.color.background);
+            }
+        }
         
         // Add user message
         chatMessages.add(new ChatMessage(msg, false));

@@ -131,14 +131,53 @@ public class AiAgentManager {
 
     public void sendMessage(String userMessage, OnMessageCallback callback) {
         String msgLower = userMessage.trim().toLowerCase();
+        
         // Match common greetings even with punctuation
-        if (msgLower.matches("^(hi|hello|hey|हाय|नमस्कार)[!?.]*$")) {
+        if (msgLower.matches("^(hi|hello|hey|हाय|नमस्कार)[!?.]*$" )) {
             addMessageToHistory("user", userMessage);
             String reply = "नमस्कार! मी MySchool AI Agent आहे. आज मी तुम्हाला कशी मदत करू? 🙏";
             addMessageToHistory("model", reply);
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (callback != null) callback.onSuccess(reply);
             }, 500);
+            return;
+        }
+
+        // Intercept suggestion chip questions to respond offline
+        String fixedReply = null;
+        if (msgLower.contains("विद्यार्थी कसा जोडावा")) {
+            fixedReply = "विद्यार्थी जोडण्यासाठी खालील पायऱ्या फॉलो करा:\n\n" +
+                    "1. खालील मेनू बारमधील **'Students'** टॅबवर जा.\n" +
+                    "2. खाली उजव्या कोपऱ्यात असलेल्या **'+' (Add)** बटणावर क्लिक करा.\n" +
+                    "3. विद्यार्थ्याचे नाव, वर्ग, हजेरी क्रमांक (Roll No), पालकांचा फोन नंबर आणि इतर माहिती भरा.\n" +
+                    "4. तुम्ही विद्यार्थ्याचा फोटो देखील जोडू शकता.\n" +
+                    "5. शेवटी **'Save'** बटणावर क्लिक करा! 💾";
+        } else if (msgLower.contains("हजेरी कशी भरावी")) {
+            fixedReply = "हजेरी भरण्यासाठी खालील सोप्या पायऱ्या फॉलो करा:\n\n" +
+                    "1. खालील मेनू बारमधील **'Attendance'** टॅबवर जा.\n" +
+                    "2. तुमचा वर्ग आणि आजची तारीख निवडा.\n" +
+                    "3. सर्व विद्यार्थ्यांची यादी दिसेल. प्रत्येक विद्यार्थ्याच्या नावासमोर हजर (Present) किंवा गैरहजर (Absent) टॅप करा.\n" +
+                    "4. शेवटी खालील **'Save Attendance'** बटणावर क्लिक करा. ✅";
+        } else if (msgLower.contains("गुणपत्रक रिपोर्ट")) {
+            fixedReply = "गुणपत्रक (Report Card) रिपोर्ट तयार करण्यासाठी:\n\n" +
+                    "1. खालील मेनू बारमधील **'Marks'** किंवा **'Reports'** टॅबवर जा.\n" +
+                    "2. ज्या विद्यार्थ्याचा रिपोर्ट हवा आहे, त्याच्या प्रोफाइलवर क्लिक करा.\n" +
+                    "3. तिथे तुम्हाला **'Generate Progress Report'** किंवा **'Print PDF'** चा पर्याय मिळेल.\n" +
+                    "4. त्यावर क्लिक करून तुम्ही सुंदर रिपोर्ट पीडीएफ (PDF) मध्ये डाऊनलोड किंवा प्रिंट करू शकता. 📊";
+        } else if (msgLower.contains("माहिती प्रिंट कशी करावी")) {
+            fixedReply = "माहिती प्रिंट करण्यासाठी:\n\n" +
+                    "1. तुम्हाला ज्या पानाची माहिती प्रिंट करायची आहे (उदा. विद्यार्थ्यांची यादी किंवा हजेरी) तिथे जा.\n" +
+                    "2. वरच्या कोपऱ्यात किंवा प्रोफाइलमध्ये असलेल्या **'Print'** किंवा **'PDF'** आयकॉनवर क्लिक करा.\n" +
+                    "3. ते तुम्हाला डायरेक्ट तुमच्या मोबाईलच्या प्रिंटर सेटिंग्जवर घेऊन जाईल, जिथून तुम्ही कागद किंवा पीडीएफ स्वरूपात फाईल सेव्ह करू शकता. 🖨️";
+        }
+
+        if (fixedReply != null) {
+            addMessageToHistory("user", userMessage);
+            addMessageToHistory("model", fixedReply);
+            final String reply = fixedReply;
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (callback != null) callback.onSuccess(reply);
+            }, 600);
             return;
         }
 

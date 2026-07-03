@@ -2,11 +2,24 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@drawable/bg_bottom_sheet_ai">
 
-    <!-- Header / Toolbar area -->
+    <!-- Drag Handle -->
+    <View
+        android:id="@+id/drag_handle"
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="12dp"
+        android:background="#D1D5DB"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Header / Toolbar area (Hidden until expanded) -->
     <LinearLayout
         android:id="@+id/ll_header"
         android:layout_width="match_parent"
@@ -17,7 +30,8 @@
         android:background="@color/surface"
         android:elevation="4dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent">
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/drag_handle">
 
         <ImageView
             android:layout_width="32dp"
@@ -38,6 +52,16 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
+            
+        <ImageView
+            android:id="@+id/btn_close"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="#6B7280"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
 
     <View
@@ -55,9 +79,84 @@
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
-        app:layout_constraintBottom_toTopOf="@id/ll_input_container"
+        app:layout_constraintBottom_toTopOf="@id/hsv_suggestions"
         app:layout_constraintTop_toBottomOf="@id/divider"
         tools:listitem="@layout/item_chat_message_ai" />
+
+    <!-- Suggestion Chips -->
+    <HorizontalScrollView
+        android:id="@+id/hsv_suggestions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="none"
+        android:paddingHorizontal="16dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@id/ll_input_container">
+        
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingVertical="4dp">
+            
+            <TextView
+                android:id="@+id/chip_add_student"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_suggestion_chip"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:text="विद्यार्थी कसा जोडावा? 👤"
+                android:textColor="#374151"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/chip_attendance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_suggestion_chip"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:text="हजेरी कशी भरावी? 📝"
+                android:textColor="#374151"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/chip_report"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_suggestion_chip"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:text="गुणपत्रक रिपोर्ट कसा काढावा? 📊"
+                android:textColor="#374151"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true"/>
+                
+            <TextView
+                android:id="@+id/chip_print"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_suggestion_chip"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:text="माहिती प्रिंट कशी करावी? 🖨️"
+                android:textColor="#374151"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <!-- Typing Indicator -->
     <LinearLayout
@@ -72,7 +171,7 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/ll_input_container"
+        app:layout_constraintBottom_toTopOf="@id/hsv_suggestions"
         app:layout_constraintStart_toStartOf="parent">
 
         <ProgressBar

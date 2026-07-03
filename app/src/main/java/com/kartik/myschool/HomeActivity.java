@@ -133,6 +133,11 @@ public class HomeActivity extends BaseActivity {
 
         // Bottom nav
         b.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_ai_assistant) {
+                new com.kartik.myschool.ui.AiBottomSheetFragment().show(getSupportFragmentManager(), "AiBottomSheet");
+                return false; // Don't select this tab
+            }
             return navigateBottomItem(item);
         });
 

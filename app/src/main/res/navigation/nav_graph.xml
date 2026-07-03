@@ -176,9 +176,4 @@
         android:name="com.kartik.myschool.ui.DescriptiveReportFragment"
         android:label="Descriptive Remarks Report"/>
 
-    <fragment
-        android:id="@+id/nav_ai_assistant"
-        android:name="com.kartik.myschool.ui.AiChatFragment"
-        android:label="MySchool AI Agent"/>
-
 </navigation>
