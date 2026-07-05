@@ -152,7 +152,7 @@ public class HomeActivity extends BaseActivity {
             int id = item.getItemId();
             if (id == R.id.nav_school_level_dropdown) {
                 toggleSchoolLevelDropdown();
-                return false;
+                return true; // Return true to force NavigationView to update its layout properly
             }
             closeDrawerAndNavigate(id);
             return true;
@@ -570,15 +570,16 @@ public class HomeActivity extends BaseActivity {
             itemSchoolLevelDropdown
                     .setTitle(getString(R.string.txt_school_level_info) + (isSchoolLevelExpanded ? " \u25B2" : " \u25BC"));
         }
-        android.view.MenuItem itemGender = menu.findItem(R.id.nav_gender);
-        if (itemGender != null) {
-            itemGender.setTitle(getString(R.string.txt_gender));
-            itemGender.setVisible(isSchoolLevelExpanded);
-        }
+        
         android.view.MenuItem itemSchoolInfo = menu.findItem(R.id.nav_school_info);
         if (itemSchoolInfo != null) {
             itemSchoolInfo.setTitle(getString(R.string.txt_school_information));
             itemSchoolInfo.setVisible(isSchoolLevelExpanded);
+        }
+        android.view.MenuItem itemGender = menu.findItem(R.id.nav_gender);
+        if (itemGender != null) {
+            itemGender.setTitle(getString(R.string.txt_gender));
+            itemGender.setVisible(isSchoolLevelExpanded);
         }
         android.view.MenuItem itemCast = menu.findItem(R.id.nav_cast_category);
         if (itemCast != null) {
@@ -630,13 +631,16 @@ public class HomeActivity extends BaseActivity {
 
     private void toggleSchoolLevelDropdown() {
         isSchoolLevelExpanded = !isSchoolLevelExpanded;
+        
+        // Force a complete rebuild of the menu to fix NavigationView layout bugs
+        b.navigationView.getMenu().clear();
+        b.navigationView.inflateMenu(R.menu.drawer_menu);
+        
         localizeSidebar();
         
-        // Force NavigationView to remeasure/layout so the new visible items
-        // are properly scrollable if they exceed the screen height.
+        // Return focus to the list or ensure layout passes
         if (b != null && b.navigationView != null) {
             b.navigationView.requestLayout();
-            b.navigationView.invalidate();
         }
     }
 
