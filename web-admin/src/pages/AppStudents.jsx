@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useTeacherContext } from '../context/TeacherContext';
 import useLanguage from '../utils/useLanguage';
 import './AppStudents.css';
 
 export default function AppStudents() {
-  const { activeClass, activeSchool } = useTeacherContext();
+  const { activeClass, activeSchool, academicYearsList, semestersList } = useTeacherContext();
   const { t } = useLanguage();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +16,15 @@ export default function AppStudents() {
   const [isEditing, setIsEditing] = useState(false);
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
   
+  const [parentLinkCode, setParentLinkCode] = useState(null);
+  const [generatingLink, setGeneratingLink] = useState(false);
+  
+  const [targetYearId, setTargetYearId] = useState('');
+  const [targetClassNum, setTargetClassNum] = useState('1');
+  const [targetDiv, setTargetDiv] = useState('-');
+  const [promoting, setPromoting] = useState(false);
+  const [promoteStatus, setPromoteStatus] = useState('');
+
   const [activeTab, setActiveTab] = useState('basic');
 
   const emptyStudent = {
@@ -87,6 +96,45 @@ export default function AppStudents() {
     setFormData(stu);
     setIsEditing(false);
     setActiveTab('basic');
+    fetchParentLink(stu.id);
+  };
+
+  const fetchParentLink = async (studentId) => {
+    try {
+      const docRef = doc(db, 'parent_links', studentId);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        setParentLinkCode(snap.data().code);
+      } else {
+        setParentLinkCode(null);
+      }
+    } catch (err) {
+      console.error("Failed to fetch parent link", err);
+    }
+  };
+
+  const generateParentLink = async () => {
+    if (!selectedStudent || !activeClass) return;
+    setGeneratingLink(true);
+    try {
+      const code = String(100000 + Math.floor(Math.random() * 900000));
+      const linkData = {
+        id: selectedStudent.id,
+        studentId: selectedStudent.id,
+        teacherId: auth.currentUser.uid,
+        code: code,
+        studentName: selectedStudent.name,
+        className: activeClass.className || activeClass.name,
+        schoolName: activeSchool?.name || 'My School',
+        createdAt: Date.now()
+      };
+      await setDoc(doc(db, 'parent_links', selectedStudent.id), linkData);
+      setParentLinkCode(code);
+    } catch (err) {
+      console.error("Failed to generate parent link", err);
+    } finally {
+      setGeneratingLink(false);
+    }
   };
 
   const handleSaveEdit = async (e) => {
@@ -119,6 +167,88 @@ export default function AppStudents() {
       } catch (err) {
         console.error("Error deleting student:", err);
       }
+    }
+  };
+
+  const handlePromoteStudents = async () => {
+    if (!targetYearId || students.length === 0) return;
+    setPromoting(true);
+    setPromoteStatus(t('Finding or creating target class...', 'लक्ष्य वर्ग शोधत आहे किंवा तयार करत आहे...'));
+
+    try {
+      const selectedYear = academicYearsList.find(y => y.id === targetYearId);
+      let targetClassObj = null;
+
+      // 1. Check if class exists
+      const qClass = query(collection(db, 'classes'), 
+        where('teacherId', '==', auth.currentUser.uid),
+        where('yearId', '==', targetYearId),
+        where('className', '==', targetClassNum),
+        where('division', '==', targetDiv)
+      );
+      const snapClass = await getDocs(qClass);
+
+      if (!snapClass.empty) {
+        targetClassObj = { id: snapClass.docs[0].id, ...snapClass.docs[0].data() };
+      } else {
+        // Create it
+        setPromoteStatus(t('Creating new class...', 'नवीन वर्ग तयार करत आहे...'));
+        let targetSemId = '';
+        if (semestersList.length > 0) {
+          const semsForYear = semestersList.filter(s => s.yearId === targetYearId);
+          if (semsForYear.length > 0) {
+            targetSemId = semsForYear[0].id;
+          }
+        }
+        
+        const newClassData = {
+          schoolId: activeSchool?.id || '',
+          yearId: targetYearId,
+          academicYearLabel: selectedYear?.label || selectedYear?.year || '',
+          semesterId: targetSemId,
+          className: targetClassNum,
+          division: targetDiv,
+          examName: 'First Semester',
+          teacherName: auth.currentUser.email?.split('@')[0] || '',
+          teacherPhone: '',
+          teacherEmail: auth.currentUser.email || '',
+          studentCount: 0,
+          subjects: [],
+          monthlyWorkingDays: {},
+          teacherId: auth.currentUser.uid,
+          createdAt: serverTimestamp()
+        };
+        const docRef = await addDoc(collection(db, 'classes'), newClassData);
+        targetClassObj = { id: docRef.id, ...newClassData };
+      }
+
+      setPromoteStatus(t('Copying students...', 'विद्यार्थ्यांची माहिती कॉपी करत आहे...'));
+      
+      let successCount = 0;
+      for (const stu of students) {
+        const newStudent = { ...stu };
+        delete newStudent.id;
+        newStudent.classId = targetClassObj.id;
+        newStudent.className = `${t('Class', 'इयत्ता')} ${targetClassNum} ${targetDiv}`;
+        newStudent.standard = targetClassNum;
+        newStudent.division = targetDiv;
+        newStudent.schoolId = targetClassObj.schoolId;
+        newStudent.schoolName = activeSchool?.name || 'My School';
+        newStudent.teacherId = auth.currentUser.uid;
+        newStudent.marksEntered = false;
+
+        await addDoc(collection(db, 'students'), newStudent);
+        successCount++;
+      }
+
+      setPromoteStatus('');
+      alert(t(`Successfully promoted ${successCount} students!`, `यशस्वीरित्या ${successCount} विद्यार्थ्यांना प्रमोट केले!`));
+      setIsPromoteModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      setPromoteStatus(t('Failed to promote students.', 'विद्यार्थ्यांना प्रमोट करण्यात त्रुटी आली.'));
+    } finally {
+      setPromoting(false);
     }
   };
 
@@ -242,6 +372,33 @@ export default function AppStudents() {
             <p><strong>{t('Admitted:', 'प्रवेश दिनांक:')}</strong> {selectedStudent.dateOfAdmission || 'N/A'}</p>
             <p><strong>{t('Student ID:', 'विद्यार्थी आयडी:')}</strong> {selectedStudent.studentIdNumber || 'N/A'}</p>
           </div>
+          <div className="profile-section card-panel" style={{ gridColumn: '1 / -1' }}>
+            <h4>{t('Parent Portal Access', 'पालक पोर्टल प्रवेश')}</h4>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: 'var(--soft-panel)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <div>
+                <p style={{ margin: '0 0 5px 0', fontWeight: '600' }}>{t('Parent Link Code', 'पालक लिंक कोड')}</p>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>
+                  {t('Share this 6-digit code with parents so they can view the student\'s marks and reports in the Parent Portal.', 'हा ६ अंकी कोड पालकांसोबत शेअर करा जेणेकरून ते पालक पोर्टलमध्ये विद्यार्थ्याचे गुण आणि निकाल पाहू शकतील.')}
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                {parentLinkCode ? (
+                  <div style={{ padding: '8px 16px', background: 'var(--surface-color)', border: '2px dashed var(--primary-color)', borderRadius: '6px', fontSize: '20px', fontWeight: '800', letterSpacing: '4px', color: 'var(--primary-color)' }}>
+                    {parentLinkCode}
+                  </div>
+                ) : (
+                  <span style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>{t('Not generated', 'तयार नाही')}</span>
+                )}
+                <button 
+                  className="btn-primary" 
+                  onClick={generateParentLink}
+                  disabled={generatingLink}
+                >
+                  {generatingLink ? '...' : (parentLinkCode ? t('Regenerate', 'पुन्हा तयार करा') : t('Generate Code', 'कोड तयार करा'))}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -329,15 +486,46 @@ export default function AppStudents() {
           <div className="modal-content">
             <h3>{t('Promote Students', 'विद्यार्थी प्रमोट करा')}</h3>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
-              {t('Select students from this class to promote them to a new class and academic year.', 'या वर्गातील विद्यार्थ्यांना नवीन वर्ग आणि नवीन शैक्षणिक वर्षात प्रमोट करा.')}
+              {t('Select target academic year and class to copy all students from the current roster.', 'वर्तमान सूचीतील सर्व विद्यार्थ्यांना कॉपी करण्यासाठी लक्ष्य शैक्षणिक वर्ष आणि वर्ग निवडा.')}
             </p>
             
-            <div className="warning-banner" style={{ marginBottom: '20px' }}>
-              {t('Feature coming soon in Phase 4.', 'हे फीचर टप्पा ४ मध्ये येत आहे.')} 
+            <div className="form-grid" style={{ marginBottom: '20px' }}>
+              <div className="input-group">
+                <label>{t('Target Academic Year', 'नवीन शैक्षणिक वर्ष')}</label>
+                <select value={targetYearId} onChange={e => setTargetYearId(e.target.value)}>
+                  <option value="">-- {t('Select Year', 'वर्ष निवडा')} --</option>
+                  {academicYearsList.map(y => (
+                    <option key={y.id} value={y.id}>{y.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="input-group">
+                <label>{t('Target Class', 'नवीन इयत्ता')}</label>
+                <select value={targetClassNum} onChange={e => setTargetClassNum(e.target.value)}>
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i+1} value={`${i+1}`}>{i+1}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="input-group">
+                <label>{t('Target Division', 'नवीन तुकडी')}</label>
+                <select value={targetDiv} onChange={e => setTargetDiv(e.target.value)}>
+                  <option value="-">{t('No Division', 'तुकडी नाही')}</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
             </div>
 
+            {promoteStatus && <div className="info-banner" style={{ background: 'var(--soft-panel)', padding: '10px', borderRadius: '6px', color: 'var(--primary-color)', marginBottom: '20px' }}>{promoteStatus}</div>}
+
             <div className="modal-actions">
-              <button type="button" className="btn-secondary" onClick={() => setIsPromoteModalOpen(false)}>{t('Close', 'बंद करा')}</button>
+              <button type="button" className="btn-secondary" onClick={() => setIsPromoteModalOpen(false)} disabled={promoting}>{t('Cancel', 'रद्द करा')}</button>
+              <button type="button" className="btn-primary" onClick={handlePromoteStudents} disabled={promoting || !targetYearId || students.length === 0}>
+                {promoting ? t('Processing...', 'प्रक्रिया चालू आहे...') : t('Promote All', 'सर्व प्रमोट करा')}
+              </button>
             </div>
           </div>
         </div>
