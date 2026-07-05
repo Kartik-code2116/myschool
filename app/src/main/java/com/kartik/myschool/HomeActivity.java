@@ -631,6 +631,13 @@ public class HomeActivity extends BaseActivity {
     private void toggleSchoolLevelDropdown() {
         isSchoolLevelExpanded = !isSchoolLevelExpanded;
         localizeSidebar();
+        
+        // Force NavigationView to remeasure/layout so the new visible items
+        // are properly scrollable if they exceed the screen height.
+        if (b != null && b.navigationView != null) {
+            b.navigationView.requestLayout();
+            b.navigationView.invalidate();
+        }
     }
 
 

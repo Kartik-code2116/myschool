@@ -293,7 +293,7 @@ public class ExtraMenusFragment extends Fragment {
     public static String getSubjectDisplayName(android.content.Context ctx, String originalName) {
         boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
         if (originalName.equalsIgnoreCase("Vishesh pragati") || originalName.equalsIgnoreCase("Special Development")) {
-            return isMr ? "विशेष विकास" : "Special Development";
+            return isMr ? "विशेष प्रगती" : "Special Development";
         }
         if (originalName.equalsIgnoreCase("Aavad, chanda, etc") || originalName.equalsIgnoreCase("Interest, Hobby")) {
             return isMr ? "आवड, छंद, इत्यादी" : "Interest, Hobby";

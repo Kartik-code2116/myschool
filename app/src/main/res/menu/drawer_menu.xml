@@ -46,14 +46,14 @@
                 android:icon="@drawable/ic_school"
                 android:title="@string/txt_school_level_info" />
             <item
-                android:id="@+id/nav_gender"
-                android:icon="@drawable/ic_person"
-                android:title="@string/txt_gender"
-                android:visible="false" />
-            <item
                 android:id="@+id/nav_school_info"
                 android:icon="@drawable/ic_home"
                 android:title="@string/txt_school_information"
+                android:visible="false" />
+            <item
+                android:id="@+id/nav_gender"
+                android:icon="@drawable/ic_person"
+                android:title="@string/txt_gender"
                 android:visible="false" />
             <item
                 android:id="@+id/nav_cast_category"

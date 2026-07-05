@@ -51,6 +51,7 @@ public class FormativeSummativeFragment extends Fragment {
     private String activeSemesterId = "sem_1";
     private int activeSemesterNumber = 1;
     private boolean isGridView = false;
+    private String currentSubscriptionStatus = "inactive";
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefresh;
     private String lastLoadedClassId = null;
     private String lastLoadedSemesterId = null;
@@ -77,6 +78,19 @@ public class FormativeSummativeFragment extends Fragment {
         setupCustomAppBar();
         setupHeaderStrip();
 
+        FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+            @Override
+            public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
+                if (teacher != null) {
+                    currentSubscriptionStatus = teacher.subscriptionStatus;
+                    if (adapter != null) {
+                        adapter.setSubscriptionStatus(currentSubscriptionStatus);
+                    }
+                }
+            }
+            @Override public void onError(Exception e) {}
+        });
+
         swipeRefresh = b.swipeRefreshLayout;
         swipeRefresh.setColorSchemeColors(0xFF6C4CCF, 0xFF9C27B0, 0xFF00A5CF);
         swipeRefresh.setProgressBackgroundColorSchemeColor(0xFFFFFFFF);
@@ -96,6 +110,7 @@ public class FormativeSummativeFragment extends Fragment {
             pool = ((HomeActivity) getActivity()).sharedPool;
         }
         adapter = new EvaluationAdapter(pool);
+        adapter.setSubscriptionStatus(currentSubscriptionStatus);
         b.rvEvaluationStudents.setAdapter(adapter);
 
         // Play smooth layout enter animation
@@ -504,11 +519,17 @@ public class FormativeSummativeFragment extends Fragment {
         private final Map<String, MarksRecord> marksMap = new HashMap<>();
         private final int[] lastPosition = new int[] { -1 };
         private final RecyclerView.RecycledViewPool viewPool;
+        private String subscriptionStatus = "inactive";
 
         public EvaluationAdapter(RecyclerView.RecycledViewPool sharedPool) {
             this.viewPool = sharedPool != null ? sharedPool : new RecyclerView.RecycledViewPool();
             this.viewPool.setMaxRecycledViews(0, 50);
             this.viewPool.setMaxRecycledViews(1, 50);
+        }
+
+        public void setSubscriptionStatus(String status) {
+            this.subscriptionStatus = status;
+            notifyDataSetChanged();
         }
 
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
@@ -605,8 +626,21 @@ public class FormativeSummativeFragment extends Fragment {
 
             public void bind(Student s, int index) {
                 String roll = (s.rollNo != null && !s.rollNo.isEmpty()) ? s.rollNo : String.valueOf(index);
-                binding.tvStudentName.setText(roll + ". " + s.name);
+                boolean isLocked = !"active".equals(subscriptionStatus) && (index - 1) >= 3;
+
+                if (isLocked) {
+                    binding.tvStudentName.setText(roll + ". " + s.name + " \uD83D\uDD12"); // Lock icon
+                    binding.getRoot().setAlpha(0.6f);
+                } else {
+                    binding.tvStudentName.setText(roll + ". " + s.name);
+                    binding.getRoot().setAlpha(1.0f);
+                }
+
                 binding.btnStudentMore.setOnClickListener(v -> {
+                    if (isLocked) {
+                        Toast.makeText(itemView.getContext(), "Free limit reached. Upgrade to premium to enter marks for more students.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(
                             itemView.getContext(), v);
                     popup.getMenu().add(0, 1, 0, "Enter Marks");
@@ -723,6 +757,12 @@ public class FormativeSummativeFragment extends Fragment {
             }
 
             public void openSingleSubjectMarks(Student student, Subject subject) {
+                int studentIndex = students.indexOf(student);
+                if (!"active".equals(subscriptionStatus) && studentIndex >= 3) {
+                    Toast.makeText(itemView.getContext(), "Free limit reached. Upgrade to premium to enter marks for more students.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 MarksRecord record = marksMap.get(student.id);
                 ClassModel freshClass = SessionContext.selectedClass != null
                         ? SessionContext.selectedClass

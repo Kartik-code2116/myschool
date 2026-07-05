@@ -131,7 +131,7 @@ public class PdfLocalizer {
         if (s.contains("odia") || s.contains("ओडिया")) return isEn ? "Odia" : "ओडिया";
         if (s.contains("assamese") || s.contains("आसामी")) return isEn ? "Assamese" : "आसामी";
 
-        if (s.contains("vishesh pragati") || s.contains("special development") || s.contains("vishesh vikas") || s.contains("विशेष प्रगती") || s.contains("विशेष विकास")) return isEn ? "Special Development" : "विशेष विकास";
+        if (s.contains("vishesh pragati") || s.contains("special development") || s.contains("vishesh vikas") || s.contains("विशेष प्रगती") || s.contains("विशेष विकास")) return isEn ? "Special Development" : "विशेष प्रगती";
         if (s.contains("aavad,chanda,etc") || s.contains("aavad, chanda, etc") || s.contains("aavad,chhand") || s.contains("interests") || s.contains("hobbies")) return isEn ? "Interests, Hobbies, etc" : "आवड, छंद, इत्यादी";
         if (s.contains("sudharna aavashyaka") || s.contains("sudharna aavasghyaka") || s.contains("needs improvement")) return isEn ? "Needs Improvement" : "सुधारणा आवश्यक";
         if (s.contains("vyaktimatva gun vishgesh") || s.contains("vyaktimatva gun vishesh") || s.contains("personality traits")) return isEn ? "Personality Traits" : "व्यक्तिमत्त्व गुण विशेष";

@@ -58,6 +58,20 @@ public class PromoteStudentsActivity extends BaseActivity {
         setupRecyclerView();
         loadAcademicYears();
 
+        FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
+            @Override
+            public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
+                if (teacher != null && !"active".equals(teacher.subscriptionStatus)) {
+                    Toast.makeText(PromoteStudentsActivity.this, "Premium required to promote students. Please upgrade your subscription.", Toast.LENGTH_LONG).show();
+                    com.kartik.myschool.ui.SubscriptionBottomSheet bottomSheet = new com.kartik.myschool.ui.SubscriptionBottomSheet();
+                    bottomSheet.show(getSupportFragmentManager(), "SubscriptionBottomSheet");
+                    b.btnProcessPromotion.setEnabled(false);
+                    b.btnProcessPromotion.setAlpha(0.5f);
+                }
+            }
+            @Override public void onError(Exception e) {}
+        });
+
         b.btnAddNewYear.setOnClickListener(v -> showAddNewYearDialog());
         b.btnProcessPromotion.setOnClickListener(v -> processRosterAdjustment());
 
