@@ -1,0 +1,105 @@
+.app-reports {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.reports-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.reports-header p {
+  margin: 0.5rem 0 0 0;
+  color: var(--text-secondary);
+}
+
+.reports-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.students-sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.students-sidebar h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.student-list-compact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.student-list-compact li {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.student-list-compact li:hover {
+  background: var(--surface-muted);
+}
+
+.student-list-compact li.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.report-viewer {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.viewer-header h3 {
+  margin: 0;
+}
+
+.printable-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Hide some UI when printing */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-report-card, .printable-report-card * {
+    visibility: visible;
+  }
+  .printable-report-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+  }
+}

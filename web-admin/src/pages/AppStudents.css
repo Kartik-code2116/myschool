@@ -15,6 +15,11 @@
   font-size: 1.5rem;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .btn-add {
   background: var(--primary-color);
   color: white;
@@ -144,4 +149,55 @@
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.app-students .large-modal {
+  max-width: 800px;
+  width: 95%;
+}
+
+.app-students .form-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 5px;
+}
+
+.app-students .form-tabs button {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-radius: 8px 8px 0 0;
+}
+
+.app-students .form-tabs button.active {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+  background: var(--bg-color);
+}
+
+.app-students .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.profile-view-details .profile-section {
+  padding: 15px;
+}
+
+.profile-view-details h4 {
+  margin-top: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  color: var(--primary-color);
+}
+
+.profile-view-details p {
+  margin: 8px 0;
+  font-size: 0.95rem;
 }

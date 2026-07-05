@@ -22,7 +22,10 @@ export default function AppMarks() {
       if (!activeClass) { setLoading(false); return; }
       setLoading(true);
       try {
-        const qStu = query(collection(db, 'students'), where('classId', '==', activeClass.id));
+        const qStu = query(collection(db, 'students'), 
+            where('classId', '==', activeClass.id),
+            where('teacherId', '==', auth.currentUser.uid)
+        );
         const snap = await getDocs(qStu);
         const stuList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         stuList.sort((a,b) => parseInt(a.rollNo||0) - parseInt(b.rollNo||0));
@@ -43,7 +46,8 @@ export default function AppMarks() {
       try {
         const q = query(collection(db, 'marks'), 
             where('studentId', '==', selectedStudent.id),
-            where('semesterId', '==', activeSemester?.id || "1")
+            where('semesterId', '==', activeSemester?.id || "1"),
+            where('teacherId', '==', auth.currentUser.uid)
         );
         const snap = await getDocs(q);
         
@@ -62,12 +66,16 @@ export default function AppMarks() {
     loadMarks();
   }, [selectedStudent, activeAcademicYear, activeSemester]);
 
+  const [entryMode, setEntryMode] = useState('marks'); // 'marks' or 'remarks'
+
   const handleMarkChange = (subject, field, value) => {
-      const numValue = parseInt(value) || 0;
       setDetailedMarks(prev => {
-          const current = prev[subject] || { akarikTotal: 0, sanklit: 0, grandTotal: 0 };
-          const updated = { ...current, [field]: numValue };
-          updated.grandTotal = (updated.akarikTotal || 0) + (updated.sanklit || 0);
+          const current = prev[subject] || { akarikTotal: 0, sanklit: 0, grandTotal: 0, remark: '' };
+          const updated = { ...current, [field]: value };
+          if (field === 'akarikTotal' || field === 'sanklit') {
+            updated[field] = parseInt(value) || 0;
+            updated.grandTotal = (parseInt(updated.akarikTotal) || 0) + (parseInt(updated.sanklit) || 0);
+          }
           return { ...prev, [subject]: updated };
       });
   };
@@ -130,50 +138,97 @@ export default function AppMarks() {
                   <div className="empty-state">Select a student from the list to enter marks.</div>
               ) : (
                   <>
-                      <div className="editor-header">
-                          <h3>Grading: {selectedStudent.name}</h3>
+                      <div className="editor-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <h3 style={{ margin: 0 }}>Grading: {selectedStudent.name}</h3>
+                            <div className="mode-toggle" style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '8px', padding: '4px' }}>
+                              <button 
+                                className={`toggle-btn ${entryMode === 'marks' ? 'active' : ''}`}
+                                onClick={() => setEntryMode('marks')}
+                                style={{ padding: '6px 12px', border: 'none', background: entryMode === 'marks' ? 'var(--surface-color)' : 'transparent', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', boxShadow: entryMode === 'marks' ? 'var(--shadow-sm)' : 'none' }}
+                              >
+                                Marks
+                              </button>
+                              <button 
+                                className={`toggle-btn ${entryMode === 'remarks' ? 'active' : ''}`}
+                                onClick={() => setEntryMode('remarks')}
+                                style={{ padding: '6px 12px', border: 'none', background: entryMode === 'remarks' ? 'var(--surface-color)' : 'transparent', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', boxShadow: entryMode === 'remarks' ? 'var(--shadow-sm)' : 'none' }}
+                              >
+                                Descriptive Remarks
+                              </button>
+                            </div>
+                          </div>
                           <button className="btn-primary" onClick={handleSave} disabled={saving}>
-                              {saving ? 'Saving...' : 'Save Marks'}
+                              {saving ? 'Saving...' : 'Save Data'}
                           </button>
                       </div>
                       <div className="marks-table-container">
-                          <table className="marks-table">
-                              <thead>
-                                  <tr>
-                                      <th>Subject</th>
-                                      <th>Formative (Akarik)</th>
-                                      <th>Summative (Sankalit)</th>
-                                      <th>Total</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  {DEFAULT_SUBJECTS.map(sub => {
-                                      const data = detailedMarks[sub] || {};
-                                      return (
-                                          <tr key={sub}>
-                                              <td>{sub}</td>
-                                              <td>
-                                                  <input 
-                                                    type="number" 
-                                                    value={data.akarikTotal || ''} 
-                                                    onChange={e => handleMarkChange(sub, 'akarikTotal', e.target.value)} 
-                                                    placeholder="0"
-                                                  />
-                                              </td>
-                                              <td>
-                                                  <input 
-                                                    type="number" 
-                                                    value={data.sanklit || ''} 
-                                                    onChange={e => handleMarkChange(sub, 'sanklit', e.target.value)}
-                                                    placeholder="0" 
-                                                  />
-                                              </td>
-                                              <td><strong>{data.grandTotal || 0}</strong></td>
-                                          </tr>
-                                      )
-                                  })}
-                              </tbody>
-                          </table>
+                          {entryMode === 'marks' ? (
+                            <table className="marks-table">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Formative (Akarik)</th>
+                                        <th>Summative (Sankalit)</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {DEFAULT_SUBJECTS.map(sub => {
+                                        const data = detailedMarks[sub] || {};
+                                        return (
+                                            <tr key={sub}>
+                                                <td>{sub}</td>
+                                                <td>
+                                                    <input 
+                                                      type="number" 
+                                                      value={data.akarikTotal || ''} 
+                                                      onChange={e => handleMarkChange(sub, 'akarikTotal', e.target.value)} 
+                                                      placeholder="0"
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <input 
+                                                      type="number" 
+                                                      value={data.sanklit || ''} 
+                                                      onChange={e => handleMarkChange(sub, 'sanklit', e.target.value)}
+                                                      placeholder="0" 
+                                                    />
+                                                </td>
+                                                <td><strong>{data.grandTotal || 0}</strong></td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                          ) : (
+                            <table className="marks-table remarks-table">
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: '20%' }}>Subject</th>
+                                        <th>Descriptive Remarks (वर्णनात्मक नोंदी)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {DEFAULT_SUBJECTS.map(sub => {
+                                        const data = detailedMarks[sub] || {};
+                                        return (
+                                            <tr key={sub}>
+                                                <td>{sub}</td>
+                                                <td>
+                                                    <textarea 
+                                                      value={data.remark || ''} 
+                                                      onChange={e => handleMarkChange(sub, 'remark', e.target.value)}
+                                                      placeholder={`Enter descriptive remarks for ${sub}...`}
+                                                      style={{ width: '100%', minHeight: '60px', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', resize: 'vertical' }}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                          )}
                       </div>
                   </>
               )}

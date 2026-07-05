@@ -57,7 +57,7 @@ export default function AppDashboard() {
         ) : (
           <div className="no-class">
             <p>No active class selected.</p>
-            <button className="btn-primary-small">Select Class</button>
+            <button className="btn-primary-small" onClick={() => navigate('/app/settings')}>Select Class</button>
           </div>
         )}
       </div>

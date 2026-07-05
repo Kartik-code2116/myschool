@@ -15,7 +15,11 @@ import AppDashboard from './pages/AppDashboard';
 import AppStudents from './pages/AppStudents';
 import AppAttendance from './pages/AppAttendance';
 import AppMarks from './pages/AppMarks';
+import AppSettings from './pages/AppSettings';
 import Subscriptions from './pages/Subscriptions';
+import AppSubjects from './pages/AppSubjects';
+import AppReports from './pages/AppReports';
+import AppProfile from './pages/AppProfile';
 import AdminRemarks from './pages/AdminRemarks';
 import AdminSubjects from './pages/AdminSubjects';
 import AdminWeightage from './pages/AdminWeightage';
@@ -75,6 +79,7 @@ export default function App() {
     const newLang = lang === 'en' ? 'mr' : 'en';
     setLang(newLang);
     localStorage.setItem('myschool-lang', newLang);
+    window.dispatchEvent(new Event('languageChange'));
   };
 
   return (
@@ -114,7 +119,10 @@ export default function App() {
           <Route path="students" element={<AppStudents />} />
           <Route path="attendance" element={<AppAttendance />} />
           <Route path="marks" element={<AppMarks />} />
-          <Route path="settings" element={<div style={{padding:'2rem', textAlign:'center'}}>Settings Page (Coming Soon)</div>} />
+          <Route path="subjects" element={<AppSubjects />} />
+          <Route path="reports" element={<AppReports />} />
+          <Route path="settings" element={<AppSettings />} />
+          <Route path="profile" element={<AppProfile />} />
         </Route>
 
         <Route path="/app-redirect" element={

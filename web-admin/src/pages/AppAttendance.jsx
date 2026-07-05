@@ -25,7 +25,10 @@ export default function AppAttendance() {
       setLoading(true);
       try {
         // Load Students
-        const qStu = query(collection(db, 'students'), where('classId', '==', activeClass.id));
+        const qStu = query(collection(db, 'students'), 
+            where('classId', '==', activeClass.id),
+            where('teacherId', '==', auth.currentUser.uid)
+        );
         const snapStu = await getDocs(qStu);
         const stuList = snapStu.docs.map(d => ({ id: d.id, ...d.data() }));
         stuList.sort((a,b) => parseInt(a.rollNo||0) - parseInt(b.rollNo||0));
