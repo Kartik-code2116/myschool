@@ -66,12 +66,6 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
             BottomSheetDialog d = (BottomSheetDialog) dialog;
             FrameLayout bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
             if (bottomSheet != null) {
-                // Set initial height to 65% of screen height
-                int screenHeight = getResources().getDisplayMetrics().heightPixels;
-                ViewGroup.LayoutParams lp = bottomSheet.getLayoutParams();
-                lp.height = (int) (screenHeight * 0.65);
-                bottomSheet.setLayoutParams(lp);
-
                 behavior = BottomSheetBehavior.from(bottomSheet);
                 behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 behavior.setSkipCollapsed(true);
@@ -110,11 +104,17 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
         chipAttendance = view.findViewById(R.id.chip_attendance);
         chipReport = view.findViewById(R.id.chip_report);
         chipPrint = view.findViewById(R.id.chip_print);
+        TextView chipExam = view.findViewById(R.id.chip_exam);
+        TextView chipYear = view.findViewById(R.id.chip_year);
+        TextView chipPassword = view.findViewById(R.id.chip_password);
 
         setupSuggestionClick(chipAddStudent, "विद्यार्थी कसा जोडावा? 👤");
         setupSuggestionClick(chipAttendance, "हजेरी कशी भरावी? 📝");
         setupSuggestionClick(chipReport, "गुणपत्रक रिपोर्ट कसा काढावा? 📊");
         setupSuggestionClick(chipPrint, "माहिती प्रिंट कशी करावी? 🖨️");
+        setupSuggestionClick(chipExam, "परीक्षेचे वेळापत्रक कसे काढावे? 📅");
+        setupSuggestionClick(chipYear, "नवीन शैक्षणिक वर्ष कसे सुरु करावे? 🏫");
+        setupSuggestionClick(chipPassword, "पासवर्ड कसा बदलावा? 🔑");
 
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(chatMessages);
@@ -173,6 +173,18 @@ public class AiBottomSheetFragment extends BottomSheetDialogFragment {
             View root = getView();
             if (root != null) {
                 root.setBackgroundResource(R.color.background);
+                ViewGroup.LayoutParams rootLp = root.getLayoutParams();
+                if (rootLp != null) {
+                    rootLp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                    root.setLayoutParams(rootLp);
+                }
+            }
+            if (rvChat != null) {
+                ViewGroup.LayoutParams rvLp = rvChat.getLayoutParams();
+                if (rvLp instanceof androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
+                    ((androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) rvLp).height = 0;
+                    rvChat.setLayoutParams(rvLp);
+                }
             }
         }
         

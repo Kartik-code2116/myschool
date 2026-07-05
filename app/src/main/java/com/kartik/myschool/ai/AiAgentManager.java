@@ -169,6 +169,20 @@ public class AiAgentManager {
                     "1. तुम्हाला ज्या पानाची माहिती प्रिंट करायची आहे (उदा. विद्यार्थ्यांची यादी किंवा हजेरी) तिथे जा.\n" +
                     "2. वरच्या कोपऱ्यात किंवा प्रोफाइलमध्ये असलेल्या **'Print'** किंवा **'PDF'** आयकॉनवर क्लिक करा.\n" +
                     "3. ते तुम्हाला डायरेक्ट तुमच्या मोबाईलच्या प्रिंटर सेटिंग्जवर घेऊन जाईल, जिथून तुम्ही कागद किंवा पीडीएफ स्वरूपात फाईल सेव्ह करू शकता. 🖨️";
+        } else if (msgLower.contains("परीक्षेचे वेळापत्रक कसे काढावे")) {
+            fixedReply = "परीक्षेचे वेळापत्रक मिळवण्यासाठी:\n\n" +
+                    "1. शाळेच्या सूचना फलकावर (Notice Board) वेळोवेळी वेळापत्रक लावले जाते.\n" +
+                    "2. App मध्ये लवकरच **'Exams'** नावाचे नवीन फिचर येणार आहे, जिथे तुम्ही सर्व परीक्षांचे वेळापत्रक पाहू शकाल. 📅";
+        } else if (msgLower.contains("नवीन शैक्षणिक वर्ष कसे सुरु करावे")) {
+            fixedReply = "नवीन शैक्षणिक वर्ष सुरू करण्यासाठी:\n\n" +
+                    "1. **'Settings'** किंवा **'School Info'** मध्ये जा.\n" +
+                    "2. तिथे **'Academic Years'** या पर्यायावर क्लिक करा.\n" +
+                    "3. **'+' (Add)** वर क्लिक करून नवीन वर्ष (उदा. २०२४-२०२५) टाका आणि त्याला Active (सक्रिय) करा. 🏫";
+        } else if (msgLower.contains("पासवर्ड कसा बदलावा")) {
+            fixedReply = "पासवर्ड बदलण्यासाठी:\n\n" +
+                    "1. डाव्या बाजूच्या मेनूमधून **'Profile'** मध्ये जा.\n" +
+                    "2. तिथे तुम्हाला **'Change Password'** चा पर्याय दिसेल.\n" +
+                    "3. तुमचा जुना पासवर्ड टाकून नवीन सुरक्षित पासवर्ड तयार करा आणि **'Save'** करा. 🔑";
         }
 
         if (fixedReply != null) {
@@ -226,7 +240,7 @@ public class AiAgentManager {
                 Log.e(TAG, "API call failed", e);
                 if (history.size() > 0) history.remove(history.size() - 1);
                 new Handler(Looper.getMainLooper()).post(() ->
-                        callback.onError("Network error: " + (e.getMessage() != null ? e.getMessage() : "Check your internet connection"))
+                        callback.onError("You do not have more access.")
                 );
             }
 
@@ -241,7 +255,7 @@ public class AiAgentManager {
                         if (dailyExhausted) {
                             if (history.size() > 0) history.remove(history.size() - 1);
                             new Handler(Looper.getMainLooper()).post(() ->
-                                    callback.onError("Daily quota exhausted. Please try again tomorrow or use a different API key from Google AI Studio (ai.google.dev)."));
+                                    callback.onError("You do not have more access."));
                             return;
                         }
                     } catch (Exception ignored) {}
@@ -257,7 +271,7 @@ public class AiAgentManager {
                     } else {
                         if (history.size() > 0) history.remove(history.size() - 1);
                         new Handler(Looper.getMainLooper()).post(() ->
-                                callback.onError("Still rate limited. Please wait 1-2 minutes then try again."));
+                                callback.onError("You do not have more access."));
                     }
                     return;
                 }
@@ -267,16 +281,7 @@ public class AiAgentManager {
                     Log.e(TAG, "API Error " + response.code() + ": " + err);
                     if (history.size() > 0) history.remove(history.size() - 1);
                     
-                    String userMsg;
-                    if (response.code() == 401) {
-                        userMsg = "Invalid API Key. Please check your Gemini API key.";
-                    } else if (response.code() == 400) {
-                        userMsg = "Bad Request. The API key might be malformed or invalid.";
-                    } else if (response.code() == 503) {
-                        userMsg = "Server is busy, please try again in a moment.";
-                    } else {
-                        userMsg = "Something went wrong. Please try again.";
-                    }
+                    String userMsg = "You do not have more access.";
                     new Handler(Looper.getMainLooper()).post(() -> callback.onError(userMsg));
                     return;
                 }
