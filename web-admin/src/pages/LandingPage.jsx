@@ -48,10 +48,12 @@ const translations = {
     step1Desc: "Select standard and division. Link semesters and configure subjects with maximum mark weightages.",
     step2Title: "2. Student Roll",
     step2Desc: "Add student info, birthdates, roll numbers, and categories. Dynamic stats calculate counts instantly.",
-    step3Title: "3. Grade Entry",
-    step3Desc: "Input formative and summative marks. The app computes averages, percentiles, and comments instantly.",
-    step4Title: "4. PDF Card Print",
-    step4Desc: "Generate government-format school report cards. Save or share PDFs instantly without internet.",
+    step3Title: "3. Marks & Remarks",
+    step3Desc: "Input formative/summative marks, attendance, and remarks. The app computes averages and percentiles instantly.",
+    step4Title: "4. PDF & Parent Portal",
+    step4Desc: "Generate government-format report cards. Share progress securely with parents via 6-digit portal pins.",
+    step5Title: "5. End of Year Rollover",
+    step5Desc: "Promote entire classrooms to the next academic year with a single click, preserving historical data.",
     
     // Demo video section
     videoTitle: "See EduReport in Action",
@@ -114,10 +116,12 @@ const translations = {
     step1Desc: "इयत्ता आणि तुकडी निवडा. सत्र लिंक करा आणि कमाल गुण भारांशांसह विषय सेट करा.",
     step2Title: "२. विद्यार्थी नोंदणी (Student Roll)",
     step2Desc: "विद्यार्थ्याची माहिती, जन्मतारीख, हजेरी क्रमांक आणि प्रवर्ग जोडा. आकडेवारी त्वरित मोजली जाते.",
-    step3Title: "३. गुण नोंदणी (Grade Entry)",
-    step3Desc: "आकारिक आणि संकलित गुण प्रविष्ट करा. ॲप सरासरी, टक्केवारी आणि शेरे त्वरित काढते.",
-    step4Title: "४. प्रगतीपत्रक पीडीएफ प्रिंट",
-    step4Desc: "शासकीय-नमुन्यात प्रगतीपत्रके जनरेट करा. इंटरनेटशिवाय पीडीएफ फाईल्स त्वरित जतन करा किंवा शेअर करा.",
+    step3Title: "३. गुण आणि शेरे नोंदणी",
+    step3Desc: "आकारिक/संकलित गुण, उपस्थिती आणि शेरे प्रविष्ट करा. ॲप सरासरी आणि टक्केवारी त्वरित काढते.",
+    step4Title: "४. प्रगतीपत्रक आणि पालक पोर्टल",
+    step4Desc: "शासकीय-नमुन्यात प्रगतीपत्रके जनरेट करा. ६-अंकी सुरक्षित पिनद्वारे पालकांसोबत प्रगती शेअर करा.",
+    step5Title: "५. पुढील वर्षासाठी बढती",
+    step5Desc: "एका क्लिकवर संपूर्ण वर्गाला पुढील शैक्षणिक वर्षात प्रमोट करा आणि सर्व जुना डेटा सुरक्षित ठेवा.",
     
     // Demo video section
     videoTitle: "वार्षिक मूल्यमापन कार्यरत पहा",
@@ -179,7 +183,7 @@ export default function LandingPage({ user, loading, lang }) {
   // Autoplay loop for how it works animations
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 4);
+      setActiveStep((prev) => (prev + 1) % 5);
     }, 4500);
     return () => clearInterval(timerRef.current);
   }, []);
@@ -228,6 +232,19 @@ export default function LandingPage({ user, loading, lang }) {
         clearTimeout(t3);
         clearTimeout(t4);
       };
+    } else if (activeStep === 4) {
+      setProgressWidth(0);
+      let width = 0;
+      const interval = setInterval(() => {
+        width += 8;
+        if (width >= 100) {
+          setProgressWidth(100);
+          clearInterval(interval);
+        } else {
+          setProgressWidth(width);
+        }
+      }, 100);
+      return () => clearInterval(interval);
     }
   }, [activeStep]);
 
@@ -237,6 +254,7 @@ export default function LandingPage({ user, loading, lang }) {
       case 1: return { top: '35%', left: '80%' };
       case 2: return { top: '56%', left: '46%' };
       case 3: return { top: '80%', left: '50%' };
+      case 4: return { top: '65%', left: '50%' };
       default: return { top: '50%', left: '50%' };
     }
   };
@@ -247,7 +265,7 @@ export default function LandingPage({ user, loading, lang }) {
       clearInterval(timerRef.current);
       // Restart loop from this index after delay
       timerRef.current = setInterval(() => {
-        setActiveStep((prev) => (prev + 1) % 4);
+        setActiveStep((prev) => (prev + 1) % 5);
       }, 4500);
     }
   };
@@ -313,7 +331,7 @@ export default function LandingPage({ user, loading, lang }) {
               <div className="mock-class-badge">🏫 Room A</div>
               <div className="mock-form-row">
                 <span>{t.mockClassLabel}</span>
-                <strong>Class 1 - Div A</strong>
+                <strong>7th Std - Div A</strong>
               </div>
               <div className="mock-sub-title">{t.mockSubjectsLabel}</div>
               <div className="mock-subjects-weights">
@@ -465,9 +483,44 @@ export default function LandingPage({ user, loading, lang }) {
                   </div>
                 </div>
               </div>
-              <div className="mock-download-overlay">
-                <div className="mock-pdf-icon animate-bounce">PDF</div>
-                <strong>Report PDF Ready!</strong>
+              <div className="mock-download-overlay" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className="mock-pdf-icon animate-bounce">PDF</div>
+                  <strong>Report PDF Ready!</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--surface-color)', padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--primary-color)' }}>
+                  <span style={{ fontSize: '14px' }}>🔗 Parent Code:</span>
+                  <strong style={{ color: 'var(--primary-color)', letterSpacing: '2px' }}>849201</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="step-mockup promote-mockup animate-scale-up">
+            <div className="mock-window-header">
+              <span>●</span><span>●</span><span>●</span>
+              <strong className="mock-window-title">End of Year Rollover</strong>
+            </div>
+            <div className="mock-window-body">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px', background: 'var(--primary-color)', color: 'white', borderRadius: '8px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '20px', marginRight: '10px' }}>🚀</span>
+                <strong>Batch Promote Students</strong>
+              </div>
+              <div className="mock-form-row">
+                <span>From:</span>
+                <strong>7th Std - Div A</strong>
+              </div>
+              <div className="mock-form-row" style={{ color: 'var(--primary-color)' }}>
+                <span>To:</span>
+                <strong>8th Std - Div A</strong>
+              </div>
+              <div className="mock-progress-track" style={{ marginTop: '20px' }}>
+                <div className="mock-progress-bar" style={{ width: `${progressWidth}%`, background: 'var(--success-color)' }}></div>
+              </div>
+              <div style={{ textAlign: 'center', fontSize: '13px', marginTop: '10px', color: 'var(--text-secondary)' }}>
+                {progressWidth < 100 ? 'Migrating student records...' : '✨ 33 Students Promoted!'}
               </div>
             </div>
           </div>
@@ -771,6 +824,14 @@ export default function LandingPage({ user, loading, lang }) {
             >
               <h4>{t.step4Title}</h4>
               <p>{t.step4Desc}</p>
+            </button>
+            <button 
+              className={`step-card ${activeStep === 4 ? 'active' : ''}`}
+              onClick={() => handleStepClick(4)}
+              type="button"
+            >
+              <h4>{t.step5Title}</h4>
+              <p>{t.step5Desc}</p>
             </button>
           </div>
 

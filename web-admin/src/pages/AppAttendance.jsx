@@ -9,7 +9,7 @@ const MONTHS_MR = ["जून", "जुलै", "ऑगस्ट", "सप्ट
 const MONTHS_EN = ["June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March", "April", "May"];
 
 export default function AppAttendance() {
-  const { activeClass, setActiveClass } = useTeacherContext();
+  const { activeClass, setActiveClass, teacherProfile } = useTeacherContext();
   const { t } = useLanguage();
   
   const [students, setStudents] = useState([]);
@@ -229,19 +229,20 @@ export default function AppAttendance() {
                           <div className="col-total">{t("Total Days", "एकूण दिवस")}</div>
                       </div>
                       <div className="grid-body">
-                          {students.map(stu => {
+                          {students.map((stu, index) => {
                               const present = editedAttendance[stu.id] !== undefined ? editedAttendance[stu.id] : "";
                               
                               // Check validation
                               const presentNum = parseInt(present) || 0;
                               const isError = presentNum > workingDays;
+                              const isLocked = teacherProfile?.subscriptionStatus !== 'active' && index >= 3;
 
                               return (
-                                  <div key={stu.id} className="grid-row">
+                                  <div key={stu.id} className="grid-row" style={isLocked ? { opacity: 0.5 } : {}} title={isLocked ? "Upgrade to premium to enter data" : ""}>
                                       <div className="col-roll">
                                           <div className="stu-avatar small">{stu.rollNo}</div>
                                       </div>
-                                      <div className="col-name">{stu.name}</div>
+                                      <div className="col-name">{stu.name} {isLocked && '🔒'}</div>
                                       <div className="col-present">
                                           <input 
                                               type="number" 
@@ -250,7 +251,7 @@ export default function AppAttendance() {
                                               onChange={e => handlePresentChange(stu.id, e.target.value)}
                                               min="0"
                                               max={workingDays}
-                                              disabled={workingDays === 0}
+                                              disabled={workingDays === 0 || isLocked}
                                           />
                                       </div>
                                       <div className="col-total text-muted">/ {workingDays}</div>

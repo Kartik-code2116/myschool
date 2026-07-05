@@ -12,7 +12,7 @@ const sanitizeKey = (key) => {
 };
 
 export default function AppMarks() {
-  const { activeClass, activeAcademicYear, activeSemester } = useTeacherContext();
+  const { activeClass, activeAcademicYear, activeSemester, teacherProfile } = useTeacherContext();
   const { t } = useLanguage();
   
   const [students, setStudents] = useState([]);
@@ -178,15 +178,25 @@ export default function AppMarks() {
               <h3>{t("Students", "विद्यार्थी")}</h3>
               {loading ? <p>{t("Loading...", "लोड होत आहे...")}</p> : (
                   <ul className="student-list-compact">
-                      {students.map(stu => (
-                          <li 
-                            key={stu.id} 
-                            className={selectedStudent?.id === stu.id ? 'active' : ''}
-                            onClick={() => setSelectedStudent(stu)}
-                          >
-                              {stu.rollNo}. {stu.name}
-                          </li>
-                      ))}
+                      {students.map((stu, index) => {
+                          const isLocked = teacherProfile?.subscriptionStatus !== 'active' && index >= 3;
+                          return (
+                            <li 
+                              key={stu.id} 
+                              className={`${selectedStudent?.id === stu.id ? 'active' : ''} ${isLocked ? 'locked-item' : ''}`}
+                              onClick={() => {
+                                if (isLocked) {
+                                  alert(t("Free limit reached. Upgrade to premium to enter marks for more students.", "अधिक विद्यार्थ्यांचे गुण नोंदवण्यासाठी कृपया प्रीमियम सबस्क्रिप्शन घ्या."));
+                                } else {
+                                  setSelectedStudent(stu);
+                                }
+                              }}
+                              style={isLocked ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                            >
+                                {stu.rollNo}. {stu.name} {isLocked && '🔒'}
+                            </li>
+                          );
+                      })}
                   </ul>
               )}
           </div>

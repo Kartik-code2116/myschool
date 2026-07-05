@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 
 const TeacherContext = createContext();
 
@@ -10,6 +10,7 @@ export function TeacherProvider({ children }) {
   const [activeSemester, setActiveSemester] = useState(null);
   const [activeClass, setActiveClass] = useState(null);
   const [activeSchool, setActiveSchool] = useState(null);
+  const [teacherProfile, setTeacherProfile] = useState(null);
 
   const [academicYearsList, setAcademicYearsList] = useState([]);
   const [semestersList, setSemestersList] = useState([]);
@@ -43,6 +44,13 @@ export function TeacherProvider({ children }) {
              localStorage.setItem('teacher_active_school', JSON.stringify(school));
           }
 
+          // 1.5 Fetch Teacher Profile (for subscription status)
+          const docRef = doc(db, 'teachers', user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setTeacherProfile({ id: docSnap.id, ...docSnap.data() });
+          }
+
           // 2. Fetch Academic Years
           const qYears = query(collection(db, 'academic_years'), where('teacherId', '==', user.uid));
           const snapYears = await getDocs(qYears);
@@ -64,6 +72,7 @@ export function TeacherProvider({ children }) {
         }
       } else {
         setActiveSchool(null);
+        setTeacherProfile(null);
         setAcademicYearsList([]);
         setSemestersList([]);
         setLoadingContext(false);
@@ -104,7 +113,7 @@ export function TeacherProvider({ children }) {
       activeAcademicYear, setActiveAcademicYear: setYear,
       activeSemester, setActiveSemester: setSemester,
       activeClass, setActiveClass: setClass,
-      activeSchool, academicYearsList, semestersList, loadingContext
+      activeSchool, teacherProfile, academicYearsList, semestersList, loadingContext
     }}>
       {children}
     </TeacherContext.Provider>

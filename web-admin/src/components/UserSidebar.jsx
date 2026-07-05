@@ -60,6 +60,10 @@ export default function UserSidebar({ isOpen, onClose }) {
           <span className="nav-icon">👤</span>
           <span>Profile</span>
         </NavLink>
+        <NavLink to="/app/subscription" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+          <span className="nav-icon">💎</span>
+          <span>Subscription</span>
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

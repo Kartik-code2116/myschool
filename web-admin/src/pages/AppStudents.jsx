@@ -6,7 +6,7 @@ import useLanguage from '../utils/useLanguage';
 import './AppStudents.css';
 
 export default function AppStudents() {
-  const { activeClass, activeSchool, academicYearsList, semestersList } = useTeacherContext();
+  const { activeClass, activeSchool, academicYearsList, semestersList, teacherProfile } = useTeacherContext();
   const { t } = useLanguage();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +70,11 @@ export default function AppStudents() {
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!activeClass || !auth.currentUser) return;
+    
+    if (teacherProfile?.subscriptionStatus !== 'active' && students.length >= 3) {
+      alert("You have reached the free limit of 3 students. Please upgrade to premium to add more.");
+      return;
+    }
     
     try {
       const docData = {
@@ -409,10 +414,25 @@ export default function AppStudents() {
       <div className="students-header">
         <h2>{t('Students Database', 'विद्यार्थी माहिती')}</h2>
         <div className="header-actions">
-          <button className="btn-secondary" onClick={() => setIsPromoteModalOpen(true)}>
-            {t('Promote Students', 'विद्यार्थी प्रमोट करा')}
+          <button 
+            className="btn btn-primary" 
+            onClick={() => setIsPromoteModalOpen(true)}
+            disabled={teacherProfile?.subscriptionStatus !== 'active'}
+            title={teacherProfile?.subscriptionStatus !== 'active' ? "Upgrade to premium to use rollover feature" : ""}
+          >
+            {t('Promote Students', 'पुढील वर्गात प्रमोट करा')}
           </button>
-          <button className="btn-primary" onClick={openAddModal}>
+          <button 
+            className="btn btn-add" 
+            onClick={() => {
+              if (teacherProfile?.subscriptionStatus !== 'active' && students.length >= 3) {
+                alert("You have reached the free limit of 3 students. Please upgrade to premium from the Subscription menu.");
+              } else {
+                setFormData(emptyStudent); 
+                setIsAdding(true);
+              }
+            }}
+          >
             + {t('Add Student', 'विद्यार्थी जोडा')}
           </button>
         </div>

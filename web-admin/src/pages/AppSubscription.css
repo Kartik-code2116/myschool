@@ -1,0 +1,212 @@
+.subscription-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.subscription-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.status-card {
+  padding: 30px;
+  border-radius: 16px;
+  border-left: 6px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-active {
+  border-left-color: var(--success-color);
+  background: color-mix(in srgb, var(--success-color) 5%, var(--surface-color));
+}
+
+.status-inactive {
+  border-left-color: var(--warning-color);
+  background: color-mix(in srgb, var(--warning-color) 5%, var(--surface-color));
+}
+
+.status-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.status-badge-large {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.status-active .status-badge-large {
+  background: rgba(5, 150, 105, 0.15);
+  color: var(--success-color);
+}
+
+.status-inactive .status-badge-large {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--warning-color);
+}
+
+.status-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.payment-card {
+  padding: 30px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.payment-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.upgrade-msg {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.payment-details-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .payment-details-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: var(--surface-muted);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.payment-qr {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.no-qr-placeholder {
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.05);
+  color: var(--text-muted);
+  border-radius: 12px;
+  border: 2px dashed var(--border-color);
+}
+
+.upi-id-box {
+  background: var(--surface-color);
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  font-size: 1.1rem;
+}
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.upload-form h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.upload-form p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 10px 0;
+}
+
+.upload-form .form-group input[type="file"] {
+  padding: 12px;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+  width: 100%;
+}
+
+.pending-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  background: color-mix(in srgb, var(--primary-color) 5%, var(--surface-muted));
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  gap: 12px;
+}
+
+.pending-icon {
+  font-size: 3rem;
+}
+
+.pending-state h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.pending-state p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.admin-setup-missing {
+  padding: 30px;
+  text-align: center;
+  background: var(--surface-muted);
+  border-radius: 12px;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
+}

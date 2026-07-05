@@ -21,6 +21,7 @@ import Subscriptions from './pages/Subscriptions';
 import AppSubjects from './pages/AppSubjects';
 import AppReports from './pages/AppReports';
 import AppProfile from './pages/AppProfile';
+import AppSubscription from './pages/AppSubscription';
 import AdminRemarks from './pages/AdminRemarks';
 import AdminSubjects from './pages/AdminSubjects';
 import AdminWeightage from './pages/AdminWeightage';
@@ -125,6 +126,7 @@ export default function App() {
           <Route path="reports" element={<AppReports />} />
           <Route path="settings" element={<AppSettings />} />
           <Route path="profile" element={<AppProfile />} />
+          <Route path="subscription" element={<AppSubscription />} />
         </Route>
 
         <Route path="/app-redirect" element={
