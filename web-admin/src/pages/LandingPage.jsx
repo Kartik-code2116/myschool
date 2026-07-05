@@ -48,12 +48,14 @@ const translations = {
     step1Desc: "Select standard and division. Link semesters and configure subjects with maximum mark weightages.",
     step2Title: "2. Student Roll",
     step2Desc: "Add student info, birthdates, roll numbers, and categories. Dynamic stats calculate counts instantly.",
-    step3Title: "3. Marks & Remarks",
-    step3Desc: "Input formative/summative marks, attendance, and remarks. The app computes averages and percentiles instantly.",
-    step4Title: "4. PDF & Parent Portal",
-    step4Desc: "Generate government-format report cards. Share progress securely with parents via 6-digit portal pins.",
-    step5Title: "5. End of Year Rollover",
-    step5Desc: "Promote entire classrooms to the next academic year with a single click, preserving historical data.",
+    step3Title: "3. Daily Attendance",
+    step3Desc: "Quickly mark absentees each month. The app automatically calculates working days and present days.",
+    step4Title: "4. Marks & Remarks",
+    step4Desc: "Input formative/summative marks, attendance, and remarks. The app computes averages and percentiles instantly.",
+    step5Title: "5. PDF & Parent Portal",
+    step5Desc: "Generate government-format report cards. Share progress securely with parents via 6-digit portal pins.",
+    step6Title: "6. End of Year Rollover",
+    step6Desc: "Promote entire classrooms to the next academic year with a single click, preserving historical data.",
     
     // Demo video section
     videoTitle: "See EduReport in Action",
@@ -116,12 +118,14 @@ const translations = {
     step1Desc: "इयत्ता आणि तुकडी निवडा. सत्र लिंक करा आणि कमाल गुण भारांशांसह विषय सेट करा.",
     step2Title: "२. विद्यार्थी नोंदणी (Student Roll)",
     step2Desc: "विद्यार्थ्याची माहिती, जन्मतारीख, हजेरी क्रमांक आणि प्रवर्ग जोडा. आकडेवारी त्वरित मोजली जाते.",
-    step3Title: "३. गुण आणि शेरे नोंदणी",
-    step3Desc: "आकारिक/संकलित गुण, उपस्थिती आणि शेरे प्रविष्ट करा. ॲप सरासरी आणि टक्केवारी त्वरित काढते.",
-    step4Title: "४. प्रगतीपत्रक आणि पालक पोर्टल",
-    step4Desc: "शासकीय-नमुन्यात प्रगतीपत्रके जनरेट करा. ६-अंकी सुरक्षित पिनद्वारे पालकांसोबत प्रगती शेअर करा.",
-    step5Title: "५. पुढील वर्षासाठी बढती",
-    step5Desc: "एका क्लिकवर संपूर्ण वर्गाला पुढील शैक्षणिक वर्षात प्रमोट करा आणि सर्व जुना डेटा सुरक्षित ठेवा.",
+    step3Title: "३. दैनंदिन हजेरी",
+    step3Desc: "दर महिन्याला गैरहजर विद्यार्थ्यांची नोंद करा. ॲप आपोआप कामाचे दिवस आणि उपस्थिती मोजते.",
+    step4Title: "४. गुण आणि शेरे नोंदणी",
+    step4Desc: "आकारिक/संकलित गुण, उपस्थिती आणि शेरे प्रविष्ट करा. ॲप सरासरी आणि टक्केवारी त्वरित काढते.",
+    step5Title: "५. प्रगतीपत्रक आणि पालक पोर्टल",
+    step5Desc: "शासकीय-नमुन्यात प्रगतीपत्रके जनरेट करा. ६-अंकी सुरक्षित पिनद्वारे पालकांसोबत प्रगती शेअर करा.",
+    step6Title: "६. पुढील वर्षासाठी बढती",
+    step6Desc: "एका क्लिकवर संपूर्ण वर्गाला पुढील शैक्षणिक वर्षात प्रमोट करा आणि सर्व जुना डेटा सुरक्षित ठेवा.",
     
     // Demo video section
     videoTitle: "वार्षिक मूल्यमापन कार्यरत पहा",
@@ -183,7 +187,7 @@ export default function LandingPage({ user, loading, lang }) {
   // Autoplay loop for how it works animations
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 5);
+      setActiveStep((prev) => (prev + 1) % 6);
     }, 4500);
     return () => clearInterval(timerRef.current);
   }, []);
@@ -204,8 +208,8 @@ export default function LandingPage({ user, loading, lang }) {
         }
       }, 100);
       return () => clearInterval(interval);
-    } else if (activeStep === 2) {
-      // Step 3: progress bar filling & typing simulations
+    } else if (activeStep === 3) {
+      // Step 4: progress bar filling & typing simulations
       setProgressWidth(0);
       setTypedMarks({ kOral: '', kWrite: '', pOral: '', pWrite: '' });
 
@@ -232,7 +236,7 @@ export default function LandingPage({ user, loading, lang }) {
         clearTimeout(t3);
         clearTimeout(t4);
       };
-    } else if (activeStep === 4) {
+    } else if (activeStep === 5) {
       setProgressWidth(0);
       let width = 0;
       const interval = setInterval(() => {
@@ -252,9 +256,10 @@ export default function LandingPage({ user, loading, lang }) {
     switch (activeStep) {
       case 0: return { top: '68%', left: '72%' };
       case 1: return { top: '35%', left: '80%' };
-      case 2: return { top: '56%', left: '46%' };
-      case 3: return { top: '80%', left: '50%' };
-      case 4: return { top: '65%', left: '50%' };
+      case 2: return { top: '40%', left: '60%' };
+      case 3: return { top: '56%', left: '46%' };
+      case 4: return { top: '80%', left: '50%' };
+      case 5: return { top: '65%', left: '50%' };
       default: return { top: '50%', left: '50%' };
     }
   };
@@ -263,10 +268,12 @@ export default function LandingPage({ user, loading, lang }) {
     setActiveStep(index);
     if (timerRef.current) {
       clearInterval(timerRef.current);
-      // Restart loop from this index after delay
-      timerRef.current = setInterval(() => {
-        setActiveStep((prev) => (prev + 1) % 5);
-      }, 4500);
+      // Resume cycle after 10s of inactivity
+      clearTimeout(resumeTimeoutRef.current);
+      resumeTimeoutRef.current = setTimeout(() => {
+        setActiveStep((prev) => (prev + 1) % 6);
+        setIsHovered(false); // Restart auto cycle
+      }, 10000);
     }
   };
 
@@ -420,6 +427,35 @@ export default function LandingPage({ user, loading, lang }) {
         );
       case 2:
         return (
+          <div className="step-mockup attendance-mockup animate-scale-up">
+            <div className="mock-window-header">
+              <span>●</span><span>●</span><span>●</span>
+              <strong className="mock-window-title">Daily Attendance</strong>
+            </div>
+            <div className="mock-window-body">
+              <div className="mock-table">
+                <div className="mock-table-head">
+                  <span>Name</span><span>June</span><span>July</span>
+                </div>
+                <div className="mock-table-row">
+                  <span>Kartik T.</span>
+                  <span className="mock-input" style={{ color: 'var(--success-color)' }}>Present</span>
+                  <span className="mock-input" style={{ color: 'var(--success-color)' }}>Present</span>
+                </div>
+                <div className="mock-table-row">
+                  <span>Priya P.</span>
+                  <span className="mock-input" style={{ color: 'var(--danger-color)' }}>Absent (2)</span>
+                  <span className="mock-input" style={{ color: 'var(--success-color)' }}>Present</span>
+                </div>
+              </div>
+              <div className="mock-calc-overlay" style={{ background: 'color-mix(in srgb, var(--success-color) 10%, transparent)' }}>
+                <span style={{ color: 'var(--success-color)' }}>Total Working Days: 22</span>
+              </div>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
           <div className="step-mockup grading-mockup animate-scale-up">
             <div className="mock-window-header">
               <span>●</span><span>●</span><span>●</span>
@@ -433,7 +469,7 @@ export default function LandingPage({ user, loading, lang }) {
                 <div className="mock-table-row">
                   <span>Kartik T.</span>
                   <span className="mock-input cell-pop-1">
-                    {typedMarks.kOral || (activeStep === 2 && !typedMarks.kOral ? <span className="typing-cursor">|</span> : '')}
+                    {typedMarks.kOral || (activeStep === 3 && !typedMarks.kOral ? <span className="typing-cursor">|</span> : '')}
                   </span>
                   <span className="mock-input cell-pop-2">
                     {typedMarks.kWrite || (typedMarks.kOral && !typedMarks.kWrite ? <span className="typing-cursor">|</span> : '')}
@@ -458,7 +494,7 @@ export default function LandingPage({ user, loading, lang }) {
             </div>
           </div>
         );
-      case 3:
+      case 4:
         return (
           <div className="step-mockup report-mockup animate-scale-up">
             <div className="mock-window-header">
@@ -496,7 +532,7 @@ export default function LandingPage({ user, loading, lang }) {
             </div>
           </div>
         );
-      case 4:
+      case 5:
         return (
           <div className="step-mockup promote-mockup animate-scale-up">
             <div className="mock-window-header">
@@ -832,6 +868,14 @@ export default function LandingPage({ user, loading, lang }) {
             >
               <h4>{t.step5Title}</h4>
               <p>{t.step5Desc}</p>
+            </button>
+            <button 
+              className={`step-card ${activeStep === 5 ? 'active' : ''}`}
+              onClick={() => handleStepClick(5)}
+              type="button"
+            >
+              <h4>{t.step6Title}</h4>
+              <p>{t.step6Desc}</p>
             </button>
           </div>
 

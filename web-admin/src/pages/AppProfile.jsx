@@ -74,8 +74,9 @@ export default function AppProfile() {
   if (loading) return <div className="app-profile"><div className="loading">{t("Loading Profile...", "प्रोफाइल लोड होत आहे...")}</div></div>;
 
   return (
-    <div className="app-profile">
+    <div className="app-profile animate-fade-in">
       <div className="profile-header">
+        <div className="page-kicker">{t("Account", "खाते")}</div>
         <h2>{t("Teacher Profile & Subscription", "शिक्षक प्रोफाइल आणि सबस्क्रिप्शन")}</h2>
         <p>{t("Manage your personal details, school information, and subscription plan.", "तुमची वैयक्तिक माहिती, शाळेची माहिती आणि सबस्क्रिप्शन प्लॅन व्यवस्थापित करा.")}</p>
       </div>

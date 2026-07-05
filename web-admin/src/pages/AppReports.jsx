@@ -16,6 +16,7 @@ export default function AppReports() {
   return (
     <div className="app-reports animate-fade-in">
       <div className="reports-header">
+        <div className="page-kicker">{t("Printables", "प्रिंट्स")}</div>
         <h2>{t("Report Cards & Printables", "रिपोर्ट आणि प्रिंट्स")}</h2>
         <p>{t("Select a report template to generate and print.", "प्रिंट करण्यासाठी रिपोर्ट निवडा.")}</p>
       </div>

@@ -89,21 +89,24 @@
 
 /* Modal styles scoped to .app-students */
 .app-students .modal-overlay {
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
-  z-index: 100;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 .app-students .modal-content {
   background: var(--card-bg);
   padding: 1.5rem;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .app-students .modal-content h3 {

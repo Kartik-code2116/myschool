@@ -175,8 +175,9 @@ export default function AppSettings() {
   };
 
   return (
-    <div className="app-settings">
+    <div className="app-settings animate-fade-in">
       <div className="settings-header">
+        <div className="page-kicker">{t("Configuration", "कॉन्फिगरेशन")}</div>
         <h2>{t('Teacher Preferences & Settings', 'शिक्षक प्राधान्ये आणि सेटिंग्ज')}</h2>
         <p>{t('Configure your active classroom session. These selections scope your Students, Attendance, and Marks pages.', 'तुमचे सक्रिय वर्ग सत्र कॉन्फिगर करा. या निवडीवर विद्यार्थी, हजेरी आणि गुण अवलंबून आहेत.')}</p>
       </div>

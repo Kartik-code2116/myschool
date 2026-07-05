@@ -32,9 +32,8 @@ public class AiAgentManager {
     private JsonArray history;
     private boolean contextInitialized = false;
 
-    // gemini-2.0-flash-lite has a higher free-tier quota (30 RPM vs 15 RPM)
-    private static final String API_KEY = BuildConfig.GEMINI_API_KEY;
-    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=" + API_KEY;
+    private static String apiKey = null;
+    private static String apiUrl = null;
     private static final int MAX_RETRIES = 4;
     // Keep only last 10 messages (5 pairs) to avoid sending too many tokens per request
     private static final int MAX_HISTORY_MESSAGES = 10;
@@ -82,6 +81,23 @@ public class AiAgentManager {
     }
 
     private void initContext() {
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("config").document("keys")
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists() && documentSnapshot.contains("gemini_api_key")) {
+                    apiKey = documentSnapshot.getString("gemini_api_key");
+                    apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=" + apiKey;
+                }
+                loadTeacherContext();
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "Failed to load API keys", e);
+                loadTeacherContext();
+            });
+    }
+
+    private void loadTeacherContext() {
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
             @Override
             public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
@@ -200,6 +216,13 @@ public class AiAgentManager {
     }
 
     private void sendWithRetry(OnMessageCallback callback, int retryCount) {
+        if (apiKey == null || apiUrl == null) {
+            new Handler(Looper.getMainLooper()).post(() ->
+                callback.onError("You do not have more access of this Assistance ! For this extra subscription is required!")
+            );
+            return;
+        }
+
         // Build a trimmed view of history: keep first 2 messages (system context) + last N recent ones
         JsonArray trimmedHistory = new JsonArray();
         int systemMessages = Math.min(2, history.size()); // first 2 = system init pair
@@ -225,13 +248,13 @@ public class AiAgentManager {
         );
 
         // Remove key from URL if it's there
-        String baseUrl = API_URL.split("\\?")[0];
+        String baseUrl = apiUrl != null ? apiUrl.split("\\?")[0] : "";
 
         Request request = new Request.Builder()
                 .url(baseUrl)
                 .post(body)
                 .header("Content-Type", "application/json")
-                .header("x-goog-api-key", API_KEY)
+                .header("x-goog-api-key", apiKey)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
