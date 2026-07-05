@@ -16,6 +16,7 @@ import AppStudents from './pages/AppStudents';
 import AppAttendance from './pages/AppAttendance';
 import AppMarks from './pages/AppMarks';
 import AppSettings from './pages/AppSettings';
+import AppRemarks from './pages/AppRemarks';
 import Subscriptions from './pages/Subscriptions';
 import AppSubjects from './pages/AppSubjects';
 import AppReports from './pages/AppReports';
@@ -119,6 +120,7 @@ export default function App() {
           <Route path="students" element={<AppStudents />} />
           <Route path="attendance" element={<AppAttendance />} />
           <Route path="marks" element={<AppMarks />} />
+          <Route path="remarks" element={<AppRemarks />} />
           <Route path="subjects" element={<AppSubjects />} />
           <Route path="reports" element={<AppReports />} />
           <Route path="settings" element={<AppSettings />} />

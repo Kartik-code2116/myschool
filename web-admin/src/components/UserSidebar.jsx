@@ -40,6 +40,10 @@ export default function UserSidebar({ isOpen, onClose }) {
           <span className="nav-icon">📝</span>
           <span>Marks Entry</span>
         </NavLink>
+        <NavLink to="/app/remarks" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+          <span className="nav-icon">⭐</span>
+          <span>Remarks</span>
+        </NavLink>
         <NavLink to="/app/reports" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
           <span className="nav-icon">📊</span>
           <span>Report Cards</span>

@@ -1,105 +1,171 @@
 .app-marks {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.marks-header h2 {
-  margin: 0;
-  font-size: 1.8rem;
+.marks-header {
+  margin-bottom: 20px;
 }
 
 .marks-layout {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
   align-items: start;
 }
 
-.card-panel {
-  background: var(--card-bg);
+.students-sidebar {
+  padding: 15px;
+  background: var(--surface-color);
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-}
-
-.students-sidebar h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 .student-list-compact {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 60vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .student-list-compact li {
-  padding: 0.8rem 1rem;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-bottom: 0.2rem;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  transition: all 0.2s;
 }
 
 .student-list-compact li:hover {
-  background: rgba(0,0,0,0.05);
+  background: color-mix(in srgb, var(--primary-color) 5%, transparent);
 }
 
 .student-list-compact li.active {
-  background: var(--primary-color);
-  color: white;
-  font-weight: bold;
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--primary-color) 30%, transparent);
+  color: var(--primary-color);
+  font-weight: 700;
 }
 
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+.marks-editor {
+  background: var(--surface-color);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  overflow: hidden;
 }
 
-.editor-header h3 {
-  margin: 0;
-}
-
-.marks-table-container {
+.spreadsheet-container {
+  width: 100%;
   overflow-x: auto;
+  padding-bottom: 15px;
+  margin-top: 20px;
 }
 
-.marks-table {
+.spreadsheet-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 1000px;
 }
 
-.marks-table th, .marks-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.marks-table th {
-  background: rgba(0,0,0,0.02);
-  font-weight: 600;
-}
-
-.marks-table input {
-  width: 80px;
-  padding: 0.5rem;
+.spreadsheet-table th,
+.spreadsheet-table td {
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--bg-color);
-  color: var(--text-color);
+  padding: 6px;
+  text-align: center;
+  font-size: 13px;
+  vertical-align: middle;
 }
 
-@media (max-width: 900px) {
+.spreadsheet-table th {
+  background: var(--surface-muted);
+  font-weight: 600;
+  color: var(--text-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.spreadsheet-table .group-header {
+  padding: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.header-formative { background: rgba(37, 99, 235, 0.08) !important; color: #2563eb !important; }
+.header-summative { background: rgba(5, 150, 105, 0.08) !important; color: #059669 !important; }
+.header-total { background: rgba(217, 119, 6, 0.08) !important; color: #d97706 !important; }
+
+.subject-cell {
+  text-align: left !important;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--surface-color);
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.02);
+  min-width: 140px;
+}
+
+.mark-input {
+  width: 50px;
+  padding: 4px;
+  text-align: center;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 13px;
+  font-family: monospace;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.mark-input:focus {
+  background: var(--control-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.mark-input:disabled {
+  background: rgba(0,0,0,0.02);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+[data-theme='dark'] .mark-input:disabled {
+  background: rgba(255,255,255,0.02);
+}
+
+.calc-cell {
+  background: var(--surface-muted);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.grand-total-cell {
+  background: color-mix(in srgb, var(--warning-color) 10%, transparent);
+  color: var(--warning-color);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
   .marks-layout {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
+  }
+  .students-sidebar {
+    max-height: 250px;
   }
 }

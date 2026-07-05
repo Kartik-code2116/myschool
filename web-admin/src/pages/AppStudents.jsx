@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useTeacherContext } from '../context/TeacherContext';
 import useLanguage from '../utils/useLanguage';
@@ -27,31 +27,30 @@ export default function AppStudents() {
 
   const [formData, setFormData] = useState(emptyStudent);
 
-  const fetchStudents = async () => {
-    if (!activeClass) {
+  useEffect(() => {
+    if (!activeClass || !auth.currentUser) {
       setStudents([]);
       setLoading(false);
       return;
     }
+    
     setLoading(true);
-    try {
-      const q = query(collection(db, 'students'), 
-          where('classId', '==', activeClass.id),
-          where('teacherId', '==', auth.currentUser.uid)
-      );
-      const snap = await getDocs(q);
-      const stuData = snap.docs.map(d => ({ id: d.id, ...emptyStudent, ...d.data() }));
-      stuData.sort((a, b) => parseInt(a.rollNo || 0) - parseInt(b.rollNo || 0));
-      setStudents(stuData);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const q = query(collection(db, 'students'), 
+        where('classId', '==', activeClass.id),
+        where('teacherId', '==', auth.currentUser.uid)
+    );
+    
+    const unsubscribe = onSnapshot(q, (snap) => {
+        const stuList = snap.docs.map(doc => ({ id: doc.id, ...emptyStudent, ...doc.data() }));
+        stuList.sort((a,b) => parseInt(a.rollNo || 0) - parseInt(b.rollNo || 0));
+        setStudents(stuList);
+        setLoading(false);
+    }, (err) => {
+        console.error(err);
+        setLoading(false);
+    });
 
-  useEffect(() => {
-    fetchStudents();
+    return () => unsubscribe();
   }, [activeClass]);
 
   const handleChange = (e) => {

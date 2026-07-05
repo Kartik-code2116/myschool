@@ -1,156 +1,266 @@
 import React, { useState, useEffect } from 'react';
 import { useTeacherContext } from '../context/TeacherContext';
 import { db, auth } from '../firebase';
-import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, doc, updateDoc, onSnapshot, writeBatch } from 'firebase/firestore';
+import useLanguage from '../utils/useLanguage';
 import './AppAttendance.css';
 
-const MONTHS = ["जून", "जुलै", "ऑगस्ट", "सप्टें", "ऑक्टो", "नोव्हे", "डिसें", "जाने", "फेब्रु", "मार्च", "एप्रिल", "मे"];
+const MONTHS_MR = ["जून", "जुलै", "ऑगस्ट", "सप्टें", "ऑक्टो", "नोव्हे", "डिसें", "जाने", "फेब्रु", "मार्च", "एप्रिल", "मे"];
+const MONTHS_EN = ["June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March", "April", "May"];
 
 export default function AppAttendance() {
-  const { activeClass, activeAcademicYear } = useTeacherContext();
+  const { activeClass, setActiveClass } = useTeacherContext();
+  const { t } = useLanguage();
+  
   const [students, setStudents] = useState([]);
-  const [attendanceRecords, setAttendanceRecords] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
-  const [selectedMonth, setSelectedMonth] = useState(MONTHS[0]);
-  const [workingDays, setWorkingDays] = useState(24);
+  const [selectedMonth, setSelectedMonth] = useState(MONTHS_MR[0]);
+  const [workingDays, setWorkingDays] = useState(0);
+  const [workingDaysSaving, setWorkingDaysSaving] = useState(false);
+
+  // Local state for edits before saving
+  const [editedAttendance, setEditedAttendance] = useState({});
 
   useEffect(() => {
-    async function loadData() {
-      if (!activeClass || !activeAcademicYear) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        // Load Students
-        const qStu = query(collection(db, 'students'), 
-            where('classId', '==', activeClass.id),
-            where('teacherId', '==', auth.currentUser.uid)
-        );
-        const snapStu = await getDocs(qStu);
-        const stuList = snapStu.docs.map(d => ({ id: d.id, ...d.data() }));
-        stuList.sort((a,b) => parseInt(a.rollNo||0) - parseInt(b.rollNo||0));
-        setStudents(stuList);
-
-        // Load Attendance Records
-        const qAtt = query(collection(db, 'attendance_records'), 
-            where('classId', '==', activeClass.id),
-            where('academicYear', '==', activeAcademicYear.name || activeAcademicYear.id)
-        );
-        const snapAtt = await getDocs(qAtt);
-        const attMap = {};
-        snapAtt.forEach(d => {
-            const data = d.data();
-            attMap[data.studentId] = data;
-        });
-        setAttendanceRecords(attMap);
-
-      } catch(e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+    if (!activeClass || !auth.currentUser) {
+      setLoading(false);
+      return;
     }
-    loadData();
-  }, [activeClass, activeAcademicYear]);
-
-  const handlePresentChange = (studentId, presentVal) => {
-    const val = parseInt(presentVal) || 0;
-    setAttendanceRecords(prev => {
-        const record = prev[studentId] || {
-            studentId, classId: activeClass.id, academicYear: activeAcademicYear.name || activeAcademicYear.id, monthlyData: {}
-        };
-        const newData = { ...record.monthlyData, [selectedMonth]: `${val}/${workingDays}` };
-        return { ...prev, [studentId]: { ...record, monthlyData: newData } };
+    
+    setLoading(true);
+    const qStu = query(collection(db, 'students'), 
+        where('classId', '==', activeClass.id),
+        where('teacherId', '==', auth.currentUser.uid)
+    );
+    
+    const unsubscribe = onSnapshot(qStu, (snap) => {
+        const stuList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        stuList.sort((a,b) => parseInt(a.rollNo || 0) - parseInt(b.rollNo || 0));
+        setStudents(stuList);
+        
+        // Populate editedAttendance with current db values so inputs show correctly
+        const initialEdits = {};
+        stuList.forEach(stu => {
+            const val = stu.monthlyAttendance?.[selectedMonth];
+            if (val && val.includes('/')) {
+                initialEdits[stu.id] = val.split('/')[0];
+            } else {
+                initialEdits[stu.id] = "";
+            }
+        });
+        setEditedAttendance(initialEdits);
+        setLoading(false);
+    }, (err) => {
+        console.error("Error fetching students:", err);
+        setLoading(false);
     });
+
+    return () => unsubscribe();
+  }, [activeClass, selectedMonth]);
+
+  // Update working days local state when class or month changes
+  useEffect(() => {
+    if (activeClass) {
+        const classDays = activeClass.monthlyWorkingDays?.[selectedMonth] || 0;
+        setWorkingDays(classDays);
+    }
+  }, [activeClass, selectedMonth]);
+
+  const handleWorkingDaysChange = (e) => {
+      const val = parseInt(e.target.value) || 0;
+      setWorkingDays(val);
   };
 
-  const handleSave = async () => {
+  const saveWorkingDays = async () => {
+      if (!activeClass) return;
+      setWorkingDaysSaving(true);
+      try {
+          const classRef = doc(db, 'classes', activeClass.id);
+          const currentMap = activeClass.monthlyWorkingDays || {};
+          const newMap = { ...currentMap, [selectedMonth]: workingDays };
+          
+          await updateDoc(classRef, { monthlyWorkingDays: newMap });
+          
+          // Update context
+          setActiveClass({ ...activeClass, monthlyWorkingDays: newMap });
+          // Note: we do not show alert here to keep it seamless, button just shows "Saved" briefly
+          setTimeout(() => setWorkingDaysSaving(false), 1000);
+      } catch(err) {
+          console.error(err);
+          alert(t("Error saving working days.", "कामकाजाचे दिवस सेव्ह करताना त्रुटी."));
+          setWorkingDaysSaving(false);
+      }
+  };
+
+  const handlePresentChange = (studentId, val) => {
+      setEditedAttendance(prev => ({
+          ...prev,
+          [studentId]: val
+      }));
+  };
+
+  const handleSaveAttendance = async () => {
+    if (!activeClass || !auth.currentUser) return;
     setSaving(true);
+    
     try {
-        for (const stu of students) {
-            const record = attendanceRecords[stu.id];
-            if (record) {
-                // Ensure default values for other months exist if new record
-                if (!record.id) {
-                    MONTHS.forEach(m => {
-                        if (!record.monthlyData[m]) record.monthlyData[m] = "0/0";
-                    });
-                }
-                const docRef = record.id ? doc(db, 'attendance_records', record.id) : doc(collection(db, 'attendance_records'));
-                await setDoc(docRef, {
-                    id: docRef.id,
-                    studentId: stu.id,
-                    classId: activeClass.id,
-                    academicYear: activeAcademicYear.name || activeAcademicYear.id,
-                    monthlyData: record.monthlyData
-                }, { merge: true });
-                record.id = docRef.id;
+        const batch = writeBatch(db);
+        
+        students.forEach(stu => {
+            const present = editedAttendance[stu.id] || "0";
+            const newAttendanceStr = `${present}/${workingDays}`;
+            
+            // Only update if it changed to avoid unnecessary writes
+            const currentStr = stu.monthlyAttendance?.[selectedMonth];
+            if (currentStr !== newAttendanceStr) {
+                const stuRef = doc(db, 'students', stu.id);
+                const currentMap = stu.monthlyAttendance || {};
+                batch.update(stuRef, {
+                    monthlyAttendance: { ...currentMap, [selectedMonth]: newAttendanceStr }
+                });
             }
-        }
-        alert("Attendance saved successfully!");
-    } catch (e) {
-        console.error(e);
-        alert("Failed to save.");
+        });
+        
+        await batch.commit();
+        alert(t("Attendance saved successfully!", "उपस्थिती यशस्वीरित्या सेव्ह झाली!"));
+    } catch(err) {
+        console.error(err);
+        alert(t("Error saving attendance.", "उपस्थिती सेव्ह करताना त्रुटी."));
     } finally {
         setSaving(false);
     }
   };
 
-  if (!activeClass || !activeAcademicYear) {
-      return <div className="app-attendance"><div className="warning-banner">Please select an Active Class and Academic Year from Settings.</div></div>;
+  if (!activeClass) {
+      return (
+          <div className="app-attendance">
+              <div className="warning-banner">{t("Please select an Active Class from the Dashboard.", "कृपया डॅशबोर्डवरून सक्रिय वर्ग निवडा.")}</div>
+          </div>
+      );
   }
 
   return (
-    <div className="app-attendance">
+    <div className="app-attendance animate-fade-in">
       <div className="attendance-header">
-        <h2>Attendance</h2>
-        <button className="btn-primary" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving...' : 'Save All'}
-        </button>
+        <h2>{t("Attendance Tracking", "विद्यार्थी उपस्थिती")}</h2>
+        <p>{t("Record monthly student attendance here. This syncs directly with the mobile app.", "महिन्यानुसार विद्यार्थ्यांची उपस्थिती येथे भरा. हे मोबाईल ॲपसोबत रिअल-टाइममध्ये सिंक होते.")}</p>
       </div>
       
-      <div className="attendance-controls card-panel">
-        <div className="form-group">
-            <label>Select Month</label>
-            <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}>
-                {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-        </div>
-        <div className="form-group">
-            <label>Total Working Days</label>
-            <input type="number" value={workingDays} onChange={e => setWorkingDays(parseInt(e.target.value)||0)} />
-        </div>
-      </div>
+      <div className="attendance-layout">
+          {/* Sidebar Configuration */}
+          <div className="attendance-sidebar">
+              <h3>{t("Configuration", "महिना आणि दिवस")}</h3>
+              
+              <div className="form-group" style={{ marginTop: '15px' }}>
+                  <label>{t("Select Month", "महिना निवडा")}</label>
+                  <select 
+                      value={selectedMonth} 
+                      onChange={e => setSelectedMonth(e.target.value)}
+                      className="styled-select"
+                  >
+                      {MONTHS_MR.map((m, i) => (
+                          <option key={m} value={m}>{t(MONTHS_EN[i], m)}</option>
+                      ))}
+                  </select>
+              </div>
 
-      <div className="attendance-list">
-        {loading ? <p>Loading...</p> : (
-            students.map(stu => {
-                const record = attendanceRecords[stu.id];
-                const monthVal = record?.monthlyData?.[selectedMonth] || `0/${workingDays}`;
-                const presentDays = monthVal.split('/')[0] || "0";
-                
-                return (
-                    <div key={stu.id} className="attendance-item card-panel">
-                        <div className="stu-info">
-                            <strong>{stu.rollNo}. {stu.name}</strong>
-                        </div>
-                        <div className="input-group">
-                            <input 
-                                type="number" 
-                                value={presentDays} 
-                                onChange={e => handlePresentChange(stu.id, e.target.value)} 
-                                max={workingDays}
-                                min="0"
-                            />
-                            <span>/ {workingDays}</span>
-                        </div>
-                    </div>
-                );
-            })
-        )}
+              <div className="form-group">
+                  <label>{t("Total Working Days", "एकूण कामकाजाचे दिवस")}</label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                      <input 
+                          type="number" 
+                          className="styled-input"
+                          value={workingDays} 
+                          onChange={handleWorkingDaysChange} 
+                          min="0"
+                          max="31"
+                      />
+                      <button 
+                          className="btn btn-secondary" 
+                          onClick={saveWorkingDays}
+                          disabled={workingDaysSaving || (activeClass.monthlyWorkingDays?.[selectedMonth] === workingDays)}
+                          style={{ padding: '0 15px', whiteSpace: 'nowrap' }}
+                      >
+                          {workingDaysSaving ? t("Saved", "सेव्ह झाले") : t("Apply", "लागू करा")}
+                      </button>
+                  </div>
+                  <small style={{ color: 'var(--text-secondary)', marginTop: '5px', display: 'block' }}>
+                      {t("Apply working days before entering attendance.", "उपस्थिती भरण्यापूर्वी कामकाजाचे दिवस लागू करा.")}
+                  </small>
+              </div>
+              
+              <div className="sidebar-stats card-panel" style={{ marginTop: '20px', padding: '15px' }}>
+                  <h4>{t("Month Summary", "महिन्याचा गोषवारा")}</h4>
+                  <p><strong>{t("Class:", "वर्ग:")}</strong> {activeClass.className} {activeClass.division}</p>
+                  <p><strong>{t("Students:", "एकूण विद्यार्थी:")}</strong> {students.length}</p>
+                  <p><strong>{t("Working Days:", "कामकाजाचे दिवस:")}</strong> {workingDays}</p>
+              </div>
+          </div>
+
+          {/* Main Grid */}
+          <div className="attendance-main">
+              <div className="main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h3>{t("Students List", "विद्यार्थ्यांची यादी")} - {t(MONTHS_EN[MONTHS_MR.indexOf(selectedMonth)], selectedMonth)}</h3>
+                  <button className="btn btn-primary" onClick={handleSaveAttendance} disabled={saving || workingDays === 0}>
+                      {saving ? t('Saving...', 'सेव्ह होत आहे...') : t('Save Attendance', 'उपस्थिती सेव्ह करा')}
+                  </button>
+              </div>
+
+              {workingDays === 0 && (
+                  <div className="warning-banner" style={{ marginBottom: '20px' }}>
+                      {t("Please set Total Working Days to greater than 0.", "कृपया एकूण कामकाजाचे दिवस ० पेक्षा जास्त सेट करा.")}
+                  </div>
+              )}
+
+              {loading ? (
+                  <p>{t("Loading students...", "विद्यार्थी लोड होत आहेत...")}</p>
+              ) : students.length === 0 ? (
+                  <div className="empty-state">
+                      <p>{t("No students found in this class.", "या वर्गात कोणतेही विद्यार्थी आढळले नाहीत.")}</p>
+                  </div>
+              ) : (
+                  <div className="attendance-grid">
+                      <div className="grid-header">
+                          <div className="col-roll">{t("Roll", "हजेरी क्र.")}</div>
+                          <div className="col-name">{t("Student Name", "विद्यार्थ्याचे नाव")}</div>
+                          <div className="col-present">{t("Present Days", "उपस्थित दिवस")}</div>
+                          <div className="col-total">{t("Total Days", "एकूण दिवस")}</div>
+                      </div>
+                      <div className="grid-body">
+                          {students.map(stu => {
+                              const present = editedAttendance[stu.id] !== undefined ? editedAttendance[stu.id] : "";
+                              
+                              // Check validation
+                              const presentNum = parseInt(present) || 0;
+                              const isError = presentNum > workingDays;
+
+                              return (
+                                  <div key={stu.id} className="grid-row">
+                                      <div className="col-roll">
+                                          <div className="stu-avatar small">{stu.rollNo}</div>
+                                      </div>
+                                      <div className="col-name">{stu.name}</div>
+                                      <div className="col-present">
+                                          <input 
+                                              type="number" 
+                                              className={`styled-input text-center ${isError ? 'input-error' : ''}`}
+                                              value={present}
+                                              onChange={e => handlePresentChange(stu.id, e.target.value)}
+                                              min="0"
+                                              max={workingDays}
+                                              disabled={workingDays === 0}
+                                          />
+                                      </div>
+                                      <div className="col-total text-muted">/ {workingDays}</div>
+                                  </div>
+                              );
+                          })}
+                      </div>
+                  </div>
+              )}
+          </div>
       </div>
     </div>
   );
