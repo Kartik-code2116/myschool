@@ -115,7 +115,7 @@ export default function Dashboard() {
 
     // 3. Subscription Status Filter
     if (subStatus !== 'all') {
-      result = result.filter((t) => t.subscriptionStatus === subStatus);
+      result = result.filter((t) => (t.subscriptionStatus || 'inactive') === subStatus);
     }
 
     return result;
@@ -156,8 +156,12 @@ export default function Dashboard() {
 
   // Unified signup trend over last 6 months
   const signupTrend = useMemo(() => {
-    const months = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
     const now = new Date();
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push(d.toLocaleString('default', { month: 'short' }));
+    }
     
     // Set up 6 months of data ending in current month
     const trendData = months.map((m, idx) => {

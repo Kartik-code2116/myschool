@@ -40,7 +40,11 @@ export default function AppDashboard() {
 
         if (activeClass) {
           // Get students count
-          const studentQ = query(collection(db, 'students'), where('classId', '==', activeClass.id));
+          const studentQ = query(
+            collection(db, 'students'), 
+            where('classId', '==', activeClass.id),
+            where('teacherId', '==', auth.currentUser.uid)
+          );
           const sSnap = await getDocs(studentQ);
           studentsCount = sSnap.size;
 

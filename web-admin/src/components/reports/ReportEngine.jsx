@@ -94,7 +94,7 @@ export default function ReportEngine({ reportTemplate, onBack }) {
     }, [activeClass]);
 
     const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
+        contentRef: componentRef,
         documentTitle: `Report_${reportTemplate.id}_${activeClass?.className}`,
     });
 
@@ -190,11 +190,16 @@ export default function ReportEngine({ reportTemplate, onBack }) {
                     </div>
 
                     <div className="printable-wrapper">
-                        {loading ? <p>Loading data...</p> : (
-                            <div className="printable-a4" ref={componentRef}>
-                                {renderTemplate()}
-                            </div>
-                        )}
+                        {loading ? <p>Loading data...</p> : (() => {
+                            const landscapeIds = [3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 16, 17, 18];
+                            const isLandscape = landscapeIds.includes(reportTemplate.id);
+                            
+                            return (
+                                <div className={`printable-a4 ${isLandscape ? 'landscape' : ''}`} ref={componentRef}>
+                                    {renderTemplate()}
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
             </div>

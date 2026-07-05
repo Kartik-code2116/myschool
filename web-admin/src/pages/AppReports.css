@@ -203,14 +203,14 @@
 .printable-a4 {
     width: 210mm;
     min-height: 297mm;
-    padding: 15mm;
+    padding: 0; /* Let individual templates handle their own padding */
     background: #ffffff;
     color: #000000;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     font-family: Arial, sans-serif;
     box-sizing: border-box;
     position: relative;
-    overflow: hidden;
+    /* overflow removed to prevent cropping */
 }
 
 .printable-a4.landscape {
