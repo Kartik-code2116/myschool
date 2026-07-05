@@ -1,0 +1,105 @@
+.app-marks {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.marks-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.marks-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.card-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.students-sidebar h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.student-list-compact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.student-list-compact li {
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 0.2rem;
+}
+
+.student-list-compact li:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.student-list-compact li.active {
+  background: var(--primary-color);
+  color: white;
+  font-weight: bold;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.editor-header h3 {
+  margin: 0;
+}
+
+.marks-table-container {
+  overflow-x: auto;
+}
+
+.marks-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.marks-table th, .marks-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.marks-table th {
+  background: rgba(0,0,0,0.02);
+  font-weight: 600;
+}
+
+.marks-table input {
+  width: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+@media (max-width: 900px) {
+  .marks-layout {
+      grid-template-columns: 1fr;
+  }
+}

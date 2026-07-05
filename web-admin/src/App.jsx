@@ -5,11 +5,16 @@ import { auth, checkIsAdmin } from './firebase';
 import Login from './Login';
 import Dashboard from './Dashboard';
 import Layout from './components/Layout';
+import UserLayout from './components/UserLayout';
 import UsersList from './pages/UsersList';
 import UserDetail from './pages/UserDetail';
 import AdminProfile from './pages/AdminProfile';
 import LandingPage from './pages/LandingPage';
 import AppRedirect from './pages/AppRedirect';
+import AppDashboard from './pages/AppDashboard';
+import AppStudents from './pages/AppStudents';
+import AppAttendance from './pages/AppAttendance';
+import AppMarks from './pages/AppMarks';
 import Subscriptions from './pages/Subscriptions';
 import AdminRemarks from './pages/AdminRemarks';
 import AdminSubjects from './pages/AdminSubjects';
@@ -27,7 +32,7 @@ function ProtectedRoute({ children, user, loading, requireAdmin, isAdmin }) {
     return <Navigate to="/" replace />;
   }
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/app-redirect" replace />;
+    return <Navigate to="/app" replace />;
   }
   if (!requireAdmin && isAdmin) {
     return <Navigate to="/admin" replace />;
@@ -96,9 +101,21 @@ export default function App() {
         
         <Route path="/admin-login" element={
           loading ? <div className="loading">Loading...</div> :
-          user ? (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/app-redirect" replace />) :
+          user ? (isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/app" replace />) :
           <Login />
         } />
+
+        <Route path="/app" element={
+          <ProtectedRoute user={user} loading={loading} requireAdmin={false} isAdmin={isAdmin}>
+            <UserLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<AppDashboard />} />
+          <Route path="students" element={<AppStudents />} />
+          <Route path="attendance" element={<AppAttendance />} />
+          <Route path="marks" element={<AppMarks />} />
+          <Route path="settings" element={<div style={{padding:'2rem', textAlign:'center'}}>Settings Page (Coming Soon)</div>} />
+        </Route>
 
         <Route path="/app-redirect" element={
           <ProtectedRoute user={user} loading={loading} requireAdmin={false} isAdmin={isAdmin}>

@@ -1,0 +1,62 @@
+.app-attendance {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.attendance-header h2 { margin: 0; font-size: 1.5rem; }
+
+.card-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.attendance-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.attendance-controls .form-group {
+  flex: 1;
+}
+
+.attendance-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.attendance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.attendance-item .stu-info {
+  font-size: 1rem;
+}
+
+.attendance-item .input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attendance-item .input-group input {
+  width: 60px;
+  padding: 0.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  text-align: center;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
