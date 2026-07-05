@@ -17,6 +17,13 @@ import RosterGradeTableT7 from './templates/RosterGradeTableT7';
 import MarksGradeLedgerT8 from './templates/MarksGradeLedgerT8';
 import ProgressCardInnerT10 from './templates/ProgressCardInnerT10';
 import SubjectRegisterT11 from './templates/SubjectRegisterT11';
+import AnnualMarksheetT12 from './templates/AnnualMarksheetT12';
+import ResultSheetT13 from './templates/ResultSheetT13';
+import ProgressPortraitT14 from './templates/ProgressPortraitT14';
+import ProgressBookCombinedT16 from './templates/ProgressBookCombinedT16';
+import CasteGradeTableT17 from './templates/CasteGradeTableT17';
+import ProgressFirstSemT18 from './templates/ProgressFirstSemT18';
+import HPCT19 from './templates/HPCT19';
 // (More will be imported here as we build them)
 
 export default function ReportEngine({ reportTemplate, onBack }) {
@@ -115,6 +122,14 @@ export default function ReportEngine({ reportTemplate, onBack }) {
             case 9: return <ProgressCardCoverT9 {...props} />;
             case 10: return <ProgressCardInnerT10 {...props} />;
             case 11: return <SubjectRegisterT11 {...props} />;
+            case 12: return <AnnualMarksheetT12 {...props} />;
+            case 13: return <ResultSheetT13 {...props} />;
+            case 14: return <ProgressPortraitT14 {...props} />;
+            case 15: return <ProgressBookT6 {...props} />; // 15 uses same structure as 6 (CCE Alt)
+            case 16: return <ProgressBookCombinedT16 {...props} />;
+            case 17: return <CasteGradeTableT17 {...props} />;
+            case 18: return <ProgressFirstSemT18 {...props} />;
+            case 19: return <HPCT19 {...props} />;
             // Add more cases as we build them...
             default: 
                 return (
