@@ -144,7 +144,7 @@ public class HomeActivity extends BaseActivity {
         // Apply AI Agent visibility based on saved preference
         android.content.SharedPreferences settingsPrefs =
             getSharedPreferences("myschool_settings_prefs", android.content.Context.MODE_PRIVATE);
-        boolean aiEnabled = settingsPrefs.getBoolean("ai_agent_enabled", true);
+        boolean aiEnabled = settingsPrefs.getBoolean("ai_agent_enabled", false);
         updateAiNavVisibility(aiEnabled);
 
 
