@@ -8,6 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+Devanagari:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <button id="floatingCloseBtn" class="floating-close-btn" aria-label="Close Guide">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+
     <div class="background-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -28,7 +35,12 @@
     <main class="timeline">
         
         <!-- Step 1 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">01</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>१. पहिली स्टेप: वर्ग जोडणे</h2>
                 <p>सुरुवात करण्यासाठी <strong>'प्रोफाईल'</strong> टॅबवर जाऊन प्रथम तुमचे शैक्षणिक वर्ष, सत्र निवडा आणि तुमचा नवीन वर्ग व तुकडी (उदा. 5-A) तयार करा.</p>
@@ -37,9 +49,15 @@
                 <img src="assets/tut_img_step1.jpg" alt="Step 1: Class Setup">
             </div>
         </section>
+        </div>
 
         <!-- Step 2 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">02</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>२. दुसरी स्टेप: विद्यार्थी जोडणे</h2>
                 <p>विद्यार्थी यादी पेजवर जाऊन नवीन विद्यार्थ्यांची नोंदणी करा. तुम्ही एका क्लिकवर एक्सेल फाईलमधून सर्व विद्यार्थी आयात (Import) करू शकता.</p>
@@ -48,9 +66,15 @@
                 <img src="assets/tut_img_step2.jpg" alt="Step 2: Add Students">
             </div>
         </section>
+        </div>
 
         <!-- Step 3 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">03</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>३. तिसरी स्टेप: हजेरी नोंदवणे</h2>
                 <p>विद्यार्थी जोडल्यानंतर <strong>'मासिक हजेरी'</strong> स्क्रीनवर जाऊन प्रत्येक विद्यार्थ्याची दर महिन्याची हजर दिवसांची नोंद करा.</p>
@@ -59,9 +83,15 @@
                 <img src="assets/tut_img_step3.jpg" alt="Step 3: Attendance">
             </div>
         </section>
+        </div>
 
         <!-- Step 4 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">04</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>४. चौथी स्टेप: गुण भरणे (FA & SA)</h2>
                 <p>मूल्यमापन स्क्रीनवर प्रत्येक विषयाचे आकारिक (FA) आणि संकलित (SA) गुण भरा. गुण टाकण्यासाठी स्मार्ट कीबोर्डचा वापर करा.</p>
@@ -70,9 +100,15 @@
                 <img src="assets/tut_img_step4.jpg" alt="Step 4: Marks">
             </div>
         </section>
+        </div>
 
         <!-- Step 5 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">05</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>५. पाचवी स्टेप: वर्णनात्मक नोंदी</h2>
                 <p>शाळेच्या शेरे बँकेतून (Remark Bank) विद्यार्थ्यांच्या वर्तन आणि प्रगतीबाबतचे वर्णनात्मक शेरे एका क्लिकवर निवडून नोंदवा.</p>
@@ -81,9 +117,15 @@
                 <img src="assets/tut_img_step5.jpg" alt="Step 5: Remarks">
             </div>
         </section>
+        </div>
 
         <!-- Step 6 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">06</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>६. सहावी स्टेप: अहवाल आणि प्रगतीपत्रक</h2>
                 <p>सर्व माहिती भरून झाल्यावर <strong>'अहवाल (Reports)'</strong> विभागात जा. तेथे तुम्ही सेकंदात विद्यार्थ्यांचे सुंदर प्रगतीपत्रक (PDF), रजिस्टर पृष्ठे तयार करून प्रिंट करू शकता.</p>
@@ -92,9 +134,15 @@
                 <img src="assets/tut_img_step6.jpg" alt="Step 6: Reports">
             </div>
         </section>
+        </div>
 
         <!-- Step 7 -->
-        <section class="step-card hidden">
+        <div class="timeline-item hidden">
+            <div class="timeline-indicator">
+                <span class="dot"></span>
+                <span class="number">07</span>
+            </div>
+            <section class="step-card">
             <div class="step-content">
                 <h2>७. सातवी स्टेप: डेटा बॅकअप</h2>
                 <p>तुमचा मौल्यवान डेटा गमावू नये म्हणून सेटिंग्जमध्ये जाऊन नेहमी स्थानिक बॅकअप घ्या (Export Backup). नवा फोन घेतल्यास तुम्ही तो डेटा पुन्हा मिळवू शकता.</p>
@@ -103,6 +151,7 @@
                 <img src="assets/tut_img_step7.jpg" alt="Step 7: Backup">
             </div>
         </section>
+        </div>
 
         <div class="footer-button-container">
             <button id="closeBtn" class="close-btn">समजले (Got it!)</button>
@@ -126,18 +175,21 @@
         hiddenElements.forEach((el) => observer.observe(el));
 
         // Close button functionality (if opened within app WebView)
-        document.getElementById('closeBtn').addEventListener('click', () => {
+        
+        const closeApp = () => {
             if (typeof Android !== 'undefined' && Android.navigateHome) {
                 Android.navigateHome();
             } else {
-                // Depending on how it's opened, we can try to close the window
                 window.close();
-                // Or fallback to history
                 if (window.history.length > 1) {
                     window.history.back();
                 }
             }
-        });
+        };
+
+        document.getElementById('closeBtn').addEventListener('click', closeApp);
+        document.getElementById('floatingCloseBtn').addEventListener('click', closeApp);
+
     </script>
 </body>
 </html>

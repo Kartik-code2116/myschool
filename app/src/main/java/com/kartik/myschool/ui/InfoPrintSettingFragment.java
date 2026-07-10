@@ -112,12 +112,17 @@ public class InfoPrintSettingFragment extends Fragment {
         b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_profile); });
         b.btnHowToUse.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnHowToUse);
-            navigateWithAnim(R.id.nav_web_guide);
+            Bundle args = new Bundle();
+            args.putString("url", "https://edu-report.in/how-to-use");
+            args.putString("title", "?? ??? ????????");
+            navigateWithAnim(R.id.nav_web_guide, args);
         });
         b.btnOnlineHelp.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnOnlineHelp);
-            android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://kartik-28deb.web.app/myschool_overview.mp4"));
-            startActivity(browserIntent);
+            Bundle args = new Bundle();
+            args.putString("url", "https://kartik-28deb.web.app/myschool_overview.mp4");
+            args.putString("title", "??? (Help)");
+            navigateWithAnim(R.id.nav_web_guide, args);
         });
 
         setupInteractiveSwipeListener(b.cardYear, b.cardYear,
@@ -657,10 +662,14 @@ public class InfoPrintSettingFragment extends Fragment {
 
     // ── Navigation ────────────────────────────────────────────────────────────
     private void navigateWithAnim(int destId) {
+        navigateWithAnim(destId, null);
+    }
+    
+    private void navigateWithAnim(int destId, Bundle args) {
         if (getActivity() instanceof HomeActivity)
-            ((HomeActivity) getActivity()).navigateTo(destId);
+            ((HomeActivity) getActivity()).navigateTo(destId, args);
         else
-            Navigation.findNavController(requireView()).navigate(destId, null, UiAnimations.navSlideForward());
+            Navigation.findNavController(requireView()).navigate(destId, args, UiAnimations.navSlideForward());
     }
 
     private void goToClassStudents() {

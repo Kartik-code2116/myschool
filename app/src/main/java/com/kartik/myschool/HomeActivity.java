@@ -250,7 +250,7 @@ public class HomeActivity extends BaseActivity {
                         ? SessionContext.selectedClass.division : "A";
                 subtitle = getString(R.string.subtitle_progress_tracker, cls, div);
             } else if (id == R.id.nav_web_guide) {
-                title = "अॅप कसे वापरावे?";
+                title = "ॲप कसे वापरावे?";
                 subtitle = "";
             }
             updateToolbar(title, subtitle);
@@ -693,7 +693,13 @@ public class HomeActivity extends BaseActivity {
     public void navigateTo(int destId) {
         if (navController == null)
             return;
-        navController.navigate(destId, null, UiAnimations.navSlideForward());
+        navController.navigate(destId, null, com.kartik.myschool.utils.UiAnimations.navSlideForward());
+    }
+
+    public void navigateTo(int destId, android.os.Bundle args) {
+        if (navController == null)
+            return;
+        navController.navigate(destId, args, com.kartik.myschool.utils.UiAnimations.navSlideForward());
     }
 
     /** Navigate from drawer sidebar — use slide forward for consistency. */

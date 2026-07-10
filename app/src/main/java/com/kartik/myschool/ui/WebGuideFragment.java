@@ -43,7 +43,17 @@ public class WebGuideFragment extends Fragment {
         webView.setWebChromeClient(new WebChromeClient());
         
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
-        webView.loadUrl("https://edu-report.in/how-to-use");
+        String url = "https://edu-report.in/how-to-use";
+        if (getArguments() != null && getArguments().containsKey("url")) {
+            url = getArguments().getString("url");
+        }
+
+        if (url.endsWith(".mp4")) {
+            String html = "<html><body style='margin:0;padding:0;background:black;display:flex;justify-content:center;align-items:center;'><video controls autoplay width='100%' style='max-height:100vh;'><source src='" + url + "' type='video/mp4'></video></body></html>";
+            webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+        } else {
+            webView.loadUrl(url);
+        }
 
         return view;
     }
