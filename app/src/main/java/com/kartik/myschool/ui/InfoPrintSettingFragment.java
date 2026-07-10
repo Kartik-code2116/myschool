@@ -112,7 +112,7 @@ public class InfoPrintSettingFragment extends Fragment {
         b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_profile); });
         b.btnHowToUse.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnHowToUse);
-            startActivity(new Intent(requireContext(), com.kartik.myschool.AppFlowOverviewActivity.class));
+            startActivity(new Intent(requireContext(), com.kartik.myschool.WebGuideActivity.class));
             requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
         b.btnOnlineHelp.setOnClickListener(v -> {

@@ -66,7 +66,7 @@
         <activity android:name=".ProfileActivity"            android:exported="false"/>
         <activity android:name=".SubjectUpdateActivity"      android:exported="false"/>
         <activity android:name=".EnterDescriptiveActivity"   android:exported="false"/>
-        <activity android:name=".AppFlowOverviewActivity"    android:exported="false"/>
+        <activity android:name=".WebGuideActivity"           android:exported="false"/>
         <activity android:name=".ui.SubscriptionHistoryActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
         <activity android:name=".ui.SubscriptionSuccessActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
 
