@@ -112,10 +112,8 @@ public class InfoPrintSettingFragment extends Fragment {
         b.btnAllClasses.setOnClickListener(v -> { UiAnimations.pulse(b.btnAllClasses); navigateWithAnim(R.id.nav_profile); });
         b.btnHowToUse.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnHowToUse);
-            new android.app.AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.msg_how_to_use)
-                    .setMessage(getString(R.string.hint_question_mark))
-                    .setPositiveButton(android.R.string.ok, null).show();
+            startActivity(new Intent(requireContext(), com.kartik.myschool.AppFlowOverviewActivity.class));
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
         });
         b.btnOnlineHelp.setOnClickListener(v -> {
             UiAnimations.pulse(b.btnOnlineHelp);
