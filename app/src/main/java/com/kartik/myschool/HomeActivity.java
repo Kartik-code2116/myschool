@@ -249,6 +249,9 @@ public class HomeActivity extends BaseActivity {
                 String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty()) 
                         ? SessionContext.selectedClass.division : "A";
                 subtitle = getString(R.string.subtitle_progress_tracker, cls, div);
+            } else if (id == R.id.nav_web_guide) {
+                title = "अॅप कसे वापरावे?";
+                subtitle = "";
             }
             updateToolbar(title, subtitle);
             syncBottomNavSelection(id);

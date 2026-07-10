@@ -72,6 +72,46 @@ body {
     margin: 0 auto;
 }
 
+/* Scroll indicator arrow */
+.scroll-indicator {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--primary);
+    animation: fadeIn 2s ease-in-out;
+}
+
+.scroll-indicator span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.bounce-arrow {
+    width: 24px;
+    height: 24px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(10px);
+    }
+    60% {
+        transform: translateY(5px);
+    }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
 .timeline {
     max-width: 800px;
     margin: 0 auto;

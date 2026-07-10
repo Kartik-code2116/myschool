@@ -16,6 +16,13 @@
     <header class="header">
         <h1>ॲप कसे वापरावे?</h1>
         <p>खालील सोप्या स्टेप्स फॉलो करून Edu Report ॲपचा वापर सुरु करा.</p>
+        
+        <div class="scroll-indicator">
+            <span>पुढे जाण्यासाठी खाली स्क्रोल करा</span>
+            <svg class="bounce-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+        </div>
     </header>
 
     <main class="timeline">
@@ -120,11 +127,15 @@
 
         // Close button functionality (if opened within app WebView)
         document.getElementById('closeBtn').addEventListener('click', () => {
-            // Depending on how it's opened, we can try to close the window
-            window.close();
-            // Or fallback to history
-            if (window.history.length > 1) {
-                window.history.back();
+            if (typeof Android !== 'undefined' && Android.navigateHome) {
+                Android.navigateHome();
+            } else {
+                // Depending on how it's opened, we can try to close the window
+                window.close();
+                // Or fallback to history
+                if (window.history.length > 1) {
+                    window.history.back();
+                }
             }
         });
     </script>
