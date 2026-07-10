@@ -231,6 +231,7 @@
         <item name="android:windowAnimationStyle">@style/DialogAnimationZoom</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.60</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
     <style name="AttendanceEntryDialogTheme" parent="Theme.Material3.DayNight.Dialog">
@@ -242,6 +243,7 @@
         <item name="android:windowAnimationStyle">@style/DialogAnimationZoom</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.60</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
     <!-- FAB Circle Shape -->

@@ -24,6 +24,13 @@ public class AppCache {
     public static List<Semester>     cachedSemesters;
     public static List<ClassModel>   cachedClasses;
 
+    // Global sort options for students list
+    public static final int SORT_BY_ROLL_ASC = 0;
+    public static final int SORT_BY_ROLL_DESC = 1;
+    public static final int SORT_BY_NAME_ASC = 2;
+    public static final int SORT_BY_NAME_DESC = 3;
+    public static int currentSortType = SORT_BY_ROLL_ASC;
+
 
 
     /** Teacher name — cached here for zero-latency display on home & profile screens. */

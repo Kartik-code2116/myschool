@@ -93,10 +93,13 @@ public class DescriptiveEntriesFragment extends Fragment {
         }
         adapter = new DescriptiveAdapter(pool);
         b.rvDescriptiveStudents.setAdapter(adapter);
+        b.rvDescriptiveStudents.setItemViewCacheSize(10);
+        b.rvDescriptiveStudents.setHasFixedSize(true);
+        b.rvDescriptiveStudents.getRecycledViewPool().setMaxRecycledViews(0, 20);
+        b.rvDescriptiveStudents.setItemAnimator(null);
 
         // Play smooth layout enter animation
         com.kartik.myschool.utils.UiAnimations.playLayoutEnter(b.getRoot());
-        com.kartik.myschool.utils.UiAnimations.setupRecyclerAnimations(b.rvDescriptiveStudents);
     }
 
     private void setupCustomAppBar() {
@@ -190,7 +193,9 @@ public class DescriptiveEntriesFragment extends Fragment {
         if (AppCache.cachedDescriptiveStudents == null || adapter == null) return;
         Map<String, MarksRecord> marks = AppCache.cachedDescriptiveMarksMap != null ? AppCache.cachedDescriptiveMarksMap : new HashMap<>();
         if (query == null || query.trim().isEmpty()) {
-            adapter.setData(AppCache.cachedDescriptiveStudents, marks, false);
+            List<Student> sortedList = new ArrayList<>(AppCache.cachedDescriptiveStudents);
+            com.kartik.myschool.utils.StudentSortUtils.sortStudents(sortedList);
+            adapter.setData(sortedList, marks, false);
             return;
         }
         String q = query.toLowerCase().trim();
@@ -202,6 +207,7 @@ public class DescriptiveEntriesFragment extends Fragment {
                 filtered.add(s);
             }
         }
+        com.kartik.myschool.utils.StudentSortUtils.sortStudents(filtered);
         adapter.setData(filtered, marks, false);
     }
 
@@ -234,7 +240,9 @@ public class DescriptiveEntriesFragment extends Fragment {
             renderedFromCache = true;
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                 if (isAdded() && b != null) {
-                    adapter.setData(cachedList, cachedMarks, true);
+                    List<Student> sortedList = new ArrayList<>(cachedList);
+                    com.kartik.myschool.utils.StudentSortUtils.sortStudents(sortedList);
+                    adapter.setData(sortedList, cachedMarks, true);
                     if (swipeRefresh != null)
                         swipeRefresh.setRefreshing(false);
                 }
@@ -329,7 +337,9 @@ public class DescriptiveEntriesFragment extends Fragment {
             AppCache.cachedDescriptiveMarksComplete = true;
 
             if (isAdded() && b != null) {
-                adapter.setData(finalList, finalMarks, !finalRenderedFromCache);
+                List<Student> sortedList = new ArrayList<>(finalList);
+                com.kartik.myschool.utils.StudentSortUtils.sortStudents(sortedList);
+                adapter.setData(sortedList, finalMarks, !finalRenderedFromCache);
                 if (swipeRefresh != null)
                     swipeRefresh.setRefreshing(false);
             }
@@ -504,8 +514,8 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         public DescriptiveAdapter(RecyclerView.RecycledViewPool sharedPool) {
             this.viewPool = sharedPool != null ? sharedPool : new RecyclerView.RecycledViewPool();
-            this.viewPool.setMaxRecycledViews(0, 50);
-            this.viewPool.setMaxRecycledViews(1, 50);
+            this.viewPool.setMaxRecycledViews(0, 30);
+            this.viewPool.setMaxRecycledViews(1, 30);
         }
 
         public void setData(List<Student> list, Map<String, MarksRecord> map, boolean resetAnimation) {
@@ -513,6 +523,11 @@ public class DescriptiveEntriesFragment extends Fragment {
             final Map<String, MarksRecord> newMarks = new HashMap<>(map);
 
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                // Take a snapshot of old data for DiffUtil before mutating
+                final List<Student> oldStudents = new ArrayList<>(students);
+                final Map<String, MarksRecord> oldMarks = new HashMap<>(marksMap);
+
+                // Update the data first
                 this.students.clear();
                 this.students.addAll(newStudents);
                 this.marksMap.clear();
@@ -520,7 +535,33 @@ public class DescriptiveEntriesFragment extends Fragment {
                 if (resetAnimation) {
                     lastPosition[0] = -1;
                 }
-                notifyDataSetChanged();
+
+                try {
+                    androidx.recyclerview.widget.DiffUtil.DiffResult diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
+                        @Override
+                        public int getOldListSize() { return oldStudents.size(); }
+                        @Override
+                        public int getNewListSize() { return newStudents.size(); }
+                        @Override
+                        public boolean areItemsTheSame(int oldPos, int newPos) {
+                            return java.util.Objects.equals(oldStudents.get(oldPos).id, newStudents.get(newPos).id);
+                        }
+                        @Override
+                        public boolean areContentsTheSame(int oldPos, int newPos) {
+                            Student oldS = oldStudents.get(oldPos);
+                            Student newS = newStudents.get(newPos);
+                            MarksRecord oldM = oldMarks.get(oldS.id);
+                            MarksRecord newM = newMarks.get(newS.id);
+                            boolean studentSame = java.util.Objects.equals(oldS.name, newS.name) && java.util.Objects.equals(oldS.rollNo, newS.rollNo);
+                            boolean marksSame = (oldM == null && newM == null) || (oldM != null && newM != null && oldM.updatedAt == newM.updatedAt);
+                            return studentSame && marksSame;
+                        }
+                    });
+                    diffResult.dispatchUpdatesTo(this);
+                } catch (Exception e) {
+                    // Safety net: if DiffUtil crashes during scroll, fall back
+                    notifyDataSetChanged();
+                }
             });
         }
 
@@ -535,15 +576,20 @@ public class DescriptiveEntriesFragment extends Fragment {
                 AppCache.cachedDescriptiveMarksComplete = true;
             }
             AppCache.cachedDescriptiveMarksMap.put(studentId, record);
-            for (int i = 0; i < students.size(); i++) {
+            final int size = students.size();
+            for (int i = 0; i < size; i++) {
                 if (java.util.Objects.equals(studentId, students.get(i).id)) {
                     final int pos = i;
-                    new android.os.Handler(android.os.Looper.getMainLooper())
-                            .post(() -> notifyItemChanged(pos));
+                    if (b != null && b.rvDescriptiveStudents != null && !b.rvDescriptiveStudents.isComputingLayout()) {
+                        notifyItemChanged(pos);
+                    } else {
+                        new android.os.Handler(android.os.Looper.getMainLooper())
+                                .post(() -> { try { notifyItemChanged(pos); } catch (Exception ignored) {} });
+                    }
                     return;
                 }
             }
-            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> { try { notifyDataSetChanged(); } catch (Exception ignored) {} });
         }
 
         @NonNull
@@ -558,7 +604,6 @@ public class DescriptiveEntriesFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Student st = students.get(position);
             holder.bind(st, position + 1);
-            com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastPosition);
         }
 
         @Override
@@ -575,7 +620,8 @@ public class DescriptiveEntriesFragment extends Fragment {
                 this.binding = binding;
                 binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
                 binding.rvSubjectsHorizontal.setNestedScrollingEnabled(false);
-                binding.rvSubjectsHorizontal.setHasFixedSize(true);
+                binding.rvSubjectsHorizontal.setItemViewCacheSize(6);
+                binding.rvSubjectsHorizontal.setItemAnimator(null);
 
                 innerAdapter = new SubjectInnerAdapter(null, new ArrayList<>(), null, isGridViewMode, this);
                 binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
@@ -599,14 +645,24 @@ public class DescriptiveEntriesFragment extends Fragment {
                 binding.layoutSubjectsGridContainer.setVisibility(View.GONE);
                 binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);
 
-                RecyclerView.LayoutManager currentLm = binding.rvSubjectsHorizontal.getLayoutManager();
-                if (isGridViewMode) {
-                    if (!(currentLm instanceof androidx.recyclerview.widget.GridLayoutManager)) {
+                if (binding.rvSubjectsHorizontal.getLayoutManager() == null) {
+                    if (isGridViewMode) {
                         binding.rvSubjectsHorizontal.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(itemView.getContext(), 2));
+                    } else {
+                        LinearLayoutManager lm = new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false);
+                        lm.setItemPrefetchEnabled(true);
+                        lm.setInitialPrefetchItemCount(4);
+                        binding.rvSubjectsHorizontal.setLayoutManager(lm);
                     }
                 } else {
-                    if (currentLm instanceof androidx.recyclerview.widget.GridLayoutManager || currentLm == null) {
-                        binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                    RecyclerView.LayoutManager currentLm = binding.rvSubjectsHorizontal.getLayoutManager();
+                    if (isGridViewMode && !(currentLm instanceof androidx.recyclerview.widget.GridLayoutManager)) {
+                        binding.rvSubjectsHorizontal.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(itemView.getContext(), 2));
+                    } else if (!isGridViewMode && currentLm instanceof androidx.recyclerview.widget.GridLayoutManager) {
+                        LinearLayoutManager lm = new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false);
+                        lm.setItemPrefetchEnabled(true);
+                        lm.setInitialPrefetchItemCount(4);
+                        binding.rvSubjectsHorizontal.setLayoutManager(lm);
                     }
                 }
 
@@ -822,17 +878,18 @@ public class DescriptiveEntriesFragment extends Fragment {
         public boolean isGridViewMode() { return isGridViewMode; }
 
         public void updateData(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridViewMode) {
-            boolean subjectsChanged = this.subjects == null || subjects == null || !this.subjects.equals(subjects);
-            boolean studentChanged = this.student == null || student == null || !this.student.id.equals(student.id);
-            boolean marksChanged = this.marks != marks && (this.marks == null || marks == null || this.marks.updatedAt != marks.updatedAt);
-            boolean gridChanged = this.isGridViewMode != isGridViewMode;
+            boolean changed = this.student == null || student == null
+                    || !java.util.Objects.equals(this.student.id, student.id)
+                    || this.marks != marks
+                    || this.isGridViewMode != isGridViewMode
+                    || this.subjects != subjects;
 
             this.student = student;
             this.subjects = subjects;
             this.marks = marks;
             this.isGridViewMode = isGridViewMode;
 
-            if (subjectsChanged || studentChanged || marksChanged || gridChanged) {
+            if (changed) {
                 notifyDataSetChanged();
             }
         }

@@ -112,10 +112,13 @@ public class FormativeSummativeFragment extends Fragment {
         adapter = new EvaluationAdapter(pool);
         adapter.setSubscriptionStatus(currentSubscriptionStatus);
         b.rvEvaluationStudents.setAdapter(adapter);
+        b.rvEvaluationStudents.setItemViewCacheSize(10);
+        b.rvEvaluationStudents.setHasFixedSize(true);
+        b.rvEvaluationStudents.getRecycledViewPool().setMaxRecycledViews(0, 20);
+        b.rvEvaluationStudents.setItemAnimator(null);
 
         // Play smooth layout enter animation
         com.kartik.myschool.utils.UiAnimations.playLayoutEnter(b.getRoot());
-        com.kartik.myschool.utils.UiAnimations.setupRecyclerAnimations(b.rvEvaluationStudents);
     }
 
     private void updateLayoutManager() {
@@ -220,7 +223,9 @@ public class FormativeSummativeFragment extends Fragment {
         if (AppCache.cachedStudents == null || adapter == null) return;
         Map<String, MarksRecord> marks = AppCache.cachedMarksMap != null ? AppCache.cachedMarksMap : new HashMap<>();
         if (query == null || query.trim().isEmpty()) {
-            adapter.setData(AppCache.cachedStudents, marks, false);
+            List<Student> sortedList = new ArrayList<>(AppCache.cachedStudents);
+            com.kartik.myschool.utils.StudentSortUtils.sortStudents(sortedList);
+            adapter.setData(sortedList, marks, false);
             return;
         }
         String q = query.toLowerCase().trim();
@@ -232,6 +237,7 @@ public class FormativeSummativeFragment extends Fragment {
                 filtered.add(s);
             }
         }
+        com.kartik.myschool.utils.StudentSortUtils.sortStudents(filtered);
         adapter.setData(filtered, marks, false);
     }
 
@@ -292,7 +298,9 @@ public class FormativeSummativeFragment extends Fragment {
                     if (activeClass != null && activeClass.subjects != null) {
                         com.kartik.myschool.model.Subject.sortSubjects(activeClass.subjects);
                     }
-                    adapter.setData(cachedList, cachedMarks, true); // Reset animation for the first instant render
+                    List<Student> sortedList = new ArrayList<>(cachedList);
+                    com.kartik.myschool.utils.StudentSortUtils.sortStudents(sortedList);
+                    adapter.setData(sortedList, cachedMarks, true); // Reset animation for the first instant render
                 }
             }, 200);
         }
@@ -346,7 +354,9 @@ public class FormativeSummativeFragment extends Fragment {
                 }
                 
                 // If we already rendered from cache, do NOT reset the animation, so the UI doesn't visually jump/stutter.
-                adapter.setData(finalList, finalMarks, !finalRenderedFromCache);
+                List<Student> sortedList = new ArrayList<>(finalList);
+                com.kartik.myschool.utils.StudentSortUtils.sortStudents(sortedList);
+                adapter.setData(sortedList, finalMarks, !finalRenderedFromCache);
             }
         };
 
@@ -523,8 +533,8 @@ public class FormativeSummativeFragment extends Fragment {
 
         public EvaluationAdapter(RecyclerView.RecycledViewPool sharedPool) {
             this.viewPool = sharedPool != null ? sharedPool : new RecyclerView.RecycledViewPool();
-            this.viewPool.setMaxRecycledViews(0, 50);
-            this.viewPool.setMaxRecycledViews(1, 50);
+            this.viewPool.setMaxRecycledViews(0, 30);
+            this.viewPool.setMaxRecycledViews(1, 30);
         }
 
         public void setSubscriptionStatus(String status) {
@@ -536,28 +546,11 @@ public class FormativeSummativeFragment extends Fragment {
             final List<Student> newStudents = new ArrayList<>(list);
             final Map<String, MarksRecord> newMarks = new HashMap<>(map);
 
-            androidx.recyclerview.widget.DiffUtil.DiffResult diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
-                @Override
-                public int getOldListSize() { return students.size(); }
-                @Override
-                public int getNewListSize() { return newStudents.size(); }
-                @Override
-                public boolean areItemsTheSame(int oldPos, int newPos) {
-                    return java.util.Objects.equals(students.get(oldPos).id, newStudents.get(newPos).id);
-                }
-                @Override
-                public boolean areContentsTheSame(int oldPos, int newPos) {
-                    Student oldS = students.get(oldPos);
-                    Student newS = newStudents.get(newPos);
-                    MarksRecord oldM = marksMap.get(oldS.id);
-                    MarksRecord newM = newMarks.get(newS.id);
-                    
-                    boolean studentSame = java.util.Objects.equals(oldS.name, newS.name) && java.util.Objects.equals(oldS.rollNo, newS.rollNo);
-                    boolean marksSame = (oldM == null && newM == null) || (oldM != null && newM != null && oldM.updatedAt == newM.updatedAt);
-                    return studentSame && marksSame;
-                }
-            });
+            // Take a snapshot of old data for DiffUtil before mutating
+            final List<Student> oldStudents = new ArrayList<>(students);
+            final Map<String, MarksRecord> oldMarks = new HashMap<>(marksMap);
 
+            // Update the data first
             this.students.clear();
             this.students.addAll(newStudents);
             this.marksMap.clear();
@@ -565,7 +558,33 @@ public class FormativeSummativeFragment extends Fragment {
             if (resetAnimation) {
                 lastPosition[0] = -1;
             }
-            diffResult.dispatchUpdatesTo(this);
+
+            try {
+                androidx.recyclerview.widget.DiffUtil.DiffResult diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
+                    @Override
+                    public int getOldListSize() { return oldStudents.size(); }
+                    @Override
+                    public int getNewListSize() { return newStudents.size(); }
+                    @Override
+                    public boolean areItemsTheSame(int oldPos, int newPos) {
+                        return java.util.Objects.equals(oldStudents.get(oldPos).id, newStudents.get(newPos).id);
+                    }
+                    @Override
+                    public boolean areContentsTheSame(int oldPos, int newPos) {
+                        Student oldS = oldStudents.get(oldPos);
+                        Student newS = newStudents.get(newPos);
+                        MarksRecord oldM = oldMarks.get(oldS.id);
+                        MarksRecord newM = newMarks.get(newS.id);
+                        boolean studentSame = java.util.Objects.equals(oldS.name, newS.name) && java.util.Objects.equals(oldS.rollNo, newS.rollNo);
+                        boolean marksSame = (oldM == null && newM == null) || (oldM != null && newM != null && oldM.updatedAt == newM.updatedAt);
+                        return studentSame && marksSame;
+                    }
+                });
+                diffResult.dispatchUpdatesTo(this);
+            } catch (Exception e) {
+                // Safety net: if DiffUtil crashes during scroll, fall back
+                notifyDataSetChanged();
+            }
         }
 
         public void patchStudentMarks(String studentId, MarksRecord record) {
@@ -578,15 +597,20 @@ public class FormativeSummativeFragment extends Fragment {
                 AppCache.cachedSemesterIdForMarks = activeSemesterId;
             }
             AppCache.cachedMarksMap.put(studentId, record);
-            for (int i = 0; i < students.size(); i++) {
+            final int size = students.size();
+            for (int i = 0; i < size; i++) {
                 if (java.util.Objects.equals(studentId, students.get(i).id)) {
                     final int pos = i;
-                    new android.os.Handler(android.os.Looper.getMainLooper())
-                            .post(() -> notifyItemChanged(pos));
+                    if (b != null && b.rvEvaluationStudents != null && !b.rvEvaluationStudents.isComputingLayout()) {
+                        notifyItemChanged(pos);
+                    } else {
+                        new android.os.Handler(android.os.Looper.getMainLooper())
+                                .post(() -> { try { notifyItemChanged(pos); } catch (Exception ignored) {} });
+                    }
                     return;
                 }
             }
-            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> notifyDataSetChanged());
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> { try { notifyDataSetChanged(); } catch (Exception ignored) {} });
         }
 
         @NonNull
@@ -601,7 +625,6 @@ public class FormativeSummativeFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Student st = students.get(position);
             holder.bind(st, position + 1);
-            com.kartik.myschool.utils.UiAnimations.animateCardPop(holder.itemView, position, lastPosition);
         }
 
         @Override
@@ -616,9 +639,14 @@ public class FormativeSummativeFragment extends Fragment {
             public ViewHolder(ItemEvaluationStudentBlockBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
-                binding.rvSubjectsHorizontal.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+                LinearLayoutManager lm = new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false);
+                lm.setItemPrefetchEnabled(true);
+                lm.setInitialPrefetchItemCount(4);
+                binding.rvSubjectsHorizontal.setLayoutManager(lm);
                 binding.rvSubjectsHorizontal.setRecycledViewPool(viewPool);
                 binding.rvSubjectsHorizontal.setNestedScrollingEnabled(false);
+                binding.rvSubjectsHorizontal.setItemViewCacheSize(6);
+                binding.rvSubjectsHorizontal.setItemAnimator(null);
 
                 innerAdapter = new SubjectInnerAdapter(null, new ArrayList<>(), null, isGridView, this);
                 binding.rvSubjectsHorizontal.setAdapter(innerAdapter);
@@ -688,13 +716,15 @@ public class FormativeSummativeFragment extends Fragment {
                 while (binding.layoutGradeChips.getChildCount() < gradesToDisplay.size()) {
                     binding.layoutGradeChips.addView(createGradeChipBase());
                 }
-                while (binding.layoutGradeChips.getChildCount() > gradesToDisplay.size()) {
-                    binding.layoutGradeChips.removeViewAt(binding.layoutGradeChips.getChildCount() - 1);
-                }
 
                 for (int i = 0; i < gradesToDisplay.size(); i++) {
                     TextView tv = (TextView) binding.layoutGradeChips.getChildAt(i);
                     bindGradeChip(tv, gradesToDisplay.get(i));
+                    tv.setVisibility(View.VISIBLE);
+                }
+
+                for (int i = gradesToDisplay.size(); i < binding.layoutGradeChips.getChildCount(); i++) {
+                    binding.layoutGradeChips.getChildAt(i).setVisibility(View.GONE);
                 }
 
                 binding.layoutGradeChips.setVisibility(isGridView ? View.GONE : View.VISIBLE);
@@ -826,17 +856,18 @@ public class FormativeSummativeFragment extends Fragment {
         public boolean isGridView() { return isGridView; }
 
         public void updateData(Student student, List<Subject> subjects, MarksRecord marks, boolean isGridView) {
-            boolean subjectsChanged = this.subjects == null || subjects == null || !this.subjects.equals(subjects);
-            boolean studentChanged = this.student == null || student == null || !this.student.id.equals(student.id);
-            boolean marksChanged = this.marks != marks && (this.marks == null || marks == null || this.marks.updatedAt != marks.updatedAt);
-            boolean gridChanged = this.isGridView != isGridView;
+            boolean changed = this.student == null || student == null
+                    || !java.util.Objects.equals(this.student.id, student.id)
+                    || this.marks != marks
+                    || this.isGridView != isGridView
+                    || this.subjects != subjects;
 
             this.student = student;
             this.subjects = subjects;
             this.marks = marks;
             this.isGridView = isGridView;
 
-            if (subjectsChanged || studentChanged || marksChanged || gridChanged) {
+            if (changed) {
                 notifyDataSetChanged();
             }
         }

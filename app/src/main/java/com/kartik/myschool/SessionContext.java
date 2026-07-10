@@ -210,6 +210,8 @@ public final class SessionContext {
                 android.util.Log.e("SessionContext", "Error serializing AppCache", e);
             }
 
+            editor.putInt("current_sort_type", AppCache.currentSortType);
+
             editor.apply();
         });
 
@@ -362,6 +364,8 @@ public final class SessionContext {
             } catch (Exception e) {
                 android.util.Log.e("SessionContext", "Error deserializing AppCache", e);
             }
+
+        AppCache.currentSortType = prefs.getInt("current_sort_type", AppCache.SORT_BY_ROLL_ASC);
 
         syncToAppCache();
     }

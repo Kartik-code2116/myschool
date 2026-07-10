@@ -16,7 +16,8 @@ public class HelpDialogHelper {
 
     public static void showHelpDialog(Context context, String pageKey) {
         if (context == null) return;
-        boolean isMarathi = Locale.getDefault().getLanguage().equals("mr");
+        android.content.SharedPreferences prefs = context.getSharedPreferences("myschool_settings_prefs", Context.MODE_PRIVATE);
+        boolean isMarathi = prefs.getString("language", "mr").equals("mr");
 
         String title;
         String message;
