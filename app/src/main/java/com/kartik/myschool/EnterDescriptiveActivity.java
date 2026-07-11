@@ -565,7 +565,7 @@ public class EnterDescriptiveActivity extends BaseActivity {
             return;
         }
 
-        MarksRecord m = existingMarks != null ? existingMarks : new MarksRecord();
+        MarksRecord m = existingMarks != null ? existingMarks.clone() : new MarksRecord();
         m.studentId = student.id;
         m.classId = classModel.id;
         m.examName = classModel.examName;
@@ -615,6 +615,7 @@ public class EnterDescriptiveActivity extends BaseActivity {
             m.detailedMarks.put(safeKey, d);
         }
 
+        m.updatedAt = System.currentTimeMillis();
         showLoading(true);
         FirebaseRepository.get().saveMarks(m, new FirebaseRepository.OnResult<String>() {
             @Override

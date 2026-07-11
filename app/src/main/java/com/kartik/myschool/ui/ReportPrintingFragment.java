@@ -78,7 +78,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        b.tvReportPrintingYear.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSubtitle(requireContext()));
+        b.tvReportPrintingYear.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSemSubtitle(requireContext()));
         
         b.btnHelpSquare.setOnClickListener(v -> {
             com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "print_report");
@@ -1432,6 +1432,7 @@ public class ReportPrintingFragment extends Fragment {
     public void onResume() {
         super.onResume();
         com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
+        displayHeaderInfo();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             activity.showCustomToolbarActions(

@@ -618,7 +618,7 @@ public class EnterMarksActivity extends BaseActivity {
         }
         Log.d("SAVE_MARKS", "Auth OK — UID: " + currentUser.getUid());
 
-        MarksRecord m = existingMarks != null ? existingMarks : new MarksRecord();
+        MarksRecord m = existingMarks != null ? existingMarks.clone() : new MarksRecord();
         m.studentId = student.id;
         m.classId = classModel.id;
         m.examName = classModel.examName;
@@ -665,8 +665,8 @@ public class EnterMarksActivity extends BaseActivity {
             return;
         }
 
-        double total = 0;
-        int maxTotal = 0;
+        double overallObtained = 0;
+        int overallMax = 0;
         for (int i = 0; i < classModel.subjects.size() && i < marksRows.size(); i++) {
             Subject sub = classModel.subjects.get(i);
             ItemSubjectMarksRowBinding row = marksRows.get(i);
@@ -709,17 +709,18 @@ public class EnterMarksActivity extends BaseActivity {
             m.subjectMarks.put(safeKey, (double) d.grandTotal);
             m.subjectMax.put(safeKey, sub.maxMarks);
 
-            total += d.grandTotal;
-            maxTotal += sub.maxMarks;
+            overallObtained += d.grandTotal;
+            overallMax += sub.maxMarks;
         }
 
-        m.totalObtained = total;
-        m.totalMax = maxTotal;
-        m.percentage = GradeCalculator.getPercentage(total, maxTotal);
-        m.grade = GradeCalculator.getEduReportGrade(total, maxTotal);
+        m.totalObtained = overallObtained;
+        m.totalMax = overallMax;
+        m.percentage = GradeCalculator.getPercentage(overallObtained, overallMax);
+        m.grade = GradeCalculator.getEduReportGrade(overallObtained, overallMax);
         m.result = GradeCalculator.getResult(m.percentage);
+        m.updatedAt = System.currentTimeMillis();
 
-        Log.d("SAVE_MARKS", "totalObtained: " + total + " / " + maxTotal
+        Log.d("SAVE_MARKS", "totalObtained: " + overallObtained + " / " + overallMax
                 + " | %: " + m.percentage + " | grade: " + m.grade);
         Log.d("SAVE_MARKS", "Calling FirebaseRepository.saveMarks() now...");
 

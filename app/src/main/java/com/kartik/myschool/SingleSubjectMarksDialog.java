@@ -317,7 +317,7 @@ public class SingleSubjectMarksDialog extends DialogFragment {
             return;
         }
 
-        MarksRecord m = existingMarks != null ? existingMarks : new MarksRecord();
+        MarksRecord m = existingMarks != null ? existingMarks.clone() : new MarksRecord();
         m.studentId = student.id;
         m.classId = classModel.id;
         m.examName = classModel.examName;
@@ -404,6 +404,7 @@ public class SingleSubjectMarksDialog extends DialogFragment {
         m.percentage = GradeCalculator.getPercentage(overallObtained, overallMax);
         m.grade = GradeCalculator.getEduReportGrade(overallObtained, overallMax);
         m.result = GradeCalculator.getResult(m.percentage);
+        m.updatedAt = System.currentTimeMillis();
 
         showLoading(true);
         FirebaseRepository.get().saveMarks(m, new FirebaseRepository.OnResult<String>() {

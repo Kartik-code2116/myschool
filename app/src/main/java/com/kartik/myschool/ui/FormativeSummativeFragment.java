@@ -428,6 +428,9 @@ public class FormativeSummativeFragment extends Fragment {
         boolean semesterChanged = !java.util.Objects.equals(activeSemesterId, lastLoadedSemesterId);
 
         if (isFirstLoad || classChanged || semesterChanged) {
+            if (adapter != null) {
+                adapter.setData(new ArrayList<>(), new HashMap<>(), false);
+            }
             b.swipeRefreshLayout.setVisibility(View.GONE);
             b.shimmerViewContainer.setVisibility(View.VISIBLE);
             b.shimmerViewContainer.startShimmer();

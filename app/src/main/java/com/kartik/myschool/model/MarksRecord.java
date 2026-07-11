@@ -68,4 +68,51 @@ public class MarksRecord {
                   .replace("~", "_")
                   .replace("*", "_");
     }
+
+    public MarksRecord clone() {
+        MarksRecord m = new MarksRecord();
+        m.id = this.id;
+        m.studentId = this.studentId;
+        m.classId = this.classId;
+        m.teacherId = this.teacherId;
+        m.examName = this.examName;
+        m.subjectMarks.putAll(this.subjectMarks);
+        m.subjectMax.putAll(this.subjectMax);
+        m.totalObtained = this.totalObtained;
+        m.totalMax = this.totalMax;
+        m.percentage = this.percentage;
+        m.grade = this.grade;
+        m.result = this.result;
+        m.editedBy = this.editedBy;
+        m.updatedAt = this.updatedAt;
+        m.presentDays = this.presentDays;
+        m.totalDays = this.totalDays;
+        m.semesterId = this.semesterId;
+        m.semesterNumber = this.semesterNumber;
+        for (Map.Entry<String, SubjectMarksDetail> e : this.detailedMarks.entrySet()) {
+            SubjectMarksDetail d = new SubjectMarksDetail();
+            SubjectMarksDetail old = e.getValue();
+            if (old != null) {
+                d.nirikhshan = old.nirikhshan;
+                d.tondiKam = old.tondiKam;
+                d.pratyakshik = old.pratyakshik;
+                d.upkram = old.upkram;
+                d.prakalp = old.prakalp;
+                d.chachani = old.chachani;
+                d.swadhyay = old.swadhyay;
+                d.itar = old.itar;
+                d.akarikTotal = old.akarikTotal;
+                d.tondi = old.tondi;
+                d.pratyakshikB = old.pratyakshikB;
+                d.lekhi = old.lekhi;
+                d.sanklit = old.sanklit;
+                d.grandTotal = old.grandTotal;
+                d.maxMarks = old.maxMarks;
+                d.grade = old.grade;
+                d.remark = old.remark;
+            }
+            m.detailedMarks.put(e.getKey(), d);
+        }
+        return m;
+    }
 }

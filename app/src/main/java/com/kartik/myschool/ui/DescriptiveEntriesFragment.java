@@ -415,6 +415,12 @@ public class DescriptiveEntriesFragment extends Fragment {
         boolean semesterChanged = !java.util.Objects.equals(activeSemesterId, lastLoadedSemesterId);
 
         if (isFirstLoad || classChanged || semesterChanged) {
+            if (adapter != null) {
+                adapter.setData(new ArrayList<>(), new HashMap<>(), false);
+            }
+            if (swipeRefresh != null) {
+                swipeRefresh.setRefreshing(true);
+            }
             loadDescriptiveData();
         }
     }
