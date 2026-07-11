@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, doc, getDoc, query, updateDoc, where } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, updateDoc, where, writeBatch, deleteDoc } from 'firebase/firestore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../firebase';
 import './UserDetail.css';
@@ -74,6 +74,9 @@ export default function UserDetail() {
   const [selectedScreenshot, setSelectedScreenshot] = useState(null);
   const [selectedClassId, setSelectedClassId] = useState('all');
   const [schoolsMap, setSchoolsMap] = useState({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -190,6 +193,65 @@ export default function UserDetail() {
       subscriptionExpiry: expiry.toISOString().slice(0, 10),
       adminNote: "Admin Gift you this subscription",
     });
+  };
+
+  const executeDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') {
+      alert('Please type DELETE to confirm.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const collectionsToDelete = ['classes', 'students', 'subscriptions', 'schools', 'marks', 'attendance'];
+      for (const collName of collectionsToDelete) {
+        const q = query(collection(db, collName), where('teacherId', '==', id));
+        const snap = await getDocs(q);
+        
+        let batch = writeBatch(db);
+        let count = 0;
+        for (const docSnap of snap.docs) {
+          batch.delete(docSnap.ref);
+          count++;
+          if (count === 490) {
+            await batch.commit();
+            batch = writeBatch(db);
+            count = 0;
+          }
+        }
+        if (count > 0) {
+          await batch.commit();
+        }
+      }
+
+      // Delete transfer requests
+      const trQuery = query(collection(db, 'transfer_requests'), where('fromTeacherId', '==', id));
+      const trSnap = await getDocs(trQuery);
+      let trBatch = writeBatch(db);
+      let trCount = 0;
+      for (const docSnap of trSnap.docs) {
+        trBatch.delete(docSnap.ref);
+        trCount++;
+        if (trCount === 490) {
+          await trBatch.commit();
+          trBatch = writeBatch(db);
+          trCount = 0;
+        }
+      }
+      if (trCount > 0) {
+        await trBatch.commit();
+      }
+
+      // Finally delete the teacher document
+      await deleteDoc(doc(db, 'teachers', id));
+      
+      alert('Account and all associated data deleted successfully.');
+      navigate('/admin/users');
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Error deleting account: ' + err.message);
+      setDeleting(false);
+      setShowDeleteModal(false);
+    }
   };
 
   const filteredStudents = selectedClassId === 'all'
@@ -335,6 +397,9 @@ export default function UserDetail() {
           {saveMessage && <span className={saveMessage.startsWith('Failed') ? 'save-error' : 'save-success'}>{saveMessage}</span>}
           <button className="btn btn-primary" onClick={() => saveUser()} disabled={saving} type="button">
             {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+          <button className="btn btn-danger" onClick={() => setShowDeleteModal(true)} disabled={saving} type="button" style={{ marginLeft: '10px' }}>
+            Delete Account
           </button>
         </div>
       </div>
@@ -487,6 +552,62 @@ export default function UserDetail() {
             </div>
             <div className="modal-footer">
               <button className="btn" onClick={() => setSelectedScreenshot(null)} type="button">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="modal-overlay animate-fade-in" onClick={() => setShowDeleteModal(false)}>
+          <div className="glass-panel modal-content" style={{ maxWidth: '500px' }} onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="label" style={{ color: '#ff4d4d' }}>Danger Zone</span>
+                <h2 style={{ color: '#ff4d4d' }}>Permanently Delete Account</h2>
+              </div>
+              <button className="close-btn" onClick={() => setShowDeleteModal(false)} type="button" disabled={deleting}>x</button>
+            </div>
+            <div className="modal-body">
+              <p>You are about to <strong>permanently delete</strong> this teacher account and ALL of their associated data, including:</p>
+              <ul style={{ margin: '15px 0 15px 20px', lineHeight: '1.6' }}>
+                <li>{students.length} Students</li>
+                <li>{classes.length} Classes</li>
+                <li>All Marks & Attendance records</li>
+                <li>School configurations</li>
+                <li>Subscription history</li>
+              </ul>
+              <p style={{ color: '#ff4d4d', fontWeight: 'bold' }}>This action CANNOT be undone.</p>
+              
+              <div style={{ marginTop: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem' }}>Type <strong>DELETE</strong> to confirm:</label>
+                <input 
+                  type="text" 
+                  value={deleteConfirmText} 
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="DELETE"
+                  disabled={deleting}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 77, 77, 0.5)',
+                    background: 'var(--background-color)',
+                    color: 'var(--text-primary)',
+                    textTransform: 'uppercase'
+                  }}
+                />
+              </div>
+            </div>
+            <div className="modal-footer" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button className="btn" onClick={() => setShowDeleteModal(false)} type="button" disabled={deleting}>Cancel</button>
+              <button 
+                className="btn btn-danger" 
+                onClick={executeDeleteAccount} 
+                type="button" 
+                disabled={deleting || deleteConfirmText !== 'DELETE'}
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete Everything'}
+              </button>
             </div>
           </div>
         </div>

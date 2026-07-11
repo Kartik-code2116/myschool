@@ -720,6 +720,28 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void deleteStudents(List<String> studentIds, OnResult<Void> cb) {
+        if (studentIds == null || studentIds.isEmpty()) {
+            cb.onError(new IllegalArgumentException("Student IDs cannot be null or empty"));
+            return;
+        }
+        com.google.firebase.firestore.WriteBatch batch = db.batch();
+        for (String id : studentIds) {
+            batch.delete(db.collection(COL_STUDENTS).document(id));
+        }
+        batch.commit()
+                .addOnSuccessListener(v -> {
+                    cachedStudentsForTeacher = null; // Invalidate
+                    cacheTimestamps.remove("students_teacher");
+                    cachedStudentsForClassMap.clear(); // Invalidate
+                    java.util.Iterator<String> it = cacheTimestamps.keySet().iterator();
+                    while (it.hasNext()) {
+                        if (it.next().startsWith("students_class_")) it.remove();
+                    }
+                    cb.onSuccess(null);
+                })
+                .addOnFailureListener(cb::onError);
+    }
 
     // Bug #3 fix: removed .orderBy("rollNo") to avoid requiring a composite Firestore index.
     // Sorting is now done in memory, consistent with other methods.

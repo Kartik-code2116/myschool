@@ -275,16 +275,16 @@
         app:iconTint="?attr/colorSurface"
         app:elevation="4dp"/>
 
-    <!-- FAB: Confirm Transfer -->
+    <!-- FAB: Multi-Select Actions -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabConfirmTransfer"
+        android:id="@+id/fabMultiActions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="24dp"
-        android:text="Confirm Transfer"
-        app:icon="@drawable/ic_send"
+        android:text="Actions"
+        app:icon="@drawable/ic_more_vert"
         app:backgroundTint="@color/warning"
         android:textColor="?attr/colorSurface"
         app:iconTint="?attr/colorSurface"

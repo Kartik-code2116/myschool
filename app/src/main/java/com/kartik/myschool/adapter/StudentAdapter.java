@@ -22,6 +22,8 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
 
     public interface OnStudentClick {
         void onClick(View view, Student student, int position);
+        void onLongClick(View view, Student student, int position);
+        void onSelectionChanged(int count);
         void onEnterMarksClick(Student student, int position);
         void onAttendanceClick(Student student, int position);
         void onEditInfoClick(Student student, int position);
@@ -53,6 +55,19 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             selectedStudentIds.add(studentId);
         }
         notifyDataSetChanged();
+        if (listener != null) {
+            listener.onSelectionChanged(selectedStudentIds.size());
+        }
+    }
+
+    public void selectAll() {
+        for (Student s : items) {
+            if (s.id != null) selectedStudentIds.add(s.id);
+        }
+        notifyDataSetChanged();
+        if (listener != null) {
+            listener.onSelectionChanged(selectedStudentIds.size());
+        }
     }
 
     public List<String> getSelectedStudentIds() {
@@ -132,6 +147,14 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             } else {
                 if (listener != null) listener.onClick(v, s, pos);
             }
+        });
+
+        h.itemView.setOnLongClickListener(v -> {
+            if (!isMultiSelectMode) {
+                if (listener != null) listener.onLongClick(v, s, pos);
+                return true;
+            }
+            return false;
         });
 
         h.btnOptions.setOnClickListener(v -> {

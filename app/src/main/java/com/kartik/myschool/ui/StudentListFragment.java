@@ -157,7 +157,7 @@ public class StudentListFragment extends Fragment {
                 }
                 return true;
             } else if (itemId == 6) {
-                startTransferMode();
+                startMultiSelectMode(null);
                 return true;
             } else if (itemId == 7) {
                 showImportTransferCodeDialog();
@@ -168,19 +168,27 @@ public class StudentListFragment extends Fragment {
         popup.show();
     }
 
-    private void startTransferMode() {
+    private void startMultiSelectMode(String initialSelectionId) {
         if (SessionContext.selectedClass == null) {
             android.widget.Toast.makeText(requireContext(), "Please select a class first.", android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
         if (filteredStudents.isEmpty()) {
-            android.widget.Toast.makeText(requireContext(), "No students to transfer.", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(requireContext(), "No students available.", android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
         studentAdapter.setMultiSelectMode(true);
+        if (initialSelectionId != null) {
+            studentAdapter.toggleSelection(initialSelectionId);
+        }
         b.fabAddStudent.setVisibility(View.GONE);
-        b.fabConfirmTransfer.setVisibility(View.VISIBLE);
-        android.widget.Toast.makeText(requireContext(), "Select students to transfer", android.widget.Toast.LENGTH_LONG).show();
+        b.fabMultiActions.setVisibility(View.VISIBLE);
+        updateMultiActionsFabText();
+    }
+
+    private void updateMultiActionsFabText() {
+        int count = studentAdapter.getSelectedStudentIds().size();
+        b.fabMultiActions.setText("Actions (" + count + ")");
     }
 
     private void showImportTransferCodeDialog() {
@@ -246,8 +254,21 @@ public class StudentListFragment extends Fragment {
                             return;
                         }
                         
-                        // Perform batch update
-                        com.google.firebase.firestore.WriteBatch batch = com.google.firebase.firestore.FirebaseFirestore.getInstance().batch();
+                        FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
+                            @Override
+                            public void onSuccess(List<Student> students) {
+                                int currentCount = students != null ? students.size() : 0;
+                                if (currentCount + req.studentIds.size() > 2000) {
+                                    b.shimmerViewContainer.stopShimmer();
+                                    b.shimmerViewContainer.setVisibility(View.GONE);
+                                    android.widget.Toast.makeText(requireContext(), 
+                                        "Account capacity exceeded. You can only add " + (2000 - currentCount) + " more students.", 
+                                        android.widget.Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                
+                                // Perform batch update
+                                com.google.firebase.firestore.WriteBatch batch = com.google.firebase.firestore.FirebaseFirestore.getInstance().batch();
                         
                         for (String sId : req.studentIds) {
                             com.google.firebase.firestore.DocumentReference studentRef = 
@@ -278,6 +299,15 @@ public class StudentListFragment extends Fragment {
                             b.shimmerViewContainer.stopShimmer();
                             b.shimmerViewContainer.setVisibility(View.GONE);
                             android.widget.Toast.makeText(requireContext(), "Failed to import students: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                        });
+                            }
+                            
+                            @Override
+                            public void onError(Exception e) {
+                                b.shimmerViewContainer.stopShimmer();
+                                b.shimmerViewContainer.setVisibility(View.GONE);
+                                android.widget.Toast.makeText(requireContext(), "Failed to check capacity.", android.widget.Toast.LENGTH_SHORT).show();
+                            }
                         });
                     }
                     @Override
@@ -370,6 +400,19 @@ public class StudentListFragment extends Fragment {
                     startActivity(intent, options.toBundle());
                 } else {
                     startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onLongClick(View view, Student student, int position) {
+                startMultiSelectMode(student.id);
+            }
+
+            @Override
+            public void onSelectionChanged(int count) {
+                b.fabMultiActions.setText("Actions (" + count + ")");
+                if (count == 0) {
+                    exitMultiSelectMode();
                 }
             }
 
@@ -532,83 +575,151 @@ public class StudentListFragment extends Fragment {
             });
         });
         
-        b.fabConfirmTransfer.setOnClickListener(v -> {
+        b.fabMultiActions.setOnClickListener(v -> {
             List<String> selected = studentAdapter.getSelectedStudentIds();
             if (selected.isEmpty()) {
                 android.widget.Toast.makeText(requireContext(), "No students selected", android.widget.Toast.LENGTH_SHORT).show();
-                
-                // Cancel mode
-                studentAdapter.setMultiSelectMode(false);
-                b.fabConfirmTransfer.setVisibility(View.GONE);
-                b.fabAddStudent.setVisibility(View.VISIBLE);
+                exitMultiSelectMode();
                 return;
             }
-            
-            b.fabConfirmTransfer.setEnabled(false);
-            
-            FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
-                @Override
-                public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
-                    if (teacher == null) return;
-                    
-                    String code = String.format(java.util.Locale.US, "%06d", new java.util.Random().nextInt(999999));
-                    
-                    com.kartik.myschool.model.TransferRequest req = new com.kartik.myschool.model.TransferRequest();
-                    req.id = java.util.UUID.randomUUID().toString();
-                    req.fromTeacherId = teacher.id;
-                    req.transferCode = code;
-                    req.studentIds = selected;
-                    req.createdAt = System.currentTimeMillis();
-                    req.isClaimed = false;
-                    
-                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                        .collection("transfer_requests")
-                        .document(req.id)
-                        .set(req)
-                        .addOnSuccessListener(aVoid -> {
-                            if (getActivity() == null) return;
-                            b.fabConfirmTransfer.setEnabled(true);
-                            studentAdapter.setMultiSelectMode(false);
-                            b.fabConfirmTransfer.setVisibility(View.GONE);
-                            b.fabAddStudent.setVisibility(View.VISIBLE);
-                            
-                            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                                .setTitle("Transfer Code Generated!")
-                                .setMessage("Share this 6-digit code with the new teacher:\n\n" + code + "\n\nThey can use the 'Import via Transfer Code' option to claim these " + selected.size() + " students.")
-                                .setPositiveButton("OK", null)
-                                .setCancelable(false)
-                                .show();
-                        })
-                        .addOnFailureListener(e -> {
-                            if (getActivity() == null) return;
-                            b.fabConfirmTransfer.setEnabled(true);
-                            android.widget.Toast.makeText(requireContext(), "Failed to generate code", android.widget.Toast.LENGTH_SHORT).show();
-                        });
+
+            android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);
+            popup.getMenu().add(0, 5, 0, "Select All");
+            popup.getMenu().add(0, 1, 1, "Export Selected");
+            popup.getMenu().add(0, 2, 2, "Transfer Selected");
+            popup.getMenu().add(0, 3, 3, "Delete Selected");
+            popup.getMenu().add(0, 4, 4, "Cancel Selection");
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == 5) {
+                    studentAdapter.selectAll();
+                } else if (item.getItemId() == 1) {
+                    exportStudentsToExcel();
+                } else if (item.getItemId() == 2) {
+                    executeTransferSelected();
+                } else if (item.getItemId() == 3) {
+                    executeDeleteSelected();
+                } else if (item.getItemId() == 4) {
+                    exitMultiSelectMode();
                 }
-                @Override
-                public void onError(Exception e) {
-                    b.fabConfirmTransfer.setEnabled(true);
-                }
+                return true;
             });
+            popup.show();
         });
     }
 
-    private void openAddStudent() {
-        AppCache.selectedStudent = new Student();
-        android.content.Intent intent = new android.content.Intent(requireContext(), StudentEditActivity.class)
-                .putExtra("new_student", true);
+    private void exitMultiSelectMode() {
+        studentAdapter.setMultiSelectMode(false);
+        b.fabMultiActions.setVisibility(View.GONE);
+        b.fabAddStudent.setVisibility(View.VISIBLE);
+    }
 
-        if (b != null && b.fabAddStudent != null && getActivity() != null) {
-            androidx.core.app.ActivityOptionsCompat options = androidx.core.app.ActivityOptionsCompat.makeScaleUpAnimation(
-                    b.fabAddStudent,
-                    b.fabAddStudent.getWidth() / 2,
-                    b.fabAddStudent.getHeight() / 2,
-                    0,
-                    0);
-            startActivity(intent, options.toBundle());
-        } else {
-            startActivity(intent);
+    private void executeDeleteSelected() {
+        List<String> selected = studentAdapter.getSelectedStudentIds();
+        if (selected.isEmpty()) return;
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Delete Selected")
+                .setMessage("Are you sure you want to delete " + selected.size() + " students?")
+                .setPositiveButton("Delete", (d, w) -> {
+                    b.shimmerViewContainer.setVisibility(View.VISIBLE);
+                    b.shimmerViewContainer.startShimmer();
+                    
+                    FirebaseRepository.get().deleteStudents(selected, new FirebaseRepository.OnResult<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            exitMultiSelectMode();
+                            android.widget.Toast.makeText(requireContext(), selected.size() + " students deleted.", android.widget.Toast.LENGTH_SHORT).show();
+                            applySessionFilterIfAny();
+                        }
+                        
+                        @Override
+                        public void onError(Exception e) {
+                            b.shimmerViewContainer.stopShimmer();
+                            b.shimmerViewContainer.setVisibility(View.GONE);
+                            android.widget.Toast.makeText(requireContext(), "Delete failed.", android.widget.Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void executeTransferSelected() {
+        List<String> selected = studentAdapter.getSelectedStudentIds();
+        if (selected.isEmpty()) return;
+        b.fabMultiActions.setEnabled(false);
+        
+        String uid = FirebaseRepository.get().currentUid();
+        if (uid == null) {
+            b.fabMultiActions.setEnabled(true);
+            android.widget.Toast.makeText(requireContext(), "User not authenticated.", android.widget.Toast.LENGTH_SHORT).show();
+            return;
         }
+        
+        String code = String.format(java.util.Locale.US, "%06d", new java.util.Random().nextInt(999999));
+        
+        com.kartik.myschool.model.TransferRequest req = new com.kartik.myschool.model.TransferRequest();
+        req.id = java.util.UUID.randomUUID().toString();
+        req.fromTeacherId = uid;
+        req.transferCode = code;
+        req.studentIds = selected;
+        req.createdAt = System.currentTimeMillis();
+        req.isClaimed = false;
+        
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("transfer_requests")
+            .document(req.id)
+            .set(req)
+            .addOnSuccessListener(aVoid -> {
+                if (getActivity() == null) return;
+                b.fabMultiActions.setEnabled(true);
+                exitMultiSelectMode();
+                
+                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Transfer Code Generated!")
+                    .setMessage("Share this 6-digit code with the new teacher:\n\n" + code + "\n\nThey can use the 'Import via Transfer Code' option to claim these " + selected.size() + " students.")
+                    .setPositiveButton("OK", null)
+                    .setCancelable(false)
+                    .show();
+            })
+            .addOnFailureListener(e -> {
+                if (getActivity() == null) return;
+                b.fabMultiActions.setEnabled(true);
+                android.widget.Toast.makeText(requireContext(), "Failed to generate code", android.widget.Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    private void openAddStudent() {
+        FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
+            @Override
+            public void onSuccess(List<Student> students) {
+                if (students != null && students.size() >= 2000) {
+                    android.widget.Toast.makeText(requireContext(), "You have reached the maximum account capacity of 2000 students.", android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
+                AppCache.selectedStudent = new Student();
+                android.content.Intent intent = new android.content.Intent(requireContext(), StudentEditActivity.class)
+                        .putExtra("new_student", true);
+
+                if (b != null && b.fabAddStudent != null && getActivity() != null) {
+                    androidx.core.app.ActivityOptionsCompat options = androidx.core.app.ActivityOptionsCompat.makeScaleUpAnimation(
+                            b.fabAddStudent,
+                            b.fabAddStudent.getWidth() / 2,
+                            b.fabAddStudent.getHeight() / 2,
+                            0,
+                            0);
+                    startActivity(intent, options.toBundle());
+                } else {
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                android.widget.Toast.makeText(requireContext(), "Failed to check student capacity.", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadAllStudents() {
@@ -879,12 +990,29 @@ public class StudentListFragment extends Fragment {
             return;
         }
 
+        List<Student> toExport = new ArrayList<>();
+        if (studentAdapter != null && studentAdapter.isMultiSelectMode()) {
+            List<String> selectedIds = studentAdapter.getSelectedStudentIds();
+            for (Student s : filteredStudents) {
+                if (selectedIds.contains(s.id)) {
+                    toExport.add(s);
+                }
+            }
+        } else {
+            toExport.addAll(filteredStudents);
+        }
+
+        if (toExport.isEmpty()) {
+            android.widget.Toast.makeText(requireContext(), "No students selected for export.", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         try {
             StringBuilder sb = new StringBuilder();
             sb.append(
                     "Student Name,Standard,Division,Roll No 1,Roll No 2,Gender,Caste,Registration No,Date of Birth,Birth Place,Religion,Blood Group,Mother's Name,Mother's Occupation,Mother's Phone,Father's Name,Father's Occupation,Father's Phone,Address,Bank Name,Account No,Branch,IFSC,Bank UID,Medium,Mother Tongue,Date of Admission,Student Id,UID,Height Sem 1,Weight Sem 1,Height Sem 2,Weight Sem 2\n");
 
-            for (Student s : filteredStudents) {
+            for (Student s : toExport) {
                 sb.append(escapeCsv(s.name != null ? s.name : "")).append(",")
                         .append(escapeCsv(s.standard != null ? s.standard : "")).append(",")
                         .append(escapeCsv(s.division != null ? s.division : "")).append(",")
@@ -1006,14 +1134,31 @@ public class StudentListFragment extends Fragment {
                 return;
             }
 
+            if (count > 500) {
+                android.widget.Toast.makeText(requireContext(), "File is too large. Maximum 500 students can be imported at once.", android.widget.Toast.LENGTH_LONG).show();
+                return;
+            }
+
             FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
                 @Override
                 public void onSuccess(com.kartik.myschool.model.Teacher teacher) {
-                    if (teacher != null && !"active".equals(teacher.subscriptionStatus)) {
-                        FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
-                            @Override
-                            public void onSuccess(List<Student> students) {
-                                int currentCount = students != null ? students.size() : 0;
+                    FirebaseRepository.get().getAllStudentsForTeacher(new FirebaseRepository.OnResult<List<Student>>() {
+                        @Override
+                        public void onSuccess(List<Student> students) {
+                            int currentCount = students != null ? students.size() : 0;
+                            
+                            if (currentCount + count > 2000) {
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(() -> {
+                                        android.widget.Toast.makeText(requireContext(),
+                                                "Account capacity exceeded. A single account can hold a maximum of 2000 students. You can add " + (2000 - currentCount) + " more.",
+                                                android.widget.Toast.LENGTH_LONG).show();
+                                    });
+                                }
+                                return;
+                            }
+
+                            if (teacher != null && !"active".equals(teacher.subscriptionStatus)) {
                                 if (currentCount + count > 3) {
                                     if (getActivity() != null) {
                                         getActivity().runOnUiThread(() -> {
@@ -1027,16 +1172,16 @@ public class StudentListFragment extends Fragment {
                                 } else {
                                     proceedWithImport(rows, count, headerMap);
                                 }
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
+                            } else {
                                 proceedWithImport(rows, count, headerMap);
                             }
-                        });
-                    } else {
-                        proceedWithImport(rows, count, headerMap);
-                    }
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            proceedWithImport(rows, count, headerMap);
+                        }
+                    });
                 }
 
                 @Override
