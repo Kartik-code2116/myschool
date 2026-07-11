@@ -338,62 +338,80 @@ public class LoginActivity extends BaseActivity {
         repo.getTeacher(new FirebaseRepository.OnResult<Teacher>() {
             @Override
             public void onSuccess(Teacher t) {
-                if (t != null) {
+                showLoading(false);
+                // Check if teacher profile exists AND is complete (has phone number filled)
+                if (t != null && t.phone != null && !t.phone.trim().isEmpty()) {
+                    // Profile exists and is complete — go to Home
                     SessionContext.clear(LoginActivity.this);
-                    showLoading(false);
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                     finishAffinity();
                 } else {
-                    // Direct sign-up: create the profile immediately
-                    Teacher newTeacher = new Teacher();
-                    newTeacher.id = uid;
-                    newTeacher.email = email;
-                    newTeacher.name = name != null ? name : "Teacher";
-                    newTeacher.phone = ""; // Phone not provided by Google
-                    
-                    SessionContext.clear(LoginActivity.this);
-                    repo.saveTeacher(newTeacher, new FirebaseRepository.OnResult<Void>() {
-                        @Override
-                        public void onSuccess(Void v) {
-                            SessionContext.clear(LoginActivity.this);
-                            showLoading(false);
-                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                            finishAffinity();
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            showLoading(false);
-                            showError("Database Error", "Failed to create profile: " + e.getMessage());
-                        }
-                    });
+                    // Profile missing or incomplete — go to CompleteProfileActivity
+                    Intent intent = new Intent(LoginActivity.this, CompleteProfileActivity.class);
+                    intent.putExtra("googleEmail", email);
+                    intent.putExtra("googleName", name);
+                    startActivity(intent);
+                    finishAffinity();
                 }
             }
 
             @Override
             public void onError(Exception e) {
                 showLoading(false);
-                showError("Database Error", "Failed to check profile: " + e.getMessage());
+                // Even on error, let them complete their profile
+                Intent intent = new Intent(LoginActivity.this, CompleteProfileActivity.class);
+                intent.putExtra("googleEmail", email);
+                intent.putExtra("googleName", name);
+                startActivity(intent);
+                finishAffinity();
             }
         });
     }
 
     private void sendReset() {
-        String email = str(b.etEmail);
-        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            b.tilEmail.setError("Enter a valid email address first");
-            return;
+        String currentEmail = str(b.etEmail);
+
+        android.widget.EditText emailInput = new android.widget.EditText(this);
+        emailInput.setHint("Enter your email address");
+        emailInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        if (!TextUtils.isEmpty(currentEmail)) {
+            emailInput.setText(currentEmail);
+            emailInput.setSelection(currentEmail.length());
         }
-        showLoading(true);
-        auth.sendPasswordResetEmail(email)
-                .addOnSuccessListener(v -> {
-                    showLoading(false);
-                    showError("Reset Email Sent", "A password reset link has been sent to:\n" + email);
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        int margin = (int) (24 * getResources().getDisplayMetrics().density);
+        params.setMargins(margin, margin / 2, margin, margin / 2);
+        emailInput.setLayoutParams(params);
+        container.addView(emailInput);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Reset Password")
+                .setMessage("Enter the email address associated with your account to receive a password reset link.")
+                .setView(container)
+                .setPositiveButton("Send", (dialog, which) -> {
+                    String email = emailInput.getText().toString().trim();
+                    if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        Toast.makeText(LoginActivity.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    showLoading(true);
+                    auth.sendPasswordResetEmail(email)
+                            .addOnSuccessListener(v -> {
+                                showLoading(false);
+                                showError("Reset Email Sent", "A password reset link has been sent to:\n" + email);
+                            })
+                            .addOnFailureListener(e -> {
+                                showLoading(false);
+                                showError("Reset Failed", getFriendlyLoginError(e));
+                            });
                 })
-                .addOnFailureListener(e -> {
-                    showLoading(false);
-                    showError("Reset Failed", getFriendlyLoginError(e));
-                });
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void showLoading(boolean show) {

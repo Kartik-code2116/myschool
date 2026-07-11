@@ -42,31 +42,31 @@
             </FrameLayout>
 
             <TextView
-                android:id="@+id/tvRegisterTitle"
+                android:id="@+id/tvCompleteTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="@string/register_title"
+                android:text="Almost There!"
                 android:textColor="?attr/colorSurface"
                 android:textSize="24sp"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.02"/>
 
             <TextView
-                android:id="@+id/tvRegisterSubtitle"
+                android:id="@+id/tvCompleteSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="@string/register_subtitle"
+                android:text="Complete your profile to get started"
                 android:textColor="?attr/colorSurface"
                 android:textSize="13sp"
                 android:alpha="0.85"
                 android:letterSpacing="0.01"/>
         </LinearLayout>
 
-        <!-- Register Input Form Card -->
+        <!-- Profile Completion Form Card -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardRegisterForm"
+            android:id="@+id/cardCompleteForm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -84,6 +84,18 @@
                 android:orientation="vertical"
                 android:padding="26dp">
 
+                <!-- Welcome message with Google email -->
+                <TextView
+                    android:id="@+id/tvWelcomeEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="Signed in as: email@gmail.com"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:fontFamily="sans-serif-medium"/>
+
                 <!-- Full Name Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilFullName"
@@ -100,7 +112,7 @@
                     app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-        android:maxLength="100"
+                        android:maxLength="100"
                         android:id="@+id/etFullName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -139,7 +151,7 @@
                         android:textSize="16sp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- School Name Input (Optional) -->
+                <!-- School Name Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilSchoolName"
                     style="@style/Widget.EduReport.TextInputLayout"
@@ -166,7 +178,7 @@
                         android:textSize="16sp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- UDISE Code Input (Optional) -->
+                <!-- UDISE Code Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilUdiseCode"
                     style="@style/Widget.EduReport.TextInputLayout"
@@ -187,115 +199,27 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:imeOptions="actionNext"
-                        android:singleLine="true"
-                        android:textColor="@color/on_surface"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Email Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilRegEmail"
-                    style="@style/Widget.EduReport.TextInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:hint="@string/label_email"
-                    app:startIconDrawable="@drawable/ic_person"
-                    app:startIconTint="@color/primary"
-                    app:boxCornerRadiusTopStart="16dp"
-                    app:boxCornerRadiusTopEnd="16dp"
-                    app:boxCornerRadiusBottomStart="16dp"
-                    app:boxCornerRadiusBottomEnd="16dp"
-                    app:errorEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-        android:maxLength="100"
-                        android:id="@+id/etRegEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:imeOptions="actionNext"
-                        android:singleLine="true"
-                        android:textColor="@color/on_surface"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Password Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilRegPassword"
-                    style="@style/Widget.EduReport.TextInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:hint="@string/label_password"
-                    app:startIconDrawable="@drawable/ic_edit"
-                    app:startIconTint="@color/primary"
-                    app:endIconMode="password_toggle"
-                    app:endIconTint="@color/on_surface_variant"
-                    app:boxCornerRadiusTopStart="16dp"
-                    app:boxCornerRadiusTopEnd="16dp"
-                    app:boxCornerRadiusBottomStart="16dp"
-                    app:boxCornerRadiusBottomEnd="16dp"
-                    app:errorEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-        android:maxLength="128"
-                        android:id="@+id/etRegPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:imeOptions="actionNext"
-                        android:singleLine="true"
-                        android:textColor="@color/on_surface"
-                        android:textSize="16sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Confirm Password Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilConfirmPassword"
-                    style="@style/Widget.EduReport.TextInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:hint="@string/label_confirm_password"
-                    app:startIconDrawable="@drawable/ic_edit"
-                    app:startIconTint="@color/primary"
-                    app:endIconMode="password_toggle"
-                    app:endIconTint="@color/on_surface_variant"
-                    app:boxCornerRadiusTopStart="16dp"
-                    app:boxCornerRadiusTopEnd="16dp"
-                    app:boxCornerRadiusBottomStart="16dp"
-                    app:boxCornerRadiusBottomEnd="16dp"
-                    app:errorEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-        android:maxLength="128"
-                        android:id="@+id/etConfirmPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
                         android:imeOptions="actionDone"
                         android:singleLine="true"
                         android:textColor="@color/on_surface"
                         android:textSize="16sp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Register Button -->
+                <!-- Complete Profile Button -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRegister"
+                    android:id="@+id/btnCompleteProfile"
                     style="@style/Widget.EduReport.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@string/btn_register"
+                    android:text="Complete Profile"
                     android:fontFamily="sans-serif-medium"
                     app:backgroundTint="@color/primary"
                     android:elevation="4dp"/>
 
                 <!-- Progress Indicator -->
                 <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/registerProgress"
+                    android:id="@+id/completeProgress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -304,80 +228,20 @@
                     app:indicatorColor="@color/primary"
                     app:trackColor="@color/primary_container"/>
 
-                <!-- Or Divider -->
-                <LinearLayout
-                    android:id="@+id/layoutOrDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="@color/outline_variant"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:text="@string/txt_or"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.05"/>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="@color/outline_variant"/>
-                </LinearLayout>
-
-                <!-- Google Sign-Up Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGoogle"
-                    style="@style/Widget.EduReport.Button.Outlined"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Sign up with Google"
-                    android:textColor="@color/on_surface"
-                    android:fontFamily="sans-serif-medium"
-                    app:strokeColor="@color/outline"
-                    app:strokeWidth="1.5dp"/>
-
-                <!-- Redirect Login Link -->
-                <TextView
-                    android:id="@+id/tvLoginLink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/link_have_account"
-                    android:textColor="@color/primary"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
-
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="8dp"
                     android:orientation="horizontal">
-                    
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="By continuing, you agree to our "
                         android:textColor="@color/on_surface_variant"
                         android:textSize="12sp" />
-                        
+
                     <TextView
                         android:id="@+id/tvPrivacyPolicy"
                         android:layout_width="wrap_content"

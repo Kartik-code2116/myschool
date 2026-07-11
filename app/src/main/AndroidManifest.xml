@@ -53,6 +53,7 @@
 
         <activity android:name=".LoginActivity"              android:exported="false"/>
         <activity android:name=".RegisterActivity"           android:exported="false"/>
+        <activity android:name=".CompleteProfileActivity"    android:exported="false"/>
         <activity android:name=".HomeActivity"               android:exported="false"/>
         <activity android:name=".ClassSetupActivity"         android:exported="false"/>
         <activity android:name=".SchoolRegisterActivity"     android:exported="false"/>

@@ -18,12 +18,23 @@ import com.kartik.myschool.repository.FirebaseRepository;
 import com.kartik.myschool.utils.UiAnimations;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.GoogleAuthProvider;
+
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.credentials.CredentialManagerCallback;
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 
 public class RegisterActivity extends BaseActivity {
 
     private ActivityRegisterBinding b;
     private FirebaseAuth auth;
     private final FirebaseRepository repo = FirebaseRepository.get();
+    private CredentialManager credentialManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +42,7 @@ public class RegisterActivity extends BaseActivity {
         b = ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         auth = FirebaseAuth.getInstance();
+        credentialManager = CredentialManager.create(this);
 
         // Diagnostic: confirm which Firebase project is connected
         if (com.kartik.myschool.BuildConfig.DEBUG) { Log.d("AUTH", "Firebase Auth initialized. App name: " +
@@ -97,6 +109,17 @@ public class RegisterActivity extends BaseActivity {
             UiAnimations.pulse(b.btnRegister);
             doRegister();
         });
+
+        b.btnGoogle.setOnClickListener(v -> {
+            UiAnimations.pulse(b.btnGoogle);
+            doGoogleSignIn();
+        });
+
+        // Hide Google button if already coming from Google Sign-In flow
+        if (isGoogleSignIn) {
+            b.btnGoogle.setVisibility(View.GONE);
+            b.layoutOrDivider.setVisibility(View.GONE);
+        }
 
         b.tvLoginLink.setOnClickListener(v -> {
             UiAnimations.pulse(b.tvLoginLink);
@@ -331,6 +354,104 @@ public class RegisterActivity extends BaseActivity {
 
     private String str(com.google.android.material.textfield.TextInputEditText et) {
         return et.getText() != null ? et.getText().toString().trim() : "";
+    }
+
+    // ========== Google Sign-In ==========
+
+    private void doGoogleSignIn() {
+        showLoading(true);
+        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(getString(R.string.default_web_client_id))
+                .setAutoSelectEnabled(true)
+                .build();
+
+        GetCredentialRequest request = new GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build();
+
+        credentialManager.getCredentialAsync(
+                this,
+                request,
+                new android.os.CancellationSignal(),
+                Runnable::run,
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse result) {
+                        handleGoogleSignInResult(result);
+                    }
+
+                    @Override
+                    public void onError(GetCredentialException e) {
+                        showLoading(false);
+                        if (!e.getType().equals(androidx.credentials.exceptions.GetCredentialCancellationException.TYPE_GET_CREDENTIAL_CANCELLATION_EXCEPTION)) {
+                            showError("Google Sign-Up", e.getMessage());
+                        }
+                    }
+                }
+        );
+    }
+
+    private void handleGoogleSignInResult(GetCredentialResponse result) {
+        androidx.credentials.Credential credential = result.getCredential();
+        if (credential instanceof CustomCredential &&
+                ((CustomCredential) credential).getType().equals(GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL)) {
+            try {
+                GoogleIdTokenCredential googleIdTokenCredential = GoogleIdTokenCredential.createFrom(((CustomCredential) credential).getData());
+                String idToken = googleIdTokenCredential.getIdToken();
+
+                com.google.firebase.auth.AuthCredential authCredential = GoogleAuthProvider.getCredential(idToken, null);
+                auth.signInWithCredential(authCredential)
+                        .addOnSuccessListener(authResult -> {
+                            String uid = authResult.getUser().getUid();
+                            String email = authResult.getUser().getEmail();
+                            String name = authResult.getUser().getDisplayName();
+                            checkIfTeacherExists(uid, email, name);
+                        })
+                        .addOnFailureListener(e -> {
+                            showLoading(false);
+                            showError("Firebase Auth Failed", e.getMessage());
+                        });
+            } catch (Exception e) {
+                showLoading(false);
+                showError("Google Sign-Up", "Failed to parse Google ID token: " + e.getMessage());
+            }
+        } else {
+            showLoading(false);
+            showError("Google Sign-Up", "Unexpected credential type");
+        }
+    }
+
+    private void checkIfTeacherExists(String uid, String email, String name) {
+        repo.getTeacher(new FirebaseRepository.OnResult<Teacher>() {
+            @Override
+            public void onSuccess(Teacher t) {
+                showLoading(false);
+                if (t != null && t.phone != null && !t.phone.trim().isEmpty()) {
+                    // Profile already complete — go to Home
+                    SessionContext.clear(RegisterActivity.this);
+                    startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                    finishAffinity();
+                } else {
+                    // Profile missing or incomplete — go to CompleteProfileActivity
+                    Intent intent = new Intent(RegisterActivity.this, CompleteProfileActivity.class);
+                    intent.putExtra("googleEmail", email);
+                    intent.putExtra("googleName", name);
+                    startActivity(intent);
+                    finishAffinity();
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                showLoading(false);
+                Intent intent = new Intent(RegisterActivity.this, CompleteProfileActivity.class);
+                intent.putExtra("googleEmail", email);
+                intent.putExtra("googleName", name);
+                startActivity(intent);
+                finishAffinity();
+            }
+        });
     }
 
     @Override
