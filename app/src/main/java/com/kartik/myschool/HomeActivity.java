@@ -177,11 +177,7 @@ public class HomeActivity extends BaseActivity {
                 subtitle = "";
             } else if (id == R.id.nav_attendance) {
                 title = getString(R.string.menu_attendance);
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty())
-                        ? SessionContext.selectedClass.className : "1";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty()) 
-                        ? SessionContext.selectedClass.division : "-";
-                subtitle = "Class: " + cls + "-" + div;
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_students) {
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_class_div) {
@@ -234,21 +230,13 @@ public class HomeActivity extends BaseActivity {
                 subtitle = SessionContext.getClassDivLabel();
             } else if (id == R.id.nav_print_report) {
                 title = "Report Printing";
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty())
-                        ? SessionContext.selectedClass.className : "1";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty()) 
-                        ? SessionContext.selectedClass.division : "A";
-                subtitle = "Class: " + cls + "-" + div;
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_settings) {
                 title = getString(R.string.drawer_settings);
                 subtitle = "App Settings & Configurations";
             } else if (id == R.id.nav_dashboard) {
                 title = getString(R.string.title_stats_dashboard);
-                String cls = (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null && !SessionContext.selectedClass.className.trim().isEmpty())
-                        ? SessionContext.selectedClass.className : "1";
-                String div = (SessionContext.selectedClass != null && SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.trim().isEmpty()) 
-                        ? SessionContext.selectedClass.division : "A";
-                subtitle = getString(R.string.subtitle_progress_tracker, cls, div);
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_web_guide) {
                 title = "ॲप कसे वापरावे?";
                 subtitle = "";

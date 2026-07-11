@@ -44,6 +44,22 @@ public final class SessionContext {
         if (AppCache.selectedClass != null) selectedClass = AppCache.selectedClass;
     }
 
+    public static synchronized String getClassDivSemSubtitle() {
+        if (selectedClass == null) return "Class: -";
+        String base = getClassDivSubtitle();
+        if (selectedSemester != null && selectedSemester.number > 0) {
+            return base + " | Sem: " + selectedSemester.number;
+        }
+        return base;
+    }
+
+    public static synchronized String getClassDivSubtitle() {
+        if (selectedClass == null) return "Class: -";
+        String cls = (selectedClass.className != null && !selectedClass.className.trim().isEmpty()) ? selectedClass.className : "1";
+        String div = (selectedClass.division != null && !selectedClass.division.trim().isEmpty()) ? selectedClass.division : "-";
+        return "Class: " + cls + "-" + div;
+    }
+
     public static synchronized void syncToAppCache() {
         AppCache.selectedSchool = selectedSchool;
         AppCache.selectedClass = selectedClass;

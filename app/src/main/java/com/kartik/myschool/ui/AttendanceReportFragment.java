@@ -70,14 +70,7 @@ public class AttendanceReportFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        String classVal = "5";
-        String divVal = "1";
-        if (SessionContext.selectedClass != null) {
-            classVal = SessionContext.selectedClass.className != null ? SessionContext.selectedClass.className : "5";
-            divVal = SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty() 
-                    ? SessionContext.selectedClass.division : "-";
-        }
-        b.tvReportContext.setText("Year: " + yearLabel + " | Class: " + classVal + "-" + divVal);
+        b.tvReportContext.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSubtitle());
     }
 
     private void loadData() {

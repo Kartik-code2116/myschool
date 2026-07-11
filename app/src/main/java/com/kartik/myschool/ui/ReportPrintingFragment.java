@@ -78,8 +78,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        String classLabel = SessionContext.selectedClass != null ? SessionContext.selectedClass.getDisplayName() : "None";
-        b.tvReportPrintingYear.setText("Year: " + yearLabel + " | Class: " + classLabel);
+        b.tvReportPrintingYear.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSubtitle());
         
         b.btnHelpSquare.setOnClickListener(v -> {
             com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "print_report");
@@ -99,6 +98,16 @@ public class ReportPrintingFragment extends Fragment {
             public void onSuccess(List<Student> list) {
                 if (list != null) {
                     studentsList = list;
+                    java.util.Collections.sort(studentsList, new java.util.Comparator<Student>() {
+                        @Override
+                        public int compare(Student s1, Student s2) {
+                            int r1 = 0;
+                            int r2 = 0;
+                            try { r1 = Integer.parseInt(s1.rollNo); } catch (Exception ignored) {}
+                            try { r2 = Integer.parseInt(s2.rollNo); } catch (Exception ignored) {}
+                            return Integer.compare(r1, r2);
+                        }
+                    });
                 }
             }
             @Override

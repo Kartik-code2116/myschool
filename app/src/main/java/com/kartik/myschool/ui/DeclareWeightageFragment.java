@@ -60,15 +60,7 @@ public class DeclareWeightageFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        String classVal = "5";
-        String divVal = "1";
-        if (activeClass != null) {
-            classVal = activeClass.className != null ? activeClass.className : "5";
-            divVal = activeClass.division != null && !activeClass.division.isEmpty()
-                    ? activeClass.division
-                    : "-";
-        }
-        b.tvWeightageHeaderContext.setText("Year: " + yearLabel + " | Class: " + classVal + "-" + divVal);
+        b.tvWeightageHeaderContext.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSubtitle());
     }
 
     private void loadActiveSubjects() {
