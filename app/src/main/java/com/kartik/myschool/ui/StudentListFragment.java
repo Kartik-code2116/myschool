@@ -360,9 +360,20 @@ public class StudentListFragment extends Fragment {
         studentAdapter = new StudentAdapter();
         studentAdapter.setListener(new StudentAdapter.OnStudentClick() {
             @Override
-            public void onClick(Student student, int position) {
+            public void onClick(View view, Student student, int position) {
                 AppCache.selectedStudent = student;
-                startActivity(new Intent(requireContext(), StudentProfileActivity.class));
+                android.content.Intent intent = new android.content.Intent(requireContext(), StudentProfileActivity.class);
+                if (getActivity() != null && view != null) {
+                    androidx.core.app.ActivityOptionsCompat options = androidx.core.app.ActivityOptionsCompat.makeScaleUpAnimation(
+                            view,
+                            view.getWidth() / 2,
+                            view.getHeight() / 2,
+                            0,
+                            0);
+                    startActivity(intent, options.toBundle());
+                } else {
+                    startActivity(intent);
+                }
             }
 
             @Override

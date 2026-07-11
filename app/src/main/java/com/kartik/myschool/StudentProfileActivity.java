@@ -33,6 +33,11 @@ public class StudentProfileActivity extends BaseActivity {
     private static final int REQ_CODE_GALLERY = 1002;
 
     @Override
+    public void finish() {
+        super.finish();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         SessionContext.load(this);
         super.onCreate(savedInstanceState); com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().log("Screen opened: " + this.getClass().getSimpleName());
@@ -42,7 +47,6 @@ public class StudentProfileActivity extends BaseActivity {
         setSupportActionBar(b.toolbar);
         b.toolbar.setNavigationOnClickListener(v -> {
             finish();
-            overridePendingTransition(R.anim.fade_in, R.anim.slide_out_right);
         });
 
         student = AppCache.selectedStudent;

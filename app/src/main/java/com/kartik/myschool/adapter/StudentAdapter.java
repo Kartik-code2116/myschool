@@ -21,7 +21,7 @@ import java.util.List;
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
 
     public interface OnStudentClick {
-        void onClick(Student student, int position);
+        void onClick(View view, Student student, int position);
         void onEnterMarksClick(Student student, int position);
         void onAttendanceClick(Student student, int position);
         void onEditInfoClick(Student student, int position);
@@ -130,7 +130,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.VH> {
             if (isMultiSelectMode) {
                 toggleSelection(s.id);
             } else {
-                if (listener != null) listener.onClick(s, pos);
+                if (listener != null) listener.onClick(v, s, pos);
             }
         });
 
