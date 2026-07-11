@@ -139,9 +139,8 @@ public class DescriptiveEntriesFragment extends Fragment {
     }
 
     private void setupHeaderStrip() {
-        String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         b.tvHeaderStripInfo
-                .setText("Year: " + yr + " | " + SessionContext.getClassDivSemSubtitle());
+                .setText(SessionContext.getClassDivSemSubtitle());
 
         // Set initial icon (show grid icon when in slide mode, show list/bullet icon
         // when in grid mode)

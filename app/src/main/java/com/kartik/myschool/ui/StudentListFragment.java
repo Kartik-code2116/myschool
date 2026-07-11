@@ -84,6 +84,10 @@ public class StudentListFragment extends Fragment {
     }
 
     private void setupCustomToolbar() {
+        if (b.tvCustomSubtitle != null) {
+            b.tvCustomSubtitle.setText(SessionContext.getClassDivSemSubtitle());
+        }
+
         if (b.btnCustomMenu != null) {
             b.btnCustomMenu.setOnClickListener(v -> {
                 if (getActivity() instanceof HomeActivity) {

@@ -179,55 +179,55 @@ public class HomeActivity extends BaseActivity {
                 title = getString(R.string.menu_attendance);
                 subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_students) {
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_class_div) {
                 subtitle = getString(R.string.subtitle_class_div);
             } else if (id == R.id.nav_reports) {
                 subtitle = getString(R.string.nav_reports);
             } else if (id == R.id.nav_info_print) {
                 title = getString(R.string.nav_home);
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_profile) {
                 subtitle = getString(R.string.profile_subtitle);
             } else if (id == R.id.nav_subjects) {
                 title = "Subject";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_weightage) {
                 title = getString(R.string.menu_declare_weightage);
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_dropdown) {
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_school_info) {
                 title = "School Information";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_gender) {
                 title = "Gender";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_cast_category) {
                 title = "Cast Category";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_class_teacher) {
                 title = "Class Teacher";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_classes) {
                 title = "Classes";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_subject) {
                 boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
                 title = isMr ? "विषय" : "Subject";
                 subtitle = isMr ? "शाळास्तर सर्व विषयांची यादी" : "School level list of all subjects";
             } else if (id == R.id.nav_default_values) {
                 title = "Default Values";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_working_days) {
                 title = "Working Days";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_he_she_items) {
                 title = "He/She Items";
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_extra) {
                 title = getString(R.string.menu_extra_menus);
-                subtitle = SessionContext.getClassDivLabel();
+                subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_print_report) {
                 title = "Report Printing";
                 subtitle = SessionContext.getClassDivSemSubtitle();

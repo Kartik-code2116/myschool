@@ -116,9 +116,8 @@ public class SubjectsFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        String classDiv = SessionContext.getClassDivLabel();
         boolean isEn = com.kartik.myschool.utils.pdf.PdfLocalizer.isEnglish(getContext());
-        b.tvHeaderLabel.setText((isEn ? "Year: " : "वर्ष: ") + yearLabel + "   " + classDiv);
+        b.tvHeaderLabel.setText((isEn ? "Year: " : "वर्ष: ") + yearLabel + " | " + SessionContext.getClassDivSemSubtitle());
     }
 
     private void loadSubjects() {
