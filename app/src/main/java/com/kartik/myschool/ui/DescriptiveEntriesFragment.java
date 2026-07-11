@@ -419,10 +419,6 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-            View activityAppBar = activity.findViewById(R.id.appBarLayout);
-            if (activityAppBar != null)
-                activityAppBar.setVisibility(View.GONE);
-
             View navHost = activity.findViewById(R.id.navHostFragment);
             if (navHost != null && navHost
                     .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {

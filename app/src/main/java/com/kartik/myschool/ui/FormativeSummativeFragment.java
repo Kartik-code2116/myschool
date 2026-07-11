@@ -427,9 +427,6 @@ public class FormativeSummativeFragment extends Fragment {
 
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-            View activityAppBar = activity.findViewById(R.id.appBarLayout);
-            if (activityAppBar != null)
-                activityAppBar.setVisibility(View.GONE);
 
             View navHost = activity.findViewById(R.id.navHostFragment);
             if (navHost != null && navHost
@@ -489,10 +486,6 @@ public class FormativeSummativeFragment extends Fragment {
         super.onDestroyView();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-            View activityAppBar = activity.findViewById(R.id.appBarLayout);
-            if (activityAppBar != null) {
-                activityAppBar.setVisibility(View.VISIBLE);
-            }
 
             // Restore CoordinatorLayout scrolling behavior:
             View navHost = activity.findViewById(R.id.navHostFragment);

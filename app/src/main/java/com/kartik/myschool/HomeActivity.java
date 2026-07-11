@@ -169,8 +169,17 @@ public class HomeActivity extends BaseActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination == null)
                 return;
-            b.appBarLayout.setVisibility(View.VISIBLE);
             int id = destination.getId();
+            
+            // Hide main toolbar for fragments that have their own complete custom toolbars
+            if (id == R.id.nav_formative || id == R.id.nav_descriptive) {
+                b.appBarLayout.setVisibility(View.GONE);
+                if (getSupportActionBar() != null) getSupportActionBar().hide();
+            } else {
+                b.appBarLayout.setVisibility(View.VISIBLE);
+                if (getSupportActionBar() != null) getSupportActionBar().show();
+            }
+
             String title = destination.getLabel() != null ? destination.getLabel().toString() : "";
             String subtitle = getString(R.string.subtitle_info_print);
             if (id == R.id.nav_edit_attendance) {
