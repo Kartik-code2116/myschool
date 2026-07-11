@@ -117,24 +117,6 @@
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Large section header with gray background -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorSurfaceVariant"
-            android:padding="16dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvHeaderSessionInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_year_2026_27_class_1_div_1"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
-                android:fontFamily="sans-serif-black"
-                android:textStyle="bold"/>
-        </LinearLayout>
 
         <!-- Search + filter bar -->
         <com.google.android.material.card.MaterialCardView

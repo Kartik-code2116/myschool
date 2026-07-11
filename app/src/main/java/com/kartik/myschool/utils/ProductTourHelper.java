@@ -208,7 +208,7 @@ public class ProductTourHelper {
                         m ? "👨‍🎓 विद्यार्थी यादी" : "👨‍🎓 Student List",
                         m ? "वर्गातील सर्व विद्यार्थी येथे दिसतात. शोध, आयात, निर्यात व जोडणी करा."
                           : "All students in the class are listed here. Search, import, export and add."));
-                s.add(new TourStep(R.id.tvHeaderSessionInfo,
+                s.add(new TourStep(R.id.tvCustomSubtitle,
                         m ? "१. सत्र माहिती" : "1. Session Info",
                         m ? "कोणत्या वर्षाची व वर्गाची यादी पाहत आहात ते येथे दिसते."
                           : "Shows which year and class student list you are viewing."));

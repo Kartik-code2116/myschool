@@ -87,9 +87,6 @@ public class StudentListFragment extends Fragment {
         if (b.tvCustomSubtitle != null) {
             b.tvCustomSubtitle.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         }
-        if (b.tvHeaderSessionInfo != null) {
-            b.tvHeaderSessionInfo.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
-        }
 
         if (b.btnCustomMenu != null) {
             b.btnCustomMenu.setOnClickListener(v -> {
@@ -839,9 +836,6 @@ public class StudentListFragment extends Fragment {
             b.tvCustomSubtitle.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         }
 
-        if (b.tvHeaderSessionInfo != null) {
-            b.tvHeaderSessionInfo.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
-        }
 
         if (SessionContext.selectedClass != null) {
             applySessionFilterIfAny();

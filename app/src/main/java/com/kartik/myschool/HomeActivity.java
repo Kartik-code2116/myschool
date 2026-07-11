@@ -169,6 +169,7 @@ public class HomeActivity extends BaseActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination == null)
                 return;
+            b.appBarLayout.setVisibility(View.VISIBLE);
             int id = destination.getId();
             String title = destination.getLabel() != null ? destination.getLabel().toString() : "";
             String subtitle = getString(R.string.subtitle_info_print);
@@ -186,7 +187,7 @@ public class HomeActivity extends BaseActivity {
                 subtitle = getString(R.string.nav_reports);
             } else if (id == R.id.nav_info_print) {
                 title = getString(R.string.nav_home);
-                subtitle = SessionContext.getClassDivSemSubtitle();
+                subtitle = SessionContext.getClassDivSemSubtitle(this);
             } else if (id == R.id.nav_profile) {
                 subtitle = getString(R.string.profile_subtitle);
             } else if (id == R.id.nav_subjects) {
@@ -282,7 +283,8 @@ public class HomeActivity extends BaseActivity {
         vm.getTeacher().observe(this, t -> {
             if (t != null && t.name != null) {
                 AppCache.cachedTeacherName = t.name;
-                b.tvToolbarSubtitle.setText(t.name);
+                String firstName = t.name.split(" ")[0];
+                b.tvToolbarSubtitle.setText(firstName);
             }
         });
         vm.loadTeacher();

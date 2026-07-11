@@ -456,7 +456,7 @@
     <string name="txt_evaluation">मूल्यमापन</string>
     <string name="str_empty_13">कोणतेही विद्यार्थी आढळले नाही</string>
     <string name="txt_myschool_1_0">वार्षिक मूल्यमापन 1.0</string>
-    <string name="txt_kartik_thorat">Kartik Thorat</string>
+    <string name="txt_kartik_thorat">Kartik</string>
     <string name="welcome_back_name">स्वागत आहे,\n%1$s</string>
     <string name="txt_myschool">वार्षिक मूल्यमापन</string>
     <string name="txt_smart_school_management">स्मार्ट शाळा व्यवस्थापन</string>
@@ -549,7 +549,7 @@
     <string name="str_empty_39">मार्च</string>
     <string name="str_empty_40">एप्रिल</string>
     <string name="str_empty_41">मे</string>
-    <string name="txt_kartik">कार्तिक थोरात</string>
+    <string name="txt_kartik">कार्तिक</string>
     <string name="txt_roll_1_1">रोल १ : १</string>
     <string name="txt_roll_2_1">रोल २ : १</string>
     <string name="txt_dob_25_05_2012">DOB - 25-05-2012</string>
