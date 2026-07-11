@@ -75,7 +75,7 @@ public class FormativeSummativeFragment extends Fragment {
             activeSemesterNumber = SessionContext.selectedSemester.number > 0 ? SessionContext.selectedSemester.number : 1;
         }
 
-        setupCustomAppBar();
+
         setupHeaderStrip();
 
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
@@ -121,48 +121,13 @@ public class FormativeSummativeFragment extends Fragment {
         com.kartik.myschool.utils.UiAnimations.playLayoutEnter(b.getRoot());
     }
 
+
+
     private void updateLayoutManager() {
         b.rvEvaluationStudents.setLayoutManager(new LinearLayoutManager(requireContext()));
     }
-
-    private void setupCustomAppBar() {
-        // Drawer Menu Button Click
-        b.btnDrawerMenu.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).openDrawer();
-            }
-        });
-
-        // 3-Dot Toolbar Menu
-        b.btnThreeDotMenu.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).showHomeMoreMenu(v);
-            }
-        });
-
-        // Subtitle dynamic binding
-        b.tvAppSubtitle
-                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
-
-        // Outlined button click actions
-        b.btnHelpSquare.setOnClickListener(
-                v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(),
-                        "formative_summative"));
-        b.btnAddSquare.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
-            }
-        });
-        b.btnCalcSquare.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_evaluation_report);
-            }
-        });
-    }
-
     private void setupHeaderStrip() {
-        b.tvAppSubtitle
-                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
+
         String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         b.tvHeaderStripInfo
                 .setText("Year: " + yr + " | " + SessionContext.getClassDivSemSubtitle(requireContext()));
@@ -398,6 +363,12 @@ public class FormativeSummativeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity activity = (HomeActivity) getActivity();
+            activity.getToolbarHelpButton().setOnClickListener(v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "formative_summative"));
+            activity.getToolbarAddButton().setOnClickListener(v -> activity.navigateTo(R.id.nav_students));
+            activity.getToolbarCalcButton().setOnClickListener(v -> activity.navigateTo(R.id.nav_evaluation_report));
+        }
         com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         if (SessionContext.selectedClass != null) {
@@ -422,22 +393,10 @@ public class FormativeSummativeFragment extends Fragment {
             activeSemesterNumber = 1;
         }
 
-        setupCustomAppBar();
         setupHeaderStrip();
 
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-
-            View navHost = activity.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost
-                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
-                        .getLayoutParams();
-                params.setBehavior(null);
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
         }
 
         // FIX: If marks were just saved in EnterMarksActivity:
@@ -482,23 +441,19 @@ public class FormativeSummativeFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-
-            // Restore CoordinatorLayout scrolling behavior:
-            View navHost = activity.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost
-                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
-                        .getLayoutParams();
-                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
+            activity.getToolbarHelpButton().setOnClickListener(null);
+            activity.getToolbarAddButton().setOnClickListener(null);
+            activity.getToolbarCalcButton().setOnClickListener(null);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
         b = null;
     }
 

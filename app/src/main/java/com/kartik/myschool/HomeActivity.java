@@ -171,14 +171,8 @@ public class HomeActivity extends BaseActivity {
                 return;
             int id = destination.getId();
             
-            // Hide main toolbar for fragments that have their own complete custom toolbars
-            if (id == R.id.nav_formative || id == R.id.nav_descriptive) {
-                b.appBarLayout.setVisibility(View.GONE);
-                if (getSupportActionBar() != null) getSupportActionBar().hide();
-            } else {
-                b.appBarLayout.setVisibility(View.VISIBLE);
-                if (getSupportActionBar() != null) getSupportActionBar().show();
-            }
+            // The main toolbar is now visible for all fragments.
+            b.appBarLayout.setVisibility(View.VISIBLE);
 
             String title = destination.getLabel() != null ? destination.getLabel().toString() : "";
             String subtitle = getString(R.string.subtitle_info_print);
@@ -189,6 +183,12 @@ public class HomeActivity extends BaseActivity {
                 title = getString(R.string.menu_attendance);
                 subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_students) {
+                subtitle = SessionContext.getClassDivSemSubtitle();
+            } else if (id == R.id.nav_formative) {
+                title = getString(R.string.menu_formative_summative);
+                subtitle = SessionContext.getClassDivSemSubtitle();
+            } else if (id == R.id.nav_descriptive) {
+                title = getString(R.string.txt_descriptive_entries);
                 subtitle = SessionContext.getClassDivSemSubtitle();
             } else if (id == R.id.nav_class_div) {
                 subtitle = getString(R.string.subtitle_class_div);
@@ -252,9 +252,17 @@ public class HomeActivity extends BaseActivity {
                 subtitle = "";
             }
             updateToolbar(title, subtitle);
+
+            // Adjust title text size for Descriptive Entries page
+            if (id == R.id.nav_descriptive) {
+                b.tvToolbarTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
+            } else {
+                b.tvToolbarTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 20);
+            }
+
             syncBottomNavSelection(id);
 
-            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_school_info || id == R.id.nav_weightage || id == R.id.nav_extra || id == R.id.nav_attendance) {
+            if (id == R.id.nav_info_print || id == R.id.nav_profile || id == R.id.nav_school_info || id == R.id.nav_weightage || id == R.id.nav_extra || id == R.id.nav_attendance || id == R.id.nav_formative || id == R.id.nav_descriptive) {
                 b.btnToolbarMore.setVisibility(View.VISIBLE);
             } else {
                 b.btnToolbarMore.setVisibility(View.GONE);
@@ -278,6 +286,10 @@ public class HomeActivity extends BaseActivity {
 
             if (id == R.id.nav_attendance) {
                 title = "उपस्थिती";
+                b.btnToolbarAdd.setVisibility(View.VISIBLE);
+                b.btnToolbarCalc.setVisibility(View.VISIBLE);
+                b.ivProfilePic.setVisibility(View.GONE);
+            } else if (id == R.id.nav_formative || id == R.id.nav_descriptive) {
                 b.btnToolbarAdd.setVisibility(View.VISIBLE);
                 b.btnToolbarCalc.setVisibility(View.VISIBLE);
                 b.ivProfilePic.setVisibility(View.GONE);
@@ -852,5 +864,21 @@ public class HomeActivity extends BaseActivity {
         // Recreate activity to force reinflating components with new resource locale
         // bundle
         recreate();
+    }
+
+    public android.widget.ImageButton getToolbarAddButton() {
+        return b.btnToolbarAdd;
+    }
+
+    public android.widget.ImageButton getToolbarCalcButton() {
+        return b.btnToolbarCalc;
+    }
+
+    public android.widget.ImageButton getToolbarMoreButton() {
+        return b.btnToolbarMore;
+    }
+
+    public android.widget.ImageButton getToolbarHelpButton() {
+        return b.btnToolbarHelp;
     }
 }

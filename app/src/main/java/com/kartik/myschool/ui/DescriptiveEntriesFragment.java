@@ -68,10 +68,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             activeSemesterId = SessionContext.selectedSemester.id;
             activeSemesterNumber = SessionContext.selectedSemester.number;
         }
-
-        setupCustomAppBar();
         setupHeaderStrip();
-
         swipeRefresh = b.swipeRefreshLayout;
         swipeRefresh.setColorSchemeColors(0xFF6C4CCF, 0xFF9C27B0, 0xFF00A5CF);
         swipeRefresh.setProgressBackgroundColorSchemeColor(0xFFFFFFFF);
@@ -102,47 +99,11 @@ public class DescriptiveEntriesFragment extends Fragment {
         com.kartik.myschool.utils.UiAnimations.playLayoutEnter(b.getRoot());
     }
 
-    private void setupCustomAppBar() {
-        // Drawer Menu Button Click
-        b.btnDrawerMenu.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).openDrawer();
-            }
-        });
-
-        // 3-Dot Toolbar Menu
-        b.btnThreeDotMenu.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).showHomeMoreMenu(v);
-            }
-        });
-
-        // Subtitle dynamic binding
-        b.tvAppSubtitle
-                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
-
-        // Outlined button click actions
-        b.btnHelpSquare.setOnClickListener(
-                v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "descriptive"));
-        b.btnAddSquare.setOnClickListener(v -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_students);
-            }
-        });
-        if (b.btnCalcSquare != null) {
-            b.btnCalcSquare.setOnClickListener(v -> {
-                if (getActivity() instanceof HomeActivity) {
-                    ((HomeActivity) getActivity()).navigateTo(R.id.nav_descriptive_report);
-                }
-            });
-        }
-    }
-
     private void setupHeaderStrip() {
-        b.tvAppSubtitle
-                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
+
+        String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         b.tvHeaderStripInfo
-                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
+                .setText("Year: " + yr + " | " + SessionContext.getClassDivSemSubtitle(requireContext()));
 
         // Set initial icon (show grid icon when in slide mode, show list/bullet icon
         // when in grid mode)
@@ -393,6 +354,12 @@ public class DescriptiveEntriesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity activity = (HomeActivity) getActivity();
+            activity.getToolbarHelpButton().setOnClickListener(v -> com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "descriptive"));
+            activity.getToolbarAddButton().setOnClickListener(v -> activity.navigateTo(R.id.nav_students));
+            activity.getToolbarCalcButton().setOnClickListener(v -> activity.navigateTo(R.id.nav_descriptive_report));
+        }
         com.kartik.myschool.SessionContext.ensureCacheLoaded(requireContext());
 
         if (SessionContext.selectedClass != null) {
@@ -413,22 +380,9 @@ public class DescriptiveEntriesFragment extends Fragment {
             activeSemesterId = SessionContext.selectedSemester.id;
             activeSemesterNumber = SessionContext.selectedSemester.number;
         }
-
-        setupCustomAppBar();
         setupHeaderStrip();
-
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-            View navHost = activity.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost
-                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
-                        .getLayoutParams();
-                params.setBehavior(null);
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
         }
 
         // FIX: If remarks were just saved in EnterDescriptiveActivity:
@@ -466,27 +420,19 @@ public class DescriptiveEntriesFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
-            View activityAppBar = activity.findViewById(R.id.appBarLayout);
-            if (activityAppBar != null) {
-                activityAppBar.setVisibility(View.VISIBLE);
-            }
-
-            // Restore CoordinatorLayout scrolling behavior:
-            View navHost = activity.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost
-                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
-                        .getLayoutParams();
-                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
+            activity.getToolbarHelpButton().setOnClickListener(null);
+            activity.getToolbarAddButton().setOnClickListener(null);
+            activity.getToolbarCalcButton().setOnClickListener(null);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
         b = null;
     }
 

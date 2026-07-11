@@ -146,7 +146,7 @@
     <string name="section_school_level">शाळास्तर माहिती</string>
     <string name="txt_school_level_info">शाळास्तर माहिती</string>
     <string name="menu_info_print">माहिती आणि मुद्रण सेटिंग</string>
-    <string name="menu_formative_summative">आकारिक/संकलित नोंदी</string>
+    <string name="menu_formative_summative">मूल्यमापन</string>
     <string name="menu_descriptive_entries">वर्णनात्मक नोंदी</string>
     <string name="menu_attendance">उपस्थिती</string>
     <string name="menu_list_students">वर्ग आणि विभाग</string>

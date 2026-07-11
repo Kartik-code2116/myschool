@@ -309,11 +309,11 @@ public class ProductTourHelper {
                         m ? "२. मदत ?" : "2. Help ?",
                         m ? "या पानाची संपूर्ण मार्गदर्शिका व प्ले बटण येथे आहे."
                           : "Tap '?' to open the complete guide and animated tour for this page."));
-                s.add(new TourStep(R.id.btnAddSquare,
+                s.add(new TourStep(R.id.btnToolbarAdd,
                         m ? "३. मूल्यमापन जोडा +" : "3. Add Evaluation +",
                         m ? "नवीन FA किंवा SA मूल्यमापन तयार करण्यासाठी '+' दाबा."
                           : "Tap '+' to create a new Formative or Summative evaluation entry."));
-                s.add(new TourStep(R.id.btnCalcSquare,
+                s.add(new TourStep(R.id.btnToolbarCalc,
                         m ? "४. एकत्रित गुण अहवाल 📊" : "4. Full Marks Report 📊",
                         m ? "वर्गाचा एकूण सरासरी निकाल, उत्तीर्ण-अनुत्तीर्ण प्रमाण आणि सर्वाधिक गुण मिळवणारे विद्यार्थी यांचा एकत्रित अहवाल पाहण्यासाठी येथे टॅप करा."
                           : "Tap this icon to view the full class marks report, class average, pass/fail status, and top scorers."));
@@ -325,7 +325,7 @@ public class ProductTourHelper {
                         m ? "६. दृश्य बदला 🔄" : "6. Toggle View 🔄",
                         m ? "ग्रीड दृश्य (अनेक विद्यार्थी एकत्र) किंवा लिस्ट दृश्य निवडा."
                           : "Switch between Grid view (compact) and List view (detailed)."));
-                s.add(new TourStep(R.id.btnThreeDotMenu,
+                s.add(new TourStep(R.id.btnToolbarMore,
                         m ? "७. अधिक पर्याय ⋮" : "7. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: गुण सेव्ह, रीसेट, विद्यार्थी क्रम बदलणे इत्यादी पर्याय आहेत."
                           : "⋮ menu has save, reset marks and reorder student options."));
@@ -355,11 +355,11 @@ public class ProductTourHelper {
                         m ? "२. मदत ?" : "2. Help ?",
                         m ? "वर्णनात्मक नोंदी पानाची संपूर्ण मार्गदर्शिका येथे मिळेल."
                           : "Tap '?' for the complete guide on how to use Descriptive Remarks."));
-                s.add(new TourStep(R.id.btnAddSquare,
+                s.add(new TourStep(R.id.btnToolbarAdd,
                         m ? "३. शेरे जोडा +" : "3. Add Remarks +",
                         m ? "नवीन शेऱ्याची नोंद करण्यासाठी '+' बटण दाबा."
                           : "Tap '+' to begin adding a new descriptive remark entry."));
-                s.add(new TourStep(R.id.btnCalcSquare,
+                s.add(new TourStep(R.id.btnToolbarCalc,
                         m ? "४. वर्णनात्मक नोंदी अहवाल 📊" : "4. Remarks Report 📊",
                         m ? "वर्गातील विद्यार्थ्यांचे एकूण शेरे आणि कोणत्या विद्यार्थ्यांचे शेरे अपूर्ण आहेत, याचा एकत्रित अहवाल पाहण्यासाठी येथे टॅप करा."
                           : "Tap this icon to view the full descriptive remarks report, total remarks entered, and student progress status."));
@@ -371,7 +371,7 @@ public class ProductTourHelper {
                         m ? "६. दृश्य बदला 🔄" : "6. Toggle View 🔄",
                         m ? "ग्रीड दृश्य (अनेक विद्यार्थी एकत्र) किंवा लिस्ट दृश्य निवडा."
                           : "Switch between Grid view (compact) and List view (detailed)."));
-                s.add(new TourStep(R.id.btnThreeDotMenu,
+                s.add(new TourStep(R.id.btnToolbarMore,
                         m ? "७. अधिक पर्याय ⋮" : "7. More Options ⋮",
                         m ? "⋮ मेनूमध्ये: शेरे डिलीट, 'तो'→'ती' (लिंग बदल), रीसेट पर्याय आहेत."
                           : "⋮ has delete entries, swap gender (he→she) and reset options."));
