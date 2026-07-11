@@ -485,8 +485,8 @@ public class FormativeSummativeFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (getActivity() instanceof HomeActivity) {
             HomeActivity activity = (HomeActivity) getActivity();
             View activityAppBar = activity.findViewById(R.id.appBarLayout);
@@ -506,11 +506,6 @@ public class FormativeSummativeFragment extends Fragment {
                 navHost.setLayoutParams(params);
             }
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
         b = null;
     }
 

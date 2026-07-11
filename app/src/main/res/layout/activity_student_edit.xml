@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="#F8F9FB"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
@@ -11,13 +11,13 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="?attr/colorSurface"
+        android:background="#F8F9FB"
         app:navigationIcon="@drawable/ic_close"
         app:navigationIconTint="?attr/colorPrimary"
         app:title="@string/edit_student"
-        app:titleTextColor="#2E2E2E"
+        app:titleTextColor="?attr/colorPrimary"
         app:titleCentered="false"
-        app:elevation="2dp"/>
+        app:elevation="0dp"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -37,26 +37,41 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E6E8EA"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Basic Information"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="16dp"
-                        android:fontFamily="sans-serif-black"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp"
+                            android:backgroundTint="?attr/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Basic Information"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="18sp"
+                            android:fontFamily="sans-serif-black"/>
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.EduReport.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_student_name">
@@ -153,26 +168,41 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E6E8EA"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/family_details"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="16dp"
-                        android:fontFamily="sans-serif-black"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp"
+                            android:backgroundTint="?attr/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/family_details"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="18sp"
+                            android:fontFamily="sans-serif-black"/>
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.EduReport.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_mother_name">
@@ -209,26 +239,41 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E6E8EA"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/bank_details"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="16dp"
-                        android:fontFamily="sans-serif-black"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp"
+                            android:backgroundTint="?attr/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/bank_details"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="18sp"
+                            android:fontFamily="sans-serif-black"/>
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.EduReport.TextInputLayout"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_bank_name">
@@ -257,26 +302,41 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                android:layout_marginBottom="24dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E6E8EA"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="32dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Academic Records"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="16dp"
-                        android:fontFamily="sans-serif-black"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp"
+                            android:backgroundTint="?attr/colorPrimary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Academic Records"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="18sp"
+                            android:fontFamily="sans-serif-black"/>
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/label_medium">

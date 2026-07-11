@@ -395,6 +395,9 @@ public class StudentListFragment extends Fragment {
                 AppCache.selectedStudent = student;
                 startActivity(new Intent(requireContext(), StudentEditActivity.class)
                         .putExtra("new_student", false));
+                if (getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out);
+                }
             }
 
             @Override
@@ -584,10 +587,19 @@ public class StudentListFragment extends Fragment {
 
     private void openAddStudent() {
         AppCache.selectedStudent = new Student();
-        startActivity(new Intent(requireContext(), StudentEditActivity.class)
-                .putExtra("new_student", true));
-        if (getActivity() != null) {
-            getActivity().overridePendingTransition(R.anim.slide_up_in, R.anim.fade_out);
+        android.content.Intent intent = new android.content.Intent(requireContext(), StudentEditActivity.class)
+                .putExtra("new_student", true);
+
+        if (b != null && b.fabAddStudent != null && getActivity() != null) {
+            androidx.core.app.ActivityOptionsCompat options = androidx.core.app.ActivityOptionsCompat.makeScaleUpAnimation(
+                    b.fabAddStudent,
+                    b.fabAddStudent.getWidth() / 2,
+                    b.fabAddStudent.getHeight() / 2,
+                    0,
+                    0);
+            startActivity(intent, options.toBundle());
+        } else {
+            startActivity(intent);
         }
     }
 
@@ -751,6 +763,26 @@ public class StudentListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        
+        // Restore parent top app bar and scrolling behavior:
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity ha = (HomeActivity) getActivity();
+            View appBar = ha.findViewById(R.id.appBarLayout);
+            if (appBar != null) {
+                appBar.setVisibility(View.VISIBLE);
+            }
+
+            View navHost = ha.findViewById(R.id.navHostFragment);
+            if (navHost != null && navHost
+                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
+                        .getLayoutParams();
+                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
+                float density = getResources().getDisplayMetrics().density;
+                params.bottomMargin = (int) (64 * density);
+                navHost.setLayoutParams(params);
+            }
+        }
         b = null;
     }
 
@@ -807,29 +839,7 @@ public class StudentListFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Restore parent top app bar and scrolling behavior:
-        if (getActivity() instanceof HomeActivity) {
-            HomeActivity ha = (HomeActivity) getActivity();
-            View appBar = ha.findViewById(R.id.appBarLayout);
-            if (appBar != null) {
-                appBar.setVisibility(View.VISIBLE);
-            }
 
-            View navHost = ha.findViewById(R.id.navHostFragment);
-            if (navHost != null && navHost
-                    .getLayoutParams() instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
-                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams params = (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) navHost
-                        .getLayoutParams();
-                params.setBehavior(new com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior());
-                float density = getResources().getDisplayMetrics().density;
-                params.bottomMargin = (int) (64 * density);
-                navHost.setLayoutParams(params);
-            }
-        }
-    }
 
     private void showExcelOptionsPopupMenu(View v) {
         android.widget.PopupMenu popup = new android.widget.PopupMenu(requireContext(), v);

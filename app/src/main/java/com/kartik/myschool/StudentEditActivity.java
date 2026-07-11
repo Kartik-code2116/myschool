@@ -367,8 +367,8 @@ public class StudentEditActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
-        if (isNew) {
-            overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down_out);
+        if (!isNew) {
+            overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_right);
         }
     }
 }
