@@ -407,6 +407,8 @@ public class StudentListFragment extends Fragment {
                                             studentAdapter.setData(filteredStudents);
                                             b.emptyState.setVisibility(
                                                     filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                                            b.rvStudents.setVisibility(
+                                                    filteredStudents.isEmpty() ? View.GONE : View.VISIBLE);
                                             com.google.android.material.snackbar.Snackbar.make(
                                                     b.getRoot(),
                                                     student.name + " deleted",
@@ -422,6 +424,7 @@ public class StudentListFragment extends Fragment {
                                                                         filteredStudents.add(student);
                                                                         studentAdapter.setData(filteredStudents);
                                                                         b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+                                                                        b.rvStudents.setVisibility(filteredStudents.isEmpty() ? View.GONE : View.VISIBLE);
                                                                     });
                                                                 }
                                                             }
@@ -623,7 +626,7 @@ public class StudentListFragment extends Fragment {
                         if (b != null) {
                             b.shimmerViewContainer.stopShimmer();
                             b.shimmerViewContainer.setVisibility(View.GONE);
-                            b.rvStudents.setVisibility(View.VISIBLE);
+                            b.rvStudents.setVisibility(View.GONE);
                             b.emptyState.setVisibility(View.VISIBLE);
                         }
                     });
@@ -648,7 +651,9 @@ public class StudentListFragment extends Fragment {
         }
         sortStudents(filteredStudents);
         studentAdapter.setData(filteredStudents);
-        b.emptyState.setVisibility(filteredStudents.isEmpty() ? View.VISIBLE : View.GONE);
+        boolean isEmpty = filteredStudents.isEmpty();
+        b.emptyState.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        b.rvStudents.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 
     private void setupSortFilterButton() {
@@ -782,17 +787,17 @@ public class StudentListFragment extends Fragment {
 
         if (b.tvCustomSubtitle != null) {
             if (SessionContext.selectedClass == null) {
-                b.tvCustomSubtitle.setText("• वर्ग निवडलेला नाही •");
+                b.tvCustomSubtitle.setText(getString(R.string.student_subtitle_no_class));
             } else {
-                b.tvCustomSubtitle.setText("• इयत्ता: " + classVal + " • तुकडी: " + divVal + " •");
+                b.tvCustomSubtitle.setText(getString(R.string.student_subtitle_class_div, classVal, divVal));
             }
         }
 
         if (b.tvHeaderSessionInfo != null) {
             if (SessionContext.selectedClass == null) {
-                b.tvHeaderSessionInfo.setText("वर्ष: " + yearLabel + " | वर्ग निवडलेला नाही");
+                b.tvHeaderSessionInfo.setText(getString(R.string.student_header_no_class, yearLabel));
             } else {
-                b.tvHeaderSessionInfo.setText("वर्ष: " + yearLabel + " | इयत्ता: " + classVal + ", तुकडी: " + divVal);
+                b.tvHeaderSessionInfo.setText(getString(R.string.student_header_class_div, yearLabel, classVal, divVal));
             }
         }
 

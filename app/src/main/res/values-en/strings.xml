@@ -786,4 +786,15 @@
     <string name="msg_year_empty">Label cannot be empty.</string>
     <string name="msg_year_sem_created">Academic Year and Semesters created.</string>
     <string name="offline_banner_text">Offline — changes will sync when connected</string>
+
+    <!-- Student page dynamic labels -->
+    <string name="student_subtitle_no_class">• No class selected •</string>
+    <string name="student_subtitle_class_div">• Class: %1$s • Div: %2$s •</string>
+    <string name="student_header_no_class">Year: %1$s | No class selected</string>
+    <string name="student_header_class_div">Year: %1$s | Class: %2$s, Div: %3$s</string>
+
+    <!-- Empty state dynamic labels -->
+    <string name="empty_add_first_student_hint">Tap the + button below to add your first student to this class.</string>
+    <string name="empty_no_classes_yet">No classes created yet</string>
+    <string name="empty_add_first_class_hint">Tap the + button to add your first class for this academic year.</string>
 </resources>

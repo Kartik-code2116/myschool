@@ -821,4 +821,9 @@
     <string name="sqv_total_s">संकलित एकूण:</string>
     <string name="sqv_grand">एकूण:</string>
     <string name="sqv_grade">श्रेणी:</string>
+
+    <!-- Empty state dynamic labels -->
+    <string name="empty_add_first_student_hint">या वर्गात तुमचा पहिला विद्यार्थी जोडण्यासाठी खालील + बटणावर टॅप करा.</string>
+    <string name="empty_no_classes_yet">अद्याप कोणतेही वर्ग तयार केलेले नाहीत</string>
+    <string name="empty_add_first_class_hint">या शैक्षणिक वर्षासाठी तुमचा पहिला वर्ग जोडण्यासाठी + बटणावर टॅप करा.</string>
 </resources>
