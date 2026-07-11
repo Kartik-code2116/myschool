@@ -399,18 +399,66 @@ public class LoginActivity extends BaseActivity {
                         Toast.makeText(LoginActivity.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    showLoading(true);
-                    auth.sendPasswordResetEmail(email)
-                            .addOnSuccessListener(v -> {
-                                showLoading(false);
-                                showError("Reset Email Sent", "A password reset link has been sent to:\n" + email);
-                            })
-                            .addOnFailureListener(e -> {
-                                showLoading(false);
-                                showError("Reset Failed", getFriendlyLoginError(e));
-                            });
+                    performPasswordReset(email);
                 })
                 .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void performPasswordReset(String email) {
+        showLoading(true);
+
+        // Configure ActionCodeSettings for proper deep-link handling
+        com.google.firebase.auth.ActionCodeSettings actionCodeSettings =
+                com.google.firebase.auth.ActionCodeSettings.newBuilder()
+                        .setUrl("https://kartik-28deb.firebaseapp.com/__/auth/action")
+                        .setHandleCodeInApp(false)
+                        .setAndroidPackageName("com.kartik.myschool", true, null)
+                        .build();
+
+        auth.sendPasswordResetEmail(email, actionCodeSettings)
+                .addOnSuccessListener(v -> {
+                    showLoading(false);
+                    showResetSuccessDialog(email);
+                })
+                .addOnFailureListener(e -> {
+                    showLoading(false);
+                    // If ActionCodeSettings fails, try without it as a fallback
+                    auth.sendPasswordResetEmail(email)
+                            .addOnSuccessListener(v2 -> {
+                                showResetSuccessDialog(email);
+                            })
+                            .addOnFailureListener(e2 -> {
+                                showError("Reset Failed", getFriendlyLoginError(e2));
+                            });
+                });
+    }
+
+    private void showResetSuccessDialog(String email) {
+        if (isFinishing() || isDestroyed()) return;
+        new AlertDialog.Builder(this)
+                .setTitle("✅ Reset Email Sent")
+                .setMessage("A password reset link has been sent to:\n" + email
+                        + "\n\n📌 Follow these steps:"
+                        + "\n1. Open your email app (Gmail, Outlook, etc.)"
+                        + "\n2. Check Inbox, Spam, Junk, and Promotions folders"
+                        + "\n3. Look for email from \"noreply@kartik-28deb.firebaseapp.com\""
+                        + "\n4. Click the reset link in the email"
+                        + "\n5. Set your new password"
+                        + "\n6. Come back here and login with your new password"
+                        + "\n\n⏱ The email may take 1-2 minutes to arrive.")
+                .setPositiveButton("OK", null)
+                .setNeutralButton("Resend", (dialog, which) -> performPasswordReset(email))
+                .setNegativeButton("Open Email App", (dialog, which) -> {
+                    try {
+                        Intent emailIntent = new Intent(Intent.ACTION_MAIN);
+                        emailIntent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                        emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(emailIntent);
+                    } catch (Exception ex) {
+                        Toast.makeText(LoginActivity.this, "No email app found", Toast.LENGTH_SHORT).show();
+                    }
+                })
                 .show();
     }
 
