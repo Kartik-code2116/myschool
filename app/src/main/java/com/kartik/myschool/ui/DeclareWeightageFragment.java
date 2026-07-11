@@ -59,7 +59,7 @@ public class DeclareWeightageFragment extends Fragment {
     }
 
     private void displayHeaderInfo() {
-        b.tvWeightageHeaderContext.setText(SessionContext.getClassDivSemSubtitle());
+        b.tvWeightageHeaderContext.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
     }
 
     private void loadActiveSubjects() {

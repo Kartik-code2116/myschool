@@ -34,9 +34,10 @@ public final class SessionContext {
 
     public static synchronized String getClassDivLabel() {
         if (selectedClass == null) return "वर्ग निवडलेला नाही";
-        String cls = (selectedClass.className != null && !selectedClass.className.trim().isEmpty()) ? selectedClass.className : "1";
-        String div = (selectedClass.division != null && !selectedClass.division.trim().isEmpty()) ? selectedClass.division : "-";
-        return "इयत्ता: " + cls + ", तुकडी: " + div;
+        String cls = (selectedClass.className != null && !selectedClass.className.trim().isEmpty()) ? selectedClass.className.trim() : "1";
+        String div = (selectedClass.division != null && !selectedClass.division.trim().isEmpty()) ? selectedClass.division.trim() : "";
+        String suffix = (div.isEmpty() || div.equals("-")) ? "" : ("-" + div);
+        return "इयत्ता: " + cls + suffix;
     }
 
     public static synchronized void syncFromAppCache() {
@@ -45,19 +46,35 @@ public final class SessionContext {
     }
 
     public static synchronized String getClassDivSemSubtitle() {
-        if (selectedClass == null) return "Class: -";
-        String base = getClassDivSubtitle();
+        return getClassDivSemSubtitle(null);
+    }
+
+    public static synchronized String getClassDivSemSubtitle(android.content.Context ctx) {
+        boolean isEn = ctx == null || com.kartik.myschool.utils.pdf.PdfLocalizer.isEnglish(ctx);
+        if (selectedClass == null) return isEn ? "Class: -" : "इयत्ता: -";
+        String base = getClassDivSubtitle(ctx);
         if (selectedSemester != null && selectedSemester.number > 0) {
-            return base + " | Sem: " + selectedSemester.number;
+            return base + " | " + (isEn ? "Sem: " : "सत्र: ") + selectedSemester.number;
         }
         return base;
     }
 
     public static synchronized String getClassDivSubtitle() {
-        if (selectedClass == null) return "Class: -";
-        String cls = (selectedClass.className != null && !selectedClass.className.trim().isEmpty()) ? selectedClass.className : "1";
-        String div = (selectedClass.division != null && !selectedClass.division.trim().isEmpty()) ? selectedClass.division : "-";
-        return "Class: " + cls + "-" + div;
+        return getClassDivSubtitle(null);
+    }
+
+    public static synchronized String getClassDivSubtitle(android.content.Context ctx) {
+        boolean isEn = ctx == null || com.kartik.myschool.utils.pdf.PdfLocalizer.isEnglish(ctx);
+        if (selectedClass == null) return isEn ? "Class: -" : "इयत्ता: -";
+        String cls = (selectedClass.className != null && !selectedClass.className.trim().isEmpty()) ? selectedClass.className.trim() : "1";
+        String div = (selectedClass.division != null && !selectedClass.division.trim().isEmpty()) ? selectedClass.division.trim() : "";
+        String suffix = (div.isEmpty() || div.equals("-")) ? "" : ("-" + div);
+        
+        if (isEn) {
+            return "Class: " + cls + suffix;
+        } else {
+            return "इयत्ता: " + cls + suffix;
+        }
     }
 
     public static synchronized void syncToAppCache() {

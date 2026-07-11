@@ -94,7 +94,7 @@ public class InfoPrintSettingFragment extends Fragment {
 
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).updateToolbar(
-                    getString(R.string.nav_home), SessionContext.getClassDivSemSubtitle());
+                    getString(R.string.nav_home), SessionContext.getClassDivSemSubtitle(requireContext()));
         }
 
         b.btnYearPrev.setOnClickListener(v     -> cycleYear(-1));
@@ -589,7 +589,7 @@ public class InfoPrintSettingFragment extends Fragment {
         b.tvSemesterName.setText(semName != null ? semName : "");
         
         if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).updateToolbar(getString(R.string.nav_home), SessionContext.getClassDivSemSubtitle());
+            ((HomeActivity) getActivity()).updateToolbar(getString(R.string.nav_home), SessionContext.getClassDivSemSubtitle(requireContext()));
         }
         
         boolean showArrows = semesters.size() > 1;
@@ -636,7 +636,7 @@ public class InfoPrintSettingFragment extends Fragment {
         SessionContext.save(getContext());
 
         if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).updateToolbar(getString(R.string.nav_home), SessionContext.getClassDivSemSubtitle());
+            ((HomeActivity) getActivity()).updateToolbar(getString(R.string.nav_home), SessionContext.getClassDivSemSubtitle(requireContext()));
         }
 
         String num = c.className != null ? c.className : "—";

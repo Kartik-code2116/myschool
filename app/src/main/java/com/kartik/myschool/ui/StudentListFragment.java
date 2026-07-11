@@ -85,7 +85,10 @@ public class StudentListFragment extends Fragment {
 
     private void setupCustomToolbar() {
         if (b.tvCustomSubtitle != null) {
-            b.tvCustomSubtitle.setText(SessionContext.getClassDivSemSubtitle());
+            b.tvCustomSubtitle.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
+        }
+        if (b.tvHeaderSessionInfo != null) {
+            b.tvHeaderSessionInfo.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         }
 
         if (b.btnCustomMenu != null) {
@@ -583,9 +586,6 @@ public class StudentListFragment extends Fragment {
         AppCache.selectedStudent = new Student();
         startActivity(new Intent(requireContext(), StudentEditActivity.class)
                 .putExtra("new_student", true));
-        if (getActivity() != null) {
-            getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }
     }
 
     private void loadAllStudents() {
@@ -790,19 +790,11 @@ public class StudentListFragment extends Fragment {
         }
 
         if (b.tvCustomSubtitle != null) {
-            if (SessionContext.selectedClass == null) {
-                b.tvCustomSubtitle.setText(getString(R.string.student_subtitle_no_class));
-            } else {
-                b.tvCustomSubtitle.setText(getString(R.string.student_subtitle_class_div, classVal, divVal));
-            }
+            b.tvCustomSubtitle.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         }
 
         if (b.tvHeaderSessionInfo != null) {
-            if (SessionContext.selectedClass == null) {
-                b.tvHeaderSessionInfo.setText(getString(R.string.student_header_no_class, yearLabel));
-            } else {
-                b.tvHeaderSessionInfo.setText(getString(R.string.student_header_class_div, yearLabel, classVal, divVal));
-            }
+            b.tvHeaderSessionInfo.setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         }
 
         if (SessionContext.selectedClass != null) {

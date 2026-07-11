@@ -78,7 +78,7 @@ public class ReportPrintingFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        b.tvReportPrintingYear.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSubtitle());
+        b.tvReportPrintingYear.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSubtitle(requireContext()));
         
         b.btnHelpSquare.setOnClickListener(v -> {
             com.kartik.myschool.utils.HelpDialogHelper.showHelpDialog(requireContext(), "print_report");

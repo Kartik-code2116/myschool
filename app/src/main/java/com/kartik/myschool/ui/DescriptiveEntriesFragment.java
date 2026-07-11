@@ -119,7 +119,7 @@ public class DescriptiveEntriesFragment extends Fragment {
 
         // Subtitle dynamic binding
         b.tvAppSubtitle
-                .setText(SessionContext.getClassDivSemSubtitle());
+                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
@@ -139,8 +139,10 @@ public class DescriptiveEntriesFragment extends Fragment {
     }
 
     private void setupHeaderStrip() {
+        b.tvAppSubtitle
+                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         b.tvHeaderStripInfo
-                .setText(SessionContext.getClassDivSemSubtitle());
+                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
 
         // Set initial icon (show grid icon when in slide mode, show list/bullet icon
         // when in grid mode)

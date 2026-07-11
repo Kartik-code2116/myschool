@@ -83,7 +83,7 @@ public class DescriptiveReportFragment extends Fragment {
 
     private void displayHeaderInfo() {
         String yearLabel = SessionContext.getYearLabel();
-        b.tvReportContext.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSemSubtitle());
+        b.tvReportContext.setText("Year: " + yearLabel + " | " + SessionContext.getClassDivSemSubtitle(requireContext()));
     }
 
     private void loadData() {

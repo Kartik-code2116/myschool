@@ -142,7 +142,7 @@ public class FormativeSummativeFragment extends Fragment {
 
         // Subtitle dynamic binding
         b.tvAppSubtitle
-                .setText(SessionContext.getClassDivSemSubtitle());
+                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
@@ -161,9 +161,11 @@ public class FormativeSummativeFragment extends Fragment {
     }
 
     private void setupHeaderStrip() {
+        b.tvAppSubtitle
+                .setText(SessionContext.getClassDivSemSubtitle(requireContext()));
         String yr = SessionContext.selectedYear != null ? SessionContext.selectedYear.label : "2025-26";
         b.tvHeaderStripInfo
-                .setText("Year: " + yr + " | " + SessionContext.getClassDivSemSubtitle());
+                .setText("Year: " + yr + " | " + SessionContext.getClassDivSemSubtitle(requireContext()));
 
         b.btnGridListToggle.setOnClickListener(v -> {
             isGridView = !isGridView;
