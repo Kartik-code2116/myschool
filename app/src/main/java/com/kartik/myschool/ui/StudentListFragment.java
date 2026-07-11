@@ -586,6 +586,9 @@ public class StudentListFragment extends Fragment {
         AppCache.selectedStudent = new Student();
         startActivity(new Intent(requireContext(), StudentEditActivity.class)
                 .putExtra("new_student", true));
+        if (getActivity() != null) {
+            getActivity().overridePendingTransition(R.anim.slide_up_in, R.anim.fade_out);
+        }
     }
 
     private void loadAllStudents() {

@@ -363,4 +363,12 @@ public class StudentEditActivity extends BaseActivity {
     private String str(EditText et) {
         return et.getText() != null ? et.getText().toString().trim() : "";
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        if (isNew) {
+            overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down_out);
+        }
+    }
 }
