@@ -2,6 +2,9 @@
 
 Edu Report is a premium, comprehensive Android application tailored for educators to manage student records, track attendance, perform academic grading, input descriptive remarks, and instantly generate official CCE-compliant report card PDFs. The app features localized support in both **English and Marathi**, seamless Firebase cloud synchronization, and offline-first performance caching.
 
+1)
+""make it user click and hold existing student then it select and user want only this selected student export and do other thing only show this thing swhen student selected"""
+
 ---
 
 ## 📖 App Descriptions
