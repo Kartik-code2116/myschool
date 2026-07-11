@@ -294,7 +294,7 @@ public class ProductTourHelper {
 
 
             // ════════════════════════════════════════════════════════════
-            // 6. Formative & Summative Evaluation  (8 steps)
+            // 6. Formative & Summative Evaluation  (9 steps)
             // ════════════════════════════════════════════════════════════
             case "formative_summative":
                 s.add(new TourStep(0,
@@ -302,17 +302,17 @@ public class ProductTourHelper {
                         m ? "वर्गातील विद्यार्थ्यांचे आकारिक (FA) व संकलित (SA) मूल्यमापन येथे व्यवस्थापित करा."
                           : "Manage Formative (FA) and Summative (SA) evaluations for the class."));
                 s.add(new TourStep(R.id.tvHeaderStripInfo,
-                        m ? "१. सत्र व परीक्षा माहिती" : "1. Session & Exam Info",
-                        m ? "कोणत्या वर्ष, सत्र, वर्ग व परीक्षेसाठी गुण नोंदवत आहात ते येथे दिसते."
-                          : "Shows the year, semester, class and exam you are entering marks for."));
-                s.add(new TourStep(R.id.btnHelpSquare,
+                        m ? "१. सत्र व वर्ग माहिती" : "1. Session & Class Info",
+                        m ? "कोणत्या वर्ष, सत्र व वर्गासाठी गुण नोंदवत आहात ते येथे दिसते."
+                          : "Shows the year, semester and class you are entering marks for."));
+                s.add(new TourStep(R.id.btnToolbarHelp,
                         m ? "२. मदत ?" : "2. Help ?",
                         m ? "या पानाची संपूर्ण मार्गदर्शिका व प्ले बटण येथे आहे."
                           : "Tap '?' to open the complete guide and animated tour for this page."));
                 s.add(new TourStep(R.id.btnToolbarAdd,
-                        m ? "३. मूल्यमापन जोडा +" : "3. Add Evaluation +",
-                        m ? "नवीन FA किंवा SA मूल्यमापन तयार करण्यासाठी '+' दाबा."
-                          : "Tap '+' to create a new Formative or Summative evaluation entry."));
+                        m ? "३. विद्यार्थी व्यवस्थापन ➕" : "3. Manage Students ➕",
+                        m ? "वर्गामध्ये नवीन विद्यार्थी जोडण्यासाठी किंवा विद्यार्थ्यांची यादी पाहण्यासाठी येथे टॅप करा."
+                          : "Tap this button to go to the Student List page to add or manage student details."));
                 s.add(new TourStep(R.id.btnToolbarCalc,
                         m ? "४. एकत्रित गुण अहवाल 📊" : "4. Full Marks Report 📊",
                         m ? "वर्गाचा एकूण सरासरी निकाल, उत्तीर्ण-अनुत्तीर्ण प्रमाण आणि सर्वाधिक गुण मिळवणारे विद्यार्थी यांचा एकत्रित अहवाल पाहण्यासाठी येथे टॅप करा."
@@ -327,8 +327,8 @@ public class ProductTourHelper {
                           : "Switch between Grid view (compact) and List view (detailed)."));
                 s.add(new TourStep(R.id.btnToolbarMore,
                         m ? "७. अधिक पर्याय ⋮" : "7. More Options ⋮",
-                        m ? "⋮ मेनूमध्ये: गुण सेव्ह, रीसेट, विद्यार्थी क्रम बदलणे इत्यादी पर्याय आहेत."
-                          : "⋮ menu has save, reset marks and reorder student options."));
+                        m ? "⋮ मेनूमध्ये ॲपची भाषा बदलणे, लॉगआउट करणे आणि इतर मुख्य पर्याय आहेत."
+                          : "⋮ menu contains language selection, logout and other main options."));
                 s.add(new TourStep(R.id.rvEvaluationStudents,
                         m ? "८. विद्यार्थी मूल्यमापन यादी" : "8. Student Evaluation List",
                         m ? "प्रत्येक विद्यार्थ्याच्या रांगेत गुण भरा. रंगीत गुण = सेव्ह झाले."
@@ -340,7 +340,7 @@ public class ProductTourHelper {
                 break;
 
             // ════════════════════════════════════════════════════════════
-            // 7. Descriptive Remarks List  (6 steps)
+            // 7. Descriptive Remarks List  (9 steps)
             // ════════════════════════════════════════════════════════════
             case "descriptive":
                 s.add(new TourStep(0,
@@ -351,14 +351,14 @@ public class ProductTourHelper {
                         m ? "१. सत्र व वर्ग माहिती" : "1. Session & Class Info",
                         m ? "कोणत्या वर्ग व सत्रासाठी शेरे नोंदवत आहात ते येथे दिसते."
                           : "Shows which class and semester the remarks are being entered for."));
-                s.add(new TourStep(R.id.btnHelpSquare,
+                s.add(new TourStep(R.id.btnToolbarHelp,
                         m ? "२. मदत ?" : "2. Help ?",
                         m ? "वर्णनात्मक नोंदी पानाची संपूर्ण मार्गदर्शिका येथे मिळेल."
                           : "Tap '?' for the complete guide on how to use Descriptive Remarks."));
                 s.add(new TourStep(R.id.btnToolbarAdd,
-                        m ? "३. शेरे जोडा +" : "3. Add Remarks +",
-                        m ? "नवीन शेऱ्याची नोंद करण्यासाठी '+' बटण दाबा."
-                          : "Tap '+' to begin adding a new descriptive remark entry."));
+                        m ? "३. विद्यार्थी व्यवस्थापन ➕" : "3. Manage Students ➕",
+                        m ? "वर्गामध्ये नवीन विद्यार्थी जोडण्यासाठी किंवा विद्यार्थ्यांची यादी पाहण्यासाठी येथे टॅप करा."
+                          : "Tap this button to go to the Student List page to add or manage student details."));
                 s.add(new TourStep(R.id.btnToolbarCalc,
                         m ? "४. वर्णनात्मक नोंदी अहवाल 📊" : "4. Remarks Report 📊",
                         m ? "वर्गातील विद्यार्थ्यांचे एकूण शेरे आणि कोणत्या विद्यार्थ्यांचे शेरे अपूर्ण आहेत, याचा एकत्रित अहवाल पाहण्यासाठी येथे टॅप करा."
@@ -373,8 +373,8 @@ public class ProductTourHelper {
                           : "Switch between Grid view (compact) and List view (detailed)."));
                 s.add(new TourStep(R.id.btnToolbarMore,
                         m ? "७. अधिक पर्याय ⋮" : "7. More Options ⋮",
-                        m ? "⋮ मेनूमध्ये: शेरे डिलीट, 'तो'→'ती' (लिंग बदल), रीसेट पर्याय आहेत."
-                          : "⋮ has delete entries, swap gender (he→she) and reset options."));
+                        m ? "⋮ मेनूमध्ये ॲपची भाषा बदलणे, लॉगआउट करणे आणि इतर मुख्य पर्याय आहेत."
+                          : "⋮ menu contains language selection, logout and other main options."));
                 s.add(new TourStep(R.id.rvDescriptiveStudents,
                         m ? "८. विद्यार्थी यादी" : "8. Student List",
                         m ? "प्रत्येक विद्यार्थ्याच्या कार्डावर टॅप केल्यास त्याचे शेरे संपादित होतात."
