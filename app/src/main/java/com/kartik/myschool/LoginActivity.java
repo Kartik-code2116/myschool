@@ -408,29 +408,14 @@ public class LoginActivity extends BaseActivity {
     private void performPasswordReset(String email) {
         showLoading(true);
 
-        // Configure ActionCodeSettings for proper deep-link handling
-        com.google.firebase.auth.ActionCodeSettings actionCodeSettings =
-                com.google.firebase.auth.ActionCodeSettings.newBuilder()
-                        .setUrl("https://kartik-28deb.firebaseapp.com/__/auth/action")
-                        .setHandleCodeInApp(false)
-                        .setAndroidPackageName("com.kartik.myschool", true, null)
-                        .build();
-
-        auth.sendPasswordResetEmail(email, actionCodeSettings)
+        auth.sendPasswordResetEmail(email)
                 .addOnSuccessListener(v -> {
                     showLoading(false);
                     showResetSuccessDialog(email);
                 })
                 .addOnFailureListener(e -> {
                     showLoading(false);
-                    // If ActionCodeSettings fails, try without it as a fallback
-                    auth.sendPasswordResetEmail(email)
-                            .addOnSuccessListener(v2 -> {
-                                showResetSuccessDialog(email);
-                            })
-                            .addOnFailureListener(e2 -> {
-                                showError("Reset Failed", getFriendlyLoginError(e2));
-                            });
+                    showError("Reset Failed", getFriendlyLoginError(e));
                 });
     }
 

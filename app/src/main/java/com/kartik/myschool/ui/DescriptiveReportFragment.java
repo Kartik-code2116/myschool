@@ -89,7 +89,7 @@ public class DescriptiveReportFragment extends Fragment {
             classVal = activeClass.className != null ? activeClass.className : "5";
             divVal = activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
         }
-        b.tvReportContext.setText("Year: " + yearLabel + " | Cls: " + classVal + "-" + divVal);
+        b.tvReportContext.setText("Year: " + yearLabel + " | Class: " + classVal + "-" + divVal);
     }
 
     private void loadData() {

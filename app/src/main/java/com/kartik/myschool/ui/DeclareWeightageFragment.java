@@ -68,7 +68,7 @@ public class DeclareWeightageFragment extends Fragment {
                     ? activeClass.division
                     : "-";
         }
-        b.tvWeightageHeaderContext.setText("Year: " + yearLabel + " | Cls: " + classVal + "-" + divVal);
+        b.tvWeightageHeaderContext.setText("Year: " + yearLabel + " | Class: " + classVal + "-" + divVal);
     }
 
     private void loadActiveSubjects() {

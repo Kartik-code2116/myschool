@@ -125,8 +125,7 @@ public class StatsDashboardFragment extends Fragment {
 
     private void updateHeader() {
         if (activeClass != null) {
-            String semNum = SessionContext.selectedSemester != null ? String.valueOf(SessionContext.selectedSemester.number) : "1";
-            tvHeaderStripInfo.setText("Semester " + semNum + " Progress");
+            tvHeaderStripInfo.setText("Class Progress");
         } else {
             tvHeaderStripInfo.setText(R.string.msg_dashboard_no_class_selected);
         }

@@ -77,7 +77,7 @@ public class AttendanceReportFragment extends Fragment {
             divVal = SessionContext.selectedClass.division != null && !SessionContext.selectedClass.division.isEmpty() 
                     ? SessionContext.selectedClass.division : "-";
         }
-        b.tvReportContext.setText("Year: " + yearLabel + " | Cls: " + classVal + "-" + divVal);
+        b.tvReportContext.setText("Year: " + yearLabel + " | Class: " + classVal + "-" + divVal);
     }
 
     private void loadData() {

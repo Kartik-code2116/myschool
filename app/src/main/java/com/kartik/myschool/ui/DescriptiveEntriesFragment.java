@@ -121,7 +121,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         String clsLabel = activeClass != null ? activeClass.className : "5";
         String divLabel = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
         b.tvAppSubtitle
-                .setText("Cls: " + clsLabel + "-" + divLabel + " • Sem: " + activeSemesterNumber);
+                .setText("Class: " + clsLabel + "-" + divLabel);
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
@@ -145,7 +145,7 @@ public class DescriptiveEntriesFragment extends Fragment {
         String cls = activeClass != null ? activeClass.className : "5";
         String div = activeClass != null && activeClass.division != null && !activeClass.division.isEmpty() ? activeClass.division : "-";
         b.tvHeaderStripInfo
-                .setText("Year: " + yr + " | Cls: " + cls + "-" + div + " | Sem: " + activeSemesterNumber);
+                .setText("Year: " + yr + " | Class: " + cls + "-" + div);
 
         // Set initial icon (show grid icon when in slide mode, show list/bullet icon
         // when in grid mode)

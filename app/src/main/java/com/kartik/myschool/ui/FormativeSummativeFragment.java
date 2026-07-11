@@ -146,7 +146,7 @@ public class FormativeSummativeFragment extends Fragment {
                 ? activeClass.division
                 : "-";
         b.tvAppSubtitle
-                .setText("Cls: " + clsLabel + "-" + divLabel + " • Sem: " + activeSemesterNumber);
+                .setText("Class: " + clsLabel + "-" + divLabel);
 
         // Outlined button click actions
         b.btnHelpSquare.setOnClickListener(
@@ -171,7 +171,7 @@ public class FormativeSummativeFragment extends Fragment {
                 ? activeClass.division
                 : "-";
         b.tvHeaderStripInfo
-                .setText("Year: " + yr + " | Cls: " + cls + "-" + div + " | Sem: " + activeSemesterNumber);
+                .setText("Year: " + yr + " | Class: " + cls + "-" + div);
 
         b.btnGridListToggle.setOnClickListener(v -> {
             isGridView = !isGridView;
