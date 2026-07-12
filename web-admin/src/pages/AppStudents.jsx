@@ -28,9 +28,9 @@ export default function AppStudents() {
   const [activeTab, setActiveTab] = useState('basic');
 
   const emptyStudent = {
-    name: '', rollNo: '', registrationNo: '', dob: '', gender: 'Male', cast: '', religion: '', birthPlace: '', bloodGroup: '', height: '', weight: '', height2: '', weight2: '',
-    motherName: '', fatherName: '', address: '', parentPhone: '', parentPhone2: '', fatherOccupation: '', motherOccupation: '',
-    bankName: '', bankAccount: '', bankIfsc: '', bankUid: '',
+    name: '', rollNo: '', registrationNo: '', dob: '', gender: 'Male', cast: '', religion: '', birthPlace: '', bloodGroup: '', heightSem1: '', weightSem1: '', heightSem2: '', weightSem2: '',
+    motherName: '', fatherName: '', address: '', fatherPhone: '', motherPhone: '', fatherOccupation: '', motherOccupation: '',
+    bankName: '', bankAccount: '', bankBranch: '', bankIfsc: '', bankUid: '',
     medium: '', motherTongue: '', dateOfAdmission: '', studentIdNumber: '', uid: ''
   };
 
@@ -83,6 +83,7 @@ export default function AppStudents() {
         teacherId: auth.currentUser.uid,
         className: activeClass.name,
         standard: activeClass.className || activeClass.name,
+        division: activeClass.division || '-',
         schoolId: activeSchool?.id || '',
         schoolName: activeSchool?.name || ''
       };
@@ -297,10 +298,10 @@ export default function AppStudents() {
               <div className="input-group"><label>{t('Religion', 'धर्म')}</label><input type="text" name="religion" value={formData.religion} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Birth Place', 'जन्म ठिकाण')}</label><input type="text" name="birthPlace" value={formData.birthPlace} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Blood Group', 'रक्तगट')}</label><input type="text" name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} /></div>
-              <div className="input-group"><label>{t('Height (Sem 1) cm', 'उंची (सत्र १) cm')}</label><input type="text" name="height" value={formData.height} onChange={handleChange} /></div>
-              <div className="input-group"><label>{t('Weight (Sem 1) kg', 'वजन (सत्र १) kg')}</label><input type="text" name="weight" value={formData.weight} onChange={handleChange} /></div>
-              <div className="input-group"><label>{t('Height (Sem 2) cm', 'उंची (सत्र २) cm')}</label><input type="text" name="height2" value={formData.height2} onChange={handleChange} /></div>
-              <div className="input-group"><label>{t('Weight (Sem 2) kg', 'वजन (सत्र २) kg')}</label><input type="text" name="weight2" value={formData.weight2} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Height (Sem 1) cm', 'उंची (सत्र १) cm')}</label><input type="text" name="heightSem1" value={formData.heightSem1} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Weight (Sem 1) kg', 'वजन (सत्र १) kg')}</label><input type="text" name="weightSem1" value={formData.weightSem1} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Height (Sem 2) cm', 'उंची (सत्र २) cm')}</label><input type="text" name="heightSem2" value={formData.heightSem2} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Weight (Sem 2) kg', 'वजन (सत्र २) kg')}</label><input type="text" name="weightSem2" value={formData.weightSem2} onChange={handleChange} /></div>
             </div>
           )}
           
@@ -309,8 +310,8 @@ export default function AppStudents() {
               <div className="input-group"><label>{t('Mother\'s Name', 'आईचे नाव')}</label><input type="text" name="motherName" value={formData.motherName} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Father\'s Name', 'वडिलांचे नाव')}</label><input type="text" name="fatherName" value={formData.fatherName} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Address', 'पत्ता')}</label><input type="text" name="address" value={formData.address} onChange={handleChange} /></div>
-              <div className="input-group"><label>{t('Phone Number 1', 'फोन नंबर १')}</label><input type="tel" name="parentPhone" value={formData.parentPhone} onChange={handleChange} /></div>
-              <div className="input-group"><label>{t('Phone Number 2', 'फोन नंबर २')}</label><input type="tel" name="parentPhone2" value={formData.parentPhone2} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Phone Number 1 (Father)', 'फोन नंबर १ (वडील)')}</label><input type="tel" name="fatherPhone" value={formData.fatherPhone} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Phone Number 2 (Mother)', 'फोन नंबर २ (आई)')}</label><input type="tel" name="motherPhone" value={formData.motherPhone} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Mother\'s Occupation', 'आईचा व्यवसाय')}</label><input type="text" name="motherOccupation" value={formData.motherOccupation} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Father\'s Occupation', 'वडिलांचा व्यवसाय')}</label><input type="text" name="fatherOccupation" value={formData.fatherOccupation} onChange={handleChange} /></div>
             </div>
@@ -320,6 +321,7 @@ export default function AppStudents() {
             <div className="form-grid">
               <div className="input-group"><label>{t('Bank Name', 'बँकेचे नाव')}</label><input type="text" name="bankName" value={formData.bankName} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Account Number', 'खाते क्रमांक')}</label><input type="text" name="bankAccount" value={formData.bankAccount} onChange={handleChange} /></div>
+              <div className="input-group"><label>{t('Bank Branch', 'बँकेची शाखा')}</label><input type="text" name="bankBranch" value={formData.bankBranch} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('IFSC Code', 'आयएफएससी कोड')}</label><input type="text" name="bankIfsc" value={formData.bankIfsc} onChange={handleChange} /></div>
               <div className="input-group"><label>{t('Aadhar UID', 'आधार क्र.')}</label><input type="text" name="bankUid" value={formData.bankUid} onChange={handleChange} /></div>
             </div>
@@ -342,7 +344,7 @@ export default function AppStudents() {
   const renderProfileView = () => {
     return (
       <div className="profile-view-details">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div className="profile-grid">
           <div className="profile-section card-panel">
             <h4>{t('Basic Info', 'मूलभूत माहिती')}</h4>
             <p><strong>{t('Registration No:', 'रजिस्टर नं:')}</strong> {selectedStudent.registrationNo || 'N/A'}</p>
@@ -351,8 +353,8 @@ export default function AppStudents() {
             <p><strong>{t('Religion:', 'धर्म:')}</strong> {selectedStudent.religion || 'N/A'}</p>
             <p><strong>{t('Blood Group:', 'रक्तगट:')}</strong> {selectedStudent.bloodGroup || 'N/A'}</p>
             <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
-              <p><strong>{t('Height:', 'उंची:')}</strong> {selectedStudent.height || '--'} cm</p>
-              <p><strong>{t('Weight:', 'वजन:')}</strong> {selectedStudent.weight || '--'} kg</p>
+              <p><strong>{t('Height:', 'उंची:')}</strong> {selectedStudent.heightSem1 || '--'} cm</p>
+              <p><strong>{t('Weight:', 'वजन:')}</strong> {selectedStudent.weightSem1 || '--'} kg</p>
             </div>
           </div>
           <div className="profile-section card-panel">
@@ -360,8 +362,8 @@ export default function AppStudents() {
             <p><strong>{t('Mother:', 'आई:')}</strong> {selectedStudent.motherName || 'N/A'}</p>
             <p><strong>{t('Father:', 'वडील:')}</strong> {selectedStudent.fatherName || 'N/A'}</p>
             <p><strong>{t('Address:', 'पत्ता:')}</strong> {selectedStudent.address || 'N/A'}</p>
-            <p><strong>{t('Phone 1:', 'फोन १:')}</strong> {selectedStudent.parentPhone || 'N/A'}</p>
-            <p><strong>{t('Phone 2:', 'फोन २:')}</strong> {selectedStudent.parentPhone2 || 'N/A'}</p>
+            <p><strong>{t('Phone 1 (Father):', 'फोन १ (वडील):')}</strong> {selectedStudent.fatherPhone || 'N/A'}</p>
+            <p><strong>{t('Phone 2 (Mother):', 'फोन २ (आई):')}</strong> {selectedStudent.motherPhone || 'N/A'}</p>
           </div>
           <div className="profile-section card-panel">
             <h4>{t('Bank & Identity', 'बँक आणि ओळख')}</h4>
@@ -379,14 +381,14 @@ export default function AppStudents() {
           </div>
           <div className="profile-section card-panel" style={{ gridColumn: '1 / -1' }}>
             <h4>{t('Parent Portal Access', 'पालक पोर्टल प्रवेश')}</h4>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: 'var(--soft-panel)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-              <div>
+            <div className="parent-link-box">
+              <div className="parent-link-info">
                 <p style={{ margin: '0 0 5px 0', fontWeight: '600' }}>{t('Parent Link Code', 'पालक लिंक कोड')}</p>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>
                   {t('Share this 6-digit code with parents so they can view the student\'s marks and reports in the Parent Portal.', 'हा ६ अंकी कोड पालकांसोबत शेअर करा जेणेकरून ते पालक पोर्टलमध्ये विद्यार्थ्याचे गुण आणि निकाल पाहू शकतील.')}
                 </p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div className="parent-link-actions">
                 {parentLinkCode ? (
                   <div style={{ padding: '8px 16px', background: 'var(--surface-color)', border: '2px dashed var(--primary-color)', borderRadius: '6px', fontSize: '20px', fontWeight: '800', letterSpacing: '4px', color: 'var(--primary-color)' }}>
                     {parentLinkCode}
@@ -464,9 +466,9 @@ export default function AppStudents() {
           <div className="modal-content large-modal">
             {!isEditing ? (
               <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div className="stu-avatar" style={{ width: '50px', height: '50px', fontSize: '24px', background: 'var(--primary-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                <div className="student-modal-header">
+                  <div className="student-modal-title">
+                    <div className="stu-avatar" style={{ width: '50px', height: '50px', fontSize: '24px' }}>
                       {selectedStudent.name.charAt(0)}
                     </div>
                     <div>
@@ -479,8 +481,8 @@ export default function AppStudents() {
                 
                 {renderProfileView()}
 
-                <div className="modal-actions" style={{ justifyContent: 'space-between', marginTop: '20px' }}>
-                  <button type="button" className="btn-danger" onClick={handleDeleteStudent} style={{ background: 'var(--danger-color)', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer' }}>{t('Delete Student', 'डिलीट करा')}</button>
+                <div className="modal-actions split-actions">
+                  <button type="button" className="btn-danger" onClick={handleDeleteStudent}>{t('Delete Student', 'डिलीट करा')}</button>
                   <button type="button" className="btn-secondary" onClick={() => setSelectedStudent(null)}>{t('Close', 'बंद करा')}</button>
                 </div>
               </>

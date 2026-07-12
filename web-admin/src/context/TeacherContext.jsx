@@ -14,6 +14,7 @@ export function TeacherProvider({ children }) {
 
   const [academicYearsList, setAcademicYearsList] = useState([]);
   const [semestersList, setSemestersList] = useState([]);
+  const [classesList, setClassesList] = useState([]);
   
   const [loadingContext, setLoadingContext] = useState(true);
 
@@ -65,6 +66,45 @@ export function TeacherProvider({ children }) {
           sems.sort((a,b) => (a.number || 0) - (b.number || 0)); // Ascending
           setSemestersList(sems);
           
+          // 4. Fetch Classes
+          const qClasses = query(collection(db, 'classes'), where('teacherId', '==', user.uid));
+          const snapClasses = await getDocs(qClasses);
+          const clsList = snapClasses.docs.map(d => ({ id: d.id, name: `Class ${d.data().className || ''} ${d.data().division || ''}`, ...d.data() }));
+          setClassesList(clsList);
+
+          // Verify and auto-select
+          const savedYearStr = localStorage.getItem('teacher_active_year');
+          let currentYear = savedYearStr ? JSON.parse(savedYearStr) : null;
+          if (currentYear && !years.find(y => y.id === currentYear.id)) currentYear = null;
+          if (!currentYear && years.length > 0) {
+            currentYear = years[0];
+            setYear(currentYear);
+          }
+
+          const savedSemStr = localStorage.getItem('teacher_active_semester');
+          let currentSem = savedSemStr ? JSON.parse(savedSemStr) : null;
+          if (currentSem && !sems.find(s => s.id === currentSem.id)) currentSem = null;
+          if (!currentSem && sems.length > 0) {
+            const yearSems = currentYear ? sems.filter(s => s.yearId === currentYear.id) : sems;
+            if (yearSems.length > 0) {
+              currentSem = yearSems[0];
+              setSemester(currentSem);
+            }
+          }
+
+          const savedClassStr = localStorage.getItem('teacher_active_class');
+          let currentClass = savedClassStr ? JSON.parse(savedClassStr) : null;
+          if (currentClass && !clsList.find(c => c.id === currentClass.id)) currentClass = null;
+          if (!currentClass && clsList.length > 0) {
+            const yearClasses = currentYear ? clsList.filter(c => c.yearId === currentYear.id) : clsList;
+            if (yearClasses.length > 0) {
+              currentClass = yearClasses[0];
+              setClass(currentClass);
+            } else {
+              setClass(clsList[0]);
+            }
+          }
+          
         } catch(err) {
           console.error("Error loading teacher context:", err);
         } finally {
@@ -75,6 +115,14 @@ export function TeacherProvider({ children }) {
         setTeacherProfile(null);
         setAcademicYearsList([]);
         setSemestersList([]);
+        setClassesList([]);
+        setActiveAcademicYear(null);
+        setActiveSemester(null);
+        setActiveClass(null);
+        localStorage.removeItem('teacher_active_year');
+        localStorage.removeItem('teacher_active_semester');
+        localStorage.removeItem('teacher_active_class');
+        localStorage.removeItem('teacher_active_school');
         setLoadingContext(false);
       }
     });
@@ -113,7 +161,7 @@ export function TeacherProvider({ children }) {
       activeAcademicYear, setActiveAcademicYear: setYear,
       activeSemester, setActiveSemester: setSemester,
       activeClass, setActiveClass: setClass,
-      activeSchool, teacherProfile, academicYearsList, semestersList, loadingContext
+      activeSchool, teacherProfile, academicYearsList, semestersList, classesList, loadingContext
     }}>
       {children}
     </TeacherContext.Provider>

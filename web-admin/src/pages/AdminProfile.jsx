@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebase';
 import './AdminProfile.css';
@@ -13,7 +13,8 @@ export default function AdminProfile() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [activeTab, setActiveTab] = useState('payment'); // 'payment' or 'app_config'
+  const [activeTab, setActiveTab] = useState('payment'); // 'payment' or 'app_config' or 'login_logs'
+  const [loginLogs, setLoginLogs] = useState([]);
 
   const [appConfig, setAppConfig] = useState({
     devName: 'Sanjay Gore',
@@ -51,6 +52,15 @@ export default function AdminProfile() {
         }
       } catch (err) {
         console.error('Error fetching admin settings:', err);
+      }
+      
+      try {
+        const qLogs = query(collection(db, 'admin_logs'), orderBy('timestamp', 'desc'));
+        const logsSnap = await getDocs(qLogs);
+        const logsData = logsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setLoginLogs(logsData);
+      } catch (err) {
+        console.error('Error fetching admin logs:', err);
       } finally {
         setLoading(false);
       }
@@ -164,6 +174,13 @@ export default function AdminProfile() {
         >
           ⚙️ App &amp; Developer Config
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'login_logs' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('login_logs'); setMessage({ text: '', type: '' }); }}
+          type="button"
+        >
+          🔐 Login History
+        </button>
       </div>
 
       <div className="glass-panel profile-card animate-fade-in">
@@ -244,7 +261,7 @@ export default function AdminProfile() {
               </button>
             </div>
           </form>
-        ) : (
+        ) : activeTab === 'app_config' ? (
           <form onSubmit={handleSaveAppConfig} className="profile-form">
             <div className="form-grid">
               <div className="form-group">
@@ -324,7 +341,49 @@ export default function AdminProfile() {
               </button>
             </div>
           </form>
-        )}
+        ) : activeTab === 'login_logs' ? (
+          <div className="profile-form">
+            <h2>Admin Login History</h2>
+            <div className="login-stats" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+              <div><strong>Total Logins:</strong> {loginLogs.length}</div>
+              {Object.entries(loginLogs.reduce((acc, log) => {
+                acc[log.email] = (acc[log.email] || 0) + 1;
+                return acc;
+              }, {})).map(([email, count]) => (
+                <div key={email}><strong>{email}:</strong> {count}</div>
+              ))}
+            </div>
+            <div className="table-responsive" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Time</th>
+                    <th>Provider</th>
+                    <th>Location & IP</th>
+                    <th>Browser/Device Info</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loginLogs.map(log => (
+                    <tr key={log.id}>
+                      <td>{log.email}</td>
+                      <td>{log.timestamp ? new Date(log.timestamp.toDate()).toLocaleString() : 'Just now'}</td>
+                      <td>{log.provider}</td>
+                      <td>{log.location || 'Unknown Location'}</td>
+                      <td style={{ fontSize: '0.85em', color: '#888', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>{log.userAgent}</td>
+                    </tr>
+                  ))}
+                  {loginLogs.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: 'center' }}>No login records found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : null}
       </div>
     </main>
   );

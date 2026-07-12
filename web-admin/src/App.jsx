@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, checkIsAdmin } from './firebase';
+import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db, checkIsAdmin, logAdminLogin } from './firebase';
 import Login from './Login';
 import Dashboard from './Dashboard';
 import Layout from './components/Layout';
@@ -54,6 +55,32 @@ export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('myschool-lang') || 'en');
 
   useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const user = result.user;
+          const teacherRef = doc(db, 'teachers', user.uid);
+          const teacherDoc = await getDoc(teacherRef);
+          if (!teacherDoc.exists()) {
+            await setDoc(teacherRef, {
+              id: user.uid,
+              name: user.displayName || 'Teacher',
+              email: user.email,
+              phone: user.phoneNumber || '',
+              schoolName: '',
+              udiseCode: '',
+              schoolIds: []
+            });
+          }
+          await logAdminLogin(user, 'Google');
+        }
+      } catch (e) {
+        console.error("Redirect login error:", e);
+      }
+    };
+    checkRedirect();
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);

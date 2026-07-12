@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { auth } from './firebase';
+import { auth, logAdminLogin } from './firebase';
 import './Login.css';
 
 export default function Login() {
@@ -45,7 +45,8 @@ export default function Login() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      await logAdminLogin(userCred.user, 'Email (Admin Page)');
       setFailedAttempts(0);
       navigate('/admin');
     } catch (err) {

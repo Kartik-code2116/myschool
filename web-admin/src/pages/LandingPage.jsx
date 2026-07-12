@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db, checkIsAdmin } from '../firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signInWithRedirect, fetchSignInMethodsForEmail } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db, checkIsAdmin, googleProvider, logAdminLogin } from '../firebase';
 import './LandingPage.css';
 
 const translations = {
@@ -176,7 +176,7 @@ export default function LandingPage({ user, loading, lang }) {
 
   useEffect(() => {
     if (!loading && user) {
-      if (checkIsAdmin(user.email)) {
+      if (checkIsAdmin(user)) {
         navigate('/admin');
       } else {
         navigate('/app');
@@ -284,9 +284,26 @@ export default function LandingPage({ user, loading, lang }) {
     setSubmitting(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      await logAdminLogin(userCred.user, 'Email');
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      if (err.message && (err.message.includes('auth/wrong-password') || err.message.includes('auth/invalid-credential'))) {
+        try {
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          if (methods && methods.includes('google.com')) {
+            setError('This email is registered with Google. Please click "Continue with Google" below.');
+            setSubmitting(false);
+            return;
+          }
+        } catch (fetchErr) {
+          // Ignore if email enumeration protection blocks this
+        }
+        setError('Invalid email or password.');
+      } else if (err.message && err.message.includes('auth/user-not-found')) {
+        setError('No account found with this email.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
       setSubmitting(false);
     }
   };
@@ -319,7 +336,53 @@ export default function LandingPage({ user, loading, lang }) {
 
       setSuccess('Account created successfully!');
     } catch (err) {
-      setError(err.message || 'Sign up failed. Please try again.');
+      if (err.message && err.message.includes('auth/email-already-in-use')) {
+        setError('This email is already registered.');
+      } else if (err.message && err.message.includes('auth/weak-password')) {
+        setError('Password should be at least 6 characters.');
+      } else {
+        setError('Sign up failed. Please try again.');
+      }
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    setError('');
+    setSuccess('');
+    setSubmitting(true);
+    try {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      
+      if (isMobile) {
+        await signInWithRedirect(auth, googleProvider);
+        return; // Redirects the page, execution stops here
+      }
+
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      const teacherRef = doc(db, 'teachers', user.uid);
+      const teacherDoc = await getDoc(teacherRef);
+      if (!teacherDoc.exists()) {
+        await setDoc(teacherRef, {
+          id: user.uid,
+          name: user.displayName || 'Teacher',
+          email: user.email,
+          phone: user.phoneNumber || '',
+          schoolName: '',
+          udiseCode: '',
+          schoolIds: []
+        });
+      }
+      setSuccess('Google authentication successful!');
+      await logAdminLogin(user, 'Google');
+    } catch (err) {
+      if (err.message && err.message.includes('auth/popup-closed-by-user')) {
+        setError('Google sign in was cancelled.');
+      } else {
+        setError('Google authentication failed: ' + (err.message || 'Unknown error'));
+      }
       setSubmitting(false);
     }
   };
@@ -641,6 +704,21 @@ export default function LandingPage({ user, loading, lang }) {
 
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message">{success}</div>}
+
+            <div className="google-auth-section">
+              <button 
+                type="button" 
+                className="btn btn-outline google-auth-btn"
+                onClick={handleGoogleAuth}
+                disabled={submitting}
+              >
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" className="google-logo" />
+                Continue with Google
+              </button>
+              <div className="auth-divider">
+                <span>OR</span>
+              </div>
+            </div>
 
             {activeTab === 'login' ? (
               <form onSubmit={handleLogin} className="auth-form">

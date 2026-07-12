@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
   
     function isAdmin() {
-      return request.auth != null && request.auth.token.email in ['admin@myschool.com', 'kartikthorat2431@gmail.com'];
+      return request.auth != null && request.auth.token.email in ['admin@myschool.com', 'kartikthorat2116@gmail.com'];
     }
 
     match /teachers/{userId} {
@@ -16,6 +16,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    match /admin_logs/{docId} {
+      allow read, write: if isAdmin();
+    }
+    
     match /global_subjects/{docId} {
       allow read: if request.auth != null;
       allow write: if isAdmin();
@@ -23,7 +27,7 @@ service cloud.firestore {
 
     match /class_default_subjects/{docId} {
       allow read: if request.auth != null;
-      allow wrchite: if isAdmin();
+      allow write: if isAdmin();
     }
 
     match /subscriptions/{docId} {
