@@ -38,7 +38,7 @@ const translations = {
     btnRegister: "Register Profile",
     btnRegistering: "Registering...",
     footerCopy: "© 2026 EduReport Classroom Suite. All rights reserved.",
-    footerVersion: "Version 2.4.0 (Stable)",
+    footerVersion: "Version 1.2 (Stable)",
     footerOperator: "🔒 Operator Console",
     
     // Interactive How it works Section
@@ -108,7 +108,7 @@ const translations = {
     btnRegister: "नोंदणी करा",
     btnRegistering: "नोंदणी होत आहे...",
     footerCopy: "© २०२६ वार्षिक मूल्यमापन क्लासरूम सूट. सर्व हक्क राखीव.",
-    footerVersion: "आवृत्ती २.४.० (स्थिर)",
+    footerVersion: "आवृत्ती १.२ (स्थिर)",
     footerOperator: "🔒 ऑपरेटर कन्सोल",
     
     // Interactive How it works Section

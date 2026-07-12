@@ -327,7 +327,7 @@
     <string name="txt_save_as_pdf">PDF म्हणून सेव्ह करा</string>
     <string name="txt_copies_1">प्रती: १</string>
     <string name="txt_paper_size_iso_a4">• कागदाचा आकार: ISO A4</string>
-    <string name="txt_v1_0">v1.0</string>
+    <string name="txt_v1_0">v1.2</string>
     <string name="txt_reg">Reg:-</string>
     <string name="txt_roll_no_1">रोल क्रमांक १</string>
     <string name="txt_roll_no_2">रोल क्रमांक २</string>
@@ -453,7 +453,7 @@
     <string name="txt_comment_descriptors_are_applie">अंतिम अहवाल कार्ड वर्णनात्मक नोंदी निर्मिती दरम्यान टिप्पणी वर्णनकर्ता गतिशीलपणे लागू केले जातात.</string>
     <string name="txt_evaluation">मूल्यमापन</string>
     <string name="str_empty_13">कोणतेही विद्यार्थी आढळले नाही</string>
-    <string name="txt_myschool_1_0">वार्षिक मूल्यमापन 1.0</string>
+    <string name="txt_myschool_1_0">वार्षिक मूल्यमापन 1.2</string>
     <string name="txt_kartik_thorat">Kartik</string>
     <string name="welcome_back_name">स्वागत आहे,\n%1$s</string>
     <string name="txt_myschool">वार्षिक मूल्यमापन</string>
@@ -494,7 +494,7 @@
     <string name="txt_clear_cache">कॅशे साफ करा</string>
     <string name="txt_myschool_pro">वार्षिक मूल्यमापन प्रो</string>
     <string name="txt_smart_erp_for_school_results_a">शालेय निकालांसाठी स्मार्ट ईआरपी &amp;amp; अहवाल</string>
-    <string name="txt_version_1_0_0_build_2026_05">आवृत्ती 1.0.0 (बिल्ड 2026.05)</string>
+    <string name="txt_version_1_0_0_build_2026_05">आवृत्ती 1.2.0 (बिल्ड 2026.05)</string>
     <string name="txt_2026_advanced_agentic_coding_a">© 2026 प्रगत एजंटिक कोडिंग. सर्व हक्क राखीव.</string>
     <string name="txt_class_5_div_1_progress_dashboa">वर्ग 5 विभाग 1 - प्रगती डॅशबोर्ड</string>
     <string name="txt_0_students">0 विद्यार्थी</string>
@@ -584,7 +584,7 @@
     <string name="str_empty_55">विषय</string>
     <string name="str_empty_56">श्रेणी</string>
     <string name="str_empty_57">वर्णनात्मक नोंद</string>
-    <string name="txt_cce110">CCE110</string>
+    <string name="txt_cce110">Edu-report(1.2)</string>
     <string name="txt_about_student">विद्यार्थ्याबद्दल</string>
     <string name="txt_formative_summative">आकारिक संकलित</string>
     <string name="txt_attendance">हजेरी</string>
@@ -612,7 +612,7 @@
     <string name="msg_thank_you_for_rating_us_5_star">आम्हाला 5 तारे रेट केल्याबद्दल धन्यवाद!</string>
     <string name="msg_opening_more_apps_on_play_stor">Play Store वर आणखी ॲप्स उघडत आहे...</string>
     <string name="msg_language_updated">Language updated / भाषा बदलली</string>
-    <string name="msg_cce110">CCE110</string>
+    <string name="msg_cce110">Edu-report(1.2)</string>
     <string name="msg_select_language">Select Language / भाषा निवडा</string>
     <string name="msg_about_developer">विकसक बद्दल</string>
     <string name="msg_google_sign_in_coming_soon">Google साइन-इन लवकरच येत आहे</string>
