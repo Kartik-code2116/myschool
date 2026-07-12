@@ -410,7 +410,7 @@ export default function LandingPage({ user, loading, lang }) {
                 <div className="mock-student-card">
                   <div className="mock-avatar">K</div>
                   <div>
-                    <strong>Kartik Thorat</strong>
+                    <strong>Kartik</strong>
                     <span>Roll: 101 • {t.mockCategoryBadge}: OBC</span>
                   </div>
                 </div>
@@ -509,7 +509,7 @@ export default function LandingPage({ user, loading, lang }) {
                 </div>
                 <div className="mock-report-body">
                   <div className="mock-report-info">
-                    <span>Name: Kartik Thorat</span>
+                    <span>Name: Kartik</span>
                     <span>Std: 7th • Div: A</span>
                   </div>
                   <div className="mock-grades-summary">
@@ -706,7 +706,7 @@ export default function LandingPage({ user, loading, lang }) {
                   <input
                     id="signup-name"
                     type="text"
-                    placeholder="Kartik Thorat"
+                    placeholder="Kartik"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required

@@ -735,7 +735,6 @@ public class HomeActivity extends BaseActivity {
             popup.getMenu().add(0, R.id.nav_info_print, 1, "🏠 " + getString(R.string.menu_3dot_home));
             popup.getMenu().add(0, R.id.nav_class_div, 2, "🏫 " + getString(R.string.menu_3dot_classes));
             popup.getMenu().add(0, R.id.nav_students, 3, "👥 " + getString(R.string.menu_3dot_students));
-            popup.getMenu().add(0, 801, 5, "💬 " + getString(R.string.menu_3dot_message));
 
             // Utility options
             popup.getMenu().add(0, 901, 6, "🌐 " + getString(R.string.menu_3dot_language));
@@ -746,10 +745,7 @@ public class HomeActivity extends BaseActivity {
 
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
-                if (id == 801) {
-                    showAdminMessageDialog();
-                    return true;
-                } else if (id == 901) {
+                if (id == 901) {
                     // Fully functional bilingual language selector dialog
                     String[] languages = { "English", "मराठी (Marathi)" };
                     android.content.SharedPreferences prefs = getSharedPreferences("myschool_settings_prefs",
@@ -798,34 +794,6 @@ public class HomeActivity extends BaseActivity {
     private void showAboutDeveloperDialog() {
         android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://kartik-28deb.web.app/app_info.html"));
         startActivity(browserIntent);
-    }
-
-    private void showAdminMessageDialog() {
-        com.kartik.myschool.utils.LoadingDialog pd = new com.kartik.myschool.utils.LoadingDialog(this, null, getString(R.string.msg_checking_messages));
-        pd.show();
-
-        FirebaseRepository.get().getTeacherFresh(new FirebaseRepository.OnResult<Teacher>() {
-            @Override
-            public void onSuccess(Teacher teacher) {
-                pd.dismiss();
-                String message = (teacher != null && teacher.adminNote != null && !teacher.adminNote.trim().isEmpty())
-                        ? teacher.adminNote.trim()
-                        : getString(R.string.msg_no_admin_message);
-
-                new androidx.appcompat.app.AlertDialog.Builder(HomeActivity.this)
-                        .setTitle("✉️ " + getString(R.string.menu_3dot_message))
-                        .setMessage(message)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                pd.dismiss();
-                Toast.makeText(HomeActivity.this, "Failed to load message: " + e.getMessage(), Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
     }
 
     private void handleHomeMoreClick(View v) {

@@ -1,7 +1,7 @@
 package com.kartik.myschool.model;
 
 public class AppConfig {
-    public String devName = "Kartik Thorat";
+    public String devName = "Kartik";
     public String devEmail = "kartikthorat2116@gmail.com";
     public String devPhone = "";
     public String devWebsite = "";

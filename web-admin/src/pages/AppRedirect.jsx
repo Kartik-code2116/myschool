@@ -145,7 +145,7 @@ export default function AppRedirect({ user, lang }) {
               {/* App Header */}
               <div className="app-header-mock">
                 <span>Welcome back</span>
-                <h3>Kartik Thorat</h3>
+                <h3>Kartik</h3>
               </div>
 
               {/* Active Class Card */}
