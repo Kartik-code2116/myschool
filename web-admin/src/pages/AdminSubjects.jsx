@@ -178,6 +178,32 @@ export default function AdminSubjects() {
     setGlobalSequence(newSeq);
   };
 
+  const handleClassMoveUp = (index) => {
+    if (index === 0) return;
+    const newSubjects = [...classDefaults];
+    const temp = newSubjects[index - 1];
+    newSubjects[index - 1] = newSubjects[index];
+    newSubjects[index] = temp;
+    // Re-index subjectCodes
+    newSubjects.forEach((sub, i) => {
+      sub.subjectCode = String(i + 1).padStart(2, '0');
+    });
+    setClassDefaults(newSubjects);
+  };
+
+  const handleClassMoveDown = (index) => {
+    if (index === classDefaults.length - 1) return;
+    const newSubjects = [...classDefaults];
+    const temp = newSubjects[index + 1];
+    newSubjects[index + 1] = newSubjects[index];
+    newSubjects[index] = temp;
+    // Re-index subjectCodes
+    newSubjects.forEach((sub, i) => {
+      sub.subjectCode = String(i + 1).padStart(2, '0');
+    });
+    setClassDefaults(newSubjects);
+  };
+
   const fetchClassDefaults = async (className) => {
     setLoadingClass(true);
     try {
@@ -210,17 +236,10 @@ export default function AdminSubjects() {
         subjects = getHardcodedDefaults(className);
       }
       
-      // Sort subjects exactly according to globalSequence
-      subjects.sort((a, b) => {
-        let indexA = globalSequence.indexOf(a.name);
-        let indexB = globalSequence.indexOf(b.name);
-        if (indexA === -1) indexA = 999;
-        if (indexB === -1) indexB = 999;
-        return indexA - indexB;
-      });
+      // No forced sort! Allow class to have its own sequence.
 
       // Ensure every subject has a subjectCode and backfill properties
-      subjects = subjects.map((sub) => {
+      subjects = subjects.map((sub, idx) => {
         // Sanitize corrupted data: ensure built-in descriptive subjects have maxMarks=0
         const info = getSubjectInfo(sub.name);
         if (info) {
@@ -232,11 +251,8 @@ export default function AdminSubjects() {
           }
         }
         
-        if (!sub.subjectCode) {
-          let globalIndex = globalSequence.indexOf(sub.name);
-          if (globalIndex === -1) globalIndex = globalSequence.length;
-          sub.subjectCode = String(globalIndex + 1).padStart(2, '0');
-        }
+        // Auto-assign subjectCode based on array index so Android respects visual order
+        sub.subjectCode = String(idx + 1).padStart(2, '0');
         if (sub.isNonAcademic === undefined) {
           sub.isNonAcademic = false;
         }
@@ -276,25 +292,15 @@ export default function AdminSubjects() {
     }
 
     const info = getSubjectInfo(selectedSubjectToAdd);
-    let globalIndex = globalSequence.indexOf(selectedSubjectToAdd);
-    if (globalIndex === -1) globalIndex = globalSequence.length;
     const newSub = {
       name: selectedSubjectToAdd,
       maxMarks: info ? info.maxMarks : 100,
-      subjectCode: String(globalIndex + 1).padStart(2, '0'),
+      subjectCode: String(classDefaults.length + 1).padStart(2, '0'),
       isNonAcademic: info ? info.isNonAcademic : false
     };
 
     let newDefaults = [...classDefaults, newSub];
-    // Re-sort immediately based on global sequence
-    newDefaults.sort((a, b) => {
-      let indexA = globalSequence.indexOf(a.name);
-      let indexB = globalSequence.indexOf(b.name);
-      if (indexA === -1) indexA = 999;
-      if (indexB === -1) indexB = 999;
-      return indexA - indexB;
-    });
-
+    // Just append to the end, they can move it up/down
     setClassDefaults(newDefaults);
     setSelectedSubjectToAdd('');
     setMessage({ text: '', type: '' });
@@ -710,7 +716,7 @@ export default function AdminSubjects() {
             <div className="editor-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3>Active Subjects for Class {selectedClass}</h3>
-                <p className="helper-text" style={{margin: 0}}>Order is locked to the Global Sequence.</p>
+                <p className="helper-text" style={{margin: 0}}>Reorder subjects to define the default sequence for this class.</p>
               </div>
               <button className="btn btn-primary" onClick={handleSaveClassDefaults} disabled={saving}>
                 {saving ? 'Saving...' : '💾 Save Class Defaults'}
@@ -771,7 +777,9 @@ export default function AdminSubjects() {
                         )}
                         <div className="sequence-item" style={{ marginBottom: '8px' }}>
                         <div className="sequence-controls">
-                          <span className="seq-number" style={{ background: '#eee', color: '#666' }}>{globalIndex !== -1 ? globalIndex + 1 : '-'}</span>
+                          <button type="button" className="seq-btn" onClick={() => handleClassMoveUp(index)} disabled={index === 0}>↑</button>
+                          <span className="seq-number" style={{ background: '#eee', color: '#666' }}>{index + 1}</span>
+                          <button type="button" className="seq-btn" onClick={() => handleClassMoveDown(index)} disabled={index === classDefaults.length - 1}>↓</button>
                         </div>
                         
                         <div className="sequence-info">

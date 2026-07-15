@@ -18,6 +18,7 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
 
     public static class SubjectItem {
         public String name;
+        public String shortName;
         public String code;
         public String serial;
         public String category; // "Academic", "Activities", "Personality"
@@ -27,9 +28,10 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         public String detailsRight1;
         public String colorHex;
 
-        public SubjectItem(String name, String code, String serial, String category, int maxMarks,
+        public SubjectItem(String name, String shortName, String code, String serial, String category, int maxMarks,
                            String detailsLeft1, String detailsLeft2, String detailsRight1, String colorHex) {
             this.name = name;
+            this.shortName = shortName;
             this.code = code;
             this.serial = serial;
             this.category = category;

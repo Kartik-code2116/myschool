@@ -95,6 +95,7 @@ public class SubjectsFragment extends Fragment {
             if (isActive) {
                 if (match == null) {
                     Subject newSub = new Subject(item.name, item.maxMarks);
+                    newSub.shortName = item.shortName;
                     newSub.subjectCode = item.code;
                     selectedClass.subjects.add(newSub);
                 }
@@ -297,7 +298,7 @@ public class SubjectsFragment extends Fragment {
                 int se = active.maxTondi + active.maxPratyakshikB + active.maxLekhi;
                 String seStr = se > 0 ? "SE: " + se : "";
                 String code = (active.subjectCode != null && !active.subjectCode.isEmpty()) ? active.subjectCode : "";
-                predefined.add(new SubjectAdapter.SubjectItem(active.name, code, orderStr, "Custom", active.maxMarks, "FE: " + fe, seStr, "", "#9C27B0"));
+                predefined.add(new SubjectAdapter.SubjectItem(active.name, active.shortName, code, orderStr, "Custom", active.maxMarks, "FE: " + fe, seStr, "", "#9C27B0"));
             }
         }
         
@@ -331,7 +332,7 @@ public class SubjectsFragment extends Fragment {
                             int fe = gSub.maxNirikhshan + gSub.maxTondiKam + gSub.maxPratyakshik + gSub.maxUpkram + gSub.maxPrakalp + gSub.maxChachani + gSub.maxSwadhyay + gSub.maxItar;
                             int se = gSub.maxTondi + gSub.maxPratyakshikB + gSub.maxLekhi;
                             String seStr = se > 0 ? "SE: " + se : "";
-                            currentList.add(new SubjectAdapter.SubjectItem(gSub.name, "", orderStr, "Global", gSub.maxMarks, "FE: " + fe, seStr, "", "#FF5722"));
+                            currentList.add(new SubjectAdapter.SubjectItem(gSub.name, gSub.shortName, "", orderStr, "Global", gSub.maxMarks, "FE: " + fe, seStr, "", "#FF5722"));
                         }
                     }
                     List<SubjectAdapter.SubjectItem> finalGlobal = deduplicateItems(currentList);
@@ -340,6 +341,28 @@ public class SubjectsFragment extends Fragment {
                         finalGlobal = filterActiveItems(finalGlobal, activeSubjects);
                     }
                     adapter.setData(finalGlobal, activeSubjects);
+
+                    // Silently sync missing shortNames for active subjects from globalSubjects!
+                    boolean activeChanged = false;
+                    for (Subject active : activeSubjects) {
+                        if (active.shortName == null || active.shortName.trim().isEmpty()) {
+                            for (Subject gSub : globalSubjects) {
+                                if (Subject.isSameSubject(active.name, gSub.name) && gSub.shortName != null && !gSub.shortName.trim().isEmpty()) {
+                                    active.shortName = gSub.shortName.trim();
+                                    activeChanged = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (activeChanged) {
+                        SessionContext.save(getContext());
+                        com.kartik.myschool.AppCache.selectedClass = SessionContext.selectedClass;
+                        FirebaseRepository.get().saveClass(SessionContext.selectedClass, new FirebaseRepository.OnResult<String>() {
+                            @Override public void onSuccess(String result) {}
+                            @Override public void onError(Exception e) {}
+                        });
+                    }
                 }
             }
             @Override
@@ -347,6 +370,41 @@ public class SubjectsFragment extends Fragment {
                 // Ignore, just use predefined
             }
         });
+
+        // Silently sync missing shortNames from admin defaults for existing classes
+        if (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) {
+            String cName = SessionContext.selectedClass.className.replaceAll("[^0-9]", "");
+            if (!cName.isEmpty()) {
+                FirebaseRepository.get().getClassDefaultSubjects(cName, new FirebaseRepository.OnResult<List<Subject>>() {
+                    @Override
+                    public void onSuccess(List<Subject> defaultSubjects) {
+                        if (defaultSubjects == null || defaultSubjects.isEmpty() || !isAdded()) return;
+                        boolean changed = false;
+                        for (Subject active : activeSubjects) {
+                            if (active.shortName == null || active.shortName.trim().isEmpty()) {
+                                for (Subject def : defaultSubjects) {
+                                    if (Subject.isSameSubject(active.name, def.name) && def.shortName != null && !def.shortName.trim().isEmpty()) {
+                                        active.shortName = def.shortName.trim();
+                                        changed = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (changed) {
+                            SessionContext.save(getContext());
+                            com.kartik.myschool.AppCache.selectedClass = SessionContext.selectedClass;
+                            FirebaseRepository.get().saveClass(SessionContext.selectedClass, new FirebaseRepository.OnResult<String>() {
+                                @Override public void onSuccess(String result) {}
+                                @Override public void onError(Exception e) {}
+                            });
+                            if (adapter != null) adapter.notifyDataSetChanged();
+                        }
+                    }
+                    @Override public void onError(Exception e) {}
+                });
+            }
+        }
     }
 
     private List<SubjectAdapter.SubjectItem> filterActiveItems(List<SubjectAdapter.SubjectItem> list, List<Subject> activeSubjects) {
@@ -628,12 +686,12 @@ public class SubjectsFragment extends Fragment {
     private SubjectAdapter.SubjectItem createItem(String name, String code, String serial, String category, int maxMarks, String color) {
         Subject s = new Subject(name, maxMarks);
         if (maxMarks == 0 || Subject.isDescriptiveOnly(name)) {
-            return new SubjectAdapter.SubjectItem(name, code, serial, category, 0, "Only Descriptive", "", "", color);
+            return new SubjectAdapter.SubjectItem(name, null, code, serial, category, 0, "Only Descriptive", "", "", color);
         }
         int fe = s.maxNirikhshan + s.maxTondiKam + s.maxPratyakshik + s.maxUpkram + s.maxPrakalp + s.maxChachani + s.maxSwadhyay + s.maxItar;
         int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
         String seStr = se > 0 ? "SE: " + se : "";
-        return new SubjectAdapter.SubjectItem(name, code, serial, category, maxMarks, "FE: " + fe, seStr, "", color);
+        return new SubjectAdapter.SubjectItem(name, null, code, serial, category, maxMarks, "FE: " + fe, seStr, "", color);
     }
 
     private List<SubjectAdapter.SubjectItem> getPredefinedSubjects() {

@@ -563,6 +563,7 @@ public class FirebaseRepository {
                                 String name = map.containsKey("name") ? (String) map.get("name") : "";
                                 int maxMarks = parseMapInt(map, "maxMarks", 100);
                                 com.kartik.myschool.model.Subject s = new com.kartik.myschool.model.Subject(name, maxMarks);
+                                if (map.containsKey("shortName")) s.shortName = (String) map.get("shortName");
                                 if (map.containsKey("subjectCode")) s.subjectCode = (String) map.get("subjectCode");
                                 
                                 boolean isDescriptive = false;
@@ -1963,6 +1964,8 @@ public class FirebaseRepository {
                                 
                                 if (name != null && !name.trim().isEmpty()) {
                                     com.kartik.myschool.model.Subject s = new com.kartik.myschool.model.Subject(name.trim(), maxMarks);
+                                    String shortName = doc.getString("shortName");
+                                    if (shortName != null) s.shortName = shortName;
                                     if (Boolean.TRUE.equals(isNonAcademic)) {
                                         s.maxTondi = 0;
                                         s.maxPratyakshikB = 0;
