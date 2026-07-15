@@ -35,14 +35,27 @@
   margin-bottom: 15px;
 }
 
+.subject-name-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 80%;
+}
+
 .subject-header input {
   font-size: 1.1rem;
   font-weight: bold;
   border: none;
   background: transparent;
   padding: 5px;
-  width: 80%;
+  width: 100%;
   color: var(--primary-color);
+}
+
+.subject-header input:nth-child(2) {
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: var(--text-secondary);
 }
 
 .subject-header input:focus {

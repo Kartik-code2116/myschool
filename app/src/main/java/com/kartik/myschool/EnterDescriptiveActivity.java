@@ -250,7 +250,7 @@ public class EnterDescriptiveActivity extends BaseActivity {
 
     private void addRemarkRow(Subject sub) {
         ItemSubjectRemarkRowBinding row = ItemSubjectRemarkRowBinding.inflate(LayoutInflater.from(this), b.llRemarkRows, false);
-        row.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, sub.name));
+        row.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, sub));
 
         // Hide "Select" button as we are showing the choices directly for fast action!
         row.btnAddRemark.setVisibility(View.GONE);

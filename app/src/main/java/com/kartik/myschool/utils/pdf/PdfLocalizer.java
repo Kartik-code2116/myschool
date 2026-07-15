@@ -1,6 +1,7 @@
 package com.kartik.myschool.utils.pdf;
 
 import android.content.Context;
+import com.kartik.myschool.model.Subject;
 
 public class PdfLocalizer {
     private static Boolean cachedIsEnglish = null;
@@ -25,6 +26,14 @@ public class PdfLocalizer {
         String lang = prefs.getString("language", "mr");
         cachedIsEnglish = "en".equals(lang);
         return cachedIsEnglish;
+    }
+
+    public static String translateSubject(Context ctx, Subject sub) {
+        if (sub == null) return "";
+        if (sub.shortName != null && !sub.shortName.trim().isEmpty()) {
+            return sub.shortName.trim();
+        }
+        return translateSubject(ctx, sub.name);
     }
 
     public static String translateSubject(Context ctx, String subName) {

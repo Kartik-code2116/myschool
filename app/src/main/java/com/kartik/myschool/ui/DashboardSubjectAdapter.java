@@ -52,7 +52,7 @@ public class DashboardSubjectAdapter extends RecyclerView.Adapter<DashboardSubje
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         SubjectStats stat = statsList.get(position);
         
-        holder.tvSubjectName.setText(stat.number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(holder.itemView.getContext(), stat.subject.name));
+        holder.tvSubjectName.setText(stat.number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(holder.itemView.getContext(), stat.subject));
         
         holder.tvFormativeCount.setText(stat.formativeFilled + " / " + stat.totalStudents);
         holder.tvSummativeCount.setText(stat.summativeFilled + " / " + stat.totalStudents);

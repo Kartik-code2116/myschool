@@ -42,6 +42,7 @@ export default function AppSubjects() {
     if (name) {
       const newSub = {
         name: name,
+        shortName: "",
         subjectCode: "",
         maxMarks: 100,
         // Formative
@@ -138,12 +139,22 @@ export default function AppSubjects() {
                   
                   {/* Card Header (Name & Delete) */}
                   <div className="subject-header">
-                    <input 
-                      type="text" 
-                      value={sub.name} 
-                      onChange={e => handleFieldChange(idx, 'name', e.target.value)}
-                      placeholder={t("Subject Name", "विषयाचे नाव")}
-                    />
+                    <div className="subject-name-inputs">
+                      <input 
+                        type="text" 
+                        value={sub.name} 
+                        onChange={e => handleFieldChange(idx, 'name', e.target.value)}
+                        placeholder={t("Subject Name", "विषयाचे नाव")}
+                        title={t("Subject Name", "विषयाचे नाव")}
+                      />
+                      <input 
+                        type="text" 
+                        value={sub.shortName || ""} 
+                        onChange={e => handleFieldChange(idx, 'shortName', e.target.value)}
+                        placeholder={t("Short Name", "लहान नाव")}
+                        title={t("Short Name (used in reports)", "लहान नाव (रिपोर्टमध्ये वापरले जाईल)")}
+                      />
+                    </div>
                     <button 
                       className="subject-delete-btn"
                       onClick={() => handleDeleteSubject(idx)}

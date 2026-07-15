@@ -269,7 +269,7 @@ public class RosterGradeTableGenerator {
             alt = !alt;
 
             cellSpan(tbl, String.valueOf(si + 1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
+            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_LEFT);
 
             int rowBoys = 0, rowGirls = 0;
             for (int gi = 0; gi < numGrades; gi++) {

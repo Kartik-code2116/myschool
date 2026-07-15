@@ -77,6 +77,8 @@ public class ResultSheetGenerator {
                 int maxTotal = 0;
                 if (cls != null && cls.subjects != null) {
                     for (Subject s : cls.subjects) {
+                        if (s.maxMarks == 0) continue; // Skip descriptive subjects
+                        
                         if (isNonAcademic(s.name)) {
                             nonAcaSubs.add(s);
                         } else {
@@ -190,11 +192,11 @@ public class ResultSheetGenerator {
         addWrappedTh(tbl, PdfLocalizer.get(ctx, "हजर दिन", "Attendance"), 1, 2, 25f);
 
         for (Subject sub : acaSubs) {
-            addTh(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 3, 1);
+            addTh(tbl, PdfLocalizer.translateSubject(ctx, sub), 3, 1);
         }
         for (Subject sub : nonAcaSubs) {
             com.kartik.myschool.utils.pdf.GunapattrakGenerator.cellVerticalSpan(tbl, ctx,
-                    PdfLocalizer.translateSubject(ctx, sub.name), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
+                    PdfLocalizer.translateSubject(ctx, sub), fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
         }
 
         addWrappedTh(tbl, PdfLocalizer.get(ctx, "एकूण ", "Total ") + maxTotal, 1, 2, 30f);

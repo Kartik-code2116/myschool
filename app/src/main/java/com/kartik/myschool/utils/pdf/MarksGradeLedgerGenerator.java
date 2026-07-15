@@ -301,7 +301,7 @@ public class MarksGradeLedgerGenerator {
             botAlt = !botAlt;
 
             cellSpan(botTbl, str(si + 1), fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(botTbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, C_DARK, 1, 1,
+            cellSpan(botTbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, bg, C_DARK, 1, 1,
                     Element.ALIGN_LEFT);
 
             int rowTotal = 0;

@@ -139,4 +139,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Image Cropper
+    implementation("com.vanniktech:android-image-cropper:4.6.0")
 }

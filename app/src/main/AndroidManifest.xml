@@ -71,7 +71,12 @@
         <activity android:name=".ui.SubscriptionHistoryActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
         <activity android:name=".ui.SubscriptionSuccessActivity" android:exported="false" android:theme="@style/Theme.EduReport"/>
 
-
+        <!-- Declare CropImageActivity explicitly to give it a theme with an ActionBar so the save button is visible -->
+        <activity
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+            android:exported="true"
+            tools:replace="android:theme"/>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

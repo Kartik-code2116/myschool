@@ -252,7 +252,7 @@ public class BothSemDescriptiveGenerator {
             String grade = findGrade(rec, sub.name);
 
             addDataCell(tbl, String.valueOf(rowIdx), fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
-            addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, Element.ALIGN_LEFT, 28f, 77f);
+            addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, bg, Element.ALIGN_LEFT, 28f, 77f);
             addDataCell(tbl, grade, fSmallBold, bg, Element.ALIGN_CENTER, 28f, -1f);
 
             if (rowIdx == 1) {

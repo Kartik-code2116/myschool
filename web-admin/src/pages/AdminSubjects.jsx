@@ -91,6 +91,11 @@ export default function AdminSubjects() {
   const [loadingClass, setLoadingClass] = useState(false);
   const [selectedSubjectToAdd, setSelectedSubjectToAdd] = useState('');
 
+  // States for Edit Modal
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingSubject, setEditingSubject] = useState(null);
+  const [editData, setEditData] = useState({});
+
   useEffect(() => {
     fetchGlobalData();
   }, []);
@@ -387,6 +392,133 @@ export default function AdminSubjects() {
     }
   };
 
+  const handleOpenEditModal = (subjectName) => {
+    const info = getSubjectInfo(subjectName);
+    
+    // Check if it exists in global_subjects
+    const custom = globalSubjects.find(s => s.name === subjectName);
+    
+    let defaultFormative = info.maxMarks === 0 ? 0 : (info.maxMarks / 2);
+    let defaultSummative = info.maxMarks === 0 ? 0 : (info.maxMarks - defaultFormative);
+    
+    // Set up default values
+    const data = {
+      name: subjectName,
+      shortName: custom?.shortName || '',
+      maxMarks: info.maxMarks,
+      category: info.category,
+      isNonAcademic: info.isNonAcademic,
+      maxNirikhshan: custom?.maxNirikhshan || 0,
+      maxTondiKam: custom?.maxTondiKam ?? (defaultFormative * 10 / 50),
+      maxPratyakshik: custom?.maxPratyakshik ?? (defaultFormative * 10 / 50),
+      maxUpkram: custom?.maxUpkram ?? (defaultFormative * 10 / 50),
+      maxPrakalp: custom?.maxPrakalp || 0,
+      maxChachani: custom?.maxChachani ?? (defaultFormative * 20 / 50),
+      maxSwadhyay: custom?.maxSwadhyay || 0,
+      maxItar: custom?.maxItar || 0,
+      maxTondi: custom?.maxTondi ?? (defaultSummative * 10 / 50),
+      maxPratyakshikB: custom?.maxPratyakshikB ?? (defaultSummative * 10 / 50),
+      maxLekhi: custom?.maxLekhi ?? (defaultSummative - (defaultSummative * 10 / 50) - (defaultSummative * 10 / 50))
+    };
+
+    if (info.maxMarks === 0 || info.isNonAcademic) {
+      data.maxTondi = 0;
+      data.maxPratyakshikB = 0;
+      data.maxLekhi = 0;
+    }
+
+    setEditingSubject({ originalName: subjectName, id: info.id, type: info.type });
+    setEditData(data);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEditModal = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    
+    try {
+      const oldName = editingSubject.originalName;
+      const newName = editData.name.trim();
+      
+      const updatedCustomObj = {
+        name: newName,
+        shortName: editData.shortName.trim(),
+        maxMarks: Number(editData.maxMarks),
+        category: editData.category,
+        isNonAcademic: Boolean(editData.isNonAcademic),
+        maxNirikhshan: Number(editData.maxNirikhshan),
+        maxTondiKam: Number(editData.maxTondiKam),
+        maxPratyakshik: Number(editData.maxPratyakshik),
+        maxUpkram: Number(editData.maxUpkram),
+        maxPrakalp: Number(editData.maxPrakalp),
+        maxChachani: Number(editData.maxChachani),
+        maxSwadhyay: Number(editData.maxSwadhyay),
+        maxItar: Number(editData.maxItar),
+        maxTondi: Number(editData.maxTondi),
+        maxPratyakshikB: Number(editData.maxPratyakshikB),
+        maxLekhi: Number(editData.maxLekhi),
+        updatedAt: new Date().getTime()
+      };
+
+      // 1. Save to global_subjects
+      let savedId = editingSubject.id;
+      if (editingSubject.type === 'Custom' && savedId) {
+        await setDoc(doc(db, 'global_subjects', savedId), updatedCustomObj, { merge: true });
+        setGlobalSubjects(globalSubjects.map(s => s.id === savedId ? { id: savedId, ...updatedCustomObj } : s));
+      } else {
+        // It was Built-in, now saving as Custom overriding the built-in
+        const docRef = await addDoc(collection(db, 'global_subjects'), { ...updatedCustomObj, createdAt: new Date().getTime() });
+        savedId = docRef.id;
+        setGlobalSubjects([...globalSubjects, { id: savedId, ...updatedCustomObj }]);
+      }
+
+      // 2. Update globalSequence if name changed
+      if (oldName !== newName) {
+        const newSeq = [...globalSequence];
+        const idx = newSeq.indexOf(oldName);
+        if (idx !== -1) {
+          newSeq[idx] = newName;
+          setGlobalSequence(newSeq);
+          await setDoc(doc(db, 'admin_settings', 'global_subject_sequence'), { subjects: newSeq });
+        }
+      }
+
+      // 3. Sync to all class_default_subjects
+      for (let i = 1; i <= 10; i++) {
+        const classRef = doc(db, 'class_default_subjects', `Class_${i}`);
+        const snap = await getDoc(classRef);
+        if (snap.exists() && snap.data().subjects) {
+          let subs = snap.data().subjects;
+          let changed = false;
+          
+          for (let j = 0; j < subs.length; j++) {
+            if (subs[j].name === oldName) {
+               // Update all details
+               subs[j] = { ...subs[j], ...updatedCustomObj };
+               changed = true;
+            }
+          }
+          if (changed) {
+            await setDoc(classRef, { subjects: subs }, { merge: true });
+          }
+        }
+      }
+
+      setMessage({ text: 'Subject updated successfully and synced to all classes!', type: 'success' });
+      setEditModalOpen(false);
+      
+      // Refresh current class view if we are on class defaults
+      if (activeTab === 'classDefaults') {
+        fetchClassDefaults(selectedClass);
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage({ text: 'Error saving: ' + error.message, type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const getSubjectInfo = (subjectName) => {
     const custom = globalSubjects.find(s => s.name === subjectName);
     if (custom) return { type: 'Custom', category: custom.category, maxMarks: custom.maxMarks, isNonAcademic: custom.isNonAcademic, id: custom.id };
@@ -540,9 +672,12 @@ export default function AdminSubjects() {
                             ) : null}
                           </div>
                         </div>
-                        {info.type === 'Custom' && (
-                          <button type="button" className="btn-delete-subject" onClick={() => handleDeleteGlobalSubject(info.id, subjectName)} title="Delete Custom Subject">×</button>
-                        )}
+                        <div className="sequence-actions" style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                          <button type="button" className="btn btn-secondary" onClick={() => handleOpenEditModal(subjectName)} style={{ padding: '4px 8px', fontSize: '0.8rem' }}>Edit</button>
+                          {info.type === 'Custom' && (
+                            <button type="button" className="btn-delete-subject" onClick={() => handleDeleteGlobalSubject(info.id, subjectName)} title="Delete Custom Subject">×</button>
+                          )}
+                        </div>
                       </div>
                       </React.Fragment>
                     );
@@ -682,6 +817,109 @@ export default function AdminSubjects() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {editModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content admin-modal">
+            <div className="modal-header">
+              <h2>Edit Global Subject: {editingSubject?.originalName}</h2>
+              <button className="close-btn" onClick={() => setEditModalOpen(false)}>✕</button>
+            </div>
+            
+            <form onSubmit={handleSaveEditModal} className="admin-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Subject Name</label>
+                  <input 
+                    type="text" 
+                    value={editData.name} 
+                    onChange={e => setEditData({...editData, name: e.target.value})} 
+                    required 
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Short Name</label>
+                  <input 
+                    type="text" 
+                    value={editData.shortName} 
+                    onChange={e => setEditData({...editData, shortName: e.target.value})} 
+                    placeholder="Used in report headers"
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Category</label>
+                  <select value={editData.category} onChange={e => setEditData({...editData, category: e.target.value})}>
+                    <option value="Academic">Academic</option>
+                    <option value="Activities">Activities</option>
+                    <option value="Personality">Personality Development</option>
+                    <option value="State Board">State Board Addition</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Max Marks</label>
+                  <input 
+                    type="number" 
+                    value={editData.maxMarks} 
+                    onChange={e => setEditData({...editData, maxMarks: e.target.value})} 
+                    min="0" max="1000" 
+                    disabled={editData.isNonAcademic}
+                    required 
+                  />
+                </div>
+              </div>
+              
+              <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                <input 
+                  type="checkbox" 
+                  id="editIsDescriptive"
+                  checked={editData.isNonAcademic}
+                  onChange={e => setEditData({...editData, isNonAcademic: e.target.checked})}
+                  style={{ width: 'auto' }}
+                />
+                <label htmlFor="editIsDescriptive" style={{ margin: 0, cursor: 'pointer' }}>
+                  Only Descriptive Entries (No Marks / Graded)
+                </label>
+              </div>
+
+              {!editData.isNonAcademic && (
+                <div className="marks-grid-editor">
+                  <div className="marks-section">
+                    <h4>Formative (आकारिक)</h4>
+                    <div className="grid-2col">
+                      <div><label>Observation</label><input type="number" value={editData.maxNirikhshan} onChange={e=>setEditData({...editData, maxNirikhshan: e.target.value})} /></div>
+                      <div><label>Oral</label><input type="number" value={editData.maxTondiKam} onChange={e=>setEditData({...editData, maxTondiKam: e.target.value})} /></div>
+                      <div><label>Practical</label><input type="number" value={editData.maxPratyakshik} onChange={e=>setEditData({...editData, maxPratyakshik: e.target.value})} /></div>
+                      <div><label>Activity</label><input type="number" value={editData.maxUpkram} onChange={e=>setEditData({...editData, maxUpkram: e.target.value})} /></div>
+                      <div><label>Project</label><input type="number" value={editData.maxPrakalp} onChange={e=>setEditData({...editData, maxPrakalp: e.target.value})} /></div>
+                      <div><label>Test</label><input type="number" value={editData.maxChachani} onChange={e=>setEditData({...editData, maxChachani: e.target.value})} /></div>
+                      <div><label>Homework</label><input type="number" value={editData.maxSwadhyay} onChange={e=>setEditData({...editData, maxSwadhyay: e.target.value})} /></div>
+                      <div><label>Other</label><input type="number" value={editData.maxItar} onChange={e=>setEditData({...editData, maxItar: e.target.value})} /></div>
+                    </div>
+                  </div>
+                  <div className="marks-section">
+                    <h4>Summative (संकलित)</h4>
+                    <div className="grid-2col">
+                      <div><label>Oral</label><input type="number" value={editData.maxTondi} onChange={e=>setEditData({...editData, maxTondi: e.target.value})} /></div>
+                      <div><label>Practical</label><input type="number" value={editData.maxPratyakshikB} onChange={e=>setEditData({...editData, maxPratyakshikB: e.target.value})} /></div>
+                      <div><label>Written</label><input type="number" value={editData.maxLekhi} onChange={e=>setEditData({...editData, maxLekhi: e.target.value})} /></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="modal-footer" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setEditModalOpen(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? 'Saving...' : '💾 Save & Sync Globally'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

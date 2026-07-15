@@ -78,6 +78,7 @@ public class MarksRegisterGenerator {
                 List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new java.util.ArrayList<>();
                 boolean isFirst = true;
                 for (Subject sub : subjects) {
+                    if (sub.maxMarks == 0) continue; // Skip descriptive remark subjects with no marks
                     if (!isFirst) doc.newPage();
                     isFirst = false;
                     addSubjectPage(doc, ctx, school, cls, students, marksMap, sub, isSem2);
@@ -162,7 +163,7 @@ public class MarksRegisterGenerator {
         PdfPTable hdr2 = new PdfPTable(new float[]{1.5f, 1f, 1f});
         hdr2.setWidthPercentage(100);
         addNoBorder(hdr2, PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Division: ") + division, fSmall,     Element.ALIGN_LEFT);
-        addNoBorder(hdr2, PdfLocalizer.translateSubject(ctx, sub.name),                                    fSmallBold, Element.ALIGN_CENTER);
+        addNoBorder(hdr2, PdfLocalizer.translateSubject(ctx, sub),                                    fSmallBold, Element.ALIGN_CENTER);
         addNoBorder(hdr2, semLabel,                                         fSmallBold, Element.ALIGN_RIGHT);
         hdr2.setSpacingAfter(5);
         doc.add(hdr2);
@@ -424,8 +425,15 @@ public class MarksRegisterGenerator {
                 int grandObtained = 0;
                 int grandMax = 0;
 
-                for (int i = 0; i < subjects.size(); i++) {
-                    Subject sub = subjects.get(i);
+                List<Subject> filteredSubjects = new java.util.ArrayList<>();
+                for (Subject s : subjects) {
+                    if (s.maxMarks > 0) {
+                        filteredSubjects.add(s);
+                    }
+                }
+
+                for (int i = 0; i < filteredSubjects.size(); i++) {
+                    Subject sub = filteredSubjects.get(i);
                     MarksRecord.SubjectMarksDetail d = detail(sem1, sub.name);
 
                     int formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik
@@ -454,7 +462,7 @@ public class MarksRegisterGenerator {
                     // Sr.No spans 2 rows
                     cellSpan(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
                     // Subject name spans 2 rows
-                    cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_LEFT);
+                    cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_LEFT);
                     // तपशील: प्राप्त
                     cellSpan(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
 

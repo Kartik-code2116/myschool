@@ -29,8 +29,27 @@ public class StudentProfileActivity extends BaseActivity {
     private ImageView dialogPhotoPreview;
     private android.graphics.Bitmap currentPhotoBitmap;
     private Uri tempCameraUri;
+    private Uri currentPhotoUri;
     private static final int REQ_CODE_CAMERA = 1001;
     private static final int REQ_CODE_GALLERY = 1002;
+
+    private final androidx.activity.result.ActivityResultLauncher<com.canhub.cropper.CropImageContractOptions> cropImageLauncher =
+            registerForActivityResult(new com.canhub.cropper.CropImageContract(), result -> {
+                if (result.isSuccessful()) {
+                    Uri croppedUri = result.getUriContent();
+                    try {
+                        android.graphics.Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(), croppedUri);
+                        currentPhotoBitmap = bitmap;
+                        if (dialogPhotoPreview != null) {
+                            dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(this, "क्रॉप केलेला फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                } else if (result.getError() != null) {
+                    Toast.makeText(this, "त्रुटी: " + result.getError().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     public void finish() {
@@ -298,7 +317,7 @@ public class StudentProfileActivity extends BaseActivity {
         if (upper.equals("NT") || upper.contains("NOMADIC TRIBES") || upper.contains("NOMADIC TRIBE") || upper.contains("BHATKYA") || upper.contains("à¤­à¤Ÿà¤•à¥à¤¯à¤¾") || upper.contains("à¤­.à¤œ.")) {
             return "NT";
         }
-        if (upper.equals("OBC") || upper.contains("OTHER BACKWARD") || upper.contains("à¤‡à¤¤à¤° à¤®à¤¾à¤—à¤¾à¤¸") || upper.contains("à¤‡.à¤®à¤¾.à¤µ.")) {
+        if (upper.equals("OBC") || upper.contains("OTHER BACKWARD") || upper.contains("इतर मागास") || upper.contains("इ.मा.व.")) {
             return "OBC";
         }
         if (upper.equals("SBC") || upper.contains("SPECIAL BACKWARD") || upper.contains("à¤µà¤¿à¤¶à¥‡à¤· à¤®à¤¾à¤—à¤¾à¤¸") || upper.contains("à¤µà¤¿.à¤®à¤¾.à¤ªà¥à¤°.")) {
@@ -775,9 +794,9 @@ public class StudentProfileActivity extends BaseActivity {
         }
 
         btnCamera.setOnClickListener(v -> {
-            String[] options = {"à¤•à¥…à¤®à¥‡à¤°à¤¾ (Camera)", "à¤—à¥…à¤²à¤°à¥€ (Gallery)"};
+            String[] options = {"कॅमेरा (Camera)", "गॅलरी (Gallery)"};
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                    .setTitle("à¤«à¥‹à¤Ÿà¥‹à¤šà¤¾ à¤¸à¥à¤¤à¥à¤°à¥‹à¤¤ à¤¨à¤¿à¤µà¤¡à¤¾ (Choose Photo Source)")
+                    .setTitle("फोटोचा स्त्रोत निवडा (Choose Photo Source)")
                     .setItems(options, (dialogInterface, which) -> {
                         if (which == 0) {
                             launchCamera();
@@ -789,24 +808,37 @@ public class StudentProfileActivity extends BaseActivity {
         });
 
         btnCrop.setOnClickListener(v -> {
-            if (currentPhotoBitmap != null) {
-                int width = currentPhotoBitmap.getWidth();
-                int height = currentPhotoBitmap.getHeight();
-                int newWidth = Math.min(width, height);
-                int cropW = (width - newWidth) / 2;
-                int cropH = (height - newWidth) / 2;
-                currentPhotoBitmap = android.graphics.Bitmap.createBitmap(currentPhotoBitmap, cropW, cropH, newWidth, newWidth);
-                dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
-                Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤•à¥à¤°à¥‰à¤ª à¤•à¥‡à¤²à¤¾", Toast.LENGTH_SHORT).show();
+            if (currentPhotoUri == null && currentPhotoBitmap != null) {
+                try {
+                    java.io.File tempFile = new java.io.File(getExternalCacheDir(), "temp_crop.jpg");
+                    java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile);
+                    currentPhotoBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 100, out);
+                    out.flush();
+                    out.close();
+                    currentPhotoUri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", tempFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (currentPhotoUri != null) {
+                com.canhub.cropper.CropImageOptions options = new com.canhub.cropper.CropImageOptions();
+                options.guidelines = com.canhub.cropper.CropImageView.Guidelines.ON;
+                options.aspectRatioX = 1;
+                options.aspectRatioY = 1;
+                options.fixAspectRatio = true;
+                com.canhub.cropper.CropImageContractOptions contractOptions = new com.canhub.cropper.CropImageContractOptions(currentPhotoUri, options);
+                cropImageLauncher.launch(contractOptions);
             } else {
-                Toast.makeText(this, "à¤•à¥à¤°à¥‰à¤ª à¤•à¤°à¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ à¤†à¤§à¥€ à¤«à¥‹à¤Ÿà¥‹ à¤¨à¤¿à¤µà¤¡à¤¾", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "क्रॉप करण्यासाठी आधी फोटो निवडा", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnDelete.setOnClickListener(v -> {
             currentPhotoBitmap = null;
+            currentPhotoUri = null;
             dialogPhotoPreview.setImageResource(getPlaceholderRes(student));
-            Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤•à¤¾à¤¢à¤²à¤¾ (à¤¡à¤¿à¤«à¥‰à¤²à¥à¤Ÿ à¤…à¤µà¤¤à¤¾à¤° à¤¦à¤°à¥à¤¶à¤µà¤¿à¤²à¤¾ à¤œà¤¾à¤ˆà¤²)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "फोटो काढला (डिफॉल्ट अवतार दर्शविला जाईल)", Toast.LENGTH_SHORT).show();
         });
 
         btnRotate.setOnClickListener(v -> {
@@ -815,25 +847,28 @@ public class StudentProfileActivity extends BaseActivity {
                 matrix.postRotate(90);
                 currentPhotoBitmap = android.graphics.Bitmap.createBitmap(currentPhotoBitmap, 0, 0, currentPhotoBitmap.getWidth(), currentPhotoBitmap.getHeight(), matrix, true);
                 dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
+                
+                // Rotation changed the bitmap, so if user clicks crop next, we should generate a new temp URI from it
+                currentPhotoUri = null; 
             } else {
-                Toast.makeText(this, "à¤«à¤¿à¤°à¤µà¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ à¤†à¤§à¥€ à¤«à¥‹à¤Ÿà¥‹ à¤¨à¤¿à¤µà¤¡à¤¾", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "फिरवण्यासाठी आधी फोटो निवडा", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnSave.setOnClickListener(v -> {
             if (currentPhotoBitmap == null) {
-                Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤•à¤¾à¤¢à¥‚à¤¨ à¤Ÿà¤¾à¤•à¤¤ à¤†à¤¹à¥‡...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "फोटो काढून टाकत आहे...", Toast.LENGTH_SHORT).show();
                 FirebaseRepository.get().deleteStudentPhoto(student.id, new FirebaseRepository.OnResult<Void>() {
                     @Override
                     public void onSuccess(Void result) {
                         student.photoUrl = "";
                         loadStudentPhoto(student, b.ivStudentPhoto);
-                        Toast.makeText(StudentProfileActivity.this, "à¤«à¥‹à¤Ÿà¥‹ à¤¯à¤¶à¤¸à¥à¤µà¥€à¤°à¥€à¤¤à¥à¤¯à¤¾ à¤•à¤¾à¤¢à¤²à¤¾", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "फोटो यशस्वीरीत्या काढला", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             } else {
@@ -842,18 +877,18 @@ public class StudentProfileActivity extends BaseActivity {
                 scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 75, baos);
                 byte[] bytes = baos.toByteArray();
 
-                Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤…à¤ªà¤²à¥‹à¤¡ à¤¹à¥‹à¤¤ à¤†à¤¹à¥‡...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "फोटो अपलोड होत आहे...", Toast.LENGTH_SHORT).show();
                 FirebaseRepository.get().uploadStudentPhoto(student.id, bytes, new FirebaseRepository.OnResult<String>() {
                     @Override
                     public void onSuccess(String url) {
                         student.photoUrl = url;
                         loadStudentPhoto(student, b.ivStudentPhoto);
-                        Toast.makeText(StudentProfileActivity.this, "à¤«à¥‹à¤Ÿà¥‹ à¤¯à¤¶à¤¸à¥à¤µà¥€à¤°à¥€à¤¤à¥à¤¯à¤¾ à¤œà¤¤à¤¨ à¤•à¥‡à¤²à¤¾", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "फोटो यशस्वीरीत्या जतन केला", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -871,9 +906,8 @@ public class StudentProfileActivity extends BaseActivity {
         }
         try {
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            // Verify that a camera app can handle the intent
             if (intent.resolveActivity(getPackageManager()) == null) {
-                Toast.makeText(this, "à¤•à¥…à¤®à¥‡à¤°à¤¾ à¤à¤ª à¤†à¤¢à¤³à¤²à¥‡ à¤¨à¤¾à¤¹à¥€", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "कॅमेरा ॲप आढळले नाही", Toast.LENGTH_SHORT).show();
                 return;
             }
             java.io.File tempFile = new java.io.File(getExternalCacheDir(), "temp_profile.jpg");
@@ -884,7 +918,7 @@ public class StudentProfileActivity extends BaseActivity {
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivityForResult(intent, REQ_CODE_CAMERA);
         } catch (Exception e) {
-            Toast.makeText(this, "à¤•à¥…à¤®à¥‡à¤°à¤¾ à¤¸à¥à¤°à¥‚ à¤•à¤°à¤¤à¤¾ à¤†à¤²à¤¾ à¤¨à¤¾à¤¹à¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "कॅमेरा सुरू करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -903,12 +937,13 @@ public class StudentProfileActivity extends BaseActivity {
                             getContentResolver().openInputStream(tempCameraUri));
                     if (bitmap != null) {
                         currentPhotoBitmap = bitmap;
+                        currentPhotoUri = tempCameraUri;
                         if (dialogPhotoPreview != null) {
                             dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
                         }
                     }
                 } catch (Exception e) {
-                    Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤²à¥‹à¤¡ à¤•à¤°à¤¤à¤¾ à¤†à¤²à¤¾ à¤¨à¤¾à¤¹à¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == REQ_CODE_GALLERY) {
                 if (data != null && data.getData() != null) {
@@ -917,12 +952,13 @@ public class StudentProfileActivity extends BaseActivity {
                                 getContentResolver(), data.getData());
                         if (bitmap != null) {
                             currentPhotoBitmap = bitmap;
+                            currentPhotoUri = data.getData();
                             if (dialogPhotoPreview != null) {
                                 dialogPhotoPreview.setImageBitmap(currentPhotoBitmap);
                             }
                         }
                     } catch (Exception e) {
-                        Toast.makeText(this, "à¤«à¥‹à¤Ÿà¥‹ à¤²à¥‹à¤¡ à¤•à¤°à¤¤à¤¾ à¤†à¤²à¤¾ à¤¨à¤¾à¤¹à¥€: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "फोटो लोड करता आला नाही: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -930,7 +966,7 @@ public class StudentProfileActivity extends BaseActivity {
     }
 
     private void showParentCodeDialog() {
-        com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "à¤•à¥‹à¤¡ à¤®à¤¿à¤³à¤µà¤¤ à¤†à¤¹à¥‡ / Fetching code...");
+        com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "कोड मिळवत आहे / Fetching code...");
         loading.show();
 
         FirebaseRepository.get().getParentLinkForStudent(student.id, new FirebaseRepository.OnResult<com.kartik.myschool.model.ParentLink>() {
@@ -947,14 +983,14 @@ public class StudentProfileActivity extends BaseActivity {
             @Override
             public void onError(Exception e) {
                 loading.dismiss();
-                Toast.makeText(StudentProfileActivity.this, "à¤¤à¥à¤°à¥à¤Ÿà¥€: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(StudentProfileActivity.this, "त्रुटी: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void generateAndSaveParentLinkCode(com.kartik.myschool.utils.LoadingDialog loading) {
         if (loading != null) {
-            loading.setMessage("à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¤ à¤†à¤¹à¥‡ / Generating new code...");
+            loading.setMessage("नवीन कोड तयार करत आहे / Generating new code...");
             if (!loading.isShowing()) loading.show();
         }
 
@@ -983,30 +1019,30 @@ public class StudentProfileActivity extends BaseActivity {
                      "(à¤¹à¤¾ à¤•à¥‹à¤¡ 'MySchool Parent' à¥²à¤ªà¤®à¤§à¥à¤¯à¥‡ à¤ªà¥à¤°à¤µà¤¿à¤·à¥à¤Ÿ à¤•à¤°à¤¾)";
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("à¤ªà¤¾à¤²à¤• à¤œà¥‹à¤¡à¤£à¥€ à¤•à¥‹à¤¡ / Parent Code")
+                .setTitle("पालक जोडणी कोड / Parent Code")
                 .setMessage(msg)
-                .setPositiveButton("WhatsApp à¤µà¤° à¤ªà¤¾à¤ à¤µà¤¾ / Share", (dialog, which) -> {
+                .setPositiveButton("WhatsApp वर पाठवा / Share", (dialog, which) -> {
                     String shareText = "à¤¨à¤®à¤¸à¥à¤•à¤¾à¤°, à¤†à¤ªà¤²à¥à¤¯à¤¾ à¤ªà¤¾à¤²à¥à¤¯à¤¾à¤šà¥‡ à¤ªà¥à¤°à¤—à¤¤à¥€à¤ªà¥à¤¸à¥à¤¤à¤• à¤†à¤£à¤¿ à¤‰à¤ªà¤¸à¥à¤¥à¤¿à¤¤à¥€ à¤ªà¤¾à¤¹à¤£à¥à¤¯à¤¾à¤¸à¤¾à¤ à¥€ 'MySchool Parent' à¥²à¤ª à¤¡à¤¾à¤‰à¤¨à¤²à¥‹à¤¡ à¤•à¤°à¤¾ à¤†à¤£à¤¿ à¤–à¤¾à¤²à¥€à¤² à¤•à¥‹à¤¡ à¤ªà¥à¤°à¤µà¤¿à¤·à¥à¤Ÿ à¤•à¤°à¤¾:\n\n" +
                                        "à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤°à¥à¤¥à¥€: " + student.name + "\n" +
-                                       "à¤œà¥‹à¤¡à¤£à¥€ à¤•à¥‹à¤¡: " + link.code + "\n\n" +
+                                       "जोडणी कोड: " + link.code + "\n\n" +
                                        "à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦!";
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("text/plain");
                     shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
                     startActivity(Intent.createChooser(shareIntent, "Share via"));
                 })
-                .setNeutralButton("à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¾ / Reset", (dialog, which) -> {
+                .setNeutralButton("नवीन कोड तयार करा / Reset", (dialog, which) -> {
                     new androidx.appcompat.app.AlertDialog.Builder(this)
                             .setTitle("à¤ªà¥à¤·à¥à¤Ÿà¥€à¤•à¤°à¤£ / Reset Code")
                             .setMessage("à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¾à¤¯à¤šà¤¾ à¤†à¤¹à¥‡ à¤•à¤¾? à¤œà¥à¤¨à¤¾ à¤•à¥‹à¤¡ à¤•à¤¾à¤® à¤•à¤°à¤£à¤¾à¤° à¤¨à¤¾à¤¹à¥€.")
-                            .setPositiveButton("à¤¹à¥‹à¤¯ / Yes", (d, w) -> {
-                                com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "à¤¨à¤µà¥€à¤¨ à¤•à¥‹à¤¡ à¤¤à¤¯à¤¾à¤° à¤•à¤°à¤¤ à¤†à¤¹à¥‡...");
+                            .setPositiveButton("होय / Yes", (d, w) -> {
+                                com.kartik.myschool.utils.LoadingDialog loading = new com.kartik.myschool.utils.LoadingDialog(this, null, "नवीन कोड तयार करत आहे...");
                                 generateAndSaveParentLinkCode(loading);
                             })
-                            .setNegativeButton("à¤¨à¤¾à¤¹à¥€ / No", null)
+                            .setNegativeButton("नाही / No", null)
                             .show();
                 })
-                .setNegativeButton("à¤¬à¤‚à¤¦ à¤•à¤°à¤¾ / Close", null);
+                .setNegativeButton("बंद करा / Close", null);
         builder.show();
     }
 

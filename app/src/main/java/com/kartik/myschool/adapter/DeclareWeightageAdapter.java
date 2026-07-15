@@ -44,7 +44,7 @@ public class DeclareWeightageAdapter extends RecyclerView.Adapter<DeclareWeighta
         ItemWeightageSubjectBinding b = holder.b;
 
         // Set subject name
-        b.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(b.getRoot().getContext(), subject.name));
+        b.tvSubjectName.setText(com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(b.getRoot().getContext(), subject));
 
         // Subject Initial inside colored circle
         String initial = subject.name != null && !subject.name.isEmpty() 

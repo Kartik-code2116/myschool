@@ -256,7 +256,7 @@ public class ProgressBookCombinedGenerator {
                 C_DARK, 1, 2);
 
         for (Subject sub : allSubs) {
-            MarathiText.cell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), 9, true, C_HEADER_BG, C_DARK, 2, 1,
+            MarathiText.cell(tbl, PdfLocalizer.translateSubject(ctx, sub), 9, true, C_HEADER_BG, C_DARK, 2, 1,
                     Element.ALIGN_CENTER);
         }
 

@@ -153,6 +153,7 @@ public class AnnualMarksheetGenerator {
         List<Subject> nonAcSubs = new ArrayList<>();
         if (cls != null && cls.subjects != null) {
             for (Subject s : cls.subjects) {
+                if (s.maxMarks == 0) continue; // Skip descriptive subjects
                 if (isNonAcademic(s.name)) nonAcSubs.add(s);
                 else academicSubs.add(s);
             }
@@ -181,7 +182,7 @@ public class AnnualMarksheetGenerator {
             if (!passed) hasFailed = true;
 
             addTd(tbl, String.valueOf(rowIdx++), Element.ALIGN_CENTER);
-            addTd(tbl, PdfLocalizer.translateSubject(ctx, sub.name), Element.ALIGN_LEFT);
+            addTd(tbl, PdfLocalizer.translateSubject(ctx, sub), Element.ALIGN_LEFT);
             addTd(tbl, String.valueOf(minPass),  Element.ALIGN_CENTER);
             addTdBold(tbl, String.valueOf(obt),  Element.ALIGN_CENTER);
             addTd(tbl, "-",                      Element.ALIGN_CENTER);
@@ -195,7 +196,7 @@ public class AnnualMarksheetGenerator {
             String grade = d != null && d.grade != null && !d.grade.isEmpty() ? normalizeGrade(d.grade) : "-";
 
             addTd(tbl, String.valueOf(rowIdx++), Element.ALIGN_CENTER);
-            addTd(tbl, PdfLocalizer.translateSubject(ctx, sub.name), Element.ALIGN_LEFT);
+            addTd(tbl, PdfLocalizer.translateSubject(ctx, sub), Element.ALIGN_LEFT);
             addTd(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"),                 Element.ALIGN_CENTER);
             addTdBold(tbl, grade,                Element.ALIGN_CENTER);
 

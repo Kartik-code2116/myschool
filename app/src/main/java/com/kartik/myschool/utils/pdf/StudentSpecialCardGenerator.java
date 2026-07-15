@@ -448,7 +448,7 @@ public class StudentSpecialCardGenerator {
                 // Sr. No & Subject
                 String srNoStr = (i < subjects.size()) ? String.valueOf(i + 1) : "-";
                 addTableCell(tbl, ctx, srNoStr, false, bg, Element.ALIGN_CENTER);
-                addTableCell(tbl, ctx, PdfLocalizer.translateSubject(ctx, sub.name), true, bg, Element.ALIGN_LEFT);
+                addTableCell(tbl, ctx, PdfLocalizer.translateSubject(ctx, sub), true, bg, Element.ALIGN_LEFT);
 
                 // Sem 1 Details
                 if (d1 != null) {

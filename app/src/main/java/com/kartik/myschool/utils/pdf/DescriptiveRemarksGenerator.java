@@ -45,16 +45,6 @@ public class DescriptiveRemarksGenerator {
 
     private static final String TAG = "DESC_PDF";
 
-    // ── Extra fixed subject rows appended after class subjects ─────────────────
-    private static final String[] EXTRA_LABELS = {
-            "विशेष प्रगती",
-            "आवड, छंद कला, क्रीडा, साहित्य इ.",
-            "सुधारणा आवश्यक",
-            "व्यक्तिमत्व गुण विशेष\n(अभिवृत्ती, कल, मूल्ये, स्वभाव गुणविशेष)"
-    };
-    private static final String[] EXTRA_KEYS_EN = { "vishesh", "aavad", "sudharna", "vyaktimatva" };
-    private static final String[] EXTRA_KEYS_MR = { "विशेष", "आवड", "सुधारणा", "व्यक्तिमत्व" };
-
     // ── Remark lookup helpers ──────────────────────────────────────────────────
 
     /**
@@ -80,24 +70,6 @@ public class DescriptiveRemarksGenerator {
                 String safeKey = key != null ? MarksRecord.sanitizeKey(key).toLowerCase() : "";
                 if (safeKey.equals(safeName) || safeKey.contains(safeName) || safeName.contains(safeKey)) {
                     return cleanRemark(val.remark);
-                }
-            }
-        }
-        return "";
-    }
-
-    /**
-     * Finds a remark from a record whose key contains `keyword1` or `keyword2` (used for extra
-     * rows).
-     */
-    private static String remarkContaining(MarksRecord rec, String keyword1, String keyword2) {
-        if (rec == null || rec.detailedMarks == null)
-            return "";
-        for (Map.Entry<String, MarksRecord.SubjectMarksDetail> e : rec.detailedMarks.entrySet()) {
-            if (e.getKey() != null && e.getValue() != null && e.getValue().remark != null && !e.getValue().remark.trim().isEmpty()) {
-                String safeKey = MarksRecord.sanitizeKey(e.getKey()).toLowerCase();
-                if (safeKey.contains(keyword1) || safeKey.contains(keyword2)) {
-                    return cleanRemark(e.getValue().remark);
                 }
             }
         }
@@ -241,50 +213,14 @@ public class DescriptiveRemarksGenerator {
         // Class subjects
         if (cls != null && cls.subjects != null) {
             for (Subject sub : cls.subjects) {
-                String sName = sub.name != null ? sub.name.toLowerCase() : "";
-                if (sName.contains("vishesh") || sName.contains("aavad") || sName.contains("sudharna") || sName.contains("vyaktimatva") ||
-                    sName.contains("विशेष") || sName.contains("आवड") || sName.contains("सुधारणा") || sName.contains("व्यक्तिमत्व")) {
-                    continue; // Skip because they are printed in the fixed rows below
-                }
-
                 BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
                 alt = !alt;
                 String remark = findRemark(rec, sub.name);
 
                 addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 32f, -1f);
-                addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fRow, bg, Element.ALIGN_LEFT, 32f, 160f);
+                addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub), fRow, bg, Element.ALIGN_LEFT, 32f, 160f);
                 addDataCell(tbl, remark, fRow, bg, Element.ALIGN_LEFT, 32f, 325f);
             }
-        }
-
-        // Extra fixed rows
-        for (int i = 0; i < EXTRA_KEYS_EN.length; i++) {
-            BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
-            alt = !alt;
-            String remark = remarkContaining(rec, EXTRA_KEYS_EN[i], EXTRA_KEYS_MR[i]);
-
-            String label;
-            switch (i) {
-                case 0:
-                    label = PdfLocalizer.get(ctx, "विशेष प्रगती", "Special Progress");
-                    break;
-                case 1:
-                    label = PdfLocalizer.get(ctx, "आवड, छंद कला, क्रीडा, साहित्य इ.",
-                            "Interests & Hobbies (Arts, Sports, Literature etc.)");
-                    break;
-                case 2:
-                    label = PdfLocalizer.get(ctx, "सुधारणा आवश्यक", "Improvement Needed");
-                    break;
-                case 3:
-                default:
-                    label = PdfLocalizer.get(ctx, "व्यक्तिमत्व गुण विशेष\n(अभिवृत्ती, कल, मूल्ये, स्वभाव गुणविशेष)",
-                            "Personality Traits\n(Attitude, Aptitude, Values, Personality Details)");
-                    break;
-            }
-
-            addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 40f, -1f);
-            addDataCell(tbl, label, fRow, bg, Element.ALIGN_LEFT, 40f, 160f);
-            addDataCell(tbl, remark, fRow, bg, Element.ALIGN_LEFT, 40f, 325f);
         }
 
         doc.add(tbl);

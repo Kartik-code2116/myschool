@@ -406,7 +406,7 @@ public class PdfGenerator {
                 com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, "अ.नं", 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
                 com.kartik.myschool.utils.pdf.MarathiText.cell(tbl, com.kartik.myschool.utils.pdf.PdfLocalizer.get(ctx, "विद्यार्थ्याचे नाव", "Student Name"), 9, true, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
                 for (int i = 0; i < numSubjects; i++) {
-                    cellVerticalSpan(tbl, ctx, PdfLocalizer.translateSubject(ctx, subjects.get(i).name), fSmallBold,
+                    cellVerticalSpan(tbl, ctx, PdfLocalizer.translateSubject(ctx, subjects.get(i)), fSmallBold,
                             C_HEADER_BG, C_DARK, 2, 1);
                 }
 
@@ -718,7 +718,7 @@ public class PdfGenerator {
             int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
             boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
             int colspan = isNonAcademic ? 2 : 4;
-            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmallBold, C_HEADER_BG, C_DARK, colspan, 1,
+            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub), fSmallBold, C_HEADER_BG, C_DARK, colspan, 1,
                     Element.ALIGN_CENTER);
         }
 
@@ -858,7 +858,7 @@ public class PdfGenerator {
             BaseColor sBg = sumAlt ? C_ROW_ALT : C_WHITE;
             sumAlt = !sumAlt;
             cellSpan(sumTbl, str(i + 1), fSmall, sBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(sumTbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, sBg, C_DARK, 1, 1,
+            cellSpan(sumTbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, sBg, C_DARK, 1, 1,
                     Element.ALIGN_LEFT);
 
             int totalGradeCount = 0;
@@ -1258,9 +1258,9 @@ public class PdfGenerator {
         cell(t, "नाव", fSmallBold, C_PRIMARY, C_WHITE, 1, Element.ALIGN_CENTER);
         if (cls.subjects != null) {
             for (Subject sub : cls.subjects) {
-                cell(t, PdfLocalizer.translateSubject(null, sub.name) + "\nस1", fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1,
+                cell(t, PdfLocalizer.translateSubject(null, sub) + "\nस1", fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1,
                         Element.ALIGN_CENTER);
-                cell(t, PdfLocalizer.translateSubject(null, sub.name) + "\nस2", fSmallBold, C_PRIMARY, C_WHITE, 1,
+                cell(t, PdfLocalizer.translateSubject(null, sub) + "\nस2", fSmallBold, C_PRIMARY, C_WHITE, 1,
                         Element.ALIGN_CENTER);
             }
         }

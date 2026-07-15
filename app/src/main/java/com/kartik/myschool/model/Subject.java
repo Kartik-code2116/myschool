@@ -2,6 +2,7 @@ package com.kartik.myschool.model;
 
 public class Subject {
     public String name;
+    public String shortName = "";
     public String subjectCode;
     public int maxMarks;
 

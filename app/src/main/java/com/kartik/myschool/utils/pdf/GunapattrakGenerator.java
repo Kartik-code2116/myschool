@@ -292,11 +292,16 @@ public class GunapattrakGenerator {
         for (int i = 0; i < 4; i++)
             cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Summative empty
 
-        List<Subject> subjects = cls.subjects;
+        List<Subject> subjects = new java.util.ArrayList<>();
+        if (cls.subjects != null) {
+            for (Subject s : cls.subjects) {
+                if (s.maxMarks > 0) subjects.add(s);
+            }
+        }
         int nonAcaCount = 0;
         int studentTotalSum = 0;
         int studentTotalMax = 0;
-        if (subjects != null) {
+        if (!subjects.isEmpty()) {
             for (Subject sub : subjects) {
                 int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
                 boolean isNonAcademic = (summativeMax == 0 && sub.maxMarks > 0);
@@ -335,7 +340,7 @@ public class GunapattrakGenerator {
 
             // Row A: प्राप्त
             cellSpan(tbl, String.valueOf(i + 1), fSmall, bg, C_DARK, 1, 2, Element.ALIGN_CENTER);
-            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub.name), fSmall, bg, C_DARK, 1, 2, Element.ALIGN_LEFT);
+            cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, bg, C_DARK, 1, 2, Element.ALIGN_LEFT);
             cellSpan(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
             if (d != null) {

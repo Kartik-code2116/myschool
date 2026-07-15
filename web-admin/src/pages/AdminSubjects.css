@@ -340,3 +340,128 @@
   font-size: 13px;
   color: var(--text-secondary);
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-modal {
+  background: var(--surface-color);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.close-btn:hover {
+  color: var(--danger-color);
+}
+
+.admin-form .form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-form .form-row .form-group {
+  flex: 1;
+}
+
+.admin-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.admin-form .form-group label {
+  font-weight: bold;
+  color: var(--text-secondary);
+}
+
+.admin-form .form-group input,
+.admin-form .form-group select {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--control-color);
+  color: var(--text-primary);
+}
+
+.admin-form .form-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.marks-grid-editor {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.marks-section {
+  background: var(--surface-muted);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.marks-section h4 {
+  margin: 0 0 10px 0;
+  color: var(--primary-color);
+}
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.grid-2col div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.grid-2col div label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.grid-2col div input {
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}

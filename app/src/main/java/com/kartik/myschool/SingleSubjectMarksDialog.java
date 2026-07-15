@@ -102,7 +102,7 @@ public class SingleSubjectMarksDialog extends DialogFragment {
     }
 
     private void setupUIInfo() {
-        b.tvDialogTitle.setText("Edit Marks: " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), subject.name));
+        b.tvDialogTitle.setText("Edit Marks: " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(getContext(), subject));
         b.tvStudentName.setText("Student: " + student.name + " (Roll: " + student.rollNo + ")");
     }
 

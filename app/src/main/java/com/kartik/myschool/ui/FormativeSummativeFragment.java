@@ -866,7 +866,7 @@ public class FormativeSummativeFragment extends Fragment {
                 this.cardB = binding;
             }
             public void bind(Student student, Subject sub, int number, MarksRecord record, EvaluationAdapter.ViewHolder parentHolder) {
-                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub.name));
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub));
                 String fe1 = "0", fe2 = "0", fe3 = "0", fe4 = "0", fe5 = "0", fe6 = "0", fe7 = "0", fe8 = "0";
                 String se1 = "0", se2 = "0", se3 = "0", fet = "0", set = "0", tet = "0", gradeVal = "—";
                 boolean hasMarks = false;
@@ -970,7 +970,7 @@ public class FormativeSummativeFragment extends Fragment {
                 this.cardB = binding;
             }
             public void bind(Student student, Subject sub, int number, MarksRecord record, EvaluationAdapter.ViewHolder parentHolder) {
-                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub.name));
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub));
 
                 String fet = "0", set = "0", tet = "0", gradeVal = "—";
                 int formativeMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik + sub.maxUpkram + sub.maxPrakalp + sub.maxChachani + sub.maxSwadhyay + sub.maxItar;

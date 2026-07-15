@@ -861,7 +861,7 @@ public class DescriptiveEntriesFragment extends Fragment {
             }
 
             public void bind(Student student, Subject sub, int number, MarksRecord record, DescriptiveAdapter.ViewHolder parentHolder) {
-                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub.name));
+                cardB.tvSubjectName.setText(number + ". " + com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(itemView.getContext(), sub));
                 List<String> remarks = new ArrayList<>();
                 MarksRecord.SubjectMarksDetail detail = getSubjectDetail(record, sub, number - 1);
                 if (detail != null && detail.remark != null && !detail.remark.trim().isEmpty()) {
