@@ -45,13 +45,22 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         void onToggle(SubjectItem item, boolean isActive);
     }
 
+    public interface OnDeleteSubjectListener {
+        void onDelete(SubjectItem item);
+    }
+
     private final List<SubjectItem> items = new ArrayList<>();
     private final List<String> activeSubjectNames = new ArrayList<>();
     private OnToggleListener toggleListener;
+    private OnDeleteSubjectListener deleteListener;
     private final int[] lastAnimatedPos = {-1};
 
     public void setOnToggleListener(OnToggleListener listener) {
         this.toggleListener = listener;
+    }
+
+    public void setOnDeleteSubjectListener(OnDeleteSubjectListener listener) {
+        this.deleteListener = listener;
     }
 
     public void setData(List<SubjectItem> list, List<Subject> activeList) {
@@ -71,6 +80,15 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         notifyDataSetChanged();
     }
 
+    public void swapItems(int fromPosition, int toPosition) {
+        java.util.Collections.swap(items, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    public List<SubjectItem> getItems() {
+        return items;
+    }
+
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -83,6 +101,29 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         SubjectItem item = items.get(position);
         ItemSubjectCardBinding b = holder.b;
+
+        String currentType = item.maxMarks == 0 ? "descriptive" : "academic";
+        boolean showHeader = false;
+        if (position == 0) {
+            showHeader = true;
+        } else {
+            SubjectItem prevItem = items.get(position - 1);
+            String prevType = prevItem.maxMarks == 0 ? "descriptive" : "academic";
+            showHeader = !currentType.equals(prevType);
+        }
+
+        if (showHeader) {
+            b.tvSectionHeader.setVisibility(View.VISIBLE);
+            if (currentType.equals("descriptive")) {
+                b.tvSectionHeader.setText("Only Descriptive Entries");
+                b.tvSectionHeader.setTextColor(Color.parseColor("#E65100"));
+            } else {
+                b.tvSectionHeader.setText("Academic & Graded Subjects");
+                b.tvSectionHeader.setTextColor(Color.parseColor("#1565C0"));
+            }
+        } else {
+            b.tvSectionHeader.setVisibility(View.GONE);
+        }
 
         b.tvSubjectCode.setText(item.code);
         b.tvSerialNumber.setText(item.serial);
@@ -159,7 +200,14 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
             popup.getMenu().add("Details");
             popup.getMenu().add("Edit Max Marks");
+            popup.getMenu().add("Delete Subject");
             popup.setOnMenuItemClickListener(menuItem -> {
+                if (menuItem.getTitle().toString().equals("Delete Subject")) {
+                    if (deleteListener != null) {
+                        deleteListener.onDelete(item);
+                    }
+                    return true;
+                }
                 android.content.Intent intent = new android.content.Intent(v.getContext(), com.kartik.myschool.SubjectUpdateActivity.class);
                 intent.putExtra("subject_name", item.name);
                 intent.putExtra("subject_code", item.code);

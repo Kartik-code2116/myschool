@@ -109,8 +109,10 @@ public class DeclareWeightageFragment extends Fragment {
         // Perform validation to ensure weightage makes sense (at least > 0)
         for (Subject s : updatedSubjects) {
             if (s.maxMarks <= 0) {
-                Toast.makeText(getContext(), s.name + " चे पैकी गुण ० पेक्षा जास्त असावेत", Toast.LENGTH_LONG).show();
-                return;
+                if (!Subject.isDescriptiveOnly(s.name)) {
+                    Toast.makeText(getContext(), s.name + " चे पैकी गुण ० पेक्षा जास्त असावेत", Toast.LENGTH_LONG).show();
+                    return;
+                }
             }
         }
 

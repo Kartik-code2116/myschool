@@ -72,63 +72,59 @@ public class Subject {
 
         if (std < 1 || std > 10) {
             // Default fallback if standard is not 1-10
-            list.add(new Subject("Marathi", 100));
-            list.add(new Subject("English", 100));
-            list.add(new Subject("Mathematics", 100));
-            list.add(new Subject("Science", 100));
+            list.add(new Subject("मराठी", 100));
+            list.add(new Subject("इंग्रजी", 100));
+            list.add(new Subject("गणित", 100));
+            list.add(new Subject("सामान्य विज्ञान", 100));
             return list;
         }
 
         // 1. First Language (Marathi) - All standards
-        list.add(new Subject("Marathi", 100));
+        list.add(new Subject("मराठी", 100));
 
         // 2. Second Language (English) - All standards
-        list.add(new Subject("English", 100));
+        list.add(new Subject("इंग्रजी", 100));
 
         if (std >= 5) {
             // 3. Third Language (Hindi) - 5th to 10th
-            list.add(new Subject("Hindi", 100));
+            list.add(new Subject("हिंदी", 100));
         }
 
         // 4. Mathematics - All standards
-        list.add(new Subject("Mathematics", 100));
+        list.add(new Subject("गणित", 100));
 
         if (std == 1 || std == 2) {
             // Lower Primary (1-2)
-            list.add(new Subject("Health & Physical Education", 100));
-            list.add(new Subject("Work Experience", 100));
-            list.add(new Subject("Art Education", 100));
+            list.add(new Subject("खेळू, करू, शिकू", 100));
         } else if (std == 3 || std == 4) {
             // Primary (3-4)
-            list.add(new Subject("Environmental Studies", 100));
-            list.add(new Subject("Health & Physical Education", 100));
-            list.add(new Subject("Work Experience", 100));
-            list.add(new Subject("Art Education", 100));
+            list.add(new Subject("परिसर अभ्यास", 100));
+            list.add(new Subject("खेळू, करू, शिकू", 100));
         } else if (std == 5) {
             // Upper Primary Transition (5)
-            list.add(new Subject("Environmental Studies Part 1", 100));
-            list.add(new Subject("Environmental Studies Part 2", 100));
-            list.add(new Subject("Health & Physical Education", 100));
-            list.add(new Subject("Art Education", 100));
-            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("परिसर अभ्यास भाग १", 100));
+            list.add(new Subject("परिसर अभ्यास भाग २", 100));
+            list.add(new Subject("आरोग्य व शारीरिक शिक्षण", 100));
+            list.add(new Subject("कार्यानुभव", 100));
+            list.add(new Subject("कला", 100));
         } else if (std >= 6 && std <= 8) {
             // Middle School (6-8)
-            list.add(new Subject("General Science", 100));
-            list.add(new Subject("History and Civics", 100));
-            list.add(new Subject("Geography", 100));
-            list.add(new Subject("Health & Physical Education", 100));
-            list.add(new Subject("Art Education", 100));
-            list.add(new Subject("Work Experience", 100));
+            list.add(new Subject("सामान्य विज्ञान", 100));
+            list.add(new Subject("इतिहास व नागरिकशास्त्र", 100));
+            list.add(new Subject("भूगोल", 100));
+            list.add(new Subject("आरोग्य व शारीरिक शिक्षण", 100));
+            list.add(new Subject("कार्यानुभव", 100));
+            list.add(new Subject("कला", 100));
         } else {
             // High School (9-10)
-            list.add(new Subject("General Science", 100));
-            list.add(new Subject("History and Civics", 100));
-            list.add(new Subject("Geography", 100));
-            list.add(new Subject("Health & Physical Education", 100));
-            list.add(new Subject("Art Education", 100));
-            list.add(new Subject("Work Experience", 100));
-            list.add(new Subject("Information & Comm. Technology (ICT)", 100));
-            list.add(new Subject("Water Security & Environment Studies", 100));
+            list.add(new Subject("सामान्य विज्ञान", 100));
+            list.add(new Subject("इतिहास व नागरिकशास्त्र", 100));
+            list.add(new Subject("भूगोल", 100));
+            list.add(new Subject("आरोग्य व शारीरिक शिक्षण", 100));
+            list.add(new Subject("कार्यानुभव", 100));
+            list.add(new Subject("कला", 100));
+            list.add(new Subject("माहिती व संप्रेषण तंत्रज्ञान (ICT)", 100));
+            list.add(new Subject("जलसुरक्षा व पर्यावरण अभ्यास", 100));
         }
 
         return list;
@@ -161,6 +157,12 @@ public class Subject {
         });
     }
 
+    public static boolean isDescriptiveOnly(String name) {
+        if (name == null) return false;
+        String lower = name.toLowerCase();
+        return lower.contains("vishesh") || lower.contains("aavad") || lower.contains("sudharna") || lower.contains("vyaktimatva") ||
+               lower.contains("विशेष") || lower.contains("आवड") || lower.contains("सुधारणा") || lower.contains("व्यक्तिमत्व");
+    }
 
     private static boolean isPhysicalEd(String sc) {
         return sc.contains("physical education") || sc.contains("शारीरिक") || sc.contains("शा.शि.") 

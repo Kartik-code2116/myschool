@@ -183,5 +183,13 @@ public class SubjectUpdateActivity extends BaseActivity {
                 finish();
             }
         });
+        
+        if (name == null || name.isEmpty()) {
+            b.llHeaderBar.setTitle("Add New Subject");
+            b.btnUpdate.setText("Add Subject");
+        } else {
+            b.llHeaderBar.setTitle("Update Subject");
+            b.btnUpdate.setText("Update Subject");
+        }
     }
 }

@@ -446,7 +446,8 @@ public class StudentSpecialCardGenerator {
                 MarksRecord.SubjectMarksDetail d2 = detail(sem2, sub.name);
 
                 // Sr. No & Subject
-                addTableCell(tbl, ctx, String.valueOf(i + 1), false, bg, Element.ALIGN_CENTER);
+                String srNoStr = (i < subjects.size()) ? String.valueOf(i + 1) : "-";
+                addTableCell(tbl, ctx, srNoStr, false, bg, Element.ALIGN_CENTER);
                 addTableCell(tbl, ctx, PdfLocalizer.translateSubject(ctx, sub.name), true, bg, Element.ALIGN_LEFT);
 
                 // Sem 1 Details

@@ -392,17 +392,34 @@ public class ExtraMenusFragment extends Fragment {
                 }
             }
 
+            com.kartik.myschool.model.Subject.sortSubjects(cleanSubjects);
+            String currentType = "";
+            boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+
             for (Subject s : cleanSubjects) {
                 if (s != null && s.name != null && !s.name.trim().isEmpty()) {
+                    String subType = s.maxMarks == 0 ? "descriptive" : "academic";
+                    
+                    if (!currentType.equals(subType)) {
+                        currentType = subType;
+                        String headerText = "";
+                        if (subType.equals("academic")) {
+                            headerText = isMr ? "शैक्षणिक आणि श्रेणीबद्ध विषय" : "Academic & Graded Subjects";
+                        } else {
+                            headerText = isMr ? "फक्त वर्णनात्मक नोंदीचे विषय" : "Only Descriptive Entries Subjects";
+                        }
+                        list.add(new SchoolSubjectItem(headerText));
+                    }
+                    
                     String category = "Academic";
                     String colorHex = "#2196F3";
 
                     String lower = s.name.toLowerCase();
                     if (lower.contains("drawing") || lower.contains("work experience")
-                            || lower.contains("physical education")) {
+                            || lower.contains("physical education") || s.name.equals("कला") || s.name.equals("कार्यानुभव") || s.name.equals("आरोग्य व शारीरिक शिक्षण") || s.name.equals("खेळू, करू, शिकू")) {
                         category = "Activities";
                         colorHex = "#4CAF50";
-                    } else if (lower.contains("special development") || lower.contains("personality")) {
+                    } else if (s.maxMarks == 0) {
                         category = "Personality";
                         colorHex = "#009688";
                     } else if (lower.contains("information & comm") || lower.contains("water security")
@@ -423,20 +440,6 @@ public class ExtraMenusFragment extends Fragment {
                 }
             }
         }
-
-        boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
-        String headerText = isMr ? "001 : फक्त वर्णनात्मक नोंदीचे विषय" : "001 : Only Descriptive Entries Subjects";
-        list.add(new SchoolSubjectItem(headerText));
-
-        String tealColor = "#009688";
-        list.add(new SchoolSubjectItem("Vishesh pragati", "", String.valueOf(serialCounter++), "Personality", tealColor,
-                "", "", ""));
-        list.add(new SchoolSubjectItem("Aavad, chanda, etc", "", String.valueOf(serialCounter++), "Personality",
-                tealColor, "", "", ""));
-        list.add(new SchoolSubjectItem("Sudharna Aavashyaka", "", String.valueOf(serialCounter++), "Personality",
-                tealColor, "", "", ""));
-        list.add(new SchoolSubjectItem("Vyaktimatva gun vishgesh", "", String.valueOf(serialCounter++), "Personality",
-                tealColor, "", "", ""));
 
         schoolSubjectAdapter.setData(list);
     }
@@ -483,16 +486,33 @@ public class ExtraMenusFragment extends Fragment {
                 }
             }
 
+            com.kartik.myschool.model.Subject.sortSubjects(cleanSubjects);
+            String currentType = "";
+            boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+
             for (Subject s : cleanSubjects) {
                 if (s != null && s.name != null && !s.name.trim().isEmpty()) {
+                    String subType = s.maxMarks == 0 ? "descriptive" : "academic";
+                    
+                    if (!currentType.equals(subType)) {
+                        currentType = subType;
+                        String headerText = "";
+                        if (subType.equals("academic")) {
+                            headerText = isMr ? "शैक्षणिक आणि श्रेणीबद्ध विषय" : "Academic & Graded Subjects";
+                        } else {
+                            headerText = isMr ? "फक्त वर्णनात्मक नोंदीचे विषय" : "Only Descriptive Entries Subjects";
+                        }
+                        list.add(new SchoolSubjectItem(headerText));
+                    }
+                    
                     String category = "Academic";
                     String colorHex = "#2196F3";
                     String lower = s.name.toLowerCase();
                     if (lower.contains("drawing") || lower.contains("work experience")
-                            || lower.contains("physical education")) {
+                            || lower.contains("physical education") || s.name.equals("कला") || s.name.equals("कार्यानुभव") || s.name.equals("आरोग्य व शारीरिक शिक्षण") || s.name.equals("खेळू, करू, शिकू")) {
                         category = "Activities";
                         colorHex = "#4CAF50";
-                    } else if (lower.contains("special development") || lower.contains("personality")) {
+                    } else if (s.maxMarks == 0) {
                         category = "Personality";
                         colorHex = "#009688";
                     } else if (lower.contains("information & comm") || lower.contains("water security")
@@ -507,20 +527,6 @@ public class ExtraMenusFragment extends Fragment {
                 }
             }
         }
-
-        boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
-        String headerText = isMr ? "001 : फक्त वर्णनात्मक नोंदीचे विषय" : "001 : Only Descriptive Entries Subjects";
-        list.add(new SchoolSubjectItem(headerText));
-
-        String tealColor = "#009688";
-        list.add(new SchoolSubjectItem("Vishesh pragati", "", String.valueOf(serialCounter++), "Personality", tealColor,
-                "", "", ""));
-        list.add(new SchoolSubjectItem("Aavad, chanda, etc", "", String.valueOf(serialCounter++), "Personality",
-                tealColor, "", "", ""));
-        list.add(new SchoolSubjectItem("Sudharna Aavashyaka", "", String.valueOf(serialCounter++), "Personality",
-                tealColor, "", "", ""));
-        list.add(new SchoolSubjectItem("Vyaktimatva gun vishgesh", "", String.valueOf(serialCounter++), "Personality",
-                tealColor, "", "", ""));
 
         remarksAdapter.setData(list);
     }

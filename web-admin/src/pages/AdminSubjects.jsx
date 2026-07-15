@@ -1,46 +1,80 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import './AdminSubjects.css';
+
+const BUILT_IN_SUBJECTS = [
+  "मराठी", "इंग्रजी", "हिंदी", "गणित", "सामान्य विज्ञान",
+  "परिसर अभ्यास", "परिसर अभ्यास भाग १", "परिसर अभ्यास भाग २",
+  "इतिहास व नागरिकशास्त्र", "भूगोल", "आरोग्य व शारीरिक शिक्षण",
+  "कार्यानुभव", "कला", "खेळू, करू, शिकू", "माहिती व संप्रेषण तंत्रज्ञान (ICT)",
+  "जलसुरक्षा व पर्यावरण अभ्यास",
+  "विशेष प्रगती", "आवड/छंद", "सुधारणा आवश्यक", "व्यक्तिमत्व गुणविशेष"
+];
+
+const EN_TO_MR = {
+  "Marathi": "मराठी", "English": "इंग्रजी", "Hindi": "हिंदी",
+  "Mathematics": "गणित", "Science": "सामान्य विज्ञान", "General Science": "सामान्य विज्ञान",
+  "Environmental Studies": "परिसर अभ्यास", "Environmental Studies Part 1": "परिसर अभ्यास भाग १", "Environmental Studies Part 2": "परिसर अभ्यास भाग २",
+  "History and Civics": "इतिहास व नागरिकशास्त्र", "Geography": "भूगोल",
+  "Health & Physical Education": "आरोग्य व शारीरिक शिक्षण", "Work Experience": "कार्यानुभव",
+  "Art": "कला", "Art Education": "कला", "Play, Do, Learn": "खेळू, करू, शिकू",
+  "Information & Comm. Technology (ICT)": "माहिती व संप्रेषण तंत्रज्ञान (ICT)",
+  "Water Security & Environment Studies": "जलसुरक्षा व पर्यावरण अभ्यास"
+};
 
 const getHardcodedDefaults = (stdStr) => {
   const std = parseInt(stdStr, 10);
   const list = [];
   const add = (name, maxMarks = 100) => {
-    list.push({ name, maxMarks, subjectCode: String(list.length + 1) });
+    let isFeMarksOnly = name === "कला" || name === "कार्यानुभव" || name === "आरोग्य व शारीरिक शिक्षण" || name === "खेळू, करू, शिकू";
+    let isTrueDescriptive = name === "विशेष प्रगती" || name === "आवड/छंद" || name === "सुधारणा आवश्यक" || name === "व्यक्तिमत्व गुणविशेष";
+    list.push({ 
+      name, 
+      maxMarks: isTrueDescriptive ? 0 : maxMarks, 
+      isNonAcademic: isFeMarksOnly || isTrueDescriptive
+    });
   };
   
   if (isNaN(std) || std < 1 || std > 10) {
-    add("Marathi"); add("English"); add("Mathematics"); add("Science");
+    add("मराठी"); add("इंग्रजी"); add("गणित"); add("सामान्य विज्ञान");
     return list;
   }
   
-  add("Marathi");
-  add("English");
-  if (std >= 5) add("Hindi");
-  add("Mathematics");
+  add("मराठी");
+  add("इंग्रजी");
+  if (std >= 5) add("हिंदी");
+  add("गणित");
   
   if (std === 1 || std === 2) {
-    add("Play, Do, Learn");
+    add("खेळू, करू, शिकू");
   } else if (std === 3 || std === 4) {
-    add("Environmental Studies"); add("Play, Do, Learn");
+    add("परिसर अभ्यास"); add("खेळू, करू, शिकू");
   } else if (std === 5) {
-    add("Environmental Studies Part 1"); add("Environmental Studies Part 2");
-    add("Health & Physical Education"); add("Work Experience"); add("Art");
+    add("परिसर अभ्यास भाग १"); add("परिसर अभ्यास भाग २");
+    add("आरोग्य व शारीरिक शिक्षण"); add("कार्यानुभव"); add("कला");
   } else if (std >= 6 && std <= 8) {
-    add("Science"); add("History and Civics"); add("Geography");
-    add("Health & Physical Education"); add("Work Experience"); add("Art");
+    add("सामान्य विज्ञान"); add("इतिहास व नागरिकशास्त्र"); add("भूगोल");
+    add("आरोग्य व शारीरिक शिक्षण"); add("कार्यानुभव"); add("कला");
   } else {
-    add("Science"); add("History and Civics"); add("Geography");
-    add("Health & Physical Education"); add("Work Experience"); add("Art");
-    add("Information & Comm. Technology (ICT)"); add("Water Security & Environment Studies");
+    add("सामान्य विज्ञान"); add("इतिहास व नागरिकशास्त्र"); add("भूगोल");
+    add("आरोग्य व शारीरिक शिक्षण"); add("कार्यानुभव"); add("कला");
+    add("माहिती व संप्रेषण तंत्रज्ञान (ICT)"); add("जलसुरक्षा व पर्यावरण अभ्यास");
   }
+  
+  // Add true descriptive subjects to all classes by default
+  add("विशेष प्रगती");
+  add("आवड/छंद");
+  add("सुधारणा आवश्यक");
+  add("व्यक्तिमत्व गुणविशेष");
+  
   return list;
 };
 
 export default function AdminSubjects() {
-  const [activeTab, setActiveTab] = useState('global'); // 'global' or 'classDefaults'
+  const [activeTab, setActiveTab] = useState('global');
   const [globalSubjects, setGlobalSubjects] = useState([]);
+  const [globalSequence, setGlobalSequence] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
@@ -49,6 +83,7 @@ export default function AdminSubjects() {
   const [name, setName] = useState('');
   const [maxMarks, setMaxMarks] = useState('100');
   const [category, setCategory] = useState('Academic');
+  const [isDescriptiveOnly, setIsDescriptiveOnly] = useState(false);
 
   // States for Class Defaults
   const [selectedClass, setSelectedClass] = useState('1');
@@ -57,28 +92,85 @@ export default function AdminSubjects() {
   const [selectedSubjectToAdd, setSelectedSubjectToAdd] = useState('');
 
   useEffect(() => {
-    fetchGlobalSubjects();
+    fetchGlobalData();
   }, []);
 
   useEffect(() => {
     if (activeTab === 'classDefaults') {
       fetchClassDefaults(selectedClass);
     }
-  }, [activeTab, selectedClass]);
+  }, [activeTab, selectedClass, globalSequence]);
 
-  const fetchGlobalSubjects = async () => {
+  const fetchGlobalData = async () => {
     setLoading(true);
     try {
       const colRef = collection(db, 'global_subjects');
       const snapshot = await getDocs(colRef);
-      const subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setGlobalSubjects(subjects);
+      const customSubjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setGlobalSubjects(customSubjects);
+
+      const seqDocRef = doc(db, 'admin_settings', 'global_subject_sequence');
+      const seqSnap = await getDoc(seqDocRef);
+      let seq = [];
+      if (seqSnap.exists() && seqSnap.data().subjects) {
+        // Map any legacy English strings to Marathi
+        seq = seqSnap.data().subjects.map(s => EN_TO_MR[s] || s);
+      }
+
+      const allKnownNames = [...BUILT_IN_SUBJECTS, ...customSubjects.map(s => s.name)];
+      let modified = false;
+      allKnownNames.forEach(n => {
+        if (!seq.includes(n)) {
+          seq.push(n);
+          modified = true;
+        }
+      });
+      seq = seq.filter(n => allKnownNames.includes(n));
+      
+      setGlobalSequence(seq);
+      if (modified && seq.length > 0) {
+        await setDoc(seqDocRef, { subjects: seq });
+      }
     } catch (error) {
-      console.error('Error fetching global subjects:', error);
+      console.error('Error fetching global data:', error);
       setMessage({ text: 'Error fetching subjects: ' + error.message, type: 'error' });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSaveGlobalSequence = async () => {
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'admin_settings', 'global_subject_sequence'), { subjects: globalSequence });
+      setMessage({ text: 'Global sequence saved! It will apply as default to all users.', type: 'success' });
+      // Trigger a re-render of class defaults if we are looking at them
+      if (activeTab === 'classDefaults') {
+        fetchClassDefaults(selectedClass);
+      }
+    } catch (error) {
+      setMessage({ text: 'Error saving sequence: ' + error.message, type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleGlobalMoveUp = (index) => {
+    if (index === 0) return;
+    const newSeq = [...globalSequence];
+    const temp = newSeq[index - 1];
+    newSeq[index - 1] = newSeq[index];
+    newSeq[index] = temp;
+    setGlobalSequence(newSeq);
+  };
+
+  const handleGlobalMoveDown = (index) => {
+    if (index === globalSequence.length - 1) return;
+    const newSeq = [...globalSequence];
+    const temp = newSeq[index + 1];
+    newSeq[index + 1] = newSeq[index];
+    newSeq[index] = temp;
+    setGlobalSequence(newSeq);
   };
 
   const fetchClassDefaults = async (className) => {
@@ -86,17 +178,69 @@ export default function AdminSubjects() {
     try {
       const docRef = doc(db, 'class_default_subjects', `Class_${className}`);
       const docSnap = await getDoc(docRef);
+      let subjects = [];
       if (docSnap.exists()) {
-        const data = docSnap.data();
-        // Sort by subjectCode (treating as sequence)
-        const subjects = data.subjects || [];
-        subjects.sort((a, b) => parseInt(a.subjectCode) - parseInt(b.subjectCode));
-        setClassDefaults(subjects);
+        subjects = docSnap.data().subjects || [];
+        // Map legacy English names to Marathi
+        subjects = subjects.map(s => {
+          if (EN_TO_MR[s.name]) {
+            s.name = EN_TO_MR[s.name];
+          }
+          return s;
+        });
+        
+        // Auto-append missing true descriptive subjects to existing classes
+        const trueDescriptives = ["विशेष प्रगती", "आवड/छंद", "सुधारणा आवश्यक", "व्यक्तिमत्व गुणविशेष"];
+        trueDescriptives.forEach(descName => {
+          if (!subjects.find(s => s.name === descName)) {
+            subjects.push({
+              name: descName,
+              maxMarks: 0,
+              isNonAcademic: true
+            });
+          }
+        });
+        
       } else {
-        setClassDefaults(getHardcodedDefaults(className));
+        subjects = getHardcodedDefaults(className);
       }
+      
+      // Sort subjects exactly according to globalSequence
+      subjects.sort((a, b) => {
+        let indexA = globalSequence.indexOf(a.name);
+        let indexB = globalSequence.indexOf(b.name);
+        if (indexA === -1) indexA = 999;
+        if (indexB === -1) indexB = 999;
+        return indexA - indexB;
+      });
+
+      // Ensure every subject has a subjectCode and backfill properties
+      subjects = subjects.map((sub) => {
+        // Sanitize corrupted data: ensure built-in descriptive subjects have maxMarks=0
+        const info = getSubjectInfo(sub.name);
+        if (info) {
+          if (info.maxMarks === 0) {
+            sub.maxMarks = 0;
+            sub.isNonAcademic = true;
+          } else if (info.isNonAcademic) {
+            sub.isNonAcademic = true;
+          }
+        }
+        
+        if (!sub.subjectCode) {
+          let globalIndex = globalSequence.indexOf(sub.name);
+          if (globalIndex === -1) globalIndex = globalSequence.length;
+          sub.subjectCode = String(globalIndex + 1).padStart(2, '0');
+        }
+        if (sub.isNonAcademic === undefined) {
+          sub.isNonAcademic = false;
+        }
+        
+        return sub;
+      });
+      
+      setClassDefaults(subjects);
     } catch (error) {
-      console.error('Error fetching class defaults:', error);
       setMessage({ text: 'Error fetching class defaults: ' + error.message, type: 'error' });
     } finally {
       setLoadingClass(false);
@@ -107,18 +251,10 @@ export default function AdminSubjects() {
     setSaving(true);
     setMessage({ text: '', type: '' });
     try {
-      // Re-assign subject codes based on current order
-      const updatedSubjects = classDefaults.map((sub, index) => ({
-        ...sub,
-        subjectCode: String(index + 1)
-      }));
-      
       const docRef = doc(db, 'class_default_subjects', `Class_${selectedClass}`);
-      await setDoc(docRef, { subjects: updatedSubjects, className: selectedClass });
-      setClassDefaults(updatedSubjects);
+      await setDoc(docRef, { subjects: classDefaults, className: selectedClass });
       setMessage({ text: `Defaults for Class ${selectedClass} saved successfully!`, type: 'success' });
     } catch (error) {
-      console.error('Error saving class defaults:', error);
       setMessage({ text: 'Error saving class defaults: ' + error.message, type: 'error' });
     } finally {
       setSaving(false);
@@ -127,43 +263,35 @@ export default function AdminSubjects() {
 
   const handleAddSubjectToClass = () => {
     if (!selectedSubjectToAdd) return;
-    const subject = globalSubjects.find(s => s.name === selectedSubjectToAdd);
-    if (!subject) return;
-
+    
     // Check if it already exists
-    if (classDefaults.some(s => s.name === subject.name)) {
+    if (classDefaults.some(s => s.name === selectedSubjectToAdd)) {
       setMessage({ text: 'Subject already exists in this class', type: 'error' });
       return;
     }
 
+    const info = getSubjectInfo(selectedSubjectToAdd);
+    let globalIndex = globalSequence.indexOf(selectedSubjectToAdd);
+    if (globalIndex === -1) globalIndex = globalSequence.length;
     const newSub = {
-      name: subject.name,
-      maxMarks: subject.maxMarks,
-      subjectCode: String(classDefaults.length + 1)
+      name: selectedSubjectToAdd,
+      maxMarks: info ? info.maxMarks : 100,
+      subjectCode: String(globalIndex + 1).padStart(2, '0'),
+      isNonAcademic: info ? info.isNonAcademic : false
     };
 
-    setClassDefaults([...classDefaults, newSub]);
+    let newDefaults = [...classDefaults, newSub];
+    // Re-sort immediately based on global sequence
+    newDefaults.sort((a, b) => {
+      let indexA = globalSequence.indexOf(a.name);
+      let indexB = globalSequence.indexOf(b.name);
+      if (indexA === -1) indexA = 999;
+      if (indexB === -1) indexB = 999;
+      return indexA - indexB;
+    });
+
+    setClassDefaults(newDefaults);
     setSelectedSubjectToAdd('');
-    setMessage({ text: '', type: '' });
-  };
-
-  const handleMoveUp = (index) => {
-    if (index === 0) return;
-    const newDefaults = [...classDefaults];
-    const temp = newDefaults[index - 1];
-    newDefaults[index - 1] = newDefaults[index];
-    newDefaults[index] = temp;
-    setClassDefaults(newDefaults);
-    setMessage({ text: '', type: '' });
-  };
-
-  const handleMoveDown = (index) => {
-    if (index === classDefaults.length - 1) return;
-    const newDefaults = [...classDefaults];
-    const temp = newDefaults[index + 1];
-    newDefaults[index + 1] = newDefaults[index];
-    newDefaults[index] = temp;
-    setClassDefaults(newDefaults);
     setMessage({ text: '', type: '' });
   };
 
@@ -174,50 +302,105 @@ export default function AdminSubjects() {
     setMessage({ text: '', type: '' });
   };
 
+  const handleSubjectCodeChange = (index, value) => {
+    const newDefaults = [...classDefaults];
+    newDefaults[index].subjectCode = value;
+    setClassDefaults(newDefaults);
+  };
+
   const handleAddGlobalSubject = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
     
     setSaving(true);
-    setMessage({ text: '', type: '' });
-    
     try {
       const colRef = collection(db, 'global_subjects');
       const newSubject = {
         name: name.trim(),
-        maxMarks: parseInt(maxMarks, 10) || 100,
+        maxMarks: isDescriptiveOnly ? 0 : Number(maxMarks),
         category: category,
+        isNonAcademic: isDescriptiveOnly,
         createdAt: new Date().getTime()
       };
       
       const docRef = await addDoc(colRef, newSubject);
       setGlobalSubjects([...globalSubjects, { id: docRef.id, ...newSubject }]);
       
+      // Also add to global sequence intelligently based on category
+      let newSeq = [...globalSequence];
+      if (newSubject.maxMarks > 0) {
+        let firstDescIdx = -1;
+        for (let i = 0; i < newSeq.length; i++) {
+           const custom = globalSubjects.find(s => s.name === newSeq[i]);
+           let isDesc = false;
+           if (custom) {
+               isDesc = custom.maxMarks === 0;
+           } else {
+               isDesc = newSeq[i] === "विशेष प्रगती" || newSeq[i] === "आवड/छंद" || newSeq[i] === "सुधारणा आवश्यक" || newSeq[i] === "व्यक्तिमत्व गुणविशेष";
+           }
+           if (isDesc) {
+               firstDescIdx = i;
+               break;
+           }
+        }
+        if (firstDescIdx !== -1) {
+           newSeq.splice(firstDescIdx, 0, newSubject.name);
+        } else {
+           newSeq.push(newSubject.name);
+        }
+      } else {
+        newSeq.push(newSubject.name);
+      }
+      
+      setGlobalSequence(newSeq);
+      await setDoc(doc(db, 'admin_settings', 'global_subject_sequence'), { subjects: newSeq });
+      
       setName('');
       setMaxMarks('100');
       setCategory('Academic');
+      setIsDescriptiveOnly(false);
       setMessage({ text: 'Global subject added successfully!', type: 'success' });
     } catch (error) {
-      console.error('Error adding subject:', error);
       setMessage({ text: 'Error adding subject: ' + error.message, type: 'error' });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDeleteGlobalSubject = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this global subject? It will not be removed from existing classes, but new classes will not see it as an option.')) {
+  const handleDeleteGlobalSubject = async (id, subjectName) => {
+    if (!window.confirm('Are you sure you want to delete this global subject?')) {
       return;
     }
     
     try {
       await deleteDoc(doc(db, 'global_subjects', id));
       setGlobalSubjects(globalSubjects.filter(s => s.id !== id));
+      
+      // Remove from sequence
+      const newSeq = globalSequence.filter(n => n !== subjectName);
+      setGlobalSequence(newSeq);
+      await setDoc(doc(db, 'admin_settings', 'global_subject_sequence'), { subjects: newSeq });
+      
       setMessage({ text: 'Subject deleted.', type: 'info' });
     } catch (error) {
-      console.error('Error deleting subject:', error);
       setMessage({ text: 'Error deleting subject: ' + error.message, type: 'error' });
     }
+  };
+
+  const getSubjectInfo = (subjectName) => {
+    const custom = globalSubjects.find(s => s.name === subjectName);
+    if (custom) return { type: 'Custom', category: custom.category, maxMarks: custom.maxMarks, isNonAcademic: custom.isNonAcademic, id: custom.id };
+    
+    let isFeMarksOnly = subjectName === "कला" || subjectName === "कार्यानुभव" || subjectName === "आरोग्य व शारीरिक शिक्षण" || subjectName === "खेळू, करू, शिकू";
+    let isTrueDescriptive = subjectName === "विशेष प्रगती" || subjectName === "आवड/छंद" || subjectName === "सुधारणा आवश्यक" || subjectName === "व्यक्तिमत्व गुणविशेष";
+    
+    return { 
+      type: 'Built-in', 
+      category: isTrueDescriptive ? 'Personality' : isFeMarksOnly ? 'Activities' : 'Academic/Other', 
+      maxMarks: isTrueDescriptive ? 0 : 100, 
+      isNonAcademic: isFeMarksOnly || isTrueDescriptive,
+      id: null 
+    };
   };
 
   return (
@@ -235,7 +418,7 @@ export default function AdminSubjects() {
           className={`tab-btn ${activeTab === 'global' ? 'active' : ''}`}
           onClick={() => { setActiveTab('global'); setMessage({text:'', type:''}); }}
         >
-          Global Subjects
+          Global Subjects Sequence
         </button>
         <button 
           className={`tab-btn ${activeTab === 'classDefaults' ? 'active' : ''}`}
@@ -254,8 +437,8 @@ export default function AdminSubjects() {
       {activeTab === 'global' && (
         <div className="subjects-layout">
           <div className="glass-panel add-panel animate-fade-in">
-            <h3>Add New Subject</h3>
-            <p className="helper-text">This subject will appear in the app for all teachers when they set up their class.</p>
+            <h3>Add Custom Subject</h3>
+            <p className="helper-text">Add custom subjects if they are missing from the built-in list.</p>
             
             <form onSubmit={handleAddGlobalSubject} className="add-subject-form">
               <div className="form-group">
@@ -274,43 +457,99 @@ export default function AdminSubjects() {
               </div>
               <div className="form-group">
                 <label>Default Max Marks</label>
-                <input type="number" value={maxMarks} onChange={(e) => setMaxMarks(e.target.value)} min="10" max="1000" required />
+                <input type="number" value={maxMarks} onChange={(e) => setMaxMarks(e.target.value)} min="1" max="1000" disabled={isDescriptiveOnly} required />
+              </div>
+              <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                <input 
+                  type="checkbox" 
+                  id="isDescriptiveOnly"
+                  checked={isDescriptiveOnly}
+                  onChange={(e) => setIsDescriptiveOnly(e.target.checked)}
+                  style={{ width: 'auto' }}
+                />
+                <label htmlFor="isDescriptiveOnly" style={{ margin: 0, cursor: 'pointer' }}>
+                  Only Descriptive Entries (No Marks / Graded)
+                </label>
               </div>
               <button type="submit" className="btn btn-primary" disabled={saving || !name.trim()}>
-                {saving ? 'Adding...' : '+ Add Global Subject'}
+                {saving ? 'Adding...' : '+ Add Custom Subject'}
               </button>
             </form>
           </div>
 
           <div className="glass-panel list-panel animate-fade-in">
-            <div className="list-header">
-              <h3>Custom Global Subjects</h3>
+            <div className="list-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>Global Subjects Sequence</h3>
+              <button className="btn btn-primary" onClick={handleSaveGlobalSequence} disabled={saving}>
+                💾 Save Global Sequence
+              </button>
             </div>
+            <p className="helper-text">This order determines the <strong>subjectCode</strong> and default sorting for all classes.</p>
+            
             {loading ? (
               <div className="loading">Loading global subjects...</div>
             ) : (
-              <div className="subjects-list">
-                {globalSubjects.length === 0 ? (
-                  <div className="empty-state">No custom global subjects added yet.</div>
+              <div className="subjects-list" style={{ marginTop: '16px' }}>
+                {globalSequence.length === 0 ? (
+                  <div className="empty-state">No subjects found.</div>
                 ) : (
-                  globalSubjects.map(subject => (
-                    <div key={subject.id} className="subject-item">
-                      <div className="subject-info">
-                        <span className="subject-name">{subject.name}</span>
-                        <div className="subject-meta">
-                          <span className="meta-badge">{subject.category}</span>
-                          <span className="meta-badge marks">Max: {subject.maxMarks}</span>
+                  globalSequence.map((subjectName, index) => {
+                    const info = getSubjectInfo(subjectName);
+                    const currentType = info.maxMarks === 0 ? 'descriptive' : 'academic';
+                    
+                    let showHeader = false;
+                    if (index === 0) {
+                      showHeader = true;
+                    } else {
+                      const prevInfo = getSubjectInfo(globalSequence[index - 1]);
+                      const prevType = prevInfo.maxMarks === 0 ? 'descriptive' : 'academic';
+                      showHeader = currentType !== prevType;
+                    }
+
+                    return (
+                      <React.Fragment key={subjectName}>
+                        {showHeader && (
+                          <div style={{ 
+                            padding: '8px 12px', 
+                            background: currentType === 'descriptive' ? '#fff3e0' : '#e3f2fd', 
+                            color: currentType === 'descriptive' ? '#e65100' : '#1565c0',
+                            fontWeight: 'bold',
+                            borderRadius: '6px',
+                            marginTop: index === 0 ? '0' : '16px',
+                            marginBottom: '12px',
+                            border: `1px solid ${currentType === 'descriptive' ? '#ffe0b2' : '#bbdefb'}`
+                          }}>
+                            {currentType === 'descriptive' ? 'Only Descriptive Entries' : 'Academic & Graded Subjects'}
+                          </div>
+                        )}
+                        <div className="sequence-item" style={{ marginBottom: '8px' }}>
+                        <div className="sequence-controls">
+                          <button type="button" className="seq-btn" onClick={() => handleGlobalMoveUp(index)} disabled={index === 0}>↑</button>
+                          <span className="seq-number">{index + 1}</span>
+                          <button type="button" className="seq-btn" onClick={() => handleGlobalMoveDown(index)} disabled={index === globalSequence.length - 1}>↓</button>
                         </div>
+                        <div className="sequence-info">
+                          <span className="subject-name">{subjectName}</span>
+                          <div className="subject-meta" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+                            <span className={`meta-badge ${info.type === 'Built-in' ? 'info' : 'success'}`}>{info.type}</span>
+                            {info.type === 'Custom' && <span className="meta-badge">{info.category}</span>}
+                            {info.maxMarks === 0 ? (
+                              <span className="meta-badge marks" style={{ background: '#ff9800', color: '#fff' }}>Only Descriptive</span>
+                            ) : info.isNonAcademic ? (
+                              <span className="meta-badge marks" style={{ background: '#2196F3', color: '#fff' }}>FE Marks Only</span>
+                            ) : null}
+                          </div>
+                        </div>
+                        {info.type === 'Custom' && (
+                          <button type="button" className="btn-delete-subject" onClick={() => handleDeleteGlobalSubject(info.id, subjectName)} title="Delete Custom Subject">×</button>
+                        )}
                       </div>
-                      <button type="button" className="btn-delete-subject" onClick={() => handleDeleteGlobalSubject(subject.id)} title="Delete Subject">×</button>
-                    </div>
-                  ))
+                      </React.Fragment>
+                    );
+                  })
                 )}
               </div>
             )}
-            <div className="builtin-info">
-              <p><strong>Note:</strong> Built-in defaults like Marathi, Hindi, English, Mathematics, Science, etc. are automatically handled in the app.</p>
-            </div>
           </div>
         </div>
       )}
@@ -333,50 +572,113 @@ export default function AdminSubjects() {
           </div>
 
           <div className="class-defaults-editor glass-panel">
-            <div className="editor-header">
-              <h3>Default Subjects for Class {selectedClass}</h3>
+            <div className="editor-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3>Active Subjects for Class {selectedClass}</h3>
+                <p className="helper-text" style={{margin: 0}}>Order is locked to the Global Sequence.</p>
+              </div>
               <button className="btn btn-primary" onClick={handleSaveClassDefaults} disabled={saving}>
-                {saving ? 'Saving...' : 'Save Configuration'}
+                {saving ? 'Saving...' : '💾 Save Class Defaults'}
               </button>
             </div>
 
-            <div className="add-to-class-bar">
+            <div className="add-to-class-bar" style={{ marginTop: '16px' }}>
               <select 
                 value={selectedSubjectToAdd} 
                 onChange={(e) => setSelectedSubjectToAdd(e.target.value)}
                 className="subject-dropdown"
               >
-                <option value="">-- Select a custom global subject to add --</option>
-                {globalSubjects.map(s => (
-                  <option key={s.id} value={s.name}>{s.name} (Max {s.maxMarks})</option>
+                <option value="">-- Add a subject to this class --</option>
+                {globalSequence.filter(s => !classDefaults.some(cd => cd.name === s)).map(s => (
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
               <button className="btn btn-secondary" onClick={handleAddSubjectToClass} disabled={!selectedSubjectToAdd}>
-                Add Subject
+                + Add
               </button>
             </div>
 
             {loadingClass ? (
               <div className="loading">Loading class defaults...</div>
             ) : (
-              <div className="sequence-list">
+              <div className="sequence-list" style={{ marginTop: '16px' }}>
                 {classDefaults.length === 0 ? (
-                  <div className="empty-state">No subjects found for this class.</div>
+                  <div className="empty-state">No subjects active for this class.</div>
                 ) : (
-                  classDefaults.map((subject, index) => (
-                    <div key={index} className="sequence-item">
-                      <div className="sequence-controls">
-                        <button className="seq-btn" onClick={() => handleMoveUp(index)} disabled={index === 0}>↑</button>
-                        <span className="seq-number">{index + 1}</span>
-                        <button className="seq-btn" onClick={() => handleMoveDown(index)} disabled={index === classDefaults.length - 1}>↓</button>
+                  classDefaults.map((subject, index) => {
+                    let globalIndex = globalSequence.indexOf(subject.name);
+                    const currentType = subject.maxMarks === 0 ? 'descriptive' : 'academic';
+                    
+                    let showHeader = false;
+                    if (index === 0) {
+                      showHeader = true;
+                    } else {
+                      const prevSubject = classDefaults[index - 1];
+                      const prevType = prevSubject.maxMarks === 0 ? 'descriptive' : 'academic';
+                      showHeader = currentType !== prevType;
+                    }
+
+                    return (
+                      <React.Fragment key={index}>
+                        {showHeader && (
+                          <div style={{ 
+                            padding: '8px 12px', 
+                            background: currentType === 'descriptive' ? '#fff3e0' : '#e3f2fd', 
+                            color: currentType === 'descriptive' ? '#e65100' : '#1565c0',
+                            fontWeight: 'bold',
+                            borderRadius: '6px',
+                            marginTop: index === 0 ? '0' : '16px',
+                            marginBottom: '12px',
+                            border: `1px solid ${currentType === 'descriptive' ? '#ffe0b2' : '#bbdefb'}`
+                          }}>
+                            {currentType === 'descriptive' ? 'Only Descriptive Entries' : 'Academic & Graded Subjects'}
+                          </div>
+                        )}
+                        <div className="sequence-item" style={{ marginBottom: '8px' }}>
+                        <div className="sequence-controls">
+                          <span className="seq-number" style={{ background: '#eee', color: '#666' }}>{globalIndex !== -1 ? globalIndex + 1 : '-'}</span>
+                        </div>
+                        
+                        <div className="sequence-info">
+                          <span className="subject-name">{subject.name}</span>
+                          <span className="subject-max" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            {subject.maxMarks === 0 ? (
+                              <span className="meta-badge marks" style={{ background: '#ff9800', color: '#fff' }}>Only Descriptive</span>
+                            ) : subject.isNonAcademic ? (
+                              <span className="meta-badge marks" style={{ background: '#2196F3', color: '#fff' }}>FE Marks Only (Max {subject.maxMarks})</span>
+                            ) : (
+                              <>Max Marks: {subject.maxMarks || 100}</>
+                            )}
+                          </span>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end', marginRight: '8px' }}>
+                          <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Subject Code
+                          </label>
+                          <input 
+                            type="text" 
+                            value={subject.subjectCode || ''} 
+                            onChange={(e) => handleSubjectCodeChange(index, e.target.value)}
+                            style={{ 
+                              width: '90px', 
+                              padding: '6px 10px', 
+                              borderRadius: '6px', 
+                              border: '1px solid var(--border-color)', 
+                              background: 'var(--surface-muted)', 
+                              color: 'var(--text-primary)',
+                              fontSize: '14px',
+                              fontFamily: 'monospace',
+                              textAlign: 'center'
+                            }}
+                          />
+                        </div>
+
+                        <button className="btn-delete-subject" onClick={() => handleRemoveFromClass(index)} title="Remove Subject from Class">×</button>
                       </div>
-                      <div className="sequence-info">
-                        <span className="subject-name">{subject.name}</span>
-                        <span className="subject-max">Max Marks: {subject.maxMarks || 100}</span>
-                      </div>
-                      <button className="btn-delete-subject" onClick={() => handleRemoveFromClass(index)} title="Remove Subject">×</button>
-                    </div>
-                  ))
+                      </React.Fragment>
+                    );
+                  })
                 )}
               </div>
             )}

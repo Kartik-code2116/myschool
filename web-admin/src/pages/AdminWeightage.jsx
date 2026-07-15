@@ -3,6 +3,17 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import './AdminWeightage.css';
 
+const EN_TO_MR = {
+  "Marathi": "मराठी", "English": "इंग्रजी", "Hindi": "हिंदी",
+  "Mathematics": "गणित", "Science": "सामान्य विज्ञान", "General Science": "सामान्य विज्ञान",
+  "Environmental Studies": "परिसर अभ्यास", "Environmental Studies Part 1": "परिसर अभ्यास भाग १", "Environmental Studies Part 2": "परिसर अभ्यास भाग २",
+  "History and Civics": "इतिहास व नागरिकशास्त्र", "Geography": "भूगोल",
+  "Health & Physical Education": "आरोग्य व शारीरिक शिक्षण", "Work Experience": "कार्यानुभव",
+  "Art": "कला", "Art Education": "कला", "Play, Do, Learn": "खेळू, करू, शिकू",
+  "Information & Comm. Technology (ICT)": "माहिती व संप्रेषण तंत्रज्ञान (ICT)",
+  "Water Security & Environment Studies": "जलसुरक्षा व पर्यावरण अभ्यास"
+};
+
 const getHardcodedDefaults = (stdStr) => {
   const std = parseInt(stdStr, 10);
   const list = [];
@@ -11,8 +22,7 @@ const getHardcodedDefaults = (stdStr) => {
     let akarikMax = Math.floor(maxMarks / 2);
     let sanklitMax = maxMarks - akarikMax;
     
-    let isNonAcademic = name.toLowerCase().includes("art") || name.toLowerCase().includes("work experience") 
-      || name.toLowerCase().includes("physical education") || name.toLowerCase().includes("play");
+    let isNonAcademic = name === "कला" || name === "कार्यानुभव" || name === "आरोग्य व शारीरिक शिक्षण" || name === "खेळू, करू, शिकू";
       
     if (isNonAcademic) {
       akarikMax = maxMarks;
@@ -38,30 +48,37 @@ const getHardcodedDefaults = (stdStr) => {
   };
   
   if (isNaN(std) || std < 1 || std > 10) {
-    add("Marathi"); add("English"); add("Mathematics"); add("Science");
+    add("मराठी"); add("इंग्रजी"); add("गणित"); add("सामान्य विज्ञान");
     return list;
   }
   
-  add("Marathi");
-  add("English");
-  if (std >= 5) add("Hindi");
-  add("Mathematics");
+  add("मराठी");
+  add("इंग्रजी");
+  if (std >= 5) add("हिंदी");
+  add("गणित");
   
   if (std === 1 || std === 2) {
-    add("Play, Do, Learn");
+    add("खेळू, करू, शिकू");
   } else if (std === 3 || std === 4) {
-    add("Environmental Studies"); add("Play, Do, Learn");
+    add("परिसर अभ्यास"); add("खेळू, करू, शिकू");
   } else if (std === 5) {
-    add("Environmental Studies Part 1"); add("Environmental Studies Part 2");
-    add("Health & Physical Education"); add("Work Experience"); add("Art");
+    add("परिसर अभ्यास भाग १"); add("परिसर अभ्यास भाग २");
+    add("आरोग्य व शारीरिक शिक्षण"); add("कार्यानुभव"); add("कला");
   } else if (std >= 6 && std <= 8) {
-    add("Science"); add("History and Civics"); add("Geography");
-    add("Health & Physical Education"); add("Work Experience"); add("Art");
+    add("सामान्य विज्ञान"); add("इतिहास व नागरिकशास्त्र"); add("भूगोल");
+    add("आरोग्य व शारीरिक शिक्षण"); add("कार्यानुभव"); add("कला");
   } else {
-    add("Science"); add("History and Civics"); add("Geography");
-    add("Health & Physical Education"); add("Work Experience"); add("Art");
-    add("Information & Comm. Technology (ICT)"); add("Water Security & Environment Studies");
+    add("सामान्य विज्ञान"); add("इतिहास व नागरिकशास्त्र"); add("भूगोल");
+    add("आरोग्य व शारीरिक शिक्षण"); add("कार्यानुभव"); add("कला");
+    add("माहिती व संप्रेषण तंत्रज्ञान (ICT)"); add("जलसुरक्षा व पर्यावरण अभ्यास");
   }
+  
+  // Add true descriptive subjects for all classes
+  add("विशेष प्रगती", 0);
+  add("आवड/छंद", 0);
+  add("सुधारणा आवश्यक", 0);
+  add("व्यक्तिमत्व गुणविशेष", 0);
+
   return list;
 };
 
@@ -87,12 +104,20 @@ export default function AdminWeightage() {
         const data = docSnap.data();
         let fetchedSubjects = data.subjects || [];
         
-        // Ensure all fields exist
+        // Ensure all fields exist and map legacy english names
         fetchedSubjects = fetchedSubjects.map(sub => {
-          let isNonAcademic = sub.name.toLowerCase().includes("art") || sub.name.toLowerCase().includes("work experience") || sub.name.toLowerCase().includes("physical education") || sub.name.toLowerCase().includes("play");
+          let n = EN_TO_MR[sub.name] ? EN_TO_MR[sub.name] : sub.name.trim();
+          sub.name = n;
+          
+          let isBuiltInFEOnly = n === "कला" || n === "कार्यानुभव" || n === "आरोग्य व शारीरिक शिक्षण" || n === "खेळू, करू, शिकू" 
+            || n.toLowerCase().includes("art") || n.toLowerCase().includes("work experience") 
+            || n.toLowerCase().includes("physical education") || n.toLowerCase().includes("play");
+          let isTrueDescriptive = n === "विशेष प्रगती" || n === "आवड/छंद" || n === "सुधारणा आवश्यक" || n === "व्यक्तिमत्व गुणविशेष" || n.toLowerCase().includes("vishesh");
+          
+          let isNonAcademic = sub.isNonAcademic || isBuiltInFEOnly || isTrueDescriptive;
           let akarikMax = Math.floor((sub.maxMarks || 100) / 2);
           let sanklitMax = (sub.maxMarks || 100) - akarikMax;
-          if (isNonAcademic) { akarikMax = sub.maxMarks || 100; sanklitMax = 0; }
+          if (isNonAcademic) { akarikMax = sub.maxMarks || (isTrueDescriptive ? 0 : 100); sanklitMax = 0; }
           
           return {
             ...sub,

@@ -565,6 +565,11 @@ public class FirebaseRepository {
                                 com.kartik.myschool.model.Subject s = new com.kartik.myschool.model.Subject(name, maxMarks);
                                 if (map.containsKey("subjectCode")) s.subjectCode = (String) map.get("subjectCode");
                                 
+                                boolean isDescriptive = false;
+                                if (map.containsKey("isNonAcademic")) {
+                                    isDescriptive = (Boolean) map.get("isNonAcademic");
+                                }
+
                                 if (map.containsKey("maxNirikhshan")) s.maxNirikhshan = parseMapInt(map, "maxNirikhshan", s.maxNirikhshan);
                                 if (map.containsKey("maxTondiKam")) s.maxTondiKam = parseMapInt(map, "maxTondiKam", s.maxTondiKam);
                                 if (map.containsKey("maxPratyakshik")) s.maxPratyakshik = parseMapInt(map, "maxPratyakshik", s.maxPratyakshik);
@@ -573,9 +578,16 @@ public class FirebaseRepository {
                                 if (map.containsKey("maxChachani")) s.maxChachani = parseMapInt(map, "maxChachani", s.maxChachani);
                                 if (map.containsKey("maxSwadhyay")) s.maxSwadhyay = parseMapInt(map, "maxSwadhyay", s.maxSwadhyay);
                                 if (map.containsKey("maxItar")) s.maxItar = parseMapInt(map, "maxItar", s.maxItar);
+                                
                                 if (map.containsKey("maxTondi")) s.maxTondi = parseMapInt(map, "maxTondi", s.maxTondi);
                                 if (map.containsKey("maxPratyakshikB")) s.maxPratyakshikB = parseMapInt(map, "maxPratyakshikB", s.maxPratyakshikB);
                                 if (map.containsKey("maxLekhi")) s.maxLekhi = parseMapInt(map, "maxLekhi", s.maxLekhi);
+                                
+                                if (isDescriptive) {
+                                    s.maxTondi = 0;
+                                    s.maxPratyakshikB = 0;
+                                    s.maxLekhi = 0;
+                                }
                                 
                                 subjects.add(s);
                             }
@@ -584,7 +596,43 @@ public class FirebaseRepository {
                             return;
                         }
                     }
-                    cb.onSuccess(null);
+                    // If no class defaults exist, fetch global sequence to properly assign sequence to hardcoded defaults
+                    getGlobalSubjectSequence(new OnResult<List<String>>() {
+                        @Override
+                        public void onSuccess(List<String> globalSequence) {
+                            List<com.kartik.myschool.model.Subject> fallback = com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(className);
+                            if (globalSequence != null && !globalSequence.isEmpty()) {
+                                for (com.kartik.myschool.model.Subject s : fallback) {
+                                    int idx = globalSequence.indexOf(s.name);
+                                    if (idx != -1) {
+                                        s.subjectCode = String.format(java.util.Locale.US, "%02d", idx + 1);
+                                    }
+                                }
+                                com.kartik.myschool.model.Subject.sortSubjects(fallback);
+                            }
+                            cb.onSuccess(fallback);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            cb.onSuccess(com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(className));
+                        }
+                    });
+                })
+                .addOnFailureListener(e -> cb.onSuccess(com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(className)));
+    }
+
+    public void getGlobalSubjectSequence(OnResult<List<String>> cb) {
+        db.collection("admin_settings").document("global_subject_sequence").get()
+                .addOnSuccessListener(snap -> {
+                    if (snap != null && snap.exists()) {
+                        List<String> seq = (List<String>) snap.get("subjects");
+                        if (seq != null) {
+                            cb.onSuccess(seq);
+                            return;
+                        }
+                    }
+                    cb.onSuccess(new ArrayList<>());
                 })
                 .addOnFailureListener(cb::onError);
     }
@@ -1866,8 +1914,16 @@ public class FirebaseRepository {
                                 String name = doc.getString("name");
                                 Long maxMarksLong = doc.getLong("maxMarks");
                                 int maxMarks = maxMarksLong != null ? maxMarksLong.intValue() : 100;
+                                Boolean isNonAcademic = doc.getBoolean("isNonAcademic");
+                                
                                 if (name != null && !name.trim().isEmpty()) {
-                                    list.add(new com.kartik.myschool.model.Subject(name.trim(), maxMarks));
+                                    com.kartik.myschool.model.Subject s = new com.kartik.myschool.model.Subject(name.trim(), maxMarks);
+                                    if (Boolean.TRUE.equals(isNonAcademic)) {
+                                        s.maxTondi = 0;
+                                        s.maxPratyakshikB = 0;
+                                        s.maxLekhi = 0;
+                                    }
+                                    list.add(s);
                                 }
                             } catch (Exception e) {
                                 com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(e);

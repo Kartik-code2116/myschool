@@ -358,7 +358,8 @@ public class ProgressCardFirstSemGenerator {
             }
 
             // SR NO
-            PdfPCell c1 = new PdfPCell(new Phrase(String.valueOf(i + 1), fSmall));
+            String srNoStr = (i < subjects.size()) ? String.valueOf(i + 1) : "-";
+            PdfPCell c1 = new PdfPCell(new Phrase(srNoStr, fSmall));
             c1.setHorizontalAlignment(Element.ALIGN_CENTER);
             c1.setVerticalAlignment(Element.ALIGN_MIDDLE);
             c1.setBorderColor(C_BLUE_BORDER);
