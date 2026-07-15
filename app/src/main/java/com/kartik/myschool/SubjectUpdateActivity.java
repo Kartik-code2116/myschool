@@ -33,15 +33,9 @@ public class SubjectUpdateActivity extends BaseActivity {
 
         b.etTeacherId.setText(R.string.msg_null);
 
-        if (name != null) {
-            String localizedName = com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, name);
-            b.etSubjectNameRegular.setText(localizedName);
-            b.etSubjectNameShort.setText(localizedName);
-            b.etSubjectNameLong.setText(localizedName);
-        }
-
-        // Determine CURRENT formative and summative values
+        // Determine CURRENT formative, summative, and shortName values
         boolean foundCustom = false;
+        String existingShortName = null;
         if (com.kartik.myschool.SessionContext.selectedClass != null && com.kartik.myschool.SessionContext.selectedClass.subjects != null) {
             for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
                 if (s.name != null && s.name.equalsIgnoreCase(name)) {
@@ -49,12 +43,24 @@ public class SubjectUpdateActivity extends BaseActivity {
                     int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
                     b.etFormativeEval.setText(String.valueOf(fe));
                     b.etSummativeEval.setText(String.valueOf(se));
+                    existingShortName = s.shortName;
                     foundCustom = true;
                     break;
                 }
             }
         }
         
+        if (name != null) {
+            String localizedName = com.kartik.myschool.utils.pdf.PdfLocalizer.translateSubject(this, name);
+            b.etSubjectNameRegular.setText(localizedName);
+            if (existingShortName != null && !existingShortName.trim().isEmpty()) {
+                b.etSubjectNameShort.setText(existingShortName);
+            } else {
+                b.etSubjectNameShort.setText(localizedName);
+            }
+            b.etSubjectNameLong.setText(localizedName);
+        }
+
         if (!foundCustom) {
             String detailsFe = getIntent().getStringExtra("details_left_1");
             String detailsSe = getIntent().getStringExtra("details_left_2");
@@ -123,6 +129,7 @@ public class SubjectUpdateActivity extends BaseActivity {
                 for (com.kartik.myschool.model.Subject s : com.kartik.myschool.SessionContext.selectedClass.subjects) {
                     if (s.name != null && s.name.equalsIgnoreCase(name)) { // compare with original name
                         s.name = updatedName;
+                        s.shortName = b.etSubjectNameShort.getText().toString().trim();
                         s.subjectCode = b.etSubjectCode.getText().toString().trim();
                         s.maxMarks = formative + summative;
 
@@ -146,6 +153,7 @@ public class SubjectUpdateActivity extends BaseActivity {
                 
                 if (!updated) {
                     com.kartik.myschool.model.Subject newSub = new com.kartik.myschool.model.Subject(updatedName, formative + summative);
+                    newSub.shortName = b.etSubjectNameShort.getText().toString().trim();
                     newSub.subjectCode = b.etSubjectCode.getText().toString().trim();
                     newSub.maxNirikhshan   = 0;
                     newSub.maxTondiKam     = formative * 10 / 50;

@@ -1607,6 +1607,7 @@ public class FirebaseRepository {
             } else if (lower.contains("आवड") || lower.contains("छंद") || lower.contains("interests") || lower.contains("hobbies")) {
                 subs.add("Interests__Hobbies__etc"); subs.add("Interests, Hobbies, etc"); subs.add("InterestsHobbies"); subs.add("आवड_छंद"); subs.add("आवड/छंद"); subs.add("आवड छंद"); subs.add("आवडछंद");
                 subs.add("Aavad_chand"); subs.add("Avad_chand"); subs.add("Aawad_chand"); // Potential exact IDs
+                subs.add("Aavad__chanda__etc"); subs.add("Aavad_chanda_etc");
             } else if (lower.contains("सुधारणा आवश्यक") || lower.contains("needs improvement") || lower.contains("sudharna")) {
                 subs.add("Needs_Improvement"); subs.add("Needs Improvement"); subs.add("NeedsImprovement"); subs.add("सुधारणा_आवश्यक"); subs.add("सुधारणा आवश्यक"); subs.add("सुधारणाआवश्यक"); subs.add("Sudharna Aavashyak"); subs.add("SudharnaAavashyak");
                 subs.add("Sudharna_Aavashyaka"); // Exact user ID

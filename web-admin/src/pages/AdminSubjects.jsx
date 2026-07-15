@@ -442,10 +442,10 @@ export default function AdminSubjects() {
       
       const updatedCustomObj = {
         name: newName,
-        shortName: editData.shortName.trim(),
-        maxMarks: Number(editData.maxMarks),
+        shortName: editData.shortName || "",
         category: editData.category,
-        isNonAcademic: Boolean(editData.isNonAcademic),
+        maxMarks: Number(editData.maxMarks),
+        isNonAcademic: editData.isNonAcademic,
         maxNirikhshan: Number(editData.maxNirikhshan),
         maxTondiKam: Number(editData.maxTondiKam),
         maxPratyakshik: Number(editData.maxPratyakshik),

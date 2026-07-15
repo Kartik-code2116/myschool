@@ -5,9 +5,15 @@ public class Subject {
     public String shortName = "";
     public String subjectCode;
     public int maxMarks;
-
     // Optional customized sub-field max marks (Formative / आकारिक)
     public int maxNirikhshan;
+
+    public String getDisplayName() {
+        if (shortName != null && !shortName.trim().isEmpty()) {
+            return shortName.trim();
+        }
+        return name;
+    }
     public int maxTondiKam;
     public int maxPratyakshik;
     public int maxUpkram;

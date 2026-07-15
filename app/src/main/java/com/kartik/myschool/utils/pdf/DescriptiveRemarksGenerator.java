@@ -213,9 +213,13 @@ public class DescriptiveRemarksGenerator {
         // Class subjects
         if (cls != null && cls.subjects != null) {
             for (Subject sub : cls.subjects) {
+                String remark = findRemark(rec, sub.name);
+                if (remark == null || remark.trim().isEmpty()) {
+                    continue; // Skip subjects with no remark
+                }
+                
                 BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
                 alt = !alt;
-                String remark = findRemark(rec, sub.name);
 
                 addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 32f, -1f);
                 addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub), fRow, bg, Element.ALIGN_LEFT, 32f, 160f);
