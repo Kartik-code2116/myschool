@@ -371,7 +371,7 @@ public class SubjectsFragment extends Fragment {
             }
         });
 
-        // Silently sync missing shortNames from admin defaults for existing classes
+        // Silently sync missing shortNames and evaluation rules from admin defaults for existing classes
         if (SessionContext.selectedClass != null && SessionContext.selectedClass.className != null) {
             String cName = SessionContext.selectedClass.className.replaceAll("[^0-9]", "");
             if (!cName.isEmpty()) {
@@ -381,13 +381,31 @@ public class SubjectsFragment extends Fragment {
                         if (defaultSubjects == null || defaultSubjects.isEmpty() || !isAdded()) return;
                         boolean changed = false;
                         for (Subject active : activeSubjects) {
-                            if (active.shortName == null || active.shortName.trim().isEmpty()) {
-                                for (Subject def : defaultSubjects) {
-                                    if (Subject.isSameSubject(active.name, def.name) && def.shortName != null && !def.shortName.trim().isEmpty()) {
-                                        active.shortName = def.shortName.trim();
-                                        changed = true;
-                                        break;
+                            for (Subject def : defaultSubjects) {
+                                if (Subject.isSameSubject(active.name, def.name)) {
+                                    if (active.shortName == null || active.shortName.trim().isEmpty()) {
+                                        if (def.shortName != null && !def.shortName.trim().isEmpty()) {
+                                            active.shortName = def.shortName.trim();
+                                            changed = true;
+                                        }
                                     }
+                                    // Sync evaluation rules from admin default
+                                    if (active.maxMarks != def.maxMarks || active.maxNirikhshan != def.maxNirikhshan || active.maxTondiKam != def.maxTondiKam || active.maxChachani != def.maxChachani || active.maxLekhi != def.maxLekhi) {
+                                        active.maxMarks = def.maxMarks;
+                                        active.maxNirikhshan = def.maxNirikhshan;
+                                        active.maxTondiKam = def.maxTondiKam;
+                                        active.maxPratyakshik = def.maxPratyakshik;
+                                        active.maxUpkram = def.maxUpkram;
+                                        active.maxPrakalp = def.maxPrakalp;
+                                        active.maxChachani = def.maxChachani;
+                                        active.maxSwadhyay = def.maxSwadhyay;
+                                        active.maxItar = def.maxItar;
+                                        active.maxTondi = def.maxTondi;
+                                        active.maxPratyakshikB = def.maxPratyakshikB;
+                                        active.maxLekhi = def.maxLekhi;
+                                        changed = true;
+                                    }
+                                    break;
                                 }
                             }
                         }
@@ -685,7 +703,7 @@ public class SubjectsFragment extends Fragment {
 
     private SubjectAdapter.SubjectItem createItem(String name, String code, String serial, String category, int maxMarks, String color) {
         Subject s = new Subject(name, maxMarks);
-        if (maxMarks == 0 || Subject.isDescriptiveOnly(name)) {
+        if (Subject.isDescriptiveOnly(name)) {
             return new SubjectAdapter.SubjectItem(name, null, code, serial, category, 0, "Only Descriptive", "", "", color);
         }
         int fe = s.maxNirikhshan + s.maxTondiKam + s.maxPratyakshik + s.maxUpkram + s.maxPrakalp + s.maxChachani + s.maxSwadhyay + s.maxItar;

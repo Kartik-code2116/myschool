@@ -680,7 +680,13 @@ public class PdfGenerator {
         doc.add(hTbl);
 
         // 3. Prepare Subjects
-        List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new ArrayList<>();
+        List<Subject> allSubs = cls != null && cls.subjects != null ? cls.subjects : new ArrayList<>();
+        List<Subject> subjects = new ArrayList<>();
+        for (Subject sub : allSubs) {
+            if (!com.kartik.myschool.model.Subject.isDescriptiveOnly(sub.name)) {
+                subjects.add(sub);
+            }
+        }
         int numCols = 2; // Sr, Student Name
         for (Subject sub : subjects) {
             int summativeMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;

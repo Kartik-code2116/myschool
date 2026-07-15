@@ -399,7 +399,7 @@ public class ExtraMenusFragment extends Fragment {
             
             for (Subject s : cleanSubjects) {
                 if (s != null && s.name != null && !s.name.trim().isEmpty()) {
-                    if (s.maxMarks == 0) {
+                    if (com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
                         descSubs.add(s);
                     } else {
                         academicSubs.add(s);
@@ -438,7 +438,7 @@ public class ExtraMenusFragment extends Fragment {
                 || lower.contains("physical education") || s.name.equals("कला") || s.name.equals("कार्यानुभव") || s.name.equals("आरोग्य व शारीरिक शिक्षण") || s.name.equals("खेळू, करू, शिकू")) {
             category = "Activities";
             colorHex = "#4CAF50";
-        } else if (s.maxMarks == 0) {
+        } else if (com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
             category = "Personality";
             colorHex = "#009688";
         } else if (lower.contains("information & comm") || lower.contains("water security")
@@ -506,7 +506,7 @@ public class ExtraMenusFragment extends Fragment {
 
             for (Subject s : cleanSubjects) {
                 if (s != null && s.name != null && !s.name.trim().isEmpty()) {
-                    String subType = s.maxMarks == 0 ? "descriptive" : "academic";
+                    String subType = com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name) ? "descriptive" : "academic";
                     
                     if (!currentType.equals(subType)) {
                         currentType = subType;
@@ -526,7 +526,7 @@ public class ExtraMenusFragment extends Fragment {
                             || lower.contains("physical education") || s.name.equals("कला") || s.name.equals("कार्यानुभव") || s.name.equals("आरोग्य व शारीरिक शिक्षण") || s.name.equals("खेळू, करू, शिकू")) {
                         category = "Activities";
                         colorHex = "#4CAF50";
-                    } else if (s.maxMarks == 0) {
+                    } else if (com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
                         category = "Personality";
                         colorHex = "#009688";
                     } else if (lower.contains("information & comm") || lower.contains("water security")

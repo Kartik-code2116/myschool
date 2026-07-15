@@ -77,13 +77,13 @@ public class ResultSheetGenerator {
                 int maxTotal = 0;
                 if (cls != null && cls.subjects != null) {
                     for (Subject s : cls.subjects) {
-                        if (s.maxMarks == 0) continue; // Skip descriptive subjects
+                        if (Subject.isDescriptiveOnly(s.name)) continue; // Skip strictly descriptive subjects like remarks
                         
                         if (isNonAcademic(s.name)) {
                             nonAcaSubs.add(s);
                         } else {
                             acaSubs.add(s);
-                            maxTotal += s.maxMarks > 0 ? s.maxMarks : 50;
+                            maxTotal += s.maxMarks > 0 ? s.maxMarks : 0;
                         }
                     }
                 }
@@ -230,16 +230,21 @@ public class ResultSheetGenerator {
                 for (Subject sub : acaSubs) {
                     MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
                     int obt = d != null ? d.grandTotal : 0;
-                    totalObtained += obt;
+                    boolean hasMarks = sub.maxMarks > 0;
+                    
+                    if (hasMarks) {
+                        totalObtained += obt;
+                    }
 
-                    int minPass = sub.maxMarks > 0 ? (int) Math.ceil(sub.maxMarks * 0.35) : 18;
-                    boolean passed = obt >= minPass;
-                    if (!passed)
+                    int minPass = hasMarks ? (int) Math.ceil(sub.maxMarks * 0.35) : 0;
+                    boolean passed = hasMarks && obt >= minPass;
+                    if (hasMarks && !passed) {
                         hasFailed = true;
+                    }
 
-                    addTd(tbl, String.valueOf(obt), Element.ALIGN_CENTER);
+                    addTd(tbl, hasMarks ? String.valueOf(obt) : "-", Element.ALIGN_CENTER);
                     addTd(tbl, "-", Element.ALIGN_CENTER); // ग्रेस
-                    addTd(tbl, passed ? "P" : "F", Element.ALIGN_CENTER); // शेरा
+                    addTd(tbl, hasMarks ? (passed ? "P" : "F") : "-", Element.ALIGN_CENTER); // शेरा
                 }
 
                 // Non-Academic Subjects

@@ -154,10 +154,10 @@ public class DescriptiveRemarksGenerator {
                 : new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, C_DARK);
         Font fHdr = sMarathiBase != null ? new Font(sMarathiBase, 10, Font.BOLD, C_WHITE)
                 : new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, C_WHITE);
-        Font fRow = sMarathiBase != null ? new Font(sMarathiBase, 9, Font.NORMAL, C_DARK)
-                : new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, C_DARK);
-        Font fRowB = sMarathiBase != null ? new Font(sMarathiBase, 9, Font.BOLD, C_DARK)
-                : new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD, C_DARK);
+        Font fRow = sMarathiBase != null ? new Font(sMarathiBase, 10, Font.NORMAL, C_DARK)
+                : new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, C_DARK);
+        Font fRowB = sMarathiBase != null ? new Font(sMarathiBase, 10, Font.BOLD, C_DARK)
+                : new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, C_DARK);
 
         // ── 1. Page Title (rendered via MarathiText for correct Devanagari) ────
         try {
@@ -221,9 +221,9 @@ public class DescriptiveRemarksGenerator {
                 BaseColor bg = alt ? C_ROW_ALT : C_WHITE;
                 alt = !alt;
 
-                addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 32f, -1f);
-                addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub), fRow, bg, Element.ALIGN_LEFT, 32f, 160f);
-                addDataCell(tbl, remark, fRow, bg, Element.ALIGN_LEFT, 32f, 325f);
+                addDataCell(tbl, String.valueOf(rowIdx++), fRowB, bg, Element.ALIGN_CENTER, 50f, -1f);
+                addDataCell(tbl, PdfLocalizer.translateSubject(ctx, sub), fRow, bg, Element.ALIGN_CENTER, 50f, 160f);
+                addDataCell(tbl, remark, fRow, bg, Element.ALIGN_LEFT, 50f, 325f);
             }
         }
 

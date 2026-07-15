@@ -209,9 +209,7 @@ public class ProgressBookCombinedGenerator {
         List<Subject> originalSubs = cls != null && cls.subjects != null ? cls.subjects : new ArrayList<>();
         List<Subject> allSubs = new ArrayList<>();
         for (Subject sub : originalSubs) {
-            String subNameLower = sub.name != null ? sub.name.toLowerCase() : "";
-            if (subNameLower.contains("vishesh") || subNameLower.contains("aavad") || subNameLower.contains("sudharna") || subNameLower.contains("vyaktimatva") ||
-                subNameLower.contains("विशेष") || subNameLower.contains("आवड") || subNameLower.contains("सुधारणा") || subNameLower.contains("व्यक्तिमत्व")) {
+            if (com.kartik.myschool.model.Subject.isDescriptiveOnly(sub.name)) {
                 continue; // Skip pseudo-subjects
             }
             allSubs.add(sub);

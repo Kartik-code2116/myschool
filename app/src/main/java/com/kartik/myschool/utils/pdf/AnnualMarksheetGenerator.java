@@ -153,7 +153,7 @@ public class AnnualMarksheetGenerator {
         List<Subject> nonAcSubs = new ArrayList<>();
         if (cls != null && cls.subjects != null) {
             for (Subject s : cls.subjects) {
-                if (s.maxMarks == 0) continue; // Skip descriptive subjects
+                if (Subject.isDescriptiveOnly(s.name)) continue; // Skip strictly descriptive subjects (they go to Option 3)
                 if (isNonAcademic(s.name)) nonAcSubs.add(s);
                 else academicSubs.add(s);
             }
@@ -174,19 +174,23 @@ public class AnnualMarksheetGenerator {
         for (Subject sub : academicSubs) {
             MarksRecord.SubjectMarksDetail d = detail(rec, sub.name);
             int obt = d != null ? d.grandTotal : 0;
-            totalObtained += obt;
-            maxTotal += sub.maxMarks > 0 ? sub.maxMarks : 50;
+            boolean hasMarks = sub.maxMarks > 0;
             
-            int minPass = sub.maxMarks > 0 ? (int) Math.ceil(sub.maxMarks * 0.35) : 18;
-            boolean passed = obt >= minPass;
-            if (!passed) hasFailed = true;
+            if (hasMarks) {
+                totalObtained += obt;
+                maxTotal += sub.maxMarks;
+            }
+            
+            int minPass = hasMarks ? (int) Math.ceil(sub.maxMarks * 0.35) : 0;
+            boolean passed = hasMarks && obt >= minPass;
+            if (hasMarks && !passed) hasFailed = true;
 
             addTd(tbl, String.valueOf(rowIdx++), Element.ALIGN_CENTER);
             addTd(tbl, PdfLocalizer.translateSubject(ctx, sub), Element.ALIGN_LEFT);
-            addTd(tbl, String.valueOf(minPass),  Element.ALIGN_CENTER);
-            addTdBold(tbl, String.valueOf(obt),  Element.ALIGN_CENTER);
+            addTd(tbl, hasMarks ? String.valueOf(minPass) : "-",  Element.ALIGN_CENTER);
+            addTdBold(tbl, hasMarks ? String.valueOf(obt) : "-",  Element.ALIGN_CENTER);
             addTd(tbl, "-",                      Element.ALIGN_CENTER);
-            addTd(tbl, passed ? PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass") : PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail"), Element.ALIGN_CENTER);
+            addTd(tbl, hasMarks ? (passed ? PdfLocalizer.get(ctx, "उत्तीर्ण", "Pass") : PdfLocalizer.get(ctx, "अनुत्तीर्ण", "Fail")) : "-", Element.ALIGN_CENTER);
         }
 
         // Non-Academic Subjects

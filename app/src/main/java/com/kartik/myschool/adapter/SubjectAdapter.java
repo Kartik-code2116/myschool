@@ -104,13 +104,13 @@ public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.VH> {
         SubjectItem item = items.get(position);
         ItemSubjectCardBinding b = holder.b;
 
-        String currentType = item.maxMarks == 0 ? "descriptive" : "academic";
+        String currentType = com.kartik.myschool.model.Subject.isDescriptiveOnly(item.name) ? "descriptive" : "academic";
         boolean showHeader = false;
         if (position == 0) {
             showHeader = true;
         } else {
             SubjectItem prevItem = items.get(position - 1);
-            String prevType = prevItem.maxMarks == 0 ? "descriptive" : "academic";
+            String prevType = com.kartik.myschool.model.Subject.isDescriptiveOnly(prevItem.name) ? "descriptive" : "academic";
             showHeader = !currentType.equals(prevType);
         }
 

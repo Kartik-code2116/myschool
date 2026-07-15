@@ -633,7 +633,7 @@ public class FormativeSummativeFragment extends Fragment {
                 List<Subject> filteredSubjects = new ArrayList<>();
                 if (activeClass != null && activeClass.subjects != null) {
                     for (Subject sub : activeClass.subjects) {
-                        if (sub.maxMarks > 0) {
+                        if (sub.maxMarks > 0 && !com.kartik.myschool.model.Subject.isDescriptiveOnly(sub.name)) {
                             filteredSubjects.add(sub);
                         }
                     }

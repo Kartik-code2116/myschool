@@ -78,7 +78,7 @@ public class MarksRegisterGenerator {
                 List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new java.util.ArrayList<>();
                 boolean isFirst = true;
                 for (Subject sub : subjects) {
-                    if (sub.maxMarks == 0) continue; // Skip descriptive remark subjects with no marks
+                    if (Subject.isDescriptiveOnly(sub.name)) continue; // Skip strictly descriptive subjects like remarks
                     if (!isFirst) doc.newPage();
                     isFirst = false;
                     addSubjectPage(doc, ctx, school, cls, students, marksMap, sub, isSem2);
@@ -382,8 +382,7 @@ public class MarksRegisterGenerator {
 
                 // ── Header Row 1 ─────────────────────
                 cellSpan(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr."), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                cellSpan(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                cellSpan(tbl, PdfLocalizer.get(ctx, "तपशील", "Detail"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "तपशील", "Detail"), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
                 
                 cellSpan(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"), fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
                 cellSpan(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"), fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
@@ -393,6 +392,9 @@ public class MarksRegisterGenerator {
                 cellSpan(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
 
                 // ── Header Row 2 ─────────────────
+                cellSpan(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                cellSpan(tbl, PdfLocalizer.get(ctx, "गुण", "Marks"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                
                 String[] formNames = {
                     PdfLocalizer.get(ctx, "निरीक्षण", "Obs."),
                     PdfLocalizer.get(ctx, "तोंडीकाम", "Oral"),
@@ -427,7 +429,7 @@ public class MarksRegisterGenerator {
 
                 List<Subject> filteredSubjects = new java.util.ArrayList<>();
                 for (Subject s : subjects) {
-                    if (s.maxMarks > 0) {
+                    if (s.maxMarks > 0 && !com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
                         filteredSubjects.add(s);
                     }
                 }
@@ -461,8 +463,14 @@ public class MarksRegisterGenerator {
                     // ── Row 1: प्राप्त (obtained marks) ──────────────
                     // Sr.No spans 2 rows
                     cellSpan(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
-                    // Subject name spans 2 rows
-                    cellSpan(tbl, PdfLocalizer.translateSubject(ctx, sub), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_LEFT);
+                    
+                    // Subject name spans 2 rows, centered with padding
+                    PdfPCell cSub = com.kartik.myschool.utils.PdfGenerator.rawCell(PdfLocalizer.translateSubject(ctx, sub), fBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+                    cSub.setColspan(1);
+                    cSub.setRowspan(2);
+                    cSub.setPaddingTop(8f);
+                    cSub.setPaddingBottom(8f);
+                    tbl.addCell(cSub);
                     // तपशील: प्राप्त
                     cellSpan(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
 
