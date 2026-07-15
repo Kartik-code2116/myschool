@@ -1565,14 +1565,54 @@ public class FirebaseRepository {
         
         if (subjectName != null) {
             String lower = subjectName.toLowerCase();
-            if (lower.contains("play") || lower.contains("learn") || lower.contains("खेळू")) {
-                subs.add("Play_Do_Learn"); subs.add("खेळू_करू_शिकू");
+            
+            // Languages
+            if (lower.contains("marathi") || lower.contains("मराठी")) {
+                subs.add("Marathi"); subs.add("मराठी");
+            } else if (lower.contains("english") || lower.contains("इंग्रजी")) {
+                subs.add("English"); subs.add("इंग्रजी");
+            } else if (lower.contains("hindi") || lower.contains("हिंदी")) {
+                subs.add("Hindi"); subs.add("हिंदी");
+            } 
+            // Core Academic
+            else if (lower.contains("mathematics") || lower.contains("maths") || lower.contains("math") || lower.contains("गणित")) {
+                subs.add("Mathematics"); subs.add("Maths"); subs.add("Math"); subs.add("गणित");
+            } else if (lower.contains("science") || lower.contains("विज्ञान")) {
+                subs.add("Science"); subs.add("विज्ञान");
+            } else if (lower.contains("history") || lower.contains("इतिहास") || lower.contains("civics") || lower.contains("नागरिकशास्त्र")) {
+                subs.add("History_and_Civics"); subs.add("History and Civics"); subs.add("HistoryAndCivics"); subs.add("इतिहास व नागरिकशास्त्र"); subs.add("इतिहास");
+            } else if (lower.contains("geography") || lower.contains("भूगोल")) {
+                subs.add("Geography"); subs.add("भूगोल");
+            } else if (lower.contains("environmental") || lower.contains("evs") || lower.contains("परिसर अभ्यास")) {
+                subs.add("Environmental_Studies"); subs.add("Environmental Studies"); subs.add("EnvironmentalStudies");
+                subs.add("Environmental_Studies_Part_1"); subs.add("Environmental Studies Part 1"); subs.add("EnvironmentalStudiesPart1");
+                subs.add("Environmental_Studies_Part_2"); subs.add("Environmental Studies Part 2"); subs.add("EnvironmentalStudiesPart2");
+                subs.add("परिसर अभ्यास"); subs.add("परिसर अभ्यास १"); subs.add("परिसर अभ्यास २"); subs.add("EVS");
+            }
+            // Activities
+            else if (lower.contains("play") || lower.contains("learn") || lower.contains("खेळू")) {
+                subs.add("Play_Do_Learn"); subs.add("Play, Do, Learn"); subs.add("Play Do Learn"); subs.add("PlayDoLearn"); subs.add("खेळू_करू_शिकू"); subs.add("खेळू करू शिकू");
             } else if (lower.contains("art") || lower.contains("कला") || lower.contains("drawing")) {
-                subs.add("Art_Education"); subs.add("कला");
-            } else if (lower.contains("physical education") || lower.contains("शारीरिक") || lower.contains("p.e") || lower.contains("pe")) {
-                subs.add("Health_Physical_Education"); subs.add("शारीरिक_शिक्षण");
+                subs.add("Art_Education"); subs.add("Art Education"); subs.add("ArtEducation"); subs.add("Art"); subs.add("कला");
+            } else if (lower.contains("physical education") || lower.contains("शारीरिक") || lower.contains("p.e") || lower.contains("pe") || lower.contains("health")) {
+                subs.add("Health_Physical_Education"); subs.add("Health & Physical Education"); subs.add("Health and Physical Education"); subs.add("HealthPhysicalEducation");
+                subs.add("Health___Physical_Education"); subs.add("शारीरिक_शिक्षण"); subs.add("आरोग्य व शारीरिक शिक्षण"); subs.add("शारीरिक शिक्षण");
             } else if (lower.contains("work experience") || lower.contains("कार्यानुभव")) {
-                subs.add("Work_Experience"); subs.add("कार्यानुभव");
+                subs.add("Work_Experience"); subs.add("Work Experience"); subs.add("WorkExperience"); subs.add("कार्यानुभव");
+            } 
+            // Descriptive
+            else if (lower.contains("विशेष प्रगती") || lower.contains("special development") || lower.contains("vishesh pragati")) {
+                subs.add("Special_Development"); subs.add("Special Development"); subs.add("SpecialDevelopment"); subs.add("विशेष_प्रगती"); subs.add("विशेष प्रगती"); subs.add("विशेषप्रगती"); subs.add("Vishesh Pragati"); subs.add("Vishesh_Pragati"); subs.add("VisheshPragati");
+                subs.add("Vishesh_pragati"); // Exact user ID
+            } else if (lower.contains("आवड") || lower.contains("छंद") || lower.contains("interests") || lower.contains("hobbies")) {
+                subs.add("Interests__Hobbies__etc"); subs.add("Interests, Hobbies, etc"); subs.add("InterestsHobbies"); subs.add("आवड_छंद"); subs.add("आवड/छंद"); subs.add("आवड छंद"); subs.add("आवडछंद");
+                subs.add("Aavad_chand"); subs.add("Avad_chand"); subs.add("Aawad_chand"); // Potential exact IDs
+            } else if (lower.contains("सुधारणा आवश्यक") || lower.contains("needs improvement") || lower.contains("sudharna")) {
+                subs.add("Needs_Improvement"); subs.add("Needs Improvement"); subs.add("NeedsImprovement"); subs.add("सुधारणा_आवश्यक"); subs.add("सुधारणा आवश्यक"); subs.add("सुधारणाआवश्यक"); subs.add("Sudharna Aavashyak"); subs.add("SudharnaAavashyak");
+                subs.add("Sudharna_Aavashyaka"); // Exact user ID
+            } else if (lower.contains("व्यक्तिमत्व") || lower.contains("personality") || lower.contains("vyaktimatva")) {
+                subs.add("Personality_Traits"); subs.add("Personality Traits"); subs.add("PersonalityTraits"); subs.add("व्यक्तिमत्व_गुणविशेष"); subs.add("व्यक्तिमत्व गुणविशेष"); subs.add("व्यक्तिमत्वगुणविशेष"); subs.add("Vyaktimatva");
+                subs.add("Vyaktimatva_gun_vishgesh"); // Exact user ID
             }
         }
         
@@ -1669,6 +1709,10 @@ public class FirebaseRepository {
         if (s.contains("environmental studies part 1") || s.contains("परिसर अभ्यास १") || s.contains("परिसर अभ्यास भाग १")) return "Environmental Studies Part 1";
         if (s.contains("environmental studies part 2") || s.contains("परिसर अभ्यास २") || s.contains("परिसर अभ्यास भाग २")) return "Environmental Studies Part 2";
         if (s.contains("environmental studies") || s.contains("परिसर अभ्यास")) return "Environmental Studies";
+        if (s.contains("vishesh pragati") || s.contains("special development") || s.contains("vishesh vikas") || s.contains("विशेष प्रगती") || s.contains("विशेष विकास")) return "Special Development";
+        if (s.contains("aavad") || s.contains("आवड") || s.contains("छंद") || s.contains("interests") || s.contains("hobbies")) return "Interests, Hobbies, etc";
+        if (s.contains("sudharna") || s.contains("सुधारणा आवश्यक") || s.contains("needs improvement")) return "Needs Improvement";
+        if (s.contains("vyaktimatva") || s.contains("व्यक्तिमत्व") || s.contains("personality traits")) return "Personality Traits";
         return name;
     }
 

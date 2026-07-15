@@ -135,6 +135,12 @@ public class Subject {
         java.util.Collections.sort(subjects, new java.util.Comparator<Subject>() {
             @Override
             public int compare(Subject s1, Subject s2) {
+                boolean s1Desc = s1.maxMarks == 0;
+                boolean s2Desc = s2.maxMarks == 0;
+                if (s1Desc != s2Desc) {
+                    return s1Desc ? 1 : -1;
+                }
+
                 String c1 = s1.subjectCode != null ? s1.subjectCode.trim() : "";
                 String c2 = s2.subjectCode != null ? s2.subjectCode.trim() : "";
                 

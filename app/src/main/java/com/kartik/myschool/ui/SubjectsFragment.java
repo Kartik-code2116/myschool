@@ -249,29 +249,6 @@ public class SubjectsFragment extends Fragment {
                 }
             }
             
-            // Auto-activate true descriptive subjects if missing
-            String[] trueDescriptives = {"विशेष प्रगती", "आवड/छंद", "सुधारणा आवश्यक", "व्यक्तिमत्व गुणविशेष"};
-            for (String desc : trueDescriptives) {
-                boolean found = false;
-                for (Subject clean : cleanList) {
-                    if (Subject.isSameSubject(clean.name, desc)) {
-                        found = true; break;
-                    }
-                }
-                if (!found) {
-                    Subject newDesc = new Subject(desc, 0);
-                    // Find subject code from predefined list if possible
-                    for (SubjectAdapter.SubjectItem item : getPredefinedSubjects()) {
-                        if (Subject.isSameSubject(item.name, desc)) {
-                            newDesc.subjectCode = item.code;
-                            break;
-                        }
-                    }
-                    cleanList.add(newDesc);
-                    modified = true;
-                }
-            }
-
             if (modified || cleanList.size() != SessionContext.selectedClass.subjects.size()) {
                 com.kartik.myschool.model.Subject.sortSubjects(cleanList);
                 SessionContext.selectedClass.subjects = cleanList;
@@ -407,6 +384,12 @@ public class SubjectsFragment extends Fragment {
         java.util.Collections.sort(list, new java.util.Comparator<SubjectAdapter.SubjectItem>() {
             @Override
             public int compare(SubjectAdapter.SubjectItem s1, SubjectAdapter.SubjectItem s2) {
+                boolean s1Desc = s1.maxMarks == 0;
+                boolean s2Desc = s2.maxMarks == 0;
+                if (s1Desc != s2Desc) {
+                    return s1Desc ? 1 : -1;
+                }
+
                 String c1 = s1.code != null ? s1.code.trim() : "";
                 String c2 = s2.code != null ? s2.code.trim() : "";
                 
@@ -527,20 +510,34 @@ public class SubjectsFragment extends Fragment {
     private void resetSubjectsToDefault(boolean silent) {
         if (SessionContext.selectedClass == null) return;
         ClassModel cls = SessionContext.selectedClass;
-        String className = cls.className != null ? cls.className : "1";
+        String originalClassName = cls.className != null ? cls.className : "1";
         
-        FirebaseRepository.get().getClassDefaultSubjects(className, new FirebaseRepository.OnResult<List<Subject>>() {
+        // Clean the class name to match Admin panel's pure numeric IDs (1-10)
+        String cleanedClassName = "1";
+        try {
+            String justNumbers = originalClassName.replaceAll("[^0-9]", "");
+            if (!justNumbers.isEmpty()) {
+                int std = Integer.parseInt(justNumbers);
+                if (std >= 1 && std <= 10) {
+                    cleanedClassName = String.valueOf(std);
+                }
+            }
+        } catch (Exception ignored) {}
+        
+        final String finalClassName = cleanedClassName;
+        
+        FirebaseRepository.get().getClassDefaultSubjects(finalClassName, new FirebaseRepository.OnResult<List<Subject>>() {
             @Override
             public void onSuccess(List<Subject> subjects) {
                 if (subjects != null && !subjects.isEmpty()) {
                     applyResetAndSave(cls, subjects, silent);
                 } else {
-                    applyHardcodedResetAndSave(cls, className, silent);
+                    applyHardcodedResetAndSave(cls, finalClassName, silent);
                 }
             }
             @Override
             public void onError(Exception e) {
-                applyHardcodedResetAndSave(cls, className, silent);
+                applyHardcodedResetAndSave(cls, finalClassName, silent);
             }
         });
     }
@@ -593,6 +590,14 @@ public class SubjectsFragment extends Fragment {
             req.add("आरोग्य व शारीरिक शिक्षण");
             req.add("कार्यानुभव");
             req.add("कला");
+        } else if (std >= 6 && std <= 8) {
+            req.add("हिंदी");
+            req.add("सामान्य विज्ञान");
+            req.add("इतिहास व नागरिकशास्त्र");
+            req.add("भूगोल");
+            req.add("आरोग्य व शारीरिक शिक्षण");
+            req.add("कार्यानुभव");
+            req.add("कला");
         } else {
             req.add("हिंदी");
             req.add("सामान्य विज्ञान");
@@ -601,13 +606,11 @@ public class SubjectsFragment extends Fragment {
             req.add("आरोग्य व शारीरिक शिक्षण");
             req.add("कार्यानुभव");
             req.add("कला");
+            req.add("माहिती व संप्रेषण तंत्रज्ञान (ICT)");
+            req.add("जलसुरक्षा व पर्यावरण अभ्यास");
         }
         
-        req.add("विशेष प्रगती");
-        req.add("आवड/छंद");
-        req.add("सुधारणा आवश्यक");
-        req.add("व्यक्तिमत्व गुणविशेष");
-        
+
         for (String nameToFind : req) {
             for (SubjectAdapter.SubjectItem item : predefined) {
                 if (Subject.isSameSubject(item.name, nameToFind)) {

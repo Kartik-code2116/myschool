@@ -629,10 +629,19 @@ public class FormativeSummativeFragment extends Fragment {
                 });
 
                 MarksRecord marks = marksMap.get(s.id);
+                
+                List<Subject> filteredSubjects = new ArrayList<>();
+                if (activeClass != null && activeClass.subjects != null) {
+                    for (Subject sub : activeClass.subjects) {
+                        if (sub.maxMarks > 0) {
+                            filteredSubjects.add(sub);
+                        }
+                    }
+                }
 
                 List<String> gradesToDisplay = new ArrayList<>();
-                if (marks != null && marks.detailedMarks != null && activeClass.subjects != null) {
-                    for (Subject sub : activeClass.subjects) {
+                if (marks != null && marks.detailedMarks != null) {
+                    for (Subject sub : filteredSubjects) {
                         String sk = MarksRecord.sanitizeKey(sub.name);
                         MarksRecord.SubjectMarksDetail detail = marks.detailedMarks.get(sk);
                         if (detail == null) detail = marks.detailedMarks.get(sub.name);
@@ -671,11 +680,7 @@ public class FormativeSummativeFragment extends Fragment {
                 binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);
                 binding.layoutSummaryGrid.setVisibility(View.GONE);
 
-                if (activeClass != null && activeClass.subjects != null) {
-                    innerAdapter.updateData(s, activeClass.subjects, marks, isGridView);
-                } else {
-                    innerAdapter.updateData(s, new ArrayList<>(), null, isGridView);
-                }
+                innerAdapter.updateData(s, filteredSubjects, marks, isGridView);
             }
 
             private TextView createGradeChipBase() {

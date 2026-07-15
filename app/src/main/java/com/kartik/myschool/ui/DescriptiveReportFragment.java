@@ -152,10 +152,6 @@ public class DescriptiveReportFragment extends Fragment {
         if (activeClass != null && activeClass.subjects != null) {
             allDescriptiveSubjects.addAll(activeClass.subjects);
         }
-        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
 
         int totalAttributes = allDescriptiveSubjects.size();
         if (totalAttributes == 0) totalAttributes = 1; // avoid divide by zero

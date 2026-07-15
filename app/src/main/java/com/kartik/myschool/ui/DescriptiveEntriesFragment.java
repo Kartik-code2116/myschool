@@ -577,10 +577,6 @@ public class DescriptiveEntriesFragment extends Fragment {
                 if (activeClass.subjects != null) {
                     allDescriptiveSubjects.addAll(activeClass.subjects);
                 }
-                allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-                allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-                allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-                allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
 
                 binding.layoutSubjectsGridContainer.setVisibility(View.GONE);
                 binding.rvSubjectsHorizontal.setVisibility(View.VISIBLE);

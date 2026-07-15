@@ -393,55 +393,69 @@ public class ExtraMenusFragment extends Fragment {
             }
 
             com.kartik.myschool.model.Subject.sortSubjects(cleanSubjects);
-            String currentType = "";
-            boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
-
+            
+            List<Subject> academicSubs = new ArrayList<>();
+            List<Subject> descSubs = new ArrayList<>();
+            
             for (Subject s : cleanSubjects) {
                 if (s != null && s.name != null && !s.name.trim().isEmpty()) {
-                    String subType = s.maxMarks == 0 ? "descriptive" : "academic";
-                    
-                    if (!currentType.equals(subType)) {
-                        currentType = subType;
-                        String headerText = "";
-                        if (subType.equals("academic")) {
-                            headerText = isMr ? "शैक्षणिक आणि श्रेणीबद्ध विषय" : "Academic & Graded Subjects";
-                        } else {
-                            headerText = isMr ? "फक्त वर्णनात्मक नोंदीचे विषय" : "Only Descriptive Entries Subjects";
-                        }
-                        list.add(new SchoolSubjectItem(headerText));
+                    if (s.maxMarks == 0) {
+                        descSubs.add(s);
+                    } else {
+                        academicSubs.add(s);
                     }
-                    
-                    String category = "Academic";
-                    String colorHex = "#2196F3";
-
-                    String lower = s.name.toLowerCase();
-                    if (lower.contains("drawing") || lower.contains("work experience")
-                            || lower.contains("physical education") || s.name.equals("कला") || s.name.equals("कार्यानुभव") || s.name.equals("आरोग्य व शारीरिक शिक्षण") || s.name.equals("खेळू, करू, शिकू")) {
-                        category = "Activities";
-                        colorHex = "#4CAF50";
-                    } else if (s.maxMarks == 0) {
-                        category = "Personality";
-                        colorHex = "#009688";
-                    } else if (lower.contains("information & comm") || lower.contains("water security")
-                            || lower.contains("environment")) {
-                        category = "State Board";
-                        colorHex = "#FF9800";
-                    }
-
-                    int fe = s.maxNirikhshan + s.maxTondiKam + s.maxPratyakshik + s.maxUpkram + s.maxPrakalp
-                            + s.maxChachani + s.maxSwadhyay + s.maxItar;
-                    int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
-                    String det1 = "FE: " + fe;
-                    String det2 = se > 0 ? "SE: " + se : "";
-
-                    String serialStr = String.valueOf(serialCounter++);
-                    list.add(new SchoolSubjectItem(s.name, s.subjectCode != null ? s.subjectCode : "", serialStr,
-                            category, colorHex, det1, det2, ""));
+                }
+            }
+            
+            boolean isMr = java.util.Locale.getDefault().getLanguage().equals("mr");
+            
+            serialCounter = 1;
+            
+            if (!academicSubs.isEmpty()) {
+                list.add(new SchoolSubjectItem(isMr ? "शैक्षणिक आणि श्रेणीबद्ध विषय" : "Academic & Graded Subjects"));
+                for (Subject s : academicSubs) {
+                    list.add(createSchoolSubjectItem(s, serialCounter++));
+                }
+            }
+            
+            if (!descSubs.isEmpty()) {
+                list.add(new SchoolSubjectItem(isMr ? "फक्त वर्णनात्मक नोंदीचे विषय" : "Only Descriptive Entries Subjects"));
+                for (Subject s : descSubs) {
+                    list.add(createSchoolSubjectItem(s, serialCounter++));
                 }
             }
         }
 
         schoolSubjectAdapter.setData(list);
+    }
+    
+    private SchoolSubjectItem createSchoolSubjectItem(Subject s, int index) {
+        String category = "Academic";
+        String colorHex = "#2196F3";
+
+        String lower = s.name.toLowerCase();
+        if (lower.contains("drawing") || lower.contains("work experience")
+                || lower.contains("physical education") || s.name.equals("कला") || s.name.equals("कार्यानुभव") || s.name.equals("आरोग्य व शारीरिक शिक्षण") || s.name.equals("खेळू, करू, शिकू")) {
+            category = "Activities";
+            colorHex = "#4CAF50";
+        } else if (s.maxMarks == 0) {
+            category = "Personality";
+            colorHex = "#009688";
+        } else if (lower.contains("information & comm") || lower.contains("water security")
+                || lower.contains("environment")) {
+            category = "State Board";
+            colorHex = "#FF9800";
+        }
+
+        int fe = s.maxNirikhshan + s.maxTondiKam + s.maxPratyakshik + s.maxUpkram + s.maxPrakalp
+                + s.maxChachani + s.maxSwadhyay + s.maxItar;
+        int se = s.maxTondi + s.maxPratyakshikB + s.maxLekhi;
+        String det1 = "FE: " + fe;
+        String det2 = se > 0 ? "SE: " + se : "";
+
+        String serialStr = String.valueOf(index);
+        return new SchoolSubjectItem(s.name, s.subjectCode != null ? s.subjectCode : "", serialStr,
+                category, colorHex, det1, det2, "");
     }
 
     private void setupRemarksEditor(ClassModel activeClass) {

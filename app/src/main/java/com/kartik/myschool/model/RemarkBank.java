@@ -1557,6 +1557,12 @@ public class RemarkBank {
         }
 
             }
+        } else if (s.contains("विशेष प्रगती") || s.contains("special development") || s.contains("vishesh pragati") || 
+                   s.contains("आवड") || s.contains("छंद") || s.contains("interests") || s.contains("hobbies") ||
+                   s.contains("सुधारणा आवश्यक") || s.contains("needs improvement") ||
+                   s.contains("व्यक्तिमत्व") || s.contains("personality")) {
+            // No hardcoded defaults for these descriptive subjects as per user request.
+            // Only admin-set remarks will be shown.
         } else {
             // Generic defaults
             if (classNum >= 10) {

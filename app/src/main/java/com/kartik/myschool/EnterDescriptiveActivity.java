@@ -91,10 +91,6 @@ public class EnterDescriptiveActivity extends BaseActivity {
             classModel.subjects = new ArrayList<>();
             
         List<Subject> allDescriptiveSubjects = new ArrayList<>(classModel.subjects);
-        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
 
         for (Subject sub : allDescriptiveSubjects) {
             addRemarkRow(sub);
@@ -326,7 +322,12 @@ public class EnterDescriptiveActivity extends BaseActivity {
         boolean isClass5MathEnglish = "5".equals(classModel.className) && 
             (subLower.contains("math") || subLower.contains("गणित") || subLower.contains("english") || subLower.contains("इंग्रजी"));
             
-        if (isClass5MathEnglish) {
+        boolean isDescriptive = subLower.contains("विशेष प्रगती") || subLower.contains("special development") || subLower.contains("vishesh pragati") || 
+                                subLower.contains("आवड") || subLower.contains("छंद") || subLower.contains("interests") || subLower.contains("hobbies") ||
+                                subLower.contains("सुधारणा आवश्यक") || subLower.contains("needs improvement") ||
+                                subLower.contains("व्यक्तिमत्व") || subLower.contains("personality");
+
+        if (isClass5MathEnglish || isDescriptive) {
             // Do not show any standard remarks as requested by user
             return;
         }
@@ -462,10 +463,6 @@ public class EnterDescriptiveActivity extends BaseActivity {
             return;
             
         List<Subject> allDescriptiveSubjects = new ArrayList<>(classModel.subjects);
-        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
 
         for (int i = 0; i < allDescriptiveSubjects.size() && i < remarkRows.size(); i++) {
             String subName = MarksRecord.sanitizeKey(allDescriptiveSubjects.get(i).name);
@@ -585,11 +582,10 @@ public class EnterDescriptiveActivity extends BaseActivity {
             m.semesterNumber = "1";
         }
 
-        List<Subject> allDescriptiveSubjects = new ArrayList<>(classModel.subjects);
-        allDescriptiveSubjects.add(new Subject("Vishesh pragati", 0));
-        allDescriptiveSubjects.add(new Subject("Aavad, chanda, etc", 0));
-        allDescriptiveSubjects.add(new Subject("Sudharna Aavashyaka", 0));
-        allDescriptiveSubjects.add(new Subject("Vyaktimatva gun vishgesh", 0));
+        List<Subject> allDescriptiveSubjects = new ArrayList<>();
+        if (classModel.subjects != null) {
+            allDescriptiveSubjects.addAll(classModel.subjects);
+        }
 
         for (int i = 0; i < allDescriptiveSubjects.size() && i < remarkRows.size(); i++) {
             Subject sub = allDescriptiveSubjects.get(i);
