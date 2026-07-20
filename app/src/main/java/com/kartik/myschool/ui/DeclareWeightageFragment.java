@@ -72,11 +72,17 @@ public class DeclareWeightageFragment extends Fragment {
         }
 
         List<Subject> activeList = activeClass.subjects;
+        List<Subject> filteredList = new ArrayList<>();
         if (activeList != null) {
-            com.kartik.myschool.model.Subject.sortSubjects(activeList);
+            for (Subject sub : activeList) {
+                if (!com.kartik.myschool.model.Subject.isDescriptiveOnly(sub.name)) {
+                    filteredList.add(sub);
+                }
+            }
+            com.kartik.myschool.model.Subject.sortSubjects(filteredList);
         }
         
-        if (activeList == null || activeList.isEmpty()) {
+        if (filteredList.isEmpty()) {
             b.layoutEmptyState.setVisibility(View.VISIBLE);
             b.rvWeightageSubjects.setVisibility(View.GONE);
             b.btnSaveWeightage.setEnabled(false);
@@ -84,7 +90,7 @@ public class DeclareWeightageFragment extends Fragment {
             b.layoutEmptyState.setVisibility(View.GONE);
             b.rvWeightageSubjects.setVisibility(View.VISIBLE);
             b.btnSaveWeightage.setEnabled(true);
-            adapter.setData(activeList);
+            adapter.setData(filteredList);
         }
     }
 
@@ -106,9 +112,9 @@ public class DeclareWeightageFragment extends Fragment {
         if (updatedSubjects == null)
             return;
 
-        // Perform validation to ensure weightage makes sense (at least > 0)
+        // Perform validation to ensure weightage makes sense (allow 0 for subjects not meant for marks entry)
         for (Subject s : updatedSubjects) {
-            if (s.maxMarks <= 0) {
+            if (s.maxMarks < 0) {
                 if (!Subject.isDescriptiveOnly(s.name)) {
                     Toast.makeText(getContext(), s.name + " चे पैकी गुण ० पेक्षा जास्त असावेत", Toast.LENGTH_LONG).show();
                     return;
@@ -116,7 +122,17 @@ public class DeclareWeightageFragment extends Fragment {
             }
         }
 
-        activeClass.subjects = new ArrayList<>(updatedSubjects);
+        List<Subject> finalSubjects = new ArrayList<>();
+        if (activeClass.subjects != null) {
+            for (Subject s : activeClass.subjects) {
+                if (Subject.isDescriptiveOnly(s.name)) {
+                    finalSubjects.add(s);
+                }
+            }
+        }
+        finalSubjects.addAll(updatedSubjects);
+
+        activeClass.subjects = finalSubjects;
 
         b.btnSaveWeightage.setEnabled(false);
         FirebaseRepository.get().saveClass(activeClass, new FirebaseRepository.OnResult<String>() {

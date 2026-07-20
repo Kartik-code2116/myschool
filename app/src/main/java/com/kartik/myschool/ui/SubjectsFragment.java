@@ -460,8 +460,8 @@ public class SubjectsFragment extends Fragment {
         java.util.Collections.sort(list, new java.util.Comparator<SubjectAdapter.SubjectItem>() {
             @Override
             public int compare(SubjectAdapter.SubjectItem s1, SubjectAdapter.SubjectItem s2) {
-                boolean s1Desc = s1.maxMarks == 0;
-                boolean s2Desc = s2.maxMarks == 0;
+                boolean s1Desc = com.kartik.myschool.model.Subject.isDescriptiveOnly(s1.name);
+                boolean s2Desc = com.kartik.myschool.model.Subject.isDescriptiveOnly(s2.name);
                 if (s1Desc != s2Desc) {
                     return s1Desc ? 1 : -1;
                 }

@@ -344,10 +344,21 @@ public class ProfileFragment extends Fragment {
         
         // Preassign default subjects if none exist for the class
         if (c.subjects == null || c.subjects.isEmpty()) {
-            c.subjects = com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(c.className);
-            FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
-                @Override public void onSuccess(String id) {}
-                @Override public void onError(Exception e) {}
+            FirebaseRepository.get().getClassDefaultSubjects(c.className, new FirebaseRepository.OnResult<List<com.kartik.myschool.model.Subject>>() {
+                @Override public void onSuccess(List<com.kartik.myschool.model.Subject> subjects) {
+                    c.subjects = (subjects != null && !subjects.isEmpty()) ? new ArrayList<>(subjects) : com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(c.className);
+                    FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
+                        @Override public void onSuccess(String id) {}
+                        @Override public void onError(Exception e) {}
+                    });
+                }
+                @Override public void onError(Exception e) {
+                    c.subjects = com.kartik.myschool.model.Subject.getDefaultSubjectsForClass(c.className);
+                    FirebaseRepository.get().saveClass(c, new FirebaseRepository.OnResult<String>() {
+                        @Override public void onSuccess(String id) {}
+                        @Override public void onError(Exception e) {}
+                    });
+                }
             });
         }
         

@@ -899,10 +899,17 @@ public class FormativeSummativeFragment extends Fragment {
                 }
 
 
-                cardB.tvFE1.setText(fe1); cardB.tvFE2.setText(fe2); cardB.tvFE3.setText(fe3); cardB.tvFE4.setText(fe4);
-                cardB.tvFE5.setText(fe5); cardB.tvFE6.setText(fe6); cardB.tvFE7.setText(fe7); cardB.tvFE8.setText(fe8);
-                cardB.tvSE1.setText(se1); cardB.tvSE2.setText(se2); cardB.tvSE3.setText(se3);
-                cardB.tvFET.setText(fet); cardB.tvSET.setText(set); cardB.tvTET.setText(tet);
+                if (sub.maxMarks == 0) {
+                    cardB.tvFE1.setText("—"); cardB.tvFE2.setText("—"); cardB.tvFE3.setText("—"); cardB.tvFE4.setText("—");
+                    cardB.tvFE5.setText("—"); cardB.tvFE6.setText("—"); cardB.tvFE7.setText("—"); cardB.tvFE8.setText("—");
+                    cardB.tvSE1.setText("—"); cardB.tvSE2.setText("—"); cardB.tvSE3.setText("—");
+                    cardB.tvFET.setText("—"); cardB.tvSET.setText("—"); cardB.tvTET.setText("—");
+                } else {
+                    cardB.tvFE1.setText(fe1); cardB.tvFE2.setText(fe2); cardB.tvFE3.setText(fe3); cardB.tvFE4.setText(fe4);
+                    cardB.tvFE5.setText(fe5); cardB.tvFE6.setText(fe6); cardB.tvFE7.setText(fe7); cardB.tvFE8.setText(fe8);
+                    cardB.tvSE1.setText(se1); cardB.tvSE2.setText(se2); cardB.tvSE3.setText(se3);
+                    cardB.tvFET.setText(fet); cardB.tvSET.setText(set); cardB.tvTET.setText(tet);
+                }
 
                 if (hasMarks) {
                     ((com.google.android.material.card.MaterialCardView) cardB.getRoot()).setStrokeColor(0xFFE0E0E0);
@@ -1012,8 +1019,13 @@ public class FormativeSummativeFragment extends Fragment {
                 }
 
 
-                cardB.tvFETObtained.setText(fet); cardB.tvSETObtained.setText(set); cardB.tvTETObtained.setText(tet);
-                cardB.tvFETMax.setText(String.valueOf(formativeMax)); cardB.tvSETMax.setText(String.valueOf(summativeMax)); cardB.tvTETMax.setText(String.valueOf(totalMax));
+                if (sub.maxMarks == 0) {
+                    cardB.tvFETObtained.setText("—"); cardB.tvSETObtained.setText("—"); cardB.tvTETObtained.setText("—");
+                    cardB.tvFETMax.setText("—"); cardB.tvSETMax.setText("—"); cardB.tvTETMax.setText("—");
+                } else {
+                    cardB.tvFETObtained.setText(fet); cardB.tvSETObtained.setText(set); cardB.tvTETObtained.setText(tet);
+                    cardB.tvFETMax.setText(String.valueOf(formativeMax)); cardB.tvSETMax.setText(String.valueOf(summativeMax)); cardB.tvTETMax.setText(String.valueOf(totalMax));
+                }
                 cardB.tvGrade.setText(gradeVal);
 
                 int gradeColor = 0xFF90A4AE;
@@ -1135,10 +1147,26 @@ public class FormativeSummativeFragment extends Fragment {
 
         MarksRecord.SubjectMarksDetail details = record != null && record.detailedMarks != null ? record.detailedMarks.get(sub.name) : null;
 
-        int aMax = sub.maxMarks / 2;
-        if (Subject.isNonAcademic(sub.name)) aMax = sub.maxMarks;
+        int aMax = sub.maxNirikhshan + sub.maxTondiKam + sub.maxPratyakshik 
+                 + sub.maxUpkram + sub.maxPrakalp + sub.maxChachani 
+                 + sub.maxSwadhyay + sub.maxItar;
+        int sMax = sub.maxTondi + sub.maxPratyakshikB + sub.maxLekhi;
 
-        if (details != null) {
+        if (aMax == 0 && sMax == 0) {
+            aMax = sub.maxMarks / 2;
+            if (Subject.isNonAcademic(sub.name)) aMax = sub.maxMarks;
+            sMax = sub.maxMarks - aMax;
+        }
+
+        if (sub.maxMarks == 0) {
+            tvA1.setText("—"); tvA2.setText("—"); tvA3.setText("—"); tvA4.setText("—");
+            tvA5.setText("—"); tvA6.setText("—"); tvA7.setText("—"); tvA8.setText("—");
+            tvATotal.setText("—");
+            tvS1.setText("—"); tvS2.setText("—"); tvS3.setText("—"); tvSTotal.setText("—");
+            tvGrandTotal.setText("—");
+            tvGrade.setText(details != null && details.grade != null && !details.grade.isEmpty() ? details.grade : "-");
+            tvRemark.setText(getString(R.string.qv_remark, (details != null && details.remark != null && !details.remark.isEmpty() ? details.remark : "-")));
+        } else if (details != null) {
             tvA1.setText(details.nirikhshan + "/" + sub.maxNirikhshan);
             tvA2.setText(details.tondiKam + "/" + sub.maxTondiKam);
             tvA3.setText(details.pratyakshik + "/" + sub.maxPratyakshik);
@@ -1149,7 +1177,6 @@ public class FormativeSummativeFragment extends Fragment {
             tvA8.setText(details.itar + "/" + sub.maxItar);
             tvATotal.setText(details.akarikTotal + "/" + aMax);
 
-            int sMax = sub.maxMarks - aMax;
             tvS1.setText(details.tondi + "/" + sub.maxTondi);
             tvS2.setText(details.pratyakshikB + "/" + sub.maxPratyakshikB);
             tvS3.setText(details.lekhi + "/" + sub.maxLekhi);
@@ -1169,7 +1196,6 @@ public class FormativeSummativeFragment extends Fragment {
             tvA8.setText("0/" + sub.maxItar);
             tvATotal.setText("0/" + aMax);
 
-            int sMax = sub.maxMarks - aMax;
             tvS1.setText("0/" + sub.maxTondi);
             tvS2.setText("0/" + sub.maxPratyakshikB);
             tvS3.setText("0/" + sub.maxLekhi);

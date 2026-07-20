@@ -229,12 +229,12 @@ public class MarksRegisterGenerator {
             cellSpan(tbl, strBlank(sub.maxChachani),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
             cellSpan(tbl, strBlank(sub.maxSwadhyay),    fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
             cellSpan(tbl, strBlank(sub.maxItar),        fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, str(formativeMax),           fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(formativeMax), fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
             
             cellSpan(tbl, strBlank(sub.maxTondi),       fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
             cellSpan(tbl, strBlank(sub.maxPratyakshikB),fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
             cellSpan(tbl, strBlank(sub.maxLekhi),       fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-            cellSpan(tbl, str(summativeMax),           fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+            cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(summativeMax), fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
         } else {
             // No row 2 & 3 required because everything spans 3 rows. But iText needs empty cells if headerRows=3.
             // Wait, if headerRows=3, and row 1 has rowspan=3 for all columns, iText handles it automatically,
@@ -265,7 +265,7 @@ public class MarksRegisterGenerator {
                         cellSpan(tbl, strBlank(d.chachani),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, strBlank(d.swadhyay),    fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, strBlank(d.itar),        fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, str(d.akarikTotal),     fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(d.akarikTotal), fSmallBold, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         // Summative
                         cellSpan(tbl, strBlank(d.tondi),       fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, strBlank(d.pratyakshikB),fSmall, bg, C_DARK, 1, 1, Element.ALIGN_CENTER);
@@ -429,7 +429,7 @@ public class MarksRegisterGenerator {
 
                 List<Subject> filteredSubjects = new java.util.ArrayList<>();
                 for (Subject s : subjects) {
-                    if (s.maxMarks > 0 && !com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
+                    if (!com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
                         filteredSubjects.add(s);
                     }
                 }
@@ -485,20 +485,20 @@ public class MarksRegisterGenerator {
                         cellSpan(tbl, strBlank(d.swadhyay),    fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, strBlank(d.itar),        fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         // Formative total
-                        cellSpan(tbl, str(d.akarikTotal), fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(d.akarikTotal), fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         // Summative obtained
                         cellSpan(tbl, strBlank(d.tondi),       fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, strBlank(d.pratyakshikB),fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
                         cellSpan(tbl, strBlank(d.lekhi),       fSmall, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                        cellSpan(tbl, str(d.sanklit),         fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(d.sanklit), fSmallBold, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     } else {
                         for (int k = 0; k < 13; k++)
                             cellSpan(tbl, "-", fSmall, C_WHITE, C_GREY, 1, 1, Element.ALIGN_CENTER);
                     }
                     // A+B, श्रे.गुण, श्रेणी span 2 rows
-                    cellSpan(tbl, str(obtTotal), fSmallBold, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
-                    cellSpan(tbl, str(obtTotal), fSmall,     C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
-                    cellSpan(tbl, nvl(grade),    fSmallBold, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(obtTotal), fSmallBold, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(obtTotal), fSmall,     C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    cellSpan(tbl, sub.maxMarks == 0 ? "-" : nvl(grade),    fSmallBold, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
 
                     // ── Row 2: पैकी (max marks) ──────────────────
                     // Sr.No and Subject already have rowspan=2, skip them
@@ -512,12 +512,12 @@ public class MarksRegisterGenerator {
                     cellSpan(tbl, strBlank(sub.maxChachani),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     cellSpan(tbl, strBlank(sub.maxSwadhyay),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     cellSpan(tbl, strBlank(sub.maxItar),        fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, str(formativeMax),           fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(formativeMax), fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     // Summative max marks
                     cellSpan(tbl, strBlank(sub.maxTondi),       fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     cellSpan(tbl, strBlank(sub.maxPratyakshikB),fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     cellSpan(tbl, strBlank(sub.maxLekhi),       fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
-                    cellSpan(tbl, str(summativeMax),           fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, sub.maxMarks == 0 ? "-" : str(summativeMax), fSmallBold, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     // A+B, श्रे.गुण, श्रेणी already have rowspan=2, skip
                 }
 

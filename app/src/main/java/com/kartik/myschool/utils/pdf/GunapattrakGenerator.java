@@ -296,7 +296,7 @@ public class GunapattrakGenerator {
         List<Subject> subjects = new java.util.ArrayList<>();
         if (cls.subjects != null) {
             for (Subject s : cls.subjects) {
-                if (s.maxMarks > 0 && !com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
+                if (!com.kartik.myschool.model.Subject.isDescriptiveOnly(s.name)) {
                     subjects.add(s);
                 }
             }

@@ -519,9 +519,24 @@ public class PromoteStudentsActivity extends BaseActivity {
         c.division = division;
         c.examName = "First Semester";
         c.year = year.startYear;
-        c.subjects = new ArrayList<>(Subject.getDefaultSubjectsForClass(className));
         c.studentCount = 0;
 
+        FirebaseRepository.get().getClassDefaultSubjects(className, new FirebaseRepository.OnResult<List<Subject>>() {
+            @Override
+            public void onSuccess(List<Subject> subjects) {
+                c.subjects = (subjects != null && !subjects.isEmpty()) ? new ArrayList<>(subjects) : new ArrayList<>(Subject.getDefaultSubjectsForClass(className));
+                saveTargetClassWithTeacher(c, cb);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                c.subjects = new ArrayList<>(Subject.getDefaultSubjectsForClass(className));
+                saveTargetClassWithTeacher(c, cb);
+            }
+        });
+    }
+
+    private void saveTargetClassWithTeacher(ClassModel c, FirebaseRepository.OnResult<ClassModel> cb) {
         FirebaseRepository.get().getTeacher(new FirebaseRepository.OnResult<com.kartik.myschool.model.Teacher>() {
             @Override
             public void onSuccess(com.kartik.myschool.model.Teacher teacher) {

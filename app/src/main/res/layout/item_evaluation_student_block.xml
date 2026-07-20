@@ -78,15 +78,20 @@
         </RelativeLayout>
 
         <!-- Grade Chips Row -->
-        <LinearLayout
-            android:id="@+id/layoutGradeChips"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="4dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp" />
+            android:scrollbars="none"
+            android:layout_marginBottom="4dp">
+            <LinearLayout
+                android:id="@+id/layoutGradeChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+        </HorizontalScrollView>
 
         <!-- Grid summary section (visible in grid/compressed view) -->
         <com.google.android.material.card.MaterialCardView
