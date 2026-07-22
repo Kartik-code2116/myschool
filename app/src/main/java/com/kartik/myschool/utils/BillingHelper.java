@@ -23,6 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.android.billingclient.api.PendingPurchasesParams;
+import com.android.billingclient.api.QueryProductDetailsResult;
 
 public class BillingHelper {
     private static final String TAG = "BillingHelper";
@@ -63,7 +65,7 @@ public class BillingHelper {
 
         billingClient = BillingClient.newBuilder(context)
                 .setListener(purchasesUpdatedListener)
-                .enablePendingPurchases()
+                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
                 .build();
     }
 
@@ -101,8 +103,9 @@ public class BillingHelper {
 
         billingClient.queryProductDetailsAsync(
                 queryProductDetailsParams,
-                (billingResult, productDetailsList) -> {
+                (billingResult, queryProductDetailsResult) -> {
                     if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        List<ProductDetails> productDetailsList = queryProductDetailsResult != null ? queryProductDetailsResult.getProductDetailsList() : null;
                         if (productDetailsList != null && !productDetailsList.isEmpty()) {
                             subscriptionProductDetails = productDetailsList.get(0);
                             if (listener != null) {

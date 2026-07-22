@@ -133,7 +133,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     // Google Play Billing
-    implementation("com.android.billingclient:billing:7.1.1")
+    implementation("com.android.billingclient:billing:8.0.0")
     implementation("com.google.android.play:review:2.0.2")
 
     testImplementation(libs.junit)

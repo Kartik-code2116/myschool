@@ -62,3 +62,12 @@
 -keep class com.kartik.myschool.BaseActivity { *; }
 -keep class com.kartik.myschool.SessionContext { *; }
 -keep class com.kartik.myschool.AppCache { *; }
+
+# Missing rules from missing_rules.txt and related ktx classes
+-dontwarn com.google.firebase.ktx.**
+-dontwarn com.google.firebase.analytics.ktx.**
+-dontwarn com.google.firebase.perf.ktx.**
+-dontwarn com.google.firebase.crashlytics.ktx.**
+-dontwarn com.google.firebase.auth.ktx.**
+-dontwarn com.google.firebase.firestore.ktx.**
+-dontwarn com.google.firebase.storage.ktx.**
