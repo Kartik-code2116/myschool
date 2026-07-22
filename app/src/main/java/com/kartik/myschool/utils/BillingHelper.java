@@ -205,41 +205,45 @@ public class BillingHelper {
         if (uid != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // Step 1: Write to "subscriptions" collection for record keeping (and any future verification)
-            Map<String, Object> subscriptionRequest = new HashMap<>();
-            subscriptionRequest.put("teacherId", uid);
-            subscriptionRequest.put("purchaseToken", purchase.getPurchaseToken());
-            subscriptionRequest.put("productId", SUBSCRIPTION_PRODUCT_ID);
-            subscriptionRequest.put("planName", "Google Play - Yearly Pro");
-            subscriptionRequest.put("status", "approved");
-            subscriptionRequest.put("subscriptionVerified", true);
             long now = System.currentTimeMillis();
-            subscriptionRequest.put("requestedAt", now);
-            subscriptionRequest.put("timestamp", now);
+            long oneYearFromNow = now + (365L * 24 * 60 * 60 * 1000); // 1 year subscription validity
 
-            // Step 2: Provide INSTANT ENTITLEMENT by updating the user's document directly.
-            Map<String, Object> userUpdate = new HashMap<>();
-            userUpdate.put("subscriptionStatus", "active");
-            userUpdate.put("subscriptionVerified", true);
+            // Step 1: Log to "subscriptions" history collection
+            Map<String, Object> subscriptionRecord = new HashMap<>();
+            subscriptionRecord.put("teacherId", uid);
+            subscriptionRecord.put("purchaseToken", purchase.getPurchaseToken());
+            subscriptionRecord.put("productId", SUBSCRIPTION_PRODUCT_ID);
+            subscriptionRecord.put("planName", "Google Play - Yearly Pro");
+            subscriptionRecord.put("status", "approved");
+            subscriptionRecord.put("subscriptionVerified", true);
+            subscriptionRecord.put("requestedAt", now);
+            subscriptionRecord.put("timestamp", now);
+
+            // Step 2: Provide INSTANT ENTITLEMENT directly to the teacher's profile document
+            Map<String, Object> teacherUpdate = new HashMap<>();
+            teacherUpdate.put("subscriptionStatus", "active");
+            teacherUpdate.put("subscriptionVerified", true);
+            teacherUpdate.put("subscriptionExpiry", oneYearFromNow);
+            teacherUpdate.put("googlePlayPurchaseToken", purchase.getPurchaseToken());
 
             com.google.firebase.firestore.WriteBatch batch = db.batch();
             
-            // Create a unique document ID so we keep a history of multiple purchases
+            // Record history and instantly activate teacher's Pro subscription
             String historyId = db.collection("subscriptions").document().getId();
-            batch.set(db.collection("subscriptions").document(historyId), subscriptionRequest);
-            batch.update(db.collection("users").document(uid), userUpdate);
+            batch.set(db.collection("subscriptions").document(historyId), subscriptionRecord);
+            batch.set(db.collection("teachers").document(uid), teacherUpdate, com.google.firebase.firestore.SetOptions.merge());
 
             batch.commit()
                     .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "Instant entitlement granted for uid=" + uid);
+                        Log.d(TAG, "Instant active subscription granted for uid=" + uid);
                         if (listener != null) {
                             listener.onPurchaseSuccessful();
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to grant instant entitlement", e);
+                        Log.e(TAG, "Failed to grant active subscription", e);
                         if (listener != null) {
-                            listener.onPurchaseFailed("Purchase successful but failed to update status: " + e.getMessage());
+                            listener.onPurchaseFailed("Purchase successful but failed to update subscription status: " + e.getMessage());
                         }
                     });
         }
