@@ -12,62 +12,19 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Preserve line numbers for stack trace debugging
+-keepattributes SourceFile,LineNumberTable
+-keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-# Keep model classes used for Firebase Firestore serialization/deserialization
+# Keep Firestore & database model classes (required for reflection/serialization)
 -keep class com.kartik.myschool.model.** { *; }
-
-# Keep Room database, entities, and DAOs
 -keep class com.kartik.myschool.data.** { *; }
 
-# Firebase Firestore — model serialization
--keepattributes Signature
--keepattributes *Annotation*
-
-# Firebase Auth + Firestore
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
-
-# iText PDF engine
--keep class com.itextpdf.** { *; }
--dontwarn com.itextpdf.**
-
-# Google Play Billing
--keep class com.android.billingclient.** { *; }
-
-# Glide
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep class com.bumptech.glide.** { *; }
-
-# RecyclerView adapters
--keep class com.kartik.myschool.adapter.** { *; }
--keep class com.kartik.myschool.ui.** { *; }
-
-# Repository + utils
--keep class com.kartik.myschool.repository.** { *; }
--keep class com.kartik.myschool.utils.** { *; }
-
-# Gson serialization (used in SessionContext)
+# Gson serialization
+-keepclassmembers class * implements com.google.gson.TypeAdapter { *; }
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
 
-# Keep App Core Classes
--keep class com.kartik.myschool.MySchoolApplication { *; }
--keep class com.kartik.myschool.BaseActivity { *; }
--keep class com.kartik.myschool.SessionContext { *; }
--keep class com.kartik.myschool.AppCache { *; }
-
-# Missing rules from missing_rules.txt and related ktx classes
--dontwarn com.google.firebase.ktx.**
--dontwarn com.google.firebase.analytics.ktx.**
--dontwarn com.google.firebase.perf.ktx.**
--dontwarn com.google.firebase.crashlytics.ktx.**
--dontwarn com.google.firebase.auth.ktx.**
--dontwarn com.google.firebase.firestore.ktx.**
--dontwarn com.google.firebase.storage.ktx.**
+# Suppress missing class warnings from Firebase KTX & third-party libraries
+-dontwarn com.google.firebase.**
+-dontwarn com.itextpdf.**
