@@ -187,6 +187,20 @@ public class FirebaseRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    public void updateTeacherSubscriptionCache(String status, boolean verified, long expiry, String token) {
+        synchronized (FirebaseRepository.class) {
+            if (cachedTeacher != null) {
+                cachedTeacher.subscriptionStatus = status;
+                cachedTeacher.subscriptionVerified = verified;
+                cachedTeacher.subscriptionExpiry = expiry;
+                cachedTeacher.googlePlayPurchaseToken = token;
+                markCacheFresh("teacher");
+            } else {
+                cacheTimestamps.remove("teacher");
+            }
+        }
+    }
+
     public void getTeacherFresh(OnResult<Teacher> cb) {
         String uid = currentUid();
         if (uid == null) {

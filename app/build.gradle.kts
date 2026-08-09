@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId = "com.kartik.myschool"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 3
         versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

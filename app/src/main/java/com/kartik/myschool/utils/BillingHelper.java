@@ -30,6 +30,11 @@ public class BillingHelper {
     private static final String TAG = "BillingHelper";
     // Default product ID. You MUST create this exactly in the Google Play Console!
     public static final String SUBSCRIPTION_PRODUCT_ID = "yearly_pro_access";
+    // Base plan ID configured in Play Console
+    private static final String BASE_PLAN_ID = "yearly-plan-100";
+    // Offer ID for the ₹50 introductory offer (create this in Play Console)
+    // Set to null to skip offer targeting and just use the base plan price
+    private static final String INTRO_OFFER_ID = "first-year-50";
 
     private BillingClient billingClient;
     private Context context;
@@ -108,6 +113,7 @@ public class BillingHelper {
                         List<ProductDetails> productDetailsList = queryProductDetailsResult != null ? queryProductDetailsResult.getProductDetailsList() : null;
                         if (productDetailsList != null && !productDetailsList.isEmpty()) {
                             subscriptionProductDetails = productDetailsList.get(0);
+                            logAvailableOffers(); // Log all offers for debugging
                             if (listener != null) {
                                 listener.onBillingSetupFinished();
                             }
@@ -127,25 +133,55 @@ public class BillingHelper {
         );
     }
 
+    /**
+     * Logs all available offers for debugging purposes.
+     * Check Logcat with tag "BillingHelper" to see what offers Google Play returns.
+     */
+    private void logAvailableOffers() {
+        if (subscriptionProductDetails == null || subscriptionProductDetails.getSubscriptionOfferDetails() == null) return;
+        for (ProductDetails.SubscriptionOfferDetails offer : subscriptionProductDetails.getSubscriptionOfferDetails()) {
+            Log.d(TAG, "Available offer -> basePlanId: " + offer.getBasePlanId()
+                    + ", offerId: " + offer.getOfferId()
+                    + ", offerToken: " + offer.getOfferToken());
+        }
+    }
+
     public void launchBillingFlow(Activity activity) {
         if (subscriptionProductDetails == null) {
             Toast.makeText(context, "Product details not loaded yet. Try again in a moment.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Use the offer token for the specified base plan ID if available, otherwise fall back to first available
         String offerToken = null;
         if (subscriptionProductDetails.getSubscriptionOfferDetails() != null &&
                 !subscriptionProductDetails.getSubscriptionOfferDetails().isEmpty()) {
-            for (ProductDetails.SubscriptionOfferDetails offer : subscriptionProductDetails.getSubscriptionOfferDetails()) {
-                if ("yearly-plan-100".equals(offer.getBasePlanId())) {
-                    offerToken = offer.getOfferToken();
-                    break;
+
+            // Priority 1: Look for the specific introductory offer (₹50)
+            if (INTRO_OFFER_ID != null) {
+                for (ProductDetails.SubscriptionOfferDetails offer : subscriptionProductDetails.getSubscriptionOfferDetails()) {
+                    if (BASE_PLAN_ID.equals(offer.getBasePlanId()) && INTRO_OFFER_ID.equals(offer.getOfferId())) {
+                        offerToken = offer.getOfferToken();
+                        Log.d(TAG, "Using introductory offer: " + INTRO_OFFER_ID);
+                        break;
+                    }
                 }
             }
+
+            // Priority 2: Fall back to base plan (no specific offer)
             if (offerToken == null) {
-                // Fallback to first available offer/base plan
+                for (ProductDetails.SubscriptionOfferDetails offer : subscriptionProductDetails.getSubscriptionOfferDetails()) {
+                    if (BASE_PLAN_ID.equals(offer.getBasePlanId()) && offer.getOfferId() == null) {
+                        offerToken = offer.getOfferToken();
+                        Log.d(TAG, "Using base plan: " + BASE_PLAN_ID);
+                        break;
+                    }
+                }
+            }
+
+            // Priority 3: Fall back to first available offer
+            if (offerToken == null) {
                 offerToken = subscriptionProductDetails.getSubscriptionOfferDetails().get(0).getOfferToken();
+                Log.d(TAG, "Using first available offer as fallback");
             }
         }
 
@@ -236,6 +272,11 @@ public class BillingHelper {
             batch.commit()
                     .addOnSuccessListener(aVoid -> {
                         Log.d(TAG, "Instant active subscription granted for uid=" + uid);
+                        
+                        // Update the local cache immediately so the user doesn't need to restart the app
+                        com.kartik.myschool.repository.FirebaseRepository.get().updateTeacherSubscriptionCache(
+                                "active", true, oneYearFromNow, purchase.getPurchaseToken());
+
                         if (listener != null) {
                             listener.onPurchaseSuccessful();
                         }
