@@ -28,3 +28,6 @@
 # Suppress missing class warnings from Firebase KTX & third-party libraries
 -dontwarn com.google.firebase.**
 -dontwarn com.itextpdf.**
+
+# Keep iText PDF library classes to prevent reflection/image loading exceptions in obfuscated release builds
+-keep class com.itextpdf.** { *; }

@@ -1358,9 +1358,15 @@ public class PdfGenerator {
                 // Fall through to iText rendering
             }
         }
-        // Fallback: iText font rendering (fine for numbers/ASCII/Latin)
-        Font englishFont = new Font(Font.FontFamily.HELVETICA, font.getSize(), font.getStyle(), textColor);
-        c.setPhrase(new Phrase(text, englishFont));
+        // Fallback: iText font rendering (fine for numbers/ASCII/Latin, falls back to Marathi base font if Devanagari is present)
+        Font fallbackFont;
+        if (text != null && containsDevanagari(text) && sMarathiBase != null) {
+            float size = font.getSize() > 0 ? font.getSize() : 9f;
+            fallbackFont = new Font(sMarathiBase, size, font.getStyle(), textColor);
+        } else {
+            fallbackFont = new Font(Font.FontFamily.HELVETICA, font.getSize(), font.getStyle(), textColor);
+        }
+        c.setPhrase(new Phrase(text, fallbackFont));
         return c;
     }
 
