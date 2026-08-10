@@ -68,22 +68,14 @@ public class EnterMarksActivity extends BaseActivity {
                 }
             });
 
-    private final ActivityResultLauncher<String> galleryPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    launchGalleryIntent();
-                } else {
-                    Toast.makeText(this, "Storage permission is required to read image", Toast.LENGTH_SHORT).show();
-                }
-            });
-
     private void launchCameraIntent() {
         cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
     }
 
     private void launchGalleryIntent() {
-        galleryLauncher.launch(new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        galleryLauncher.launch(intent);
     }
 
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
@@ -838,21 +830,7 @@ public class EnterMarksActivity extends BaseActivity {
     }
 
     private void checkGalleryPermissionAndLaunch() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                    == PackageManager.PERMISSION_GRANTED) {
-                launchGalleryIntent();
-            } else {
-                galleryPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                launchGalleryIntent();
-            } else {
-                galleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
-        }
+        launchGalleryIntent();
     }
 
     private void processOcr(Bitmap bitmap) {

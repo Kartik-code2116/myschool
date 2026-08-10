@@ -20,9 +20,9 @@ android {
     defaultConfig {
         applicationId = "com.kartik.myschool"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 4
-        versionName = "1.3"
+        targetSdk = 36
+        versionCode = 6
+        versionName = "1.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val localProperties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
@@ -146,4 +146,8 @@ dependencies {
 
     // Image Cropper
     implementation("com.vanniktech:android-image-cropper:4.6.0")
+
+    // DataStore (forces 16 KB page-aligned transitives)
+    implementation(libs.datastore.core)
+    implementation(libs.datastore.preferences)
 }
