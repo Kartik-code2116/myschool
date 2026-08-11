@@ -86,22 +86,24 @@ public class PdfGenerator {
     public static Font fTitle, fTitleSub, fHeader, fNormal, fSmall, fMicro, fBold, fSmallBold;
 
     public static synchronized void ensureFonts(Context ctx) {
-        if (sMarathiBase != null)
+        if (sFontsInitDone)
             return;
 
         // ── Step 1: Load Android Typeface for bitmap rendering (MarathiText) ──
         // NotoSansDevanagari has the broadest Unicode Devanagari coverage and
         // renders ALL matras/conjuncts correctly via Android's Harfbuzz engine.
+        File notoFile = new File(ctx.getFilesDir(), "noto_dev.ttf");
         try {
-            File notoFile = new File(ctx.getFilesDir(), "noto_dev.ttf");
-            InputStream nis = ctx.getAssets().open("fonts/NotoSansDevanagari-Regular.ttf");
-            FileOutputStream nos = new FileOutputStream(notoFile);
-            byte[] buf2 = new byte[4096];
-            int len2;
-            while ((len2 = nis.read(buf2)) > 0)
-                nos.write(buf2, 0, len2);
-            nis.close();
-            nos.close();
+            if (!notoFile.exists() || notoFile.length() == 0) {
+                InputStream nis = ctx.getAssets().open("fonts/NotoSansDevanagari-Regular.ttf");
+                FileOutputStream nos = new FileOutputStream(notoFile);
+                byte[] buf2 = new byte[4096];
+                int len2;
+                while ((len2 = nis.read(buf2)) > 0)
+                    nos.write(buf2, 0, len2);
+                nis.close();
+                nos.close();
+            }
             sMarathiTypeface = android.graphics.Typeface.createFromFile(notoFile);
             android.util.Log.d("PDF_FONT", "Loaded NotoSansDevanagari Typeface for rendering");
         } catch (Exception e) {
@@ -110,42 +112,73 @@ public class PdfGenerator {
 
         // ── Step 2: Load iText BaseFont (TiroDevanagariHindi) for embedded PDF font ──
         // This is used for numbers, ASCII and fallback text in iText Phrases.
+        File tiroFile = new File(ctx.getFilesDir(), "tiro_dev.ttf");
         try {
-            File fontFile = new File(ctx.getFilesDir(), "tiro_dev.ttf");
-            InputStream is = ctx.getAssets().open("fonts/TiroDevanagariHindi-Regular.ttf");
-            FileOutputStream os = new FileOutputStream(fontFile);
-            byte[] buf = new byte[4096];
-            int len;
-            while ((len = is.read(buf)) > 0)
-                os.write(buf, 0, len);
-            is.close();
-            os.close();
-            sMarathiBase = BaseFont.createFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            if (!tiroFile.exists() || tiroFile.length() == 0) {
+                InputStream is = ctx.getAssets().open("fonts/TiroDevanagariHindi-Regular.ttf");
+                FileOutputStream os = new FileOutputStream(tiroFile);
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = is.read(buf)) > 0)
+                    os.write(buf, 0, len);
+                is.close();
+                os.close();
+            }
+            sMarathiBase = BaseFont.createFont(tiroFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             android.util.Log.d("PDF_FONT", "Loaded TiroDevanagariHindi iText BaseFont");
         } catch (Exception e) {
-            android.util.Log.e("PDF_FONT", "TiroDevanagari load failed, trying system fonts", e);
-            // Fallback: Try system Devanagari fonts for BaseFont
-            String[] systemFonts = {
-                    "/system/fonts/NotoSansDevanagari-Regular.ttf",
-                    "/system/fonts/NotoSansDevanagari-UI-Regular.ttf",
-                    "/system/fonts/DroidSansDevanagari-Regular.ttf",
-                    "/system/fonts/DroidSansFallback.ttf"
-            };
-            for (String sysFont : systemFonts) {
+            android.util.Log.e("PDF_FONT", "TiroDevanagari load failed, trying NotoSans as BaseFont", e);
+            // Fallback A: Try NotoSans (already copied in Step 1) as BaseFont
+            if (notoFile.exists() && notoFile.length() > 0) {
                 try {
-                    if (new File(sysFont).exists()) {
-                        sMarathiBase = BaseFont.createFont(sysFont, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        if (sMarathiTypeface == null)
-                            sMarathiTypeface = android.graphics.Typeface.createFromFile(sysFont);
-                        android.util.Log.d("PDF_FONT", "Loaded system font: " + sysFont);
-                        break;
+                    sMarathiBase = BaseFont.createFont(notoFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                    android.util.Log.d("PDF_FONT", "Loaded NotoSans as iText BaseFont fallback");
+                } catch (Exception e2) {
+                    android.util.Log.e("PDF_FONT", "NotoSans BaseFont fallback also failed", e2);
+                }
+            }
+            // Fallback B: Try system Devanagari fonts
+            if (sMarathiBase == null) {
+                String[] systemFonts = {
+                        "/system/fonts/NotoSansDevanagari-Regular.ttf",
+                        "/system/fonts/NotoSansDevanagari-UI-Regular.ttf",
+                        "/system/fonts/DroidSansDevanagari-Regular.ttf",
+                        "/system/fonts/DroidSansFallback.ttf"
+                };
+                for (String sysFont : systemFonts) {
+                    try {
+                        if (new File(sysFont).exists()) {
+                            sMarathiBase = BaseFont.createFont(sysFont, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                            if (sMarathiTypeface == null)
+                                sMarathiTypeface = android.graphics.Typeface.createFromFile(sysFont);
+                            android.util.Log.d("PDF_FONT", "Loaded system font: " + sysFont);
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                        android.util.Log.e("PDF_FONT", "Failed system font: " + sysFont);
                     }
-                } catch (Exception ignored) {
-                    android.util.Log.e("PDF_FONT", "Failed system font: " + sysFont);
                 }
             }
         }
+
+        // Log to Crashlytics if font init completely failed (will use Helvetica fallback)
+        if (sMarathiBase == null) {
+            android.util.Log.e("PDF_FONT", "All BaseFont loading failed! PDFs will use Helvetica fallback.");
+            try {
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                        .log("PDF_FONT: All Devanagari BaseFont loading failed. Typeface loaded: " + (sMarathiTypeface != null));
+            } catch (Exception ignored) {}
+        }
+        if (sMarathiTypeface == null) {
+            android.util.Log.e("PDF_FONT", "Typeface loading failed! MarathiText bitmap rendering will use system default.");
+            try {
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                        .log("PDF_FONT: Devanagari Typeface loading failed. BaseFont loaded: " + (sMarathiBase != null));
+            } catch (Exception ignored) {}
+        }
+
         buildFonts();
+        sFontsInitDone = true;
     }
 
     private static void buildFonts() {

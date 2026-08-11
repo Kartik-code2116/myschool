@@ -249,7 +249,7 @@ public class GunapattrakGenerator {
 
         // Row 1
         cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ.नं", "Sr.No."), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
-        com.kartik.myschool.utils.PdfGenerator.cellSpan(tbl, PdfLocalizer.get(ctx, "तपशील", "Details"), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+        cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "तपशील", "Details"), fSmallBold, C_HEADER_BG, C_DARK, 2, 1);
         cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"), fSmallBold, C_HEADER_BG,
                 C_DARK, 9, 1);
         cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"), fSmallBold, C_HEADER_BG,
@@ -259,8 +259,8 @@ public class GunapattrakGenerator {
         cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
 
         // Row 2
-        com.kartik.myschool.utils.PdfGenerator.cellSpan(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-        com.kartik.myschool.utils.PdfGenerator.cellSpan(tbl, PdfLocalizer.get(ctx, "गुण", "Marks"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+        cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+        cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "गुण", "Marks"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
         
         String[] formatives = {
                 PdfLocalizer.get(ctx, "निरीक्षण", "Observation"),
