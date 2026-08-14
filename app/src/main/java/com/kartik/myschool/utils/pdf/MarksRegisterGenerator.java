@@ -294,8 +294,18 @@ public class MarksRegisterGenerator {
 
     private static void pCell(PdfPTable tbl, String text, Font font, BaseColor bg, BaseColor textColor, int colspan, int rowspan, int align) {
         PdfPCell c = PdfGenerator.rawCell(text, font, bg, textColor, align);
-        c.setPadding(6f); // Generous padding for a clean layout
-        c.setVerticalAlignment(Element.ALIGN_MIDDLE); // Vertically center text
+        c.setPadding(3f);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        if (colspan > 1) c.setColspan(colspan);
+        if (rowspan > 1) c.setRowspan(rowspan);
+        tbl.addCell(c);
+    }
+
+    private static void pCellWithHeight(PdfPTable tbl, String text, Font font, BaseColor bg, BaseColor textColor, int colspan, int rowspan, int align, float minHeight) {
+        PdfPCell c = PdfGenerator.rawCell(text, font, bg, textColor, align);
+        c.setPadding(3f);
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        if (minHeight > 0) c.setMinimumHeight(minHeight);
         if (colspan > 1) c.setColspan(colspan);
         if (rowspan > 1) c.setRowspan(rowspan);
         tbl.addCell(c);
@@ -335,13 +345,17 @@ public class MarksRegisterGenerator {
                 writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
-                doc.setMargins(18, 18, 22, 22);
+                doc.setMargins(12, 12, 15, 15);
 
                 List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new java.util.ArrayList<>();
 
-                // ── 1. Title ──────────────────────────────────────────
+                // ── 1. School Name + Title ──────────────────────────────────────────
+                String schoolNameHdr = school != null ? nvl(school.name) : "";
+                if (!schoolNameHdr.isEmpty()) {
+                    PdfGenerator.addMarathiParagraph(doc, schoolNameHdr, 12, true, C_DARK, 0, 2);
+                }
                 PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
-                        16, true, C_DARK, 0, 8);
+                        18, true, C_DARK, 0, 5);
 
                 // ── 2. Meta header ────────────────────────────────────
                 String yearLabel  = cls != null ? nvl(cls.academicYearLabel) : "";
@@ -370,18 +384,18 @@ public class MarksRegisterGenerator {
                 // Columns: अ.नं | विषय | तपशील | निरीक्षण..इतर(8) | एकूण | तोंडी,प्रात्य.,लेखी,एकूण(4) | अ+ब | श्रे.गुण | श्रेणी
                 // Total = 3 + 8 + 1 + 4 + 3 = 19 columns
                 float[] colWidths = {
-                    0.35f,  // अ.नं
-                    1.4f,   // विषय
-                    0.55f,  // तपशील
-                    // Formative 8 sub-cols:
+                    0.4f,   // अ.नं
+                    2.2f,   // विषय (Much wider block)
+                    0.6f,   // तपशील
+                    // Formative 8 sub-cols (Tighter blocks):
                     0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f,
-                    0.45f,  // एकूण (formative total)
+                    0.5f,   // एकूण (formative total)
                     // Summative 4 sub-cols:
-                    0.4f, 0.4f, 0.4f, 0.45f,
+                    0.4f, 0.4f, 0.4f, 0.5f,
                     // Finals:
-                    0.45f,  // अ+ब
-                    0.4f,   // श्रे.गुण
-                    0.4f    // श्रेणी
+                    0.5f,   // अ+ब
+                    0.5f,   // श्रे.गुण
+                    0.6f    // श्रेणी
                 };
 
                 PdfPTable tbl = new PdfPTable(colWidths);
@@ -389,35 +403,35 @@ public class MarksRegisterGenerator {
                 tbl.setSpacingBefore(3);
                 tbl.setHeaderRows(3);
 
-                // ── Header Row 1 ─────────────────────
-                pCell(tbl, PdfLocalizer.get(ctx, "अ.नं", "Sr."), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                pCell(tbl, PdfLocalizer.get(ctx, "तपशील", "Detail"), fSmallBold, C_HEADER_BG, C_DARK, 2, 1, Element.ALIGN_CENTER);
+                // ── Header Row 1 (vertical bitmap text for Marathi) ─────────────────────
+                GunapattrakGenerator.cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ. नं", "Sr.No."), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+                GunapattrakGenerator.cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "तपशील", "Details"), fSmallBold, C_HEADER_BG, C_DARK, 2, 1);
                 
-                pCell(tbl, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"), fSmallBold, C_HEADER_BG, C_DARK, 9, 1, Element.ALIGN_CENTER);
-                pCell(tbl, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"), fSmallBold, C_HEADER_BG, C_DARK, 4, 1, Element.ALIGN_CENTER);
+                GunapattrakGenerator.cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "आकारिक (अ)", "Formative (A)"), fSmallBold, C_HEADER_BG, C_DARK, 9, 1);
+                GunapattrakGenerator.cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "संकलित (ब)", "Summative (B)"), fSmallBold, C_HEADER_BG, C_DARK, 4, 1);
                 
-                pCell(tbl, PdfLocalizer.get(ctx, "अ+ब", "A+B"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                pCell(tbl, PdfLocalizer.get(ctx, "श्रे.गुण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
-                pCell(tbl, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3, Element.ALIGN_CENTER);
+                GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "अ+ब", "A+B"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+                GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रे.गुण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
+                GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "श्रेणी", "Grade"), fSmallBold, C_HEADER_BG, C_DARK, 1, 3);
 
-                // ── Header Row 2 ─────────────────
-                pCell(tbl, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
-                pCell(tbl, PdfLocalizer.get(ctx, "गुण", "Marks"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                // ── Header Row 2 (vertical rotated text for sub-columns) ─────────────────
+                GunapattrakGenerator.cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "विषय", "Subject"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
+                GunapattrakGenerator.cellHorizontalImageSpan(tbl, ctx, PdfLocalizer.get(ctx, "गुण", "Marks"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
                 
                 String[] formNames = {
-                    PdfLocalizer.get(ctx, "निरीक्षण", "Obs."),
-                    PdfLocalizer.get(ctx, "तोंडीकाम", "Oral"),
-                    PdfLocalizer.get(ctx, "प्रात्यक्षिक", "Pract."),
+                    PdfLocalizer.get(ctx, "निरीक्षण", "Observation"),
+                    PdfLocalizer.get(ctx, "तोंडीकाम", "Oral Work"),
+                    PdfLocalizer.get(ctx, "प्रात्यक्षिक", "Practical"),
                     PdfLocalizer.get(ctx, "उपक्रम", "Activity"),
                     PdfLocalizer.get(ctx, "प्रकल्प", "Project"),
                     PdfLocalizer.get(ctx, "चाचणी", "Test"),
-                    PdfLocalizer.get(ctx, "स्वाध्याय", "Assign."),
+                    PdfLocalizer.get(ctx, "स्वाध्याय", "Assignment"),
                     PdfLocalizer.get(ctx, "इतर", "Other")
                 };
                 for (String f : formNames)
-                    pCell(tbl, f, fMicro, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    GunapattrakGenerator.cellVerticalSpan(tbl, ctx, f, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
 
-                pCell(tbl, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                GunapattrakGenerator.cellVerticalSpan(tbl, ctx, PdfLocalizer.get(ctx, "एकूण", "Total"), fSmallBold, C_HEADER_BG, C_DARK, 1, 2);
 
                 String[] summNames = {
                     PdfLocalizer.get(ctx, "तोंडी", "Oral"),
@@ -426,11 +440,14 @@ public class MarksRegisterGenerator {
                     PdfLocalizer.get(ctx, "एकूण", "Total")
                 };
                 for (String s : summNames)
-                    pCell(tbl, s, fMicro, C_HEADER_BG, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    GunapattrakGenerator.cellVerticalSpan(tbl, ctx, s, fSmallBold, C_HEADER_BG, C_DARK, 1, 1);
 
-                // ── Header Row 3 ─────────────────
+                // ── Header Row 3 (numbers stay horizontal) ─────────────────
                 for (int i = 1; i <= 8; i++)
-                    pCell(tbl, String.valueOf(i), fMicro, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    cellSpan(tbl, String.valueOf(i), fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Formative total empty
+                for (int i = 0; i < 4; i++)
+                    cellSpan(tbl, " ", fSmallBold, C_HEADER_BG, C_DARK, 1, 1, Element.ALIGN_CENTER); // Summative empty
 
                 // ── Data rows: 2 rows per subject (ग्राप + पैकी) ────
                 int grandObtained = 0;
@@ -442,6 +459,16 @@ public class MarksRegisterGenerator {
                         filteredSubjects.add(s);
                     }
                 }
+
+                // ── Calculate row height to fill the full A4 page ──────────
+                float pageH = PageSize.A4.getHeight(); // 842 pts
+                float marginsV = 15f + 15f; // top + bottom margins
+                float headerContentH = 100f; // school name + title + header info
+                float footerContentH = 70f;  // summary + signature
+                float tableAvailH = pageH - marginsV - headerContentH - footerContentH;
+                float headerRowsH = 120f; // 3 header rows (bitmap vertical text is tall)
+                int totalDataRows = filteredSubjects.size() * 2;
+                float rowMinH = totalDataRows > 0 ? Math.max(20f, (tableAvailH - headerRowsH) / totalDataRows) : 25f;
 
                 for (int i = 0; i < filteredSubjects.size(); i++) {
                     Subject sub = filteredSubjects.get(i);
@@ -471,17 +498,17 @@ public class MarksRegisterGenerator {
 
                     // ── Row 1: प्राप्त (obtained marks) ──────────────
                     // Sr.No spans 2 rows
-                    pCell(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER);
+                    pCellWithHeight(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER, rowMinH * 2);
                     
                     // Subject name spans 2 rows, centered with padding
                     PdfPCell cSub = com.kartik.myschool.utils.PdfGenerator.rawCell(PdfLocalizer.translateSubject(ctx, sub), fBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
                     cSub.setColspan(1);
                     cSub.setRowspan(2);
-                    cSub.setPaddingTop(8f);
-                    cSub.setPaddingBottom(8f);
+                    cSub.setPaddingTop(4f);
+                    cSub.setPaddingBottom(4f);
                     tbl.addCell(cSub);
                     // तपशील: प्राप्त
-                    pCell(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    pCellWithHeight(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER, rowMinH);
 
                     if (d != null) {
                         // Formative individual obtained
@@ -511,7 +538,7 @@ public class MarksRegisterGenerator {
 
                     // ── Row 2: पैकी (max marks) ──────────────────
                     // Sr.No and Subject already have rowspan=2, skip them
-                    pCell(tbl, PdfLocalizer.get(ctx, "पैकी", "Max"), fMicro, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                    pCellWithHeight(tbl, PdfLocalizer.get(ctx, "पैकी", "Max"), fMicro, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER, rowMinH);
                     // Formative max marks
                     pCell(tbl, strBlank(sub.maxNirikhshan),  fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
                     pCell(tbl, strBlank(sub.maxTondiKam),    fSmall, C_ROW_ALT, C_DARK, 1, 1, Element.ALIGN_CENTER);
@@ -538,24 +565,53 @@ public class MarksRegisterGenerator {
 
                 PdfPTable sumTbl = new PdfPTable(new float[]{1f, 1f, 1f});
                 sumTbl.setWidthPercentage(100);
-                sumTbl.setSpacingBefore(6);
+                sumTbl.setSpacingBefore(4);
+                BaseColor sumBg = new BaseColor(220, 237, 255);
                 pCell(sumTbl, PdfLocalizer.get(ctx, "एकूण गुण : ", "Total Marks : ") + grandObtained + " / " + grandMax,
-                        fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        fSmallBold, sumBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                 pCell(sumTbl, PdfLocalizer.get(ctx, "शे.गुण : ", "Percent : ") + String.format(java.util.Locale.US, "%.1f %%", percentage),
-                        fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        fSmallBold, sumBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                 pCell(sumTbl, PdfLocalizer.get(ctx, "सर्वसाधारण श्रेणी : ", "Overall Grade : ") + overallGrade,
-                        fSmallBold, C_PRIMARY_LIGHT, C_DARK, 1, 1, Element.ALIGN_CENTER);
+                        fSmallBold, sumBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
                 doc.add(sumTbl);
 
-                // ── 5. Signature Footer ───────────────────────────────
+                // ── 5. Signature Footer with lines ───────────────────────────────
                 PdfPTable sigTbl = new PdfPTable(new float[]{1f, 1f});
-                sigTbl.setWidthPercentage(100);
-                sigTbl.setSpacingBefore(30);
+                sigTbl.setWidthPercentage(85);
+                sigTbl.setHorizontalAlignment(Element.ALIGN_CENTER);
+                sigTbl.setSpacingBefore(20);
                 String teacherName = cls != null ? nvl(cls.teacherName) : "";
                 String principalName = school != null ? nvl(school.principalName) : "";
-                addNoBorder(sigTbl, PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी : ", "Class Teacher : ") + teacherName, fSmallBold, Element.ALIGN_LEFT);
-                addNoBorder(sigTbl, PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी : ", "Principal : ") + principalName, fSmallBold, Element.ALIGN_RIGHT);
+                // Signature lines
+                PdfPCell sigLine1 = new PdfPCell(new Phrase(" "));
+                sigLine1.setBorder(Rectangle.BOTTOM);
+                sigLine1.setBorderColor(C_DARK);
+                sigLine1.setBorderWidth(0.5f);
+                sigLine1.setMinimumHeight(18f);
+                sigTbl.addCell(sigLine1);
+                PdfPCell sigLine2 = new PdfPCell(new Phrase(" "));
+                sigLine2.setBorder(Rectangle.BOTTOM);
+                sigLine2.setBorderColor(C_DARK);
+                sigLine2.setBorderWidth(0.5f);
+                sigLine2.setMinimumHeight(18f);
+                sigTbl.addCell(sigLine2);
+                // Name labels below lines
+                addNoBorder(sigTbl, PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\n", "Class Teacher\n") + teacherName, fSmallBold, Element.ALIGN_CENTER);
+                addNoBorder(sigTbl, PdfLocalizer.get(ctx, "मुख्याध्यापक स्वाक्षरी\n", "Principal\n") + principalName, fSmallBold, Element.ALIGN_CENTER);
                 doc.add(sigTbl);
+
+                // ── 6. Draw decorative page border ──────────────────────────────
+                com.itextpdf.text.pdf.PdfContentByte borderCanvas = writer.getDirectContent();
+                float bW = doc.getPageSize().getWidth();
+                float bH = doc.getPageSize().getHeight();
+                borderCanvas.setLineWidth(1.5f);
+                borderCanvas.setColorStroke(new BaseColor(60, 60, 60));
+                borderCanvas.rectangle(6, 6, bW - 12, bH - 12);
+                borderCanvas.stroke();
+                // Inner thin border
+                borderCanvas.setLineWidth(0.5f);
+                borderCanvas.rectangle(9, 9, bW - 18, bH - 18);
+                borderCanvas.stroke();
 
                 doc.close();
                 cb.onSuccess(out);
