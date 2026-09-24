@@ -345,17 +345,17 @@ public class MarksRegisterGenerator {
                 writer.setPageEvent(new com.kartik.myschool.utils.pdf.DynamicMarginHelper(ctx));
                 com.kartik.myschool.utils.pdf.DynamicMarginHelper.applyMarginsForPage(ctx, doc, 1);
                 doc.open();
-                doc.setMargins(12, 12, 15, 15);
+                doc.setMargins(14, 14, 12, 12);
 
                 List<Subject> subjects = cls != null && cls.subjects != null ? cls.subjects : new java.util.ArrayList<>();
 
                 // ── 1. School Name + Title ──────────────────────────────────────────
                 String schoolNameHdr = school != null ? nvl(school.name) : "";
                 if (!schoolNameHdr.isEmpty()) {
-                    PdfGenerator.addMarathiParagraph(doc, schoolNameHdr, 12, true, C_DARK, 0, 2);
+                    PdfGenerator.addMarathiParagraph(doc, schoolNameHdr, 10, true, C_DARK, 0, 1);
                 }
                 PdfGenerator.addMarathiParagraph(doc, PdfLocalizer.get(ctx, "सातत्यपूर्ण सर्वंकष मूल्यमापन", "Continuous Comprehensive Evaluation"),
-                        18, true, C_DARK, 0, 5);
+                        13, true, C_DARK, 0, 3);
 
                 // ── 2. Meta header ────────────────────────────────────
                 String yearLabel  = cls != null ? nvl(cls.academicYearLabel) : "";
@@ -368,7 +368,7 @@ public class MarksRegisterGenerator {
                 hdr1.setWidthPercentage(100);
                 addNoBorder(hdr1, PdfLocalizer.get(ctx, "नाव: ", "Name: ") + nvl(student.name), fSmallBold, Element.ALIGN_LEFT);
                 addNoBorder(hdr1, PdfLocalizer.get(ctx, "सन : ", "Year : ") + yearLabel, fSmallBold, Element.ALIGN_RIGHT);
-                hdr1.setSpacingAfter(2);
+                hdr1.setSpacingAfter(1);
                 doc.add(hdr1);
 
                 // Row 2: class+div (left) | roll no (center) | semester (right)
@@ -377,7 +377,7 @@ public class MarksRegisterGenerator {
                 addNoBorder(hdr2, PdfLocalizer.get(ctx, "इयत्ता: ", "Class: ") + className + PdfLocalizer.get(ctx, ", तुकडी: ", ", Div: ") + division, fSmall, Element.ALIGN_LEFT);
                 addNoBorder(hdr2, PdfLocalizer.get(ctx, "रोल नं.: ", "Roll No.: ") + nvl(student.rollNo), fSmallBold, Element.ALIGN_CENTER);
                 addNoBorder(hdr2, semLabel, fSmallBold, Element.ALIGN_RIGHT);
-                hdr2.setSpacingAfter(5);
+                hdr2.setSpacingAfter(3);
                 doc.add(hdr2);
 
                 // ── 3. Main Table ────────────────────────────────────
@@ -400,7 +400,7 @@ public class MarksRegisterGenerator {
 
                 PdfPTable tbl = new PdfPTable(colWidths);
                 tbl.setWidthPercentage(100);
-                tbl.setSpacingBefore(3);
+                tbl.setSpacingBefore(2);
                 tbl.setHeaderRows(3);
 
                 // ── Header Row 1 (vertical bitmap text for Marathi) ─────────────────────
@@ -462,13 +462,13 @@ public class MarksRegisterGenerator {
 
                 // ── Calculate row height to fill the full A4 page ──────────
                 float pageH = PageSize.A4.getHeight(); // 842 pts
-                float marginsV = 15f + 15f; // top + bottom margins
-                float headerContentH = 100f; // school name + title + header info
-                float footerContentH = 70f;  // summary + signature
+                float marginsV = 12f + 12f; // top + bottom margins
+                float headerContentH = 60f; // school name (15) + title (20) + hdr1 (14) + hdr2 (14) + spacings
+                float footerContentH = 50f;  // summary row (18) + signature (32)
                 float tableAvailH = pageH - marginsV - headerContentH - footerContentH;
-                float headerRowsH = 120f; // 3 header rows (bitmap vertical text is tall)
+                float headerRowsH = 80f; // 3 header rows (bitmap vertical text)
                 int totalDataRows = filteredSubjects.size() * 2;
-                float rowMinH = totalDataRows > 0 ? Math.max(20f, (tableAvailH - headerRowsH) / totalDataRows) : 25f;
+                float rowMinH = totalDataRows > 0 ? Math.max(18f, (tableAvailH - headerRowsH) / totalDataRows) : 22f;
 
                 for (int i = 0; i < filteredSubjects.size(); i++) {
                     Subject sub = filteredSubjects.get(i);
@@ -498,14 +498,15 @@ public class MarksRegisterGenerator {
 
                     // ── Row 1: प्राप्त (obtained marks) ──────────────
                     // Sr.No spans 2 rows
-                    pCellWithHeight(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER, rowMinH * 2);
+                    pCellWithHeight(tbl, String.valueOf(i + 1), fSmall, C_WHITE, C_DARK, 1, 2, Element.ALIGN_CENTER, rowMinH * 2f);
                     
                     // Subject name spans 2 rows, centered with padding
-                    PdfPCell cSub = com.kartik.myschool.utils.PdfGenerator.rawCell(PdfLocalizer.translateSubject(ctx, sub), fBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
+                    PdfPCell cSub = com.kartik.myschool.utils.PdfGenerator.rawCell(PdfLocalizer.translateSubject(ctx, sub), fSmallBold, C_WHITE, C_DARK, Element.ALIGN_CENTER);
                     cSub.setColspan(1);
                     cSub.setRowspan(2);
-                    cSub.setPaddingTop(4f);
-                    cSub.setPaddingBottom(4f);
+                    cSub.setPaddingTop(2f);
+                    cSub.setPaddingBottom(2f);
+                    cSub.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     tbl.addCell(cSub);
                     // तपशील: प्राप्त
                     pCellWithHeight(tbl, PdfLocalizer.get(ctx, "प्राप्त", "Obt."), fMicro, C_WHITE, C_DARK, 1, 1, Element.ALIGN_CENTER, rowMinH);
@@ -565,7 +566,7 @@ public class MarksRegisterGenerator {
 
                 PdfPTable sumTbl = new PdfPTable(new float[]{1f, 1f, 1f});
                 sumTbl.setWidthPercentage(100);
-                sumTbl.setSpacingBefore(4);
+                sumTbl.setSpacingBefore(2);
                 BaseColor sumBg = new BaseColor(220, 237, 255);
                 pCell(sumTbl, PdfLocalizer.get(ctx, "एकूण गुण : ", "Total Marks : ") + grandObtained + " / " + grandMax,
                         fSmallBold, sumBg, C_DARK, 1, 1, Element.ALIGN_CENTER);
@@ -579,7 +580,7 @@ public class MarksRegisterGenerator {
                 PdfPTable sigTbl = new PdfPTable(new float[]{1f, 1f});
                 sigTbl.setWidthPercentage(85);
                 sigTbl.setHorizontalAlignment(Element.ALIGN_CENTER);
-                sigTbl.setSpacingBefore(20);
+                sigTbl.setSpacingBefore(8);
                 String teacherName = cls != null ? nvl(cls.teacherName) : "";
                 String principalName = school != null ? nvl(school.principalName) : "";
                 // Signature lines
@@ -587,13 +588,13 @@ public class MarksRegisterGenerator {
                 sigLine1.setBorder(Rectangle.BOTTOM);
                 sigLine1.setBorderColor(C_DARK);
                 sigLine1.setBorderWidth(0.5f);
-                sigLine1.setMinimumHeight(18f);
+                sigLine1.setMinimumHeight(14f);
                 sigTbl.addCell(sigLine1);
                 PdfPCell sigLine2 = new PdfPCell(new Phrase(" "));
                 sigLine2.setBorder(Rectangle.BOTTOM);
                 sigLine2.setBorderColor(C_DARK);
                 sigLine2.setBorderWidth(0.5f);
-                sigLine2.setMinimumHeight(18f);
+                sigLine2.setMinimumHeight(14f);
                 sigTbl.addCell(sigLine2);
                 // Name labels below lines
                 addNoBorder(sigTbl, PdfLocalizer.get(ctx, "वर्गशिक्षक स्वाक्षरी\n", "Class Teacher\n") + teacherName, fSmallBold, Element.ALIGN_CENTER);
